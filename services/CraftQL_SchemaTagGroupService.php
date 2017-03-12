@@ -28,7 +28,7 @@ class CraftQL_SchemaTagGroupService extends BaseApplicationComponent {
     $tagGroupFields = [];
     $tagGroupFields['id'] = ['type' => Type::int()];
     $tagGroupFields['slug'] = ['type' => Type::string()];
-    $tagGroupFields = array_merge($tagGroupFields, craft()->craftQL_schemaField->getFields($group->fieldLayoutId));
+    $tagGroupFields = array_merge($tagGroupFields, craft()->craftQL_field->getFields($group->fieldLayoutId));
 
     return new ObjectType([
       'name' => $group->name.' Tags',

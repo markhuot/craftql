@@ -20,6 +20,7 @@ class CraftQL_QueryController extends BaseController
         // Eager load some things we know we'll need later
         craft()->craftQL_schemaTagGroup->loadAllGroups();
         craft()->craftQL_schemaSection->loadAllSections();
+        craft()->craftQL_schemaAssetSource->loadAllSources();
 
         $queryTypeConfig = [
             'name' => 'Query',
