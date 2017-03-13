@@ -11,7 +11,7 @@ class CraftQL_FieldDateService extends BaseApplicationComponent {
     return [
       'type' => Type::int(),
       'resolve' => function ($root, $args) use ($field) {
-        return $root->{$field->handle}->format('U');
+        return $root->{$field->handle} ? $root->{$field->handle}->format('U') : null;
       }
     ];
   }

@@ -35,17 +35,20 @@ class CraftQL_QueryController extends BaseController
         ];
 
         foreach (craft()->craftQL_schemaSection->loadedSections() as $handle => $sectionType) {
+            $args = [
+                'id' => Type::int(),
+                'limit' => Type::int(),
+                'order' => Type::string(),
+            ];
             $queryTypeConfig['fields'][$handle] = [
                 'type' => Type::listOf($sectionType),
                 'description' => 'list of entries',
-                'args' => [
-                    'id' => Type::int(),
-                ],
+                'args' => $args,
                 'resolve' => function ($root, $args) use ($handle) {
                     $criteria = craft()->elements->getCriteria(ElementType::Entry);
                     $criteria = $criteria->section($handle);
-                    if (!empty($args['id'])) {
-                      $criteria = $criteria->id($args['id']);
+                    foreach ($args as $key => $value) {
+                        $criteria = $criteria->{$key}($value);
                     }
                     return $criteria->find();
                 }
@@ -59,8 +62,7 @@ class CraftQL_QueryController extends BaseController
         ]);
 
         try {
-            $rootValue = ['prefix' => 'You said: '];
-            $result = GraphQL::execute($schema, $rawInput, $rootValue);
+            $result = GraphQL::execute($schema, $rawInput, []);
         } catch (\Exception $e) {
             $result = [
                 'error' => [
