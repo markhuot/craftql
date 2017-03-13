@@ -16,15 +16,11 @@ class CraftQL_FieldEntriesService extends BaseApplicationComponent {
         'name' => 'Entry',
         'description' => 'An entry in Craft',
         'fields' => [
-            'id' => ['type' => Type::nonNull(Type::string())],
-            'name' => ['type' => Type::nonNull(Type::string())],
+            'id' => ['type' => Type::nonNull(Type::int())],
             'title' => ['type' => Type::nonNull(Type::string())],
         ],
         'resolveType' => function ($entry) {
-          $type = craft()->craftQL_schemaSection->getSection($entry->section->id);
-          // var_dump($type);
-          // die;
-          return craft()->craftQL_schemaSection->getSection($entry->section->id);
+          return craft()->craftQL_schemaSection->getSection($entry->section->handle);
         }
       ]);
     }
@@ -37,10 +33,6 @@ class CraftQL_FieldEntriesService extends BaseApplicationComponent {
 
     return [
       'type' => Type::listOf($entryInterface),
-      'resolve' => function ($root, $args) use ($field) {
-        $entries = $root->{$field->handle};
-        return $entries;
-      }
     ];
   }
 

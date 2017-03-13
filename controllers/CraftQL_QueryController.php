@@ -34,7 +34,7 @@ class CraftQL_QueryController extends BaseController
             ],
         ];
 
-        foreach (craft()->craftQL_schemaSection->sections as $handle => $sectionType) {
+        foreach (craft()->craftQL_schemaSection->loadedSections() as $handle => $sectionType) {
             $queryTypeConfig['fields'][$handle] = [
                 'type' => Type::listOf($sectionType),
                 'description' => 'list of entries',

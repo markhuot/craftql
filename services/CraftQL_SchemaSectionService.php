@@ -7,7 +7,7 @@ use GraphQL\Type\Definition\Type;
 
 class CraftQL_SchemaSectionService extends BaseApplicationComponent {
 
-  public $sections = [];
+  private $sections = [];
 
   function loadAllSections() {
     foreach (craft()->sections->allSections as $section) {
@@ -17,11 +17,15 @@ class CraftQL_SchemaSectionService extends BaseApplicationComponent {
 
   function getSection($sectionHandle) {
     if (!isset($this->sections[$sectionHandle])) {
-      $section = craft()->sections->getSectionById($sectionHandle);
+      $section = craft()->sections->getSectionByHandle($sectionHandle);
       $this->sections[$sectionHandle] = $this->parseSectionToObject($section);
     }
 
     return $this->sections[$sectionHandle];
+  }
+
+  function loadedSections() {
+    return $this->sections;
   }
 
   function parseSectionToObject($section) {
