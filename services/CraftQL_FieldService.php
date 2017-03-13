@@ -20,7 +20,7 @@ class CraftQL_FieldService extends BaseApplicationComponent {
         case 'Assets': $fields[$field->handle] = craft()->craftQL_fieldAssets->getDefinition($field); break;
         case 'Entries': $fields[$field->handle] = craft()->craftQL_fieldEntries->getDefinition($field); break;
         case 'Checkboxes': $fields[$field->handle] = craft()->craftQL_fieldCheckboxes->getDefinition($field); break;
-        default:
+        case 'RichText': case 'PlainText':
           $fields[$field->handle] = [
           'type' => Type::string(),
         ];
