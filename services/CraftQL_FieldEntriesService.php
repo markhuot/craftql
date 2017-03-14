@@ -9,8 +9,28 @@ use GraphQL\Type\Definition\Type;
 class CraftQL_FieldEntriesService extends BaseApplicationComponent {
 
   static $interface;
+  static $baseFields;
 
   function baseFields() {
+    if (!empty(static::$baseFields)) {
+      return static::$baseFields;
+    }
+
+    $sectionType = new ObjectType([
+      'name' => 'Section',
+      'fields' => [
+        'id' => ['type' => Type::nonNull(Type::int())],
+        'structureId' => ['type' => Type::nonNull(Type::int())],
+        'name' => ['type' => Type::nonNull(Type::string())],
+        'handle' => ['type' => Type::nonNull(Type::string())],
+        'type' => ['type' => Type::nonNull(Type::string())],
+        'template' => ['type' => Type::nonNull(Type::string())],
+        'maxLevels' => ['type' => Type::nonNull(Type::int())],
+        'hasUrls' => ['type' => Type::nonNull(Type::boolean())],
+        'enableVersioning' => ['type' => Type::nonNull(Type::boolean())],
+      ],
+    ]);
+
     $fields = [];
     $fields['id'] = ['type' => Type::nonNull(Type::int())];
     $fields['title'] = ['type' => Type::nonNull(Type::string())];
@@ -28,8 +48,11 @@ class CraftQL_FieldEntriesService extends BaseApplicationComponent {
     $fields['status'] = ['type' => Type::nonNull(Type::string())];
     $fields['uri'] = ['type' => Type::string()];
     $fields['url'] = ['type' => Type::string()];
+    $fields['section'] = ['type' => $sectionType, 'resolve' => function ($root, $args) {
+      return $root->section;
+    }];
 
-    return $fields;
+    return static::$baseFields = $fields;
   }
 
   function getInterface() {
