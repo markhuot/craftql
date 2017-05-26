@@ -38,7 +38,7 @@ class CraftQL_SchemaAssetSourceService extends BaseApplicationComponent {
     $assetSourceFields = array_merge($assetSourceFields, craft()->craftQL_field->getFields($source->fieldLayoutId));
 
     return new ObjectType([
-      'name' => $source->name.' Assets',
+      'name' => ucfirst($source->handle).'Assets',
       'fields' => $assetSourceFields,
     ]);
   }

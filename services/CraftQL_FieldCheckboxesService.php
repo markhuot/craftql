@@ -12,17 +12,16 @@ class CraftQL_FieldCheckboxesService extends BaseApplicationComponent {
     $options = [];
     foreach ($field['settings']['options'] as $option) {
       $options[$option['value']] = [
-        // 'name' => $option['label'],
         'description' => $option['label'],
       ];
     }
 
     $enumType = new EnumType([
-      'name' => $field->name,
+      'name' => ucfirst($field->handle),
       'values' => $options,
     ]);
 
-    return [
+    return [$field->handle => [
       'type' => Type::listOf($enumType),
       'resolve' => function ($root, $args) use ($field) {
         $values = [];
@@ -31,7 +30,7 @@ class CraftQL_FieldCheckboxesService extends BaseApplicationComponent {
         }
         return $values;
       }
-    ];
+    ]];
   }
 
 }

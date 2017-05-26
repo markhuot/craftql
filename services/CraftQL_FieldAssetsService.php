@@ -8,7 +8,7 @@ use GraphQL\Type\Definition\Type;
 class CraftQL_FieldAssetsService extends BaseApplicationComponent {
 
   function getDefinition($field) {
-    return [
+    return [$field->handle => [
       'type' => Type::listOf(craft()->craftQL_schemaAssetSource->getSource(1)),
       'resolve' => function ($root, $args) use ($field) {
         $assets = $root->{$field->handle};
@@ -27,7 +27,7 @@ class CraftQL_FieldAssetsService extends BaseApplicationComponent {
         }, $root->{$field->handle}->find());
         return $assets;
       }
-    ];
+    ]];
   }
 
 }

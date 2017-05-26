@@ -31,7 +31,7 @@ class CraftQL_SchemaTagGroupService extends BaseApplicationComponent {
     $tagGroupFields = array_merge($tagGroupFields, craft()->craftQL_field->getFields($group->fieldLayoutId));
 
     return new ObjectType([
-      'name' => $group->name.' Tags',
+      'name' => ucfirst($group->handle).'Tags',
       'fields' => $tagGroupFields,
     ]);
   }

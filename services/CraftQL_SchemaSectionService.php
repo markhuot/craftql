@@ -36,11 +36,12 @@ class CraftQL_SchemaSectionService extends BaseApplicationComponent {
     }
 
     return new ObjectType([
-      'name' => $section->name,
+      'name' => ucfirst($section->handle),
       'fields' => $fields,
       'interfaces' => [
         craft()->craftQL_fieldEntries->getInterface()
-      ]
+      ],
+      'isSingle' => $section->type == 'single',
     ]);
   }
 

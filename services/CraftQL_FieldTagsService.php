@@ -11,9 +11,9 @@ class CraftQL_FieldTagsService extends BaseApplicationComponent {
     $source = $field->settings['source'];
     if (preg_match('/taggroup:(\d+)/', $source, $matches)) {
       $groupId = $matches[1];
-      return [
+      return [$field->handle => [
         'type' => Type::listOf(craft()->craftQL_schemaTagGroup->getGroup($groupId))
-      ];
+      ]];
     }
   }
 
