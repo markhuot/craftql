@@ -29,7 +29,7 @@ class CraftQL_SchemaSectionService extends BaseApplicationComponent {
   }
 
   function parseSectionToObject($section) {
-    $fields = craft()->craftQL_fieldEntries->baseFields();
+    $fields = craft()->craftQL_schemaEntry->baseFields();
 
     foreach ($section->entryTypes as $entryType) {
       $fields = array_merge($fields, craft()->craftQL_field->getFields($entryType->fieldLayoutId));
@@ -39,9 +39,10 @@ class CraftQL_SchemaSectionService extends BaseApplicationComponent {
       'name' => ucfirst($section->handle),
       'fields' => $fields,
       'interfaces' => [
-        craft()->craftQL_fieldEntries->getInterface()
+        craft()->craftQL_schemaEntry->getInterface(),
+        craft()->craftQL_schemaElement->getInterface(),
       ],
-      'isSingle' => $section->type == 'single',
+      'type' => $section->type,
     ]);
   }
 

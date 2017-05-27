@@ -21,9 +21,7 @@ class CraftQL_FieldService extends BaseApplicationComponent {
         case 'Assets': $graphQlFields = craft()->craftQL_fieldAssets->getDefinition($field); break;
         case 'Entries': $graphQlFields = craft()->craftQL_fieldEntries->getDefinition($field); break;
         case 'Checkboxes': $graphQlFields = craft()->craftQL_fieldCheckboxes->getDefinition($field); break;
-        case 'RichText':
-        case 'PlainText':
-          $graphQlFields = craft()->craftQL_fieldText->getDefinition($field); break;
+        case 'RichText': case 'PlainText': $graphQlFields = craft()->craftQL_fieldText->getDefinition($field); break;
       }
 
       $fields = array_merge($fields, $graphQlFields);
