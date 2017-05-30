@@ -3,6 +3,7 @@
 namespace Craft;
 
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
 
 class CraftQL_SchemaSectionService extends BaseApplicationComponent {

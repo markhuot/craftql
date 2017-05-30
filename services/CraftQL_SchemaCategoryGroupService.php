@@ -9,6 +9,7 @@ use GraphQL\Type\Definition\Type;
 class CraftQL_SchemaCategoryGroupService extends BaseApplicationComponent {
 
   static $interface;
+  static $baseFields;
   public $groups = [];
 
   function loadedGroups() {
@@ -31,24 +32,40 @@ class CraftQL_SchemaCategoryGroupService extends BaseApplicationComponent {
   }
 
   function parseGroupToObject($group) {
-    $categoryGroupFields = $this->baseFields();
-    $categoryGroupFields = array_merge($categoryGroupFields, craft()->craftQL_field->getFields($group->fieldLayoutId));
+    $fields = $this->baseFields();
+    $fields = array_merge($fields, craft()->craftQL_field->getFields($group->fieldLayoutId));
 
     return new ObjectType([
       'name' => ucfirst($group->handle),
       'interfaces' => [$this->getInterface(), craft()->craftQL_schemaElement->getInterface()],
-      'fields' => $categoryGroupFields,
+      'fields' => $fields,
     ]);
   }
 
   function baseFields() {
-    $categoryGroupFields = [];
-    $categoryGroupFields['id'] = ['type' => Type::nonNull(Type::int())];
-    $categoryGroupFields['title'] = ['type' => Type::nonNull(Type::string())];
-    $categoryGroupFields['slug'] = ['type' => Type::string()];
-    $categoryGroupFields['uri'] = ['type' => Type::string()];
+    if (!empty(static::$baseFields)) {
+      return static::$baseFields;
+    }
 
-    return $categoryGroupFields;
+    $categoryGroup = new ObjectType([
+      'name' => 'CategoryGroup',
+      'fields' => [
+        'id' => ['type' => Type::nonNull(Type::int())],
+        'name' => ['type' => Type::nonNull(Type::string())],
+        'handle' => ['type' => Type::nonNull(Type::string())],
+      ],
+    ]);
+
+    $fields = [];
+    $fields['id'] = ['type' => Type::nonNull(Type::int())];
+    $fields['title'] = ['type' => Type::nonNull(Type::string())];
+    $fields['slug'] = ['type' => Type::string()];
+    $fields['uri'] = ['type' => Type::string()];
+    $fields['group'] = ['type' => $categoryGroup, 'resolve' => function ($root, $args) {
+      return $root->group;
+    }];
+
+    return static::$baseFields = $fields;
   }
 
   function getInterface() {

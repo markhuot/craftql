@@ -31,6 +31,15 @@ class CraftQL_SchemaEntryService extends BaseApplicationComponent {
       ],
     ]);
 
+    $entryType = new ObjectType([
+      'name' => 'EntryType',
+      'fields' => [
+        'id' => ['type' => Type::nonNull(Type::int())],
+        'name' => ['type' => Type::nonNull(Type::string())],
+        'handle' => ['type' => Type::nonNull(Type::string())],
+      ],
+    ]);
+
     $fields = [];
     $fields['id'] = ['type' => Type::nonNull(Type::int())];
     $fields['title'] = ['type' => Type::nonNull(Type::string())];
@@ -65,6 +74,9 @@ class CraftQL_SchemaEntryService extends BaseApplicationComponent {
     $fields['url'] = ['type' => Type::string()];
     $fields['section'] = ['type' => $sectionType, 'resolve' => function ($root, $args) {
       return $root->section;
+    }];
+    $fields['type'] = ['type' => $entryType, 'resolve' => function ($root, $args) {
+      return $root->type;
     }];
 
     return static::$baseFields = $fields;
