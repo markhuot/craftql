@@ -11,8 +11,7 @@ class CraftQL_FieldAssetsService extends BaseApplicationComponent {
     return [$field->handle => [
       'type' => Type::listOf(craft()->craftQL_schemaAssetSource->getSource(1)),
       'resolve' => function ($root, $args) use ($field) {
-        $assets = $root->{$field->handle};
-        $assets = array_map(function ($asset) {
+        return array_map(function ($asset) {
           return [
             'id' => $asset->id,
             'url' => $asset->url,
@@ -25,7 +24,6 @@ class CraftQL_FieldAssetsService extends BaseApplicationComponent {
             'extension' => $asset->extension,
           ];
         }, $root->{$field->handle}->find());
-        return $assets;
       }
     ]];
   }
