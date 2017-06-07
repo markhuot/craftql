@@ -1,9 +1,37 @@
 {
+    "name": "markhuot/craftql",
+    "description": "A GraphQL implementation for Craft",
+    "type": "plugin",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin"
+    ],
     "require": {
-        "webonyx/graphql-php": "^0.9.5",
-        "symfony/serializer": "^3.2",
-        "symfony/property-access": "^3.2",
-        "react/http": "dev-master",
-        "anahkiasen/underscore-php": "^2.0"
+        "craftcms/cms": "~3.0.0",
+        "guzzlehttp/guzzle": "^6.2",
+        "webonyx/graphql-php": "^0.9.10",
+        "react/http": "^0.7.0",
+        "anahkiasen/underscore-php": "^2.0",
+        "symfony/serializer": "^3.3",
+        "symfony/property-access": "^3.3"
+    },
+    "authors": [
+        {
+            "name": "Mark Huot",
+            "email": "mark@markhuot.com"
+        }
+    ],
+    "extra": {
+        "name": "CraftQL",
+        "handle": "craftQL",
+        "schemaVersion": "1.0.0",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "changelogUrl": "",
+        "components": {
+            // ...
+        }
     }
 }
