@@ -9,7 +9,6 @@
         "craft-plugin"
     ],
     "require": {
-        "craftcms/cms": "~3.0.0",
         "guzzlehttp/guzzle": "^6.2",
         "webonyx/graphql-php": "^0.9.10",
         "react/http": "^0.7.0",
@@ -30,8 +29,6 @@
         "hasCpSettings": false,
         "hasCpSection": false,
         "changelogUrl": "",
-        "components": {
-            // ...
-        }
+        "components": {}
     }
 }
