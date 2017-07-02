@@ -1,27 +1,35 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\Services;
 
+use Craft;
+use craft\fields\RichText;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Plugin;
+use markhuot\CraftQL\FieldTransformers\Text;
 
-class CraftQL_FieldService extends BaseApplicationComponent {
+class FieldService {
+
+  static $textTransformer;
+
+  function __construct() {
+    static::$textTransformer = new Text;
+  }
 
   function getFields($fieldLayoutId, $tagTypes=[]) {
     $fields = [];
 
-    $fieldLayout = craft()->fields->getLayoutById($fieldLayoutId);
-    $fieldPivots = $fieldLayout->getFields();
-    foreach ($fieldPivots as $fieldPivot) {
-      $field = $fieldPivot->getField();
-
+    $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
+    foreach ($fieldLayout->getFields() as $field) {
       $graphQlFields = [];
-      switch ($field->type) {
+
+      switch (get_class($field)) {
         case 'Tags': $graphQlFields = craft()->craftQL_fieldTags->getDefinition($field); break;
         case 'Date': $graphQlFields = craft()->craftQL_fieldDate->getDefinition($field); break;
         case 'Assets': $graphQlFields = craft()->craftQL_fieldAssets->getDefinition($field); break;
         case 'Entries': $graphQlFields = craft()->craftQL_fieldEntries->getDefinition($field); break;
         case 'Checkboxes': $graphQlFields = craft()->craftQL_fieldCheckboxes->getDefinition($field); break;
-        case 'RichText': case 'PlainText': $graphQlFields = craft()->craftQL_fieldText->getDefinition($field); break;
+        case RichText::class: case 'PlainText': $graphQlFields = static::$textTransformer->getDefinition($field); break;
       }
 
       $fields = array_merge($fields, $graphQlFields);

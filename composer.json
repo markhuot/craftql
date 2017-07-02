@@ -1,7 +1,7 @@
 {
     "name": "markhuot/craftql",
     "description": "A GraphQL implementation for Craft",
-    "type": "plugin",
+    "type": "craft-plugin",
     "keywords": [
         "craft",
         "cms",
@@ -22,13 +22,16 @@
             "email": "mark@markhuot.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "markhuot\\CraftQL\\": "src/"
+        }
+    },
     "extra": {
         "name": "CraftQL",
-        "handle": "craftQL",
-        "schemaVersion": "1.0.0",
-        "hasCpSettings": false,
-        "hasCpSection": false,
-        "changelogUrl": "",
-        "components": {}
+        "handle": "craftql",
+        "developer": "Mark Huot",
+        "developerUrl": "https://www.github.com/markhuot",
+        "class": "markhuot\\CraftQL\\Plugin"
     }
 }

@@ -1,11 +1,11 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\FieldTransformers;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
-class CraftQL_FieldTextService extends BaseApplicationComponent {
+class Text {
 
   function getDefinition($field) {
     return [

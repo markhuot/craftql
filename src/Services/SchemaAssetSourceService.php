@@ -1,27 +1,29 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\services;
 
+use Craft;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Plugin;
 
-class CraftQL_SchemaAssetSourceService extends BaseApplicationComponent {
+class SchemaAssetSourceService {
 
   public $sources = [];
 
   function loadAllSources() {
-    foreach (craft()->assetSources->allSources as $source) {
-      $this->sources[$source->id] = $this->parseSourceToObject($source);
-    }
+    // foreach (Craft::$app->volumes->allSources as $source) {
+    //   $this->sources[$source->id] = $this->parseSourceToObject($source);
+    // }
   }
 
   function getSource($sourceId) {
-    if (!isset($this->sources[$sourceId])) {
-      $source = craft()->assetSources->getSourceById($sourceId);
-      $this->sources[$sourceId] = $this->parseSourceToObject($source);
-    }
+    // if (!isset($this->sources[$sourceId])) {
+    //   $source = Craft::$app->volumes->getSourceById($sourceId);
+    //   $this->sources[$sourceId] = $this->parseSourceToObject($source);
+    // }
 
-    return $this->sources[$sourceId];
+    // return $this->sources[$sourceId];
   }
 
   function parseSourceToObject($source) {
@@ -35,7 +37,7 @@ class CraftQL_SchemaAssetSourceService extends BaseApplicationComponent {
     $assetSourceFields['path'] = ['type' => Type::string()];
     $assetSourceFields['title'] = ['type' => Type::string()];
     $assetSourceFields['extension'] = ['type' => Type::string()];
-    $assetSourceFields = array_merge($assetSourceFields, craft()->craftQL_field->getFields($source->fieldLayoutId));
+    $assetSourceFields = array_merge($assetSourceFields, Plugin::$fieldService->getFields($source->fieldLayoutId));
 
     return new ObjectType([
       'name' => ucfirst($source->handle).'Assets',

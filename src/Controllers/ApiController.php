@@ -1,21 +1,22 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\Controllers;
 
-require_once rtrim(__DIR__, '/').'/../vendor/autoload.php';
+use craft\web\Controller;
+use markhuot\CraftQL\Plugin;
 
-class CraftQL_QueryController extends BaseController
+class ApiController extends Controller
 {
-    protected $allowAnonymous = true;
+    protected $allowAnonymous = ['index'];
 
-    function actionQuery()
+    function actionIndex()
     {
-        $input = craft()->craftQL_request->input();
+        $input = Plugin::$requestService->input();
 
-        craft()->craftQL_graphQL->bootstrap();
+        Plugin::$graphQLService->bootstrap();
 
         try {
-            $result = craft()->craftQL_graphQL->execute($input);
+            $result = Plugin::$graphQLService->execute($input);
         } catch (\Exception $e) {
             $result = [
                 'error' => [
@@ -30,7 +31,7 @@ class CraftQL_QueryController extends BaseController
         header('Access-Control-Allow-Headers: Content-Type');
 
         $index = 1;
-        foreach (craft()->craftQL_graphQL->getTimers() as $key => $timer) {
+        foreach (Plugin::$graphQLService->getTimers() as $key => $timer) {
             header('X-Timer-'.$index++.'-'.ucfirst($key).': '.$timer);
         }
 

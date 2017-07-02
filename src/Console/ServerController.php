@@ -1,25 +1,27 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\console;
 
+use Craft;
 use React\EventLoop\Factory;
 use React\Socket\Server;
 use React\Http\Response;
+use React\Http\Server as HttpServer;
 use React\Promise\Promise;
 use Psr\Http\Message\ServerRequestInterface;
+use yii\console\Controller;
+use markhuot\CraftQL\Plugin;
 
-require_once rtrim(__DIR__, '/').'/../vendor/autoload.php';
-
-class CraftQLServerCommand extends BaseCommand
+class ServerController extends Controller
 {
     public function actionIndex()
     {
-        craft()->craftQL_graphQL->bootstrap();
+        Plugin::$graphQLService->bootstrap();
 
         $loop = Factory::create();
         $socket = new Server(isset($argv[1]) ? $argv[1] : '0.0.0.0:9001', $loop);
 
-        $server = new \React\Http\Server($socket, function (ServerRequestInterface $request) {
+        $server = new HttpServer(function (ServerRequestInterface $request) {
             return new Promise(function ($resolve, $reject) use ($request) {
                 $postBody = '';
 
@@ -44,7 +46,7 @@ class CraftQLServerCommand extends BaseCommand
 
                     try {
                         echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n";
-                        $result = craft()->craftQL_graphQL->execute($query, $variables);
+                        $result = Plugin::$graphQLService->execute($query, $variables);
                     } catch (\Exception $e) {
                         $result = [
                             'error' => [
@@ -59,7 +61,7 @@ class CraftQLServerCommand extends BaseCommand
                     ];
 
                     $index = 1;
-                    foreach (craft()->craftQL_graphQL->getTimers() as $key => $timer) {
+                    foreach (Plugin::$graphQLService->getTimers() as $key => $timer) {
                         $headers['X-Timer-'.$index++.'-'.ucfirst($key)] = $timer;
                     }
 
@@ -73,7 +75,7 @@ class CraftQLServerCommand extends BaseCommand
                 });
             });
         });
-        echo 'Listening on http://' . $socket->getAddress() . PHP_EOL;
+        echo 'Listening on ' . $socket->getAddress() . PHP_EOL;
         $loop->run();
     }
 }

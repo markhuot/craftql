@@ -1,12 +1,14 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\services;
 
+use Craft;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Plugin;
 
-class CraftQL_SchemaCategoryGroupService extends BaseApplicationComponent {
+class SchemaCategoryGroupService {
 
   static $interface;
   static $baseFields;
@@ -17,14 +19,14 @@ class CraftQL_SchemaCategoryGroupService extends BaseApplicationComponent {
   }
 
   function loadAllGroups() {
-    foreach (craft()->categories->allGroups as $group) {
+    foreach (Craft::$app->categories->allGroups as $group) {
       $this->groups[$group->handle] = $this->parseGroupToObject($group);
     }
   }
 
   function getGroup($groupId) {
     if (!isset($this->groups[$groupId])) {
-      $group = craft()->categories->getGroupById($groupId);
+      $group = Craft::$app->categories->getGroupById($groupId);
       $this->groups[$group->handle] = $this->parseGroupToObject($group);
     }
 
@@ -33,11 +35,11 @@ class CraftQL_SchemaCategoryGroupService extends BaseApplicationComponent {
 
   function parseGroupToObject($group) {
     $fields = $this->baseFields();
-    $fields = array_merge($fields, craft()->craftQL_field->getFields($group->fieldLayoutId));
+    $fields = array_merge($fields, Plugin::$fieldService->getFields($group->fieldLayoutId));
 
     return new ObjectType([
       'name' => ucfirst($group->handle),
-      'interfaces' => [$this->getInterface(), craft()->craftQL_schemaElement->getInterface()],
+      'interfaces' => [$this->getInterface(), Plugin::$schemaElementService->getInterface()],
       'fields' => $fields,
     ]);
   }
@@ -77,7 +79,7 @@ class CraftQL_SchemaCategoryGroupService extends BaseApplicationComponent {
         'description' => 'A category in Craft',
         'fields' => $fields,
         'resolveType' => function ($category) {
-          return craft()->craftQL_schemaCategoryGroup->getGroup($category->group->handle);
+          return Plugin::$schemaCategoryGroupService->getGroup($category->group->handle);
         }
       ]);
     }

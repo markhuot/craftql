@@ -1,23 +1,25 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\services;
 
+use Craft;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Plugin;
 
-class CraftQL_SchemaTagGroupService extends BaseApplicationComponent {
+class SchemaTagGroupService {
 
   public $groups = [];
 
   function loadAllGroups() {
-    foreach (craft()->tags->allTagGroups as $group) {
+    foreach (Craft::$app->tags->allTagGroups as $group) {
       $this->groups[$group->id] = $this->parseGroupToObject($group);
     }
   }
 
   function getGroup($groupId) {
     if (!isset($this->groups[$groupId])) {
-      $group = craft()->tags->getTagGroupById($groupId);
+      $group = Craft::$app->tags->getTagGroupById($groupId);
       $this->groups[$groupId] = $this->parseGroupToObject($group);
     }
 
@@ -28,7 +30,7 @@ class CraftQL_SchemaTagGroupService extends BaseApplicationComponent {
     $tagGroupFields = [];
     $tagGroupFields['id'] = ['type' => Type::int()];
     $tagGroupFields['slug'] = ['type' => Type::string()];
-    $tagGroupFields = array_merge($tagGroupFields, craft()->craftQL_field->getFields($group->fieldLayoutId));
+    $tagGroupFields = array_merge($tagGroupFields, Plugin::$field->getFields($group->fieldLayoutId));
 
     return new ObjectType([
       'name' => ucfirst($group->handle).'Tags',

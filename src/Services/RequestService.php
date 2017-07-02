@@ -1,8 +1,8 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\Services;
 
-class CraftQL_RequestService extends BaseApplicationComponent {
+class RequestService {
 
     private $schema;
 

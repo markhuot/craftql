@@ -1,12 +1,12 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\services;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
 
-class CraftQL_SchemaElementService extends BaseApplicationComponent {
+class SchemaElementService {
 
   static $interface;
 
