@@ -20,4 +20,18 @@ class RequestService {
         return @$data['query'];
     }
 
+    function variables() {
+        if (!empty($_POST['variables'])) {
+            return $_POST['variables'];
+        }
+
+        if (!empty($_GET['variables'])) {
+            return $_GET['variables'];
+        }
+
+        $data = file_get_contents('php://input');
+        $data = json_decode($data, true);
+        return @$data['variables'];
+    }
+
 }

@@ -5,11 +5,16 @@ namespace markhuot\CraftQL\services;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
+use yii\base\Component;
 
-class SchemaEntryService {
+class SchemaEntryService extends Component {
 
   static $interface;
   static $baseFields;
+
+  function baseArgs() {
+    
+  }
 
   function baseFields() {
     if (!empty(static::$baseFields)) {
@@ -41,6 +46,9 @@ class SchemaEntryService {
     ]);
 
     $fields = [];
+    $fields['elementType'] = ['type' => Type::nonNull(Type::string()), 'resolve' => function ($root, $args) {
+      return 'Entry';
+    }];
     $fields['id'] = ['type' => Type::nonNull(Type::int())];
     $fields['title'] = ['type' => Type::nonNull(Type::string())];
     $fields['slug'] = ['type' => Type::nonNull(Type::string())];

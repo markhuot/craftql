@@ -23,30 +23,18 @@ use markhuot\CraftQL\Services\FieldService;
 
 class Plugin extends BasePlugin
 {
-    static $plugin;
-    static $graphQLService;
-    static $schemaAssetSourceService;
-    static $schemaCategoryGroupService;
-    static $schemaElementService;
-    static $schemaEntryService;
-    static $schemaSectionService;
-    static $schemaTagGroupService;
-    static $requestService;
-    static $fieldService;
-
     public $controllerNamespace = 'markhuot\\CraftQL\\Controllers';
 
     function init() {
-        self::$plugin = $this;
-        self::$graphQLService = new GraphQLService;
-        self::$schemaAssetSourceService = new SchemaAssetSourceService;
-        self::$schemaCategoryGroupService = new SchemaCategoryGroupService;
-        self::$schemaElementService = new SchemaElementService;
-        self::$schemaEntryService = new SchemaEntryService;
-        self::$schemaSectionService = new SchemaSectionService;
-        self::$schemaTagGroupService = new SchemaTagGroupService;
-        self::$requestService = new RequestService;
-        self::$fieldService = new FieldService;
+        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\FieldService::class);
+        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\GraphQLService::class);
+        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\RequestService::class);
+        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaAssetSourceService::class);
+        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaCategoryGroupService::class);
+        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaElementService::class);
+        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaEntryService::class);
+        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaSectionService::class);
+        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaTagGroupService::class);
 
         // Add in our console commands
         if (Craft::$app instanceof ConsoleApplication) {
@@ -58,7 +46,8 @@ class Plugin extends BasePlugin
             UrlManager::className(),
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
             function (RegisterUrlRulesEvent $event) {
-                $event->rules['api'] = 'craftql/api';
+                $event->rules['POST api'] = 'craftql/api/index';
+                $event->rules['GET api'] = 'craftql/api/graphiql';
             }
         );
 

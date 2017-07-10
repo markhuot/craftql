@@ -6,10 +6,18 @@ use Craft;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
+use yii\base\Component;
 
-class SchemaAssetSourceService {
+class SchemaAssetSourceService extends Component {
 
   public $sources = [];
+  private $fields;
+
+  function __construct(
+    \markhuot\CraftQL\Services\FieldService $fields
+  ) {
+    $this->fields = $fields;
+  }
 
   function loadAllSources() {
     // foreach (Craft::$app->volumes->allSources as $source) {
@@ -37,7 +45,7 @@ class SchemaAssetSourceService {
     $assetSourceFields['path'] = ['type' => Type::string()];
     $assetSourceFields['title'] = ['type' => Type::string()];
     $assetSourceFields['extension'] = ['type' => Type::string()];
-    $assetSourceFields = array_merge($assetSourceFields, Plugin::$fieldService->getFields($source->fieldLayoutId));
+    $assetSourceFields = array_merge($assetSourceFields, $this->fields->getFields($source->fieldLayoutId));
 
     return new ObjectType([
       'name' => ucfirst($source->handle).'Assets',

@@ -13,6 +13,17 @@ class SchemaCategoryGroupService {
   static $interface;
   static $baseFields;
   public $groups = [];
+  private $fields;
+  private $elements;
+  private $categoryGroups;
+
+  function __construct(
+    \markhuot\CraftQL\Services\FieldService $fields,
+    \markhuot\CraftQL\Services\SchemaElementService $elements
+  ) {
+    $this->fields = $fields;
+    $this->elements = $elements;
+  }
 
   function loadedGroups() {
     return $this->groups;
@@ -35,11 +46,11 @@ class SchemaCategoryGroupService {
 
   function parseGroupToObject($group) {
     $fields = $this->baseFields();
-    $fields = array_merge($fields, Plugin::$fieldService->getFields($group->fieldLayoutId));
+    $fields = array_merge($fields, $this->fields->getFields($group->fieldLayoutId));
 
     return new ObjectType([
       'name' => ucfirst($group->handle),
-      'interfaces' => [$this->getInterface(), Plugin::$schemaElementService->getInterface()],
+      'interfaces' => [$this->getInterface(), $this->elements->getInterface()],
       'fields' => $fields,
     ]);
   }
@@ -79,7 +90,7 @@ class SchemaCategoryGroupService {
         'description' => 'A category in Craft',
         'fields' => $fields,
         'resolveType' => function ($category) {
-          return Plugin::$schemaCategoryGroupService->getGroup($category->group->handle);
+          return $this->getGroup($category->group->handle);
         }
       ]);
     }

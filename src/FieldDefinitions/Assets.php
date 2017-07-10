@@ -1,15 +1,24 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\FieldDefinitions;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use yii\base\Component;
 
-class CraftQL_FieldAssetsService extends BaseApplicationComponent {
+class Assets extends Component {
+
+  private $assetSources;
+
+  function __construct(
+    \markhuot\CraftQL\Services\SchemaAssetSourceService $assetSources
+  ) {
+    $this->assetSources = $assetSources;
+  }
 
   function getDefinition($field) {
     return [$field->handle => [
-      'type' => Type::listOf(craft()->craftQL_schemaAssetSource->getSource(1)),
+      'type' => Type::listOf($this->assetSources->getSource(1)),
       'resolve' => function ($root, $args) use ($field) {
         return array_map(function ($asset) {
           return [

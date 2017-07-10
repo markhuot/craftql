@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\services;
+namespace markhuot\CraftQL\Services;
 
 use Craft;
 use GraphQL\Type\Definition\ObjectType;
@@ -9,20 +9,38 @@ use GraphQL\GraphQL;
 use GraphQL\Schema;
 use Underscore\Types\Arrays;
 use markhuot\CraftQL\Plugin;
+use yii\base\Component;
 
-class GraphQLService {
+class GraphQLService extends Component {
 
     private $schema;
     private $timers = [];
+
+    private $sections;
+    private $tagGroups;
+    private $categoryGroups;
+    private $assetSources;
+
+    function __construct(
+        \markhuot\CraftQL\Services\SchemaSectionService $sections,
+        \markhuot\CraftQL\Services\SchemaTagGroupService $tagGroups,
+        \markhuot\CraftQL\Services\SchemaCategoryGroupService $categoryGroups,
+        \markhuot\CraftQL\Services\SchemaAssetSourceService $assetSources
+    ) {
+        $this->sections = $sections;
+        $this->tagGroups = $tagGroups;
+        $this->categoryGroups = $categoryGroups;
+        $this->assetSources = $assetSources;
+    }
 
     function bootstrap() {
         $this->timers['start'] = microtime(true) * 1000;
 
         // Eager load some things we know we'll need later
-        Plugin::$schemaTagGroupService->loadAllGroups();
-        Plugin::$schemaCategoryGroupService->loadAllGroups();
-        Plugin::$schemaSectionService->loadAllSections();
-        Plugin::$schemaAssetSourceService->loadAllSources();
+        $this->tagGroups->loadAllGroups();
+        $this->categoryGroups->loadAllGroups();
+        $this->sections->loadAllSections();
+        $this->assetSources->loadAllSources();
 
         $queryTypeConfig = [
             'name' => 'Query',
@@ -36,7 +54,7 @@ class GraphQLService {
             ],
         ];
 
-        foreach (Plugin::$schemaSectionService->loadedSections() as $handle => $sectionType) {
+        foreach ($this->sections->loadedSections() as $handle => $sectionType) {
             $isSingle = $sectionType->config['type'] == 'single';
 
             $queryTypeConfig['fields'][$handle] = [
@@ -86,7 +104,7 @@ class GraphQLService {
             ];
         }
 
-        foreach (Plugin::$schemaCategoryGroupService->loadedGroups() as $handle => $group) {
+        foreach ($this->categoryGroups->loadedGroups() as $handle => $group) {
             $queryTypeConfig['fields'][$handle] = [
                 'type' => Type::listOf($group),
                 'resolve' => function ($root, $args) use ($handle) {
@@ -135,14 +153,14 @@ class GraphQLService {
         ]);
 
         $this->timers['setup'] = microtime(true) * 1000;
-        $this->timers['total1'] = $this->timers['setup']-$this->timers['start'];
+        // $this->timers['total1'] = $this->timers['setup']-$this->timers['start'];
     }
 
     function execute($input, $variables = []) {
         $result = GraphQL::execute($this->schema, $input, null, null, $variables);
 
         $this->timers['end'] = microtime(true) * 1000;
-        $this->timers['total2'] = $this->timers['end']-$this->timers['start'];
+        // $this->timers['total2'] = $this->timers['end']-$this->timers['start'];
 
         return $result;
     }

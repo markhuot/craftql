@@ -1,12 +1,12 @@
 <?php
 
-namespace Craft;
+namespace markhuot\CraftQL\FieldDefinitions;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\EnumType;
 
-class CraftQL_FieldCheckboxesService extends BaseApplicationComponent {
+class Checkboxes {
 
   function getDefinition($field) {
     $options = [];
@@ -17,7 +17,7 @@ class CraftQL_FieldCheckboxesService extends BaseApplicationComponent {
     }
 
     $enumType = new EnumType([
-      'name' => ucfirst($field->handle),
+      'name' => ucfirst($field->handle.'Checkboxes'),
       'values' => $options,
     ]);
 
