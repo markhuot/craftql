@@ -11,6 +11,7 @@ use craft\fields\Lightswitch as LightswitchField;
 use craft\fields\Date as DateField;
 use craft\fields\Entries as EntriesField;
 use craft\fields\Tags as TagsField;
+use craft\fields\Assets as AssetsField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
 use markhuot\CraftQL\FieldDefinitions\Text as TextTransformer;
@@ -20,6 +21,7 @@ use markhuot\CraftQL\FieldDefinitions\Lightswitch as LightswitchTransformer;
 use markhuot\CraftQL\FieldDefinitions\Date as DateTransformer;
 use markhuot\CraftQL\FieldDefinitions\Entries as EntriesTransformer;
 use markhuot\CraftQL\FieldDefinitions\Tags as TagsTransformer;
+use markhuot\CraftQL\FieldDefinitions\Assets as AssetsTransformer;
 
 class FieldService {
 
@@ -39,7 +41,7 @@ class FieldService {
       $graphQlFields = [];
 
       switch (get_class($field)) {
-        // case 'Assets': $graphQlFields = craft()->craftQL_fieldAssets->getDefinition($field); break;
+        case AssetsField::class: $transformer = Yii::$container->get(AssetsTransformer::class); break;
         case TagsField::class: $transformer = Yii::$container->get(TagsTransformer::class); break;
         case EntriesField::class: $transformer = Yii::$container->get(EntriesTransformer::class); break;
         case DateField::class: $transformer = Yii::$container->get(DateTransformer::class); break;

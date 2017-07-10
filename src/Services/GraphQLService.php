@@ -19,18 +19,18 @@ class GraphQLService extends Component {
     private $sections;
     private $tagGroups;
     private $categoryGroups;
-    private $assetSources;
+    private $assetVolumes;
 
     function __construct(
         \markhuot\CraftQL\Services\SchemaSectionService $sections,
         \markhuot\CraftQL\Services\SchemaTagGroupService $tagGroups,
         \markhuot\CraftQL\Services\SchemaCategoryGroupService $categoryGroups,
-        \markhuot\CraftQL\Services\SchemaAssetSourceService $assetSources
+        \markhuot\CraftQL\Services\SchemaAssetVolumeService $assetVolumes
     ) {
         $this->sections = $sections;
         $this->tagGroups = $tagGroups;
         $this->categoryGroups = $categoryGroups;
-        $this->assetSources = $assetSources;
+        $this->assetVolumes = $assetVolumes;
     }
 
     function bootstrap() {
@@ -40,7 +40,7 @@ class GraphQLService extends Component {
         $this->tagGroups->loadAllGroups();
         $this->categoryGroups->loadAllGroups();
         $this->sections->loadAllSections();
-        $this->assetSources->loadAllSources();
+        $this->assetVolumes->loadAllVolumes();
 
         $queryTypeConfig = [
             'name' => 'Query',

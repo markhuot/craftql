@@ -8,29 +8,31 @@ use yii\base\Component;
 
 class Assets extends Component {
 
-  private $assetSources;
+  private $assetVolumes;
 
   function __construct(
-    \markhuot\CraftQL\Services\SchemaAssetSourceService $assetSources
+    \markhuot\CraftQL\Services\SchemaAssetVolumeService $assetVolumes
   ) {
-    $this->assetSources = $assetSources;
+    $this->assetVolumes = $assetVolumes;
   }
 
   function getDefinition($field) {
     return [$field->handle => [
-      'type' => Type::listOf($this->assetSources->getSource(1)),
+      'type' => Type::listOf($this->assetVolumes->getVolume(1)),
       'resolve' => function ($root, $args) use ($field) {
         return array_map(function ($asset) {
+          // var_dump($asset);
+          // die;
           return [
             'id' => $asset->id,
-            'url' => $asset->url,
+            'uri' => $asset->getUri(),
             'width' => $asset->width,
             'height' => $asset->height,
             'folder' => $asset->folder,
             'mimeType' => $asset->mimeType,
-            'path' => $asset->path,
             'title' => $asset->title,
             'extension' => $asset->extension,
+            'filename' => $asset->filename,
           ];
         }, $root->{$field->handle}->find());
       }

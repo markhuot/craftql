@@ -8,9 +8,9 @@ use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
 use yii\base\Component;
 
-class SchemaAssetSourceService extends Component {
+class SchemaAssetVolumeService extends Component {
 
-  public $sources = [];
+  public $volumes = [];
   private $fields;
 
   function __construct(
@@ -19,32 +19,32 @@ class SchemaAssetSourceService extends Component {
     $this->fields = $fields;
   }
 
-  function loadAllSources() {
-    // foreach (Craft::$app->volumes->allSources as $source) {
-    //   $this->sources[$source->id] = $this->parseSourceToObject($source);
-    // }
+  function loadAllVolumes() {
+    foreach (Craft::$app->volumes->getAllVolumes() as $source) {
+      $this->volumes[$source->id] = $this->parseVolumeToObject($source);
+    }
   }
 
-  function getSource($sourceId) {
-    // if (!isset($this->sources[$sourceId])) {
-    //   $source = Craft::$app->volumes->getSourceById($sourceId);
-    //   $this->sources[$sourceId] = $this->parseSourceToObject($source);
-    // }
+  function getVolume($volumeId) {
+    if (!isset($this->volumes[$volumeId])) {
+      $source = Craft::$app->volumes->getVolumeById($volumeId);
+      $this->volumes[$volumeId] = $this->parseVolumeToObject($source);
+    }
 
-    // return $this->sources[$sourceId];
+    return $this->volumes[$volumeId];
   }
 
-  function parseSourceToObject($source) {
+  function parseVolumeToObject($source) {
     $assetSourceFields = [];
     $assetSourceFields['id'] = ['type' => Type::int()];
-    $assetSourceFields['url'] = ['type' => Type::string()];
+    $assetSourceFields['uri'] = ['type' => Type::string()];
     $assetSourceFields['width'] = ['type' => Type::string()];
     $assetSourceFields['height'] = ['type' => Type::string()];
     $assetSourceFields['folder'] = ['type' => Type::string()];
     $assetSourceFields['mimeType'] = ['type' => Type::string()];
-    $assetSourceFields['path'] = ['type' => Type::string()];
     $assetSourceFields['title'] = ['type' => Type::string()];
     $assetSourceFields['extension'] = ['type' => Type::string()];
+    $assetSourceFields['filename'] = ['type' => Type::string()];
     $assetSourceFields = array_merge($assetSourceFields, $this->fields->getFields($source->fieldLayoutId));
 
     return new ObjectType([
