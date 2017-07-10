@@ -40,7 +40,7 @@ class ApiController extends Controller
             $result = $this->graphQl->execute($input, $variables);
         } catch (\Exception $e) {
             $result = [
-                'error' => [
+                'errors' => [
                     'message' => $e->getMessage()
                 ]
             ];
