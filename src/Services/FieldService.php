@@ -2,6 +2,7 @@
 
 namespace markhuot\CraftQL\Services;
 
+use Yii;
 use Craft;
 use craft\fields\PlainText as PlainTextField;
 use craft\fields\RichText as RichTextField;
@@ -9,6 +10,7 @@ use craft\fields\Checkboxes as CheckboxesField;
 use craft\fields\Lightswitch as LightswitchField;
 use craft\fields\Date as DateField;
 use craft\fields\Entries as EntriesField;
+use craft\fields\Tags as TagsField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
 use markhuot\CraftQL\FieldDefinitions\Text as TextTransformer;
@@ -17,9 +19,9 @@ use markhuot\CraftQL\FieldDefinitions\Checkboxes as CheckboxTransformer;
 use markhuot\CraftQL\FieldDefinitions\Lightswitch as LightswitchTransformer;
 use markhuot\CraftQL\FieldDefinitions\Date as DateTransformer;
 use markhuot\CraftQL\FieldDefinitions\Entries as EntriesTransformer;
-use yii\base\Component;
+use markhuot\CraftQL\FieldDefinitions\Tags as TagsTransformer;
 
-class FieldService extends Component {
+class FieldService {
 
   private $textTransformer;
   private $richTextTransformer;
@@ -27,22 +29,7 @@ class FieldService extends Component {
   private $lightswitchTransformer;
   private $dateTransformer;
   private $entriesTransformer;
-
-  function __construct(
-    TextTransformer $textTransformer,
-    RichTextTransformer $richTextTransformer,
-    CheckboxTransformer $checkboxTransformer,
-    LightswitchTransformer $lightswitchTransformer,
-    DateTransformer $dateTransformer,
-    EntriesTransformer $entriesTransformer
-  ) {
-    $this->textTransformer = $textTransformer;
-    $this->richTextTransformer = $richTextTransformer;
-    $this->checkboxTransformer = $checkboxTransformer;
-    $this->lightswitchTransformer = $lightswitchTransformer;
-    $this->dateTransformer = $dateTransformer;
-    $this->entriesTransformer = $entriesTransformer;
-  }
+  private $tagsTransformer;
 
   function getFields($fieldLayoutId) {
     $fields = [];
@@ -52,17 +39,17 @@ class FieldService extends Component {
       $graphQlFields = [];
 
       switch (get_class($field)) {
-        case 'Tags': $graphQlFields = craft()->craftQL_fieldTags->getDefinition($field); break;
-        case 'Assets': $graphQlFields = craft()->craftQL_fieldAssets->getDefinition($field); break;
-        case EntriesField::class: $graphQlFields = $this->entriesTransformer->getDefinition($field); break;
-        case DateField::class: $graphQlFields = $this->dateTransformer->getDefinition($field); break;
-        case LightswitchField::class: $graphQlFields = $this->lightswitchTransformer->getDefinition($field); break;
-        case CheckboxesField::class: $graphQlFields = $this->checkboxTransformer->getDefinition($field); break;
-        case RichTextField::class: $graphQlFields = $this->richTextTransformer->getDefinition($field); break;
-        case PlainTextField::class: $graphQlFields = $this->textTransformer->getDefinition($field); break;
+        // case 'Assets': $graphQlFields = craft()->craftQL_fieldAssets->getDefinition($field); break;
+        case TagsField::class: $transformer = Yii::$container->get(TagsTransformer::class); break;
+        case EntriesField::class: $transformer = Yii::$container->get(EntriesTransformer::class); break;
+        case DateField::class: $transformer = Yii::$container->get(DateTransformer::class); break;
+        case LightswitchField::class: $transformer = Yii::$container->get(LightswitchTransformer::class); break;
+        case CheckboxesField::class: $transformer = Yii::$container->get(CheckboxTransformer::class); break;
+        case RichTextField::class: $transformer = Yii::$container->get(RichTextTransformer::class); break;
+        case PlainTextField::class: $transformer = Yii::$container->get(TextTransformer::class); break;
       }
 
-      $fields = array_merge($fields, $graphQlFields);
+      $fields = array_merge($fields, $transformer->getDefinition($field));
     }
 
     return $fields;

@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\services;
+namespace markhuot\CraftQL\Services;
 
 use Craft;
 use GraphQL\Type\Definition\ObjectType;
@@ -37,7 +37,7 @@ class SchemaTagGroupService extends Component {
   function parseGroupToObject($group) {
     $tagGroupFields = [];
     $tagGroupFields['id'] = ['type' => Type::int()];
-    $tagGroupFields['slug'] = ['type' => Type::string()];
+    $tagGroupFields['title'] = ['type' => Type::string()];
     $tagGroupFields = array_merge($tagGroupFields, $this->fields->getFields($group->fieldLayoutId));
 
     return new ObjectType([
