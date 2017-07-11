@@ -12,6 +12,10 @@ use craft\fields\Date as DateField;
 use craft\fields\Entries as EntriesField;
 use craft\fields\Tags as TagsField;
 use craft\fields\Assets as AssetsField;
+use craft\fields\Color as ColorField;
+use craft\fields\Dropdown as DropdownField;
+use craft\fields\MultiSelect as MultiSelectField;
+use craft\fields\Number as NumberField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
 use markhuot\CraftQL\FieldDefinitions\Text as TextTransformer;
@@ -22,16 +26,11 @@ use markhuot\CraftQL\FieldDefinitions\Date as DateTransformer;
 use markhuot\CraftQL\FieldDefinitions\Entries as EntriesTransformer;
 use markhuot\CraftQL\FieldDefinitions\Tags as TagsTransformer;
 use markhuot\CraftQL\FieldDefinitions\Assets as AssetsTransformer;
+use markhuot\CraftQL\FieldDefinitions\Color as ColorTransformer;
+use markhuot\CraftQL\FieldDefinitions\Dropdown as DropdownTransformer;
+use markhuot\CraftQL\FieldDefinitions\Number as NumberTransformer;
 
 class FieldService {
-
-  private $textTransformer;
-  private $richTextTransformer;
-  private $checkboxTransformer;
-  private $lightswitchTransformer;
-  private $dateTransformer;
-  private $entriesTransformer;
-  private $tagsTransformer;
 
   function getFields($fieldLayoutId) {
     $fields = [];
@@ -49,6 +48,10 @@ class FieldService {
         case CheckboxesField::class: $transformer = Yii::$container->get(CheckboxTransformer::class); break;
         case RichTextField::class: $transformer = Yii::$container->get(RichTextTransformer::class); break;
         case PlainTextField::class: $transformer = Yii::$container->get(TextTransformer::class); break;
+        case ColorField::class: $transformer = Yii::$container->get(ColorTransformer::class); break;
+        case DropdownField::class: $transformer = Yii::$container->get(DropdownTransformer::class); break;
+        case MultiSelectField::class: $transformer = Yii::$container->get(CheckboxTransformer::class); break;
+        case NumberField::class: $transformer = Yii::$container->get(NumberTransformer::class); break;
       }
 
       $fields = array_merge($fields, $transformer->getDefinition($field));
