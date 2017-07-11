@@ -17,7 +17,7 @@ class Checkboxes {
     }
 
     $enumType = new EnumType([
-      'name' => ucfirst($field->handle.'Checkboxes'),
+      'name' => ucfirst($field->handle.'CheckboxesEnum'),
       'values' => $options,
     ]);
 

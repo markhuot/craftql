@@ -12,10 +12,6 @@ class SchemaEntryService extends Component {
   static $interface;
   static $baseFields;
 
-  function baseArgs() {
-    
-  }
-
   function baseFields() {
     if (!empty(static::$baseFields)) {
       return static::$baseFields;
@@ -95,7 +91,7 @@ class SchemaEntryService extends Component {
       $fields = $this->baseFields();
 
       static::$interface = new InterfaceType([
-        'name' => 'Entry',
+        'name' => 'EntryInterface',
         'description' => 'An entry in Craft',
         'fields' => $fields,
         'resolveType' => function ($entry) {

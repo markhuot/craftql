@@ -18,23 +18,9 @@ class Assets extends Component {
 
   function getDefinition($field) {
     return [$field->handle => [
-      'type' => Type::listOf($this->assetVolumes->getVolume(1)),
+      'type' => Type::listOf($this->assetVolumes->getInterface()),
       'resolve' => function ($root, $args) use ($field) {
-        return array_map(function ($asset) {
-          // var_dump($asset);
-          // die;
-          return [
-            'id' => $asset->id,
-            'uri' => $asset->getUri(),
-            'width' => $asset->width,
-            'height' => $asset->height,
-            'folder' => $asset->folder,
-            'mimeType' => $asset->mimeType,
-            'title' => $asset->title,
-            'extension' => $asset->extension,
-            'filename' => $asset->filename,
-          ];
-        }, $root->{$field->handle}->find());
+        return $root->{$field->handle}->find();
       }
     ]];
   }

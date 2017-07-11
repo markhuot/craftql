@@ -52,6 +52,7 @@ class GraphQLService extends Component {
                     }
                 ]
             ],
+            'types' => [],
         ];
 
         foreach ($this->sections->loadedSections() as $handle => $sectionType) {
@@ -149,7 +150,10 @@ class GraphQLService extends Component {
         $queryType = new ObjectType($queryTypeConfig);
 
         $this->schema = new Schema([
-            'query' => $queryType
+            'query' => $queryType,
+            'types' => array_merge([],
+                $this->assetVolumes->getAllVolumes()
+            ),
         ]);
 
         $this->timers['setup'] = microtime(true) * 1000;
