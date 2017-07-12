@@ -1,0 +1,51 @@
+{% import "_includes/forms" as forms %}
+
+
+<div class="" style="width: 70%">
+    <h2>Welcome</h2>
+    <p>You can access your GraphQL endpoint in two ways,</p>
+
+    <h3>GraphiQL</h3>
+    <p><a href="/{{ settings.uri }}">/{{ settings.uri}}</a> will show you a graphical interface to GraphQL named GraphiQL. Use it to explore your schema and test requests.</p>
+
+    <h3>Curl</h3>
+    <p>Using a token, generated below, you can query your schema directly. The following CURL request should get you started,</p>
+    <p><pre style="background: whiteSmoke; padding: 5px;"><code>curl -H "X-Token: {{ settings.tokens[0].token|default('{TOKEN}') }}" -H "Content-type: application/json" -d '{"query":"{__schema{types{name}}}"}' {{ siteUrl }}{{ settings.uri }}</code></pre></p>
+</div>
+
+    <hr>
+
+<div class="" style="width: 70%">
+    <h2>URI</h2>
+    
+    {{ forms.textField({
+        first: true,
+        name: 'uri',
+        value: settings.uri,
+        instructions: 'The URI to the GraphQL service. Typically this is `api` but you can override it with your own preference.',
+    }) }}
+
+    <h2>Tokens</h2>
+    <p>Tokens control access in to your API. Instead of authenticating with a username and password, API access is granted via a token. Treat this token like a password because it provides privileged access in to your Craft website.</p>
+
+    <p><a href="/admin/craftql/token-gen">Generate a new token</a> (for my user)</p>
+
+    {% if settings.tokens|length > 0 %}
+    <table class="data fullwidth collapsible">
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Token</th>
+                <td class="thin"></td>
+            </tr>
+        </thead>
+        {% for token in settings.tokens %}
+            <tr>
+                <td><input type="text" name="token[{{ token.id }}][name]" class="text" placeholder="Name..." value="{{ token.name }}" /></td>
+                <td>{{ token.token }}</td>
+                <td><a class="delete icon" title="Delete" role="button" href="/admin/craftql/token-del/{{ token.id }}"></a></td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+</div>

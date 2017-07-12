@@ -2,12 +2,16 @@
 
 namespace markhuot\CraftQL\Controllers;
 
+use Craft;
 use craft\web\Controller;
+use craft\records\User;
 use markhuot\CraftQL\Plugin;
+use markhuot\CraftQL\Models\Token;
+use yii\web\ForbiddenHttpException;
 
 class ApiController extends Controller
 {
-    protected $allowAnonymous = ['index','graphiql'];
+    protected $allowAnonymous = ['index'];
 
     private $graphQl;
     private $request;
@@ -26,11 +30,40 @@ class ApiController extends Controller
     }
 
     function actionGraphiql() {
-        return file_get_contents(dirname(__FILE__) . '/../../graphiql/index.html');
+        $url = Craft::$app->request->getUrl();
+        $url = preg_replace('/\?.*$/', '', $url);
+
+        $html = file_get_contents(dirname(__FILE__) . '/../../graphiql/index.html');
+        $html = str_replace('{{ url }}', $url, $html);
+        return $html;
     }
 
     function actionIndex()
     {
+        $user = Craft::$app->getUser()->getIdentity();
+
+        if (!$user) {
+            $tokenId = Craft::$app->request->headers->get('X-Token');
+            if ($tokenId) {
+                $token = Token::find()->where(['token' => $tokenId])->one();
+                if ($token) {
+                    $user = User::find()->where(['id' => $token->userId])->one();
+                }
+            }
+        }
+
+        // @todo, check user permissions when PRO license
+
+        if (!$user) {
+            http_response_code(403);
+            header('Content-Type: application/json; charset=UTF-8');
+            return json_encode([
+                'errors' => [
+                    ['message' => 'Not authorized']
+                ]
+            ]);
+        }
+
         $input = $this->request->input();
         $variables = $this->request->variables();
 
@@ -47,14 +80,12 @@ class ApiController extends Controller
         }
 
         header('Content-Type: application/json; charset=UTF-8');
-        header('Access-Control-Allow-Credentials: true');
-        header('Access-Control-Allow-Headers: Content-Type');
 
         $index = 1;
         foreach ($this->graphQl->getTimers() as $key => $timer) {
             header('X-Timer-'.$index++.'-'.ucfirst($key).': '.$timer);
         }
 
-        echo json_encode($result);
+        return json_encode($result);
     }
 }

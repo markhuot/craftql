@@ -1,0 +1,25 @@
+<?php
+
+namespace markhuot\CraftQL\Models;
+
+use craft\base\Model;
+use markhuot\CraftQL\Models\Token;
+
+class Settings extends Model
+{
+    public $uri = 'api';
+
+    function rules()
+    {
+        return [
+            [['uri'], 'required'],
+            // ...
+        ];
+    }
+
+    function tokens()
+    {
+        $tokens = Token::find()->where(['userId' => 1])->all();
+        return $tokens;
+    }
+}
