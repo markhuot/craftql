@@ -1,16 +1,63 @@
 {% import "_includes/forms" as forms %}
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+<style>
+.hljs {
+    background: none;
+    padding: 0;
+}
+</style>
 
+{% set welcome %}
+_CraftQL_ exposes the configuration of this Craft website to a [GraphQL](http://graphql.org) API. Without any additional configuration all your sections, assets, categories, and tags can be queried using the native GraphQL syntax.
+    
+For example, if you had a section named `news` you could ask _CraftQL_ for the most recent five news entries with their uri, title, and body. _CraftQL_ would then respond with a JSON structure matching the query structure, populated with the requested data.
+
+<div style="background: whiteSmoke; overflow: hidden;">
+<div style="float:left; width: 40%; padding: 15px; box-sizing: border-box;">
+<p><strong>Query</strong></p>
+<pre><code>{
+    news(limit:5) {
+    uri
+    title
+    body
+    }
+}</code></pre>
+</div>
+<div style="float:left; width: 50%; border-left: 1px solid #fff; padding: 15px; box-sizing: border-box;">
+<p><strong>Response</strong></p>
+<pre><code class="json">{
+    "data": {
+    "news": [
+        {
+        "uri": "news/a-news-article",
+        "title": "A News Article",
+        "body": "&lt;p>This is the body&hellip;&lt;/p>"
+        },
+        // ...
+    ]
+    }
+}</code></pre>
+</div>
+</div>
+
+## Getting started
+
+You can access your GraphQL endpoint in two ways,
+
+### GraphiQL
+
+[/{{ settings.uri}}](/{{ settings.uri}}) will show you a graphical interface to GraphQL named _GraphiQL_. Use it to explore your schema and test requests. Click **Docs** in the upper right hand corner to see all the fields you can query against.
+
+### Curl
+
+Using a token (generated below) you can query your schema directly. The following CURL request should get you started,
+
+<p><pre style="background: whiteSmoke; padding: 15px;"><code class="shell">$ curl -H "X-Token: {{ settings.tokens[0].token|default('{TOKEN}') }}" -H "Content-type: application/json" -d '{"query":"{__schema{types{name}}}"}' {{ siteUrl }}{{ settings.uri }}</code></pre></p>
+{% endset %}
 
 <div class="" style="width: 70%">
-    <h2>Welcome</h2>
-    <p>You can access your GraphQL endpoint in two ways,</p>
-
-    <h3>GraphiQL</h3>
-    <p><a href="/{{ settings.uri }}">/{{ settings.uri}}</a> will show you a graphical interface to GraphQL named GraphiQL. Use it to explore your schema and test requests.</p>
-
-    <h3>Curl</h3>
-    <p>Using a token, generated below, you can query your schema directly. The following CURL request should get you started,</p>
-    <p><pre style="background: whiteSmoke; padding: 5px;"><code>curl -H "X-Token: {{ settings.tokens[0].token|default('{TOKEN}') }}" -H "Content-type: application/json" -d '{"query":"{__schema{types{name}}}"}' {{ siteUrl }}{{ settings.uri }}</code></pre></p>
+    {{ welcome|md }}
 </div>
 
     <hr>
@@ -49,3 +96,5 @@
     </table>
     {% endif %}
 </div>
+
+<script>hljs.initHighlightingOnLoad();</script>

@@ -43,7 +43,9 @@ class ApiController extends Controller
         $user = Craft::$app->getUser()->getIdentity();
 
         if (!$user) {
-            $tokenId = Craft::$app->request->headers->get('X-Token');
+            $authorization = Craft::$app->request->headers->get('Authorization');
+            preg_match('/^bearer\s+(?<tokenId>.+)/', $authorization, $matches);
+            $tokenId = @$matches['tokenId'];
             if ($tokenId) {
                 $token = Token::find()->where(['token' => $tokenId])->one();
                 if ($token) {
