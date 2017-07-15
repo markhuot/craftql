@@ -63,4 +63,61 @@ class SchemaSectionService extends Component {
     ]);
   }
 
+  function getSectionArgs() {
+    return [
+      'after' => Type::string(),
+      'ancestorOf' => Type::int(),
+      'ancestorDist' => Type::int(),
+      'archived' => Type::boolean(),
+      'authorGroup' => Type::string(),
+      'authorGroupId' => Type::int(),
+      'authorId' => Type::int(),
+      'before' => Type::string(),
+      'level' => Type::int(),
+      'localeEnabled' => Type::boolean(),
+      'descendantOf' => Type::int(),
+      'descendantDist' => Type::int(),
+      'fixedOrder' => Type::boolean(),
+      'id' => Type::int(),
+      'limit' => Type::int(),
+      'locale' => Type::string(),
+      'nextSiblingOf' => Type::int(),
+      'offset' => Type::int(),
+      'order' => Type::string(),
+      'positionedAfter' => Type::id(),
+      'positionedBefore' => Type::id(),
+      'postDate' => Type::string(),
+      'prevSiblingOf' => Type::id(),
+      'relatedTo' => Type::id(),
+      'search' => Type::string(),
+      'siblingOf' => Type::int(),
+      'slug' => Type::string(),
+      'status' => Type::string(),
+      'title' => Type::string(),
+      'type' => Type::string(),
+      'uri' => Type::string(),
+    ];
+  }
+
+  function getSectionField($handle) {
+    $sectionType = $this->getSection($handle);
+    $isSingle = $sectionType->config['type'] == 'single';
+
+    return [
+      $handle => [
+        'type' => $isSingle ? $sectionType : Type::listOf($sectionType),
+        'description' => 'Entries from the '.$handle.' section',
+        'args' => $this->getSectionArgs(),
+        'resolve' => function ($root, $args) use ($handle, $isSingle) {
+            $criteria = \craft\elements\Entry::find();
+            $criteria = $criteria->section($handle);
+            foreach ($args as $key => $value) {
+                $criteria = $criteria->{$key}($value);
+            }
+            return $isSingle ? $criteria->one() : $criteria->find();
+        }
+      ]
+    ];
+  }
+
 }
