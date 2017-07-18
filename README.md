@@ -35,9 +35,9 @@ $ composer require markhuot/craftql
 
 ## Running the CLI server
 
-_CraftQL_ ships with a PHP-native web server. When running _CraftQL_ through the built-in web server the bootstrapping process will only happen during the initial start up. This has the potential to greatly speed up responses times since Craft will persist state between requests. In general, I have seen performance improvements of 5x (500ms to <100ms).
+_CraftQL_ ships with a PHP-native web server. When running _CraftQL_ through the provided web server the bootstrapping process will only happen during the initial start up. This has the potential to greatly speed up responses times since PHP will persist state between requests. In general, I have seen performance improvements of 5x (500ms to <100ms).
 
-Caution: this can also create unintended side effects since Craft is not natively built to run this way. Do not use this in production.
+Caution: this can also create unintended side effects since Craft is not natively built to run this way. Do not use this in production it could lead to memory leaks, server fires, and IT pager notifications :).
 
 ```
 php craft craftql/server
