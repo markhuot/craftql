@@ -1,6 +1,6 @@
 A drop-in GraphQL server for your [Craft CMS](https://craftcms.com/) implementation. With zero configuration, _CraftQL_ allows you to access all of Craft's features through a familiar [GraphQL](http://graphql.org) interface.
 
-# Example
+## Example
 
 Once installed, you can query Craft CMS using almost the exact same syntax as your Twig templates.
 
@@ -33,7 +33,7 @@ Once you have a running version of Craft 3 you can install _CraftQL_ with Compos
 $ composer require markhuot/craftql
 ```
 
-# Running the CLI server
+## Running the CLI server
 
 _CraftQL_ ships with a PHP-native web server. When running _CraftQL_ through the built-in web server the bootstrapping process will only happen during the initial start up. This has the potential to greatly speed up responses times since Craft will persist state between requests. In general, I have seen performance improvements of 5x (500ms to <100ms).
 
