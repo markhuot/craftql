@@ -48,12 +48,12 @@ class GraphQLService extends Component {
         $queryTypeConfig = [
             'name' => 'Query',
             'fields' => [
-                // 'me' => [
-                //     'type' => Type::string(),
-                //     'resolve' => function ($root, $args) {
-                //       return 'wooot!';
-                //     }
-                // ]
+                'helloWorld' => [
+                    'type' => Type::string(),
+                    'resolve' => function ($root, $args) {
+                      return 'Welcome to GraphQL! You now have a fully functional GraphQL endpoint.';
+                    }
+                ]
             ],
             'types' => [],
         ];
