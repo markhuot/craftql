@@ -33,7 +33,7 @@ class ApiController extends Controller
         $url = Craft::$app->request->getUrl();
         $url = preg_replace('/\?.*$/', '', $url);
 
-        $html = file_get_contents(dirname(__FILE__) . '/../../graphiql/index.html');
+        $html = file_get_contents(dirname(__FILE__) . '/../templates/graphiql.html');
         $html = str_replace('{{ url }}', $url, $html);
         return $html;
     }

@@ -16,6 +16,13 @@ class SchemaSectionService extends Component {
   private $elements;
   private $fields;
 
+  /**
+   * Constructor
+   *
+   * @param \markhuot\CraftQL\Services\SchemaEntryService $entries
+   * @param \markhuot\CraftQL\Services\SchemaElementService $elements
+   * @param \markhuot\CraftQL\Services\FieldService $fields
+   */
   function __construct(
     \markhuot\CraftQL\Services\SchemaEntryService $entries,
     \markhuot\CraftQL\Services\SchemaElementService $elements,
@@ -26,12 +33,25 @@ class SchemaSectionService extends Component {
     $this->fields = $fields;
   }
 
+  /**
+   * Load sections out of the Craft database and convert them to
+   * GraphQL sections
+   *
+   * @return void
+   */
   function loadAllSections() {
     foreach (Craft::$app->sections->allSections as $section) {
       $this->sections[$section->handle] = $this->parseSectionToObject($section);
     }
   }
 
+  /**
+   * Get a loaded section. This will no pull sections out of the
+   * database, so make sure you call `loadAllSections` first
+   *
+   * @param string $sectionHandle
+   * @return void
+   */
   function getSection($sectionHandle) {
     if (!isset($this->sections[$sectionHandle])) {
       $section = Craft::$app->sections->getSectionByHandle($sectionHandle);
@@ -41,10 +61,22 @@ class SchemaSectionService extends Component {
     return $this->sections[$sectionHandle];
   }
 
+  /**
+   * Return the loaded sections, converted into GraphQL types
+   *
+   * @return array
+   */
   function loadedSections() {
     return $this->sections;
   }
 
+  /**
+   * Convert a section from the Craft database into a native
+   * GraphQL type
+   *
+   * @param [type] $section
+   * @return void
+   */
   function parseSectionToObject($section) {
     $fields = $this->entries->baseFields();
 
@@ -63,6 +95,11 @@ class SchemaSectionService extends Component {
     ]);
   }
 
+  /**
+   * The params you can filter a `craft.entries` call with
+   *
+   * @return array
+   */
   function getSectionArgs() {
     return [
       'after' => Type::string(),
@@ -90,6 +127,7 @@ class SchemaSectionService extends Component {
       'prevSiblingOf' => Type::id(),
       'relatedTo' => Type::id(),
       'search' => Type::string(),
+      'section' => Type::string(),
       'siblingOf' => Type::int(),
       'slug' => Type::string(),
       'status' => Type::string(),
@@ -99,7 +137,13 @@ class SchemaSectionService extends Component {
     ];
   }
 
-  function getSectionField($handle) {
+  /**
+   * All GraphQL fields a section may expose
+   *
+   * @param string $handle
+   * @return array
+   */
+  function getGraphQLFields($handle) {
     $sectionType = $this->getSection($handle);
     $isSingle = $sectionType->config['type'] == 'single';
 
@@ -116,7 +160,7 @@ class SchemaSectionService extends Component {
             }
             return $isSingle ? $criteria->one() : $criteria->find();
         }
-      ]
+      ],
     ];
   }
 

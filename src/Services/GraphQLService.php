@@ -20,17 +20,20 @@ class GraphQLService extends Component {
     private $tagGroups;
     private $categoryGroups;
     private $assetVolumes;
+    private $entries;
 
     function __construct(
         \markhuot\CraftQL\Services\SchemaSectionService $sections,
         \markhuot\CraftQL\Services\SchemaTagGroupService $tagGroups,
         \markhuot\CraftQL\Services\SchemaCategoryGroupService $categoryGroups,
-        \markhuot\CraftQL\Services\SchemaAssetVolumeService $assetVolumes
+        \markhuot\CraftQL\Services\SchemaAssetVolumeService $assetVolumes,
+        \markhuot\CraftQL\Services\SchemaEntryService $entries
     ) {
         $this->sections = $sections;
         $this->tagGroups = $tagGroups;
         $this->categoryGroups = $categoryGroups;
         $this->assetVolumes = $assetVolumes;
+        $this->entries = $entries;
     }
 
     function bootstrap() {
@@ -55,8 +58,10 @@ class GraphQLService extends Component {
             'types' => [],
         ];
 
+        $queryTypeConfig['fields'] = array_merge($queryTypeConfig['fields'], $this->entries->getGraphQLFields());
+
         foreach ($this->sections->loadedSections() as $handle => $sectionType) {
-            $queryTypeConfig['fields'] = array_merge($queryTypeConfig['fields'], $this->sections->getSectionField($handle));
+            $queryTypeConfig['fields'] = array_merge($queryTypeConfig['fields'], $this->sections->getGraphQLFields($handle));
         }
 
         foreach ($this->categoryGroups->loadedGroups() as $handle => $group) {

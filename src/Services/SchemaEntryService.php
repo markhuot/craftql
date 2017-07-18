@@ -5,12 +5,21 @@ namespace markhuot\CraftQL\services;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
+use yii;
 use yii\base\Component;
+use markhuot\CraftQL\Services\SchemaSectionService;
 
 class SchemaEntryService extends Component {
 
   static $interface;
   static $baseFields;
+  private $sections;
+
+  // function __construct(
+  //     \markhuot\CraftQL\Services\SchemaSectionService $sections
+  // ) {
+  //     $this->sections = $sections;
+  // }
 
   function baseFields() {
     if (!empty(static::$baseFields)) {
@@ -101,6 +110,104 @@ class SchemaEntryService extends Component {
     }
 
     return static::$interface;
+  }
+
+  function getGraphQLField() {
+    $sections = Yii::$container->get(SchemaSectionService::class);
+
+    return [
+      'type' => Type::listOf($this->getInterface()),
+      'description' => 'Entries from the craft interface',
+      'args' => $sections->getSectionArgs(),
+      'resolve' => function ($root, $args) {
+        $criteria = \craft\elements\Entry::find();
+        foreach ($args as $key => $value) {
+          $criteria = $criteria->{$key}($value);
+        }
+        return $criteria->find();
+      }
+    ];
+  }
+
+  /**
+   * A Relay-compatable field that includes pagination
+   *
+   * @return array
+   */
+  function getGraphQLFieldPaginator() {
+    $sections = Yii::$container->get(SchemaSectionService::class);
+
+    $edges = new ObjectType([
+      'name' => 'Edges',
+      'fields' => [
+        'node' => ['type' => $this->getInterface(), 'resolve' => function ($root, $args) {
+          return $root;
+        }],
+        'cursor' => ['type' => Type::nonNull(Type::string()), 'resolve' => function ($root, $args) {
+          return base64_encode($root->id);
+        }],
+      ],
+    ]);
+
+    $pageInfo = new ObjectType([
+      'name' => 'PageInfo',
+      'fields' => [
+        'hasNextPage' => ['type' => Type::nonNull(Type::boolean())],
+        'hasPreviousPage' => ['type' => Type::nonNull(Type::boolean())],
+      ],
+    ]);
+
+    $paginator = new ObjectType([
+      'name' => 'Paginator',
+      'fields' => [
+        'pageInfo' => ['type' => $pageInfo, 'resolve' => function ($root, $args) {
+          $total = $root->total();
+          $offset = $root->offset;
+          $perPage = $root->limit;
+          return [
+            'hasNextPage' => $perPage !== null && $offset + $perPage < $total,
+            'hasPreviousPage' => $offset > 0,
+          ];
+        }],
+        'edges' => ['type' => Type::listOf($edges), 'resolve' => function ($root, $args) {
+          return $root->find();
+        }],
+      ],
+    ]);
+
+    $args = $sections->getSectionArgs();
+    $args = array_merge($args, [
+      'first' => Type::int(),
+      'after' => Type::string(),
+    ]);
+
+    return [
+      'type' => $paginator,
+      'args' => $args,
+      'resolve' => function ($root, $args) {
+        $criteria = \craft\elements\Entry::find();
+        foreach ($args as $key => $value) {
+          switch ($key) {
+            case 'first':
+              $criteria = $criteria->limit($value);
+              break;
+            case 'after':
+              $criteria = $criteria->where(['>', 'entries.id', base64_decode($value)]);
+              break;
+            default:
+              $criteria = $criteria->{$key}($value);
+          }
+        }
+        return $criteria;
+      }
+    ];
+  }
+
+  function getGraphQLFields() {
+    return [
+      'entries' => $this->getGraphQLField(),
+      'entriesPaginator' => $this->getGraphQLFieldPaginator(),
+    ];
   }
 
 }
