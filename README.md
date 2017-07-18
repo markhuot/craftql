@@ -1,5 +1,7 @@
 A drop-in GraphQL server for your [Craft CMS](https://craftcms.com/) implementation. With zero configuration, _CraftQL_ allows you to access all of Craft's features through a familiar [GraphQL](http://graphql.org) interface.
 
+<div style="border: 1px solid red; padding: 10px;"><p><strong>NOTE:</strong> This software is in beta and while querying the database works quite well it has not been thouroughly tested. Use at your own risk.</p><p><strong>P.P.S</strong>, this plugin may or may not become a paid add-on when the Craft Plugin store becomes available. <strike>Buyer</strike> Downloader be ware.</p></div>
+
 ## Example
 
 Once installed, you can query Craft CMS using almost the exact same syntax as your Twig templates.
