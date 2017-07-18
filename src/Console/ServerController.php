@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\console;
+namespace markhuot\CraftQL\Console;
 
 use Craft;
 use React\EventLoop\Factory;
@@ -10,43 +10,64 @@ use React\Http\Server as HttpServer;
 use React\Promise\Promise;
 use Psr\Http\Message\ServerRequestInterface;
 use yii\console\Controller;
-use markhuot\CraftQL\Plugin;
+use yii;
+use markhuot\CraftQL\Services\GraphQLService;
 
 class ServerController extends Controller
 {
+    public $port = 9001;
+    public $host = '0.0.0.0';
+    public $debug = false;
+    
+    public function options($actionID)
+    {
+        return ['port', 'host', 'debug'];
+    }
+    
+    public function optionAliases()
+    {
+        return [
+            'p' => 'port',
+            'h' => 'host'
+        ];
+    }
+
+    public function getHelpSummary() {
+        return 'Tools for CraftQL';
+    }
+
+    public function getActionHelpSummary($action) {
+        return 'An event-driven, non-blocking web server.';
+    }
+
     public function actionIndex()
     {
-        Plugin::$graphQLService->bootstrap();
+        $graphQl = Yii::$container->get(GraphQLService::class);
+        $graphQl->bootstrap();
 
-        $loop = Factory::create();
-        $socket = new Server(isset($argv[1]) ? $argv[1] : '0.0.0.0:9001', $loop);
+        $loop = \React\EventLoop\Factory::create();
 
-        $server = new HttpServer(function (ServerRequestInterface $request) {
-            return new Promise(function ($resolve, $reject) use ($request) {
+        $server = new HttpServer(function (ServerRequestInterface $request) use ($graphQl) {
+            return new Promise(function ($resolve, $reject) use ($request, $graphQl) {
                 $postBody = '';
-
+                
                 $request->getBody()->on('data', function ($data) use (&$postBody) {
                     $postBody .= $data;
                 });
 
-                $request->getBody()->on('end', function () use ($request, $resolve, &$postBody){
+                $request->getBody()->on('end', function () use ($request, $resolve, &$postBody, $graphQl) {
                     $query = false;
                     $variables = [];
 
-                    parse_str($request->getUri()->getQuery(), $queryParams);
-                    if (!empty($queryParams['query'])) {
-                        $query = $queryParams['query'];
-                    }
-
                     if ($postBody) {
                         $body = json_decode($postBody, true);
-                        $query = $body['query'];
+                        $query = @$body['query'];
                         $variables = @$body['variables'] ?: [];
                     }
 
                     try {
-                        echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n";
-                        $result = Plugin::$graphQLService->execute($query, $variables);
+                        if ($this->debug) { echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n"; }
+                        $result = $graphQl->execute($query, $variables);
                     } catch (\Exception $e) {
                         $result = [
                             'error' => [
@@ -55,27 +76,21 @@ class ServerController extends Controller
                         ];
                     }
 
-                    $headers = [
-                        'Content-Type' => 'application/json; charset=UTF-8',
-                        'Access-Control-Allow-Origin' => '*',
-                    ];
-
-                    $index = 1;
-                    foreach (Plugin::$graphQLService->getTimers() as $key => $timer) {
-                        $headers['X-Timer-'.$index++.'-'.ucfirst($key)] = $timer;
-                    }
-
-                    $response = new Response(
-                        200,
-                        $headers,
+                    $response = new Response(200, [
+                            'Content-Type' => 'application/json; charset=UTF-8',
+                            'Access-Control-Allow-Origin' => '*',
+                        ],
                         json_encode($result)
                     );
-
                     $resolve($response);
                 });
             });
         });
-        echo 'Listening on ' . $socket->getAddress() . PHP_EOL;
+
+        $socket = new \React\Socket\Server($this->host.':'.$this->port, $loop);
+        $server->listen($socket);
+
+        echo "Server is now listening at http://{$this->host}:{$this->port}\n";
         $loop->run();
     }
 }

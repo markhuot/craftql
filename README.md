@@ -40,5 +40,5 @@ _CraftQL_ ships with a PHP-native web server. When running _CraftQL_ through the
 Caution: this can also create unintended side effects since Craft is not natively built to run this way. Do not use this in production.
 
 ```
-env $(cat .env | xargs) ./craft/app/etc/console/yiic craftqlserver
+php craft craftql/server
 ```
