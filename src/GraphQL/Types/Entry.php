@@ -94,7 +94,7 @@ class Entry {
                 'description' => 'An entry in Craft',
                 'fields' => $fields,
                 'resolveType' => function ($entry) {
-                    return ucfirst($entry->section->handle);
+                    return \markhuot\CraftQL\GraphQL\Types\EntryType::getName($entry->type);
                 }
             ]);
         }

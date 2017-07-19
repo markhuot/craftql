@@ -39,9 +39,19 @@ class Sections {
     /**
      * Return the loaded sections, converted into GraphQL types
      *
+     * @deprecated
      * @return array
      */
     function loadedSections() {
+        return $this->sections;
+    }
+
+    /**
+     * Return the loaded sections, converted into GraphQL types
+     *
+     * @return array
+     */
+    function getAllSections() {
         return $this->sections;
     }
 

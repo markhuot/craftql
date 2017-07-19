@@ -8,6 +8,8 @@ use GraphQL\Type\Definition\EnumType;
 
 class Checkboxes {
 
+  static $enums = [];
+
   function getDefinition($field) {
     $options = [];
     foreach ($field['settings']['options'] as $option) {
@@ -16,13 +18,15 @@ class Checkboxes {
       ];
     }
 
-    $enumType = new EnumType([
-      'name' => ucfirst($field->handle.'Enum'),
-      'values' => $options,
-    ]);
+    if (empty(static::$enums[$field->handle])) {
+      static::$enums[$field->handle] = new EnumType([
+        'name' => ucfirst($field->handle.'Enum'),
+        'values' => $options,
+      ]);
+    }
 
     return [$field->handle => [
-      'type' => Type::listOf($enumType),
+      'type' => Type::listOf(static::$enums[$field->handle]),
       'resolve' => function ($root, $args) use ($field) {
         $values = [];
         foreach ($root->{$field->handle} as $option) {

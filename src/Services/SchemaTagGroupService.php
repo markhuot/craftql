@@ -10,7 +10,7 @@ use yii\base\Component;
 
 class SchemaTagGroupService extends Component {
 
-  public $groups = [];
+  static $groups = [];
   private $fields;
 
   function __construct(
@@ -21,17 +21,17 @@ class SchemaTagGroupService extends Component {
 
   function loadAllGroups() {
     foreach (Craft::$app->tags->allTagGroups as $group) {
-      $this->groups[$group->id] = $this->parseGroupToObject($group);
+      static::$groups[$group->id] = $this->parseGroupToObject($group);
     }
   }
 
   function getGroup($groupId) {
-    if (!isset($this->groups[$groupId])) {
+    if (!isset(static::$groups[$groupId])) {
       $group = Craft::$app->tags->getTagGroupById($groupId);
-      $this->groups[$groupId] = $this->parseGroupToObject($group);
+      static::$groups[$groupId] = $this->parseGroupToObject($group);
     }
 
-    return $this->groups[$groupId];
+    return static::$groups[$groupId];
   }
 
   function parseGroupToObject($group) {
