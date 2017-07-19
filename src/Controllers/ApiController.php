@@ -40,6 +40,11 @@ class ApiController extends Controller
 
     function actionIndex()
     {
+        // You must set the header to JSON, otherwise Craft will see HTML and try to insert
+        // javascript at the bottom to run pending tasks
+        $headers = \Craft::$app->response->headers;
+        $headers->add('Content-Type', 'application/json; charset=UTF-8');
+
         $writable = true;
         $token = false;
         $user = Craft::$app->getUser()->getIdentity();
@@ -61,7 +66,6 @@ class ApiController extends Controller
 
         if (!$user) {
             http_response_code(403);
-            header('Content-Type: application/json; charset=UTF-8');
             return json_encode([
                 'errors' => [
                     ['message' => 'Not authorized']
@@ -80,11 +84,6 @@ class ApiController extends Controller
                 ]
             ];
         }
-
-        // You must set the header to JSON, otherwise Craft will see HTML and try to insert
-        // javascript at the bottom to run pending tasks
-        $headers = \Craft::$app->response->headers;
-        $headers->add('Content-Type', 'application/json; charset=UTF-8');
 
         // $index = 1;
         // foreach ($this->graphQl->getTimers() as $key => $timer) {
