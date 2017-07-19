@@ -26,20 +26,22 @@ class Plugin extends BasePlugin
     public $controllerNamespace = 'markhuot\\CraftQL\\Controllers';
     public $hasCpSettings = true;
 
+    function __construct($id, $parent = null, array $config = []) {
+        // Make some of the services singletons
+        // \Craft::$container->setSingleton(\markhuot\CraftQL\Repositories\CategoryGroup::class);
+        // var_dump('a');
+
+        parent::__construct($id, $parent, $config);
+    }
+
     /**
      * Init for the entire plugin
      *
      * @return void
      */
     function init() {
-        // Make some of the services singletons
-        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\FieldService::class);
-        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\GraphQLService::class);
-        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\RequestService::class);
-        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaAssetSourceService::class);
-        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaCategoryGroupService::class);
-        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaElementService::class);
-        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaTagGroupService::class);
+        // var_dump('0');
+        \Craft::$container->setSingleton(\markhuot\CraftQL\Repositories\CategoryGroup::class);
 
         // Add in our console commands
         if (Craft::$app instanceof ConsoleApplication) {

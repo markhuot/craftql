@@ -16,6 +16,7 @@ use craft\fields\Color as ColorField;
 use craft\fields\Dropdown as DropdownField;
 use craft\fields\MultiSelect as MultiSelectField;
 use craft\fields\Number as NumberField;
+use craft\fields\Categories as CategoriesField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
 use markhuot\CraftQL\Craft\Fields\Text as TextTransformer;
@@ -29,6 +30,7 @@ use markhuot\CraftQL\Craft\Fields\Assets as AssetsTransformer;
 use markhuot\CraftQL\Craft\Fields\Color as ColorTransformer;
 use markhuot\CraftQL\Craft\Fields\Dropdown as DropdownTransformer;
 use markhuot\CraftQL\Craft\Fields\Number as NumberTransformer;
+use markhuot\CraftQL\Craft\Fields\Categories as CategoriesTransformer;
 
 class FieldService {
 
@@ -52,6 +54,7 @@ class FieldService {
         case DropdownField::class: $transformer = Yii::$container->get(DropdownTransformer::class); break;
         case MultiSelectField::class: $transformer = Yii::$container->get(CheckboxTransformer::class); break;
         case NumberField::class: $transformer = Yii::$container->get(NumberTransformer::class); break;
+        case CategoriesField::class: $transformer = Yii::$container->get(CategoriesTransformer::class); break;
       }
 
       $fields = array_merge($fields, $transformer->getDefinition($field));

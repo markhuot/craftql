@@ -7,34 +7,37 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
+use yii\base\Component;
 
-class CategoryGroup {
+class CategoryGroup extends Component {
 
-  public $groups = [];
+  static $groups = [];
   private $elements;
   private $categoryGroups;
 
   function loadedGroups() {
-    return $this->groups;
+    return static::$groups;
   }
 
   function loadAllGroups() {
     foreach (Craft::$app->categories->allGroups as $group) {
-      $this->groups[$group->handle] = $this->parseGroupToObject($group);
+      if (!isset(static::$groups[$group->id])) {
+        static::$groups[$group->id] = $this->parseGroupToObject($group);
+      }
     }
   }
 
-  function getGroup($groupId) {
-    if (!isset($this->groups[$groupId])) {
-      $group = Craft::$app->categories->getGroupById($groupId);
-      $this->groups[$group->handle] = $this->parseGroupToObject($group);
+  function getGroup($id) {
+    if (!isset(static::$groups[$id])) {
+      $group = Craft::$app->categories->getGroupById($id);
+      static::$groups[$group->id] = $this->parseGroupToObject($group);
     }
 
-    return $this->groups[$groupId];
+    return static::$groups[$id];
   }
 
   function getAllGroups() {
-    return $this->groups;
+    return static::$groups;
   }
 
   function parseGroupToObject($group) {
