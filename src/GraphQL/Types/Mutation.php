@@ -23,9 +23,13 @@ class Mutation extends Component {
                         if (!empty($args['id'])) {
                             $criteria = Entry::find();
                             $criteria->id($args['id']);
-                            $entry = $criteria->one();   
+                            $entry = $criteria->one();
+                            if (!$entry) {
+                                throw new \Exception('Could not find an entry with id '.$args['id']);
+                            }
                         }
-                        else if (
+                        
+                        if (
                             !empty($args['sectionId']) &&
                             !empty($args['typeId']) &&
                             !empty($args['authorId'])
@@ -36,7 +40,7 @@ class Mutation extends Component {
                             $entry->authorId = $args['authorId'];
                         }
                         else {
-                            throw new \Exception('Could not find or create an entry.');
+                            throw new \Exception('Could not create an entry. `sectionId`, `typeId`, and `authorId` must be set.');
                         }
 
                         if (isset($args['title'])) {

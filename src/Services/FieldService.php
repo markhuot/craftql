@@ -19,18 +19,18 @@ use craft\fields\Number as NumberField;
 use craft\fields\Categories as CategoriesField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
-use markhuot\CraftQL\Craft\Fields\Text as TextTransformer;
-use markhuot\CraftQL\Craft\Fields\RichText as RichTextTransformer;
-use markhuot\CraftQL\Craft\Fields\Checkboxes as CheckboxTransformer;
-use markhuot\CraftQL\Craft\Fields\Lightswitch as LightswitchTransformer;
-use markhuot\CraftQL\Craft\Fields\Date as DateTransformer;
-use markhuot\CraftQL\Craft\Fields\Entries as EntriesTransformer;
-use markhuot\CraftQL\Craft\Fields\Tags as TagsTransformer;
-use markhuot\CraftQL\Craft\Fields\Assets as AssetsTransformer;
-use markhuot\CraftQL\Craft\Fields\Color as ColorTransformer;
-use markhuot\CraftQL\Craft\Fields\Dropdown as DropdownTransformer;
-use markhuot\CraftQL\Craft\Fields\Number as NumberTransformer;
-use markhuot\CraftQL\Craft\Fields\Categories as CategoriesTransformer;
+use markhuot\CraftQL\Fields\Text as TextTransformer;
+use markhuot\CraftQL\Fields\RichText as RichTextTransformer;
+use markhuot\CraftQL\Fields\Checkboxes as CheckboxTransformer;
+use markhuot\CraftQL\Fields\Lightswitch as LightswitchTransformer;
+use markhuot\CraftQL\Fields\Date as DateTransformer;
+use markhuot\CraftQL\Fields\Entries as EntriesTransformer;
+use markhuot\CraftQL\Fields\Tags as TagsTransformer;
+use markhuot\CraftQL\Fields\Assets as AssetsTransformer;
+use markhuot\CraftQL\Fields\Color as ColorTransformer;
+use markhuot\CraftQL\Fields\Dropdown as DropdownTransformer;
+use markhuot\CraftQL\Fields\Number as NumberTransformer;
+use markhuot\CraftQL\Fields\Categories as CategoriesTransformer;
 
 class FieldService {
 
