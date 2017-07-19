@@ -108,8 +108,36 @@ class GraphQLService extends Component {
 
         $queryType = new ObjectType($queryTypeConfig);
 
+        $mutationType = new ObjectType([
+            'name' => 'Mutation',
+            'fields' => [
+                'updateEntry' => [
+                    'type' => $this->entries->getInterface(),
+                    'args' => [
+                        'id' => Type::nonNull(Type::int()),
+                        'title' => Type::string(),
+                    ],
+                    'resolve' => function ($root, $args) {
+                        $criteria = \craft\elements\Entry::find();
+                        $criteria->id($args['id']);
+                        $entry = $criteria->one();
+                        $entry->title = $args['title'];
+                        // $entry->setFieldValues(['title' => $args['title']]);
+                        Craft::$app->elements->saveElement($entry);
+
+                        // foreach ($args as $key => $value) {
+                        //     $entry->
+                        // }
+                        
+                        return $entry;
+                    }
+                ]
+            ],
+        ]);
+
         $this->schema = new Schema([
             'query' => $queryType,
+            'mutation' => $mutationType,
             'types' => array_merge([],
                 $this->assetVolumes->getAllVolumes()
             ),
