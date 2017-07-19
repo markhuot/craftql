@@ -10,11 +10,19 @@ A drop-in GraphQL server for your [Craft CMS](https://craftcms.com/) implementat
 
 ## Example
 
-Once installed, you can query Craft CMS using almost the exact same syntax as your Twig templates.
+Once installed, you can test your installation with a simple Hello World,
 
 ```graphql
 {
-  entries(section:"news") {
+  helloWorld
+}
+```
+
+If that worked, you can now query Craft CMS using almost the exact same syntax as your Twig templates.
+
+```graphql
+{
+  entries(section:"news", limit:5, search:"body:salty") {
     ...on News {
       title
       url
