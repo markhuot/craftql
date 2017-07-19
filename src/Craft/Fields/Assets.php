@@ -14,7 +14,7 @@ class Assets extends Component {
     return [$field->handle => [
       'type' => Type::listOf(\markhuot\CraftQL\GraphQL\Types\Volume::interface()),
       'resolve' => function ($root, $args) use ($field) {
-        return $root->{$field->handle}->find();
+        return $root->{$field->handle}->all();
       }
     ]];
   }

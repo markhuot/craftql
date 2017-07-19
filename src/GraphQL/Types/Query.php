@@ -18,7 +18,7 @@ class Query extends Component {
     function __construct(
         \markhuot\CraftQL\Repositories\Sections $sections,
         \markhuot\CraftQL\Repositories\Volumes $volumes,
-        \markhuot\CraftQL\Services\SchemaCategoryGroupService $categoryGroups
+        \markhuot\CraftQL\Repositories\CategoryGroup $categoryGroups
     ) {
         $this->sections = $sections;
         $this->volumes = $volumes;
@@ -53,7 +53,7 @@ class Query extends Component {
                 foreach ($args as $key => $value) {
                     $criteria = $criteria->{$key}($value);
                 }
-                return $criteria->find();
+                return $criteria->all();
             }
         ];
 
@@ -71,28 +71,33 @@ class Query extends Component {
                     foreach ($args as $key => $value) {
                         $criteria = $criteria->{$key}($value);
                     }
-                    return $isSingle ? $criteria->one() : $criteria->find();
+                    return $isSingle ? $criteria->one() : $criteria->all();
                 }
             ];
         }
 
-        foreach ($this->categoryGroups->loadedGroups() as $handle => $group) {
-            $queryTypeConfig['fields'][$handle] = [
-                'type' => Type::listOf($group),
-                'resolve' => function ($root, $args) use ($handle) {
-                    $criteria = \craft\elements\Entry::find();
-                    $criteria = $criteria->group($handle);
-                    return $criteria->find();
-                },
-            ];
-        }
+        // foreach ($this->categoryGroups->loadedGroups() as $handle => $group) {
+        //     $queryTypeConfig['fields'][$handle] = [
+        //         'type' => Type::listOf($group),
+        //         'resolve' => function ($root, $args) use ($handle) {
+        //             $criteria = \craft\elements\Entry::find();
+        //             $criteria = $criteria->group($handle);
+        //             return $criteria->find();
+        //         },
+        //     ];
+        // }
 
         return new ObjectType($queryTypeConfig);
     }
 
     function getTypes() {
         $this->volumes->loadAllVolumes();
-        return $this->volumes->getAllVolumes();
+        $this->categoryGroups->loadAllGroups();
+
+        return array_merge(
+            $this->volumes->getAllVolumes(),
+            $this->categoryGroups->getAllGroups()
+        );
     }
 
 }
