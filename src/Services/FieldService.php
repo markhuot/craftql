@@ -16,7 +16,9 @@ use craft\fields\Color as ColorField;
 use craft\fields\Dropdown as DropdownField;
 use craft\fields\MultiSelect as MultiSelectField;
 use craft\fields\Number as NumberField;
+use craft\fields\RadioButtons as RadioButtonsField;
 use craft\fields\Categories as CategoriesField;
+use craft\fields\PositionSelect as PositionSelectField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
 use markhuot\CraftQL\Fields\Text as TextTransformer;
@@ -31,6 +33,8 @@ use markhuot\CraftQL\Fields\Color as ColorTransformer;
 use markhuot\CraftQL\Fields\Dropdown as DropdownTransformer;
 use markhuot\CraftQL\Fields\Number as NumberTransformer;
 use markhuot\CraftQL\Fields\Categories as CategoriesTransformer;
+use markhuot\CraftQL\Fields\PositionSelect as PositionSelectTransformer;
+use markhuot\CraftQL\Fields\RadioButton as RadioButtonTransformer;
 
 class FieldService {
 
@@ -67,9 +71,11 @@ class FieldService {
         case PlainTextField::class: $transformer = Yii::$container->get(TextTransformer::class); break;
         case ColorField::class: $transformer = Yii::$container->get(ColorTransformer::class); break;
         case DropdownField::class: $transformer = Yii::$container->get(DropdownTransformer::class); break;
+        case RadioButtonsField::class: $transformer = Yii::$container->get(RadioButtonTransformer::class); break;
         case MultiSelectField::class: $transformer = Yii::$container->get(CheckboxTransformer::class); break;
         case NumberField::class: $transformer = Yii::$container->get(NumberTransformer::class); break;
         case CategoriesField::class: $transformer = Yii::$container->get(CategoriesTransformer::class); break;
+        case PositionSelectField::class: $transformer = Yii::$container->get(PositionSelectTransformer::class); break;
       }
 
       $fields = array_merge($fields, $transformer->getDefinition($field));
