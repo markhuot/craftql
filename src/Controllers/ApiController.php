@@ -40,6 +40,8 @@ class ApiController extends Controller
 
     function actionIndex()
     {
+        $writable = true;
+        $token = false;
         $user = Craft::$app->getUser()->getIdentity();
 
         if (!$user) {
@@ -49,6 +51,7 @@ class ApiController extends Controller
             if ($tokenId) {
                 $token = Token::find()->where(['token' => $tokenId])->one();
                 if ($token) {
+                    $writable = $token->isWritable;
                     $user = User::find()->where(['id' => $token->userId])->one();
                 }
             }
@@ -69,7 +72,7 @@ class ApiController extends Controller
         $input = $this->request->input();
         $variables = $this->request->variables();
 
-        $this->graphQl->bootstrap();
+        $this->graphQl->bootstrap($writable);
 
         try {
             $result = $this->graphQl->execute($input, $variables);
@@ -83,10 +86,10 @@ class ApiController extends Controller
 
         header('Content-Type: application/json; charset=UTF-8');
 
-        $index = 1;
-        foreach ($this->graphQl->getTimers() as $key => $timer) {
-            header('X-Timer-'.$index++.'-'.ucfirst($key).': '.$timer);
-        }
+        // $index = 1;
+        // foreach ($this->graphQl->getTimers() as $key => $timer) {
+        //     header('X-Timer-'.$index++.'-'.ucfirst($key).': '.$timer);
+        // }
 
         return json_encode($result);
     }

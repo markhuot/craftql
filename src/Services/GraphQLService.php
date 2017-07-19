@@ -14,7 +14,7 @@ use yii\base\Component;
 class GraphQLService extends Component {
 
     private $schema;
-    private $timers = [];
+    // private $timers = [];
 
     private $sections;
     private $tagGroups;
@@ -36,8 +36,8 @@ class GraphQLService extends Component {
         $this->entries = $entries;
     }
 
-    function bootstrap() {
-        $this->timers['start'] = microtime(true) * 1000;
+    function bootstrap($writable=false) {
+        // $this->timers['start'] = microtime(true) * 1000;
 
         // Eager load some things we know we'll need later
         $this->tagGroups->loadAllGroups();
@@ -106,58 +106,64 @@ class GraphQLService extends Component {
         //     }
         // ];
 
-        $queryType = new ObjectType($queryTypeConfig);
-
-        $mutationType = new ObjectType([
-            'name' => 'Mutation',
-            'fields' => [
-                'updateEntry' => [
-                    'type' => $this->entries->getInterface(),
-                    'args' => [
-                        'id' => Type::nonNull(Type::int()),
-                        'title' => Type::string(),
-                    ],
-                    'resolve' => function ($root, $args) {
-                        $criteria = \craft\elements\Entry::find();
-                        $criteria->id($args['id']);
-                        $entry = $criteria->one();
-                        $entry->title = $args['title'];
-                        // $entry->setFieldValues(['title' => $args['title']]);
-                        Craft::$app->elements->saveElement($entry);
-
-                        // foreach ($args as $key => $value) {
-                        //     $entry->
-                        // }
-                        
-                        return $entry;
-                    }
-                ]
-            ],
-        ]);
-
-        $this->schema = new Schema([
-            'query' => $queryType,
-            'mutation' => $mutationType,
+        $schema = [
             'types' => array_merge([],
                 $this->assetVolumes->getAllVolumes()
             ),
-        ]);
+        ];
 
-        $this->timers['setup'] = microtime(true) * 1000;
+        $schema['query'] = new ObjectType($queryTypeConfig);
+
+        if ($writable) {
+            $schema['mutation'] = new ObjectType([
+                'name' => 'Mutation',
+                'fields' => [
+                    'updateEntry' => [
+                        'type' => $this->entries->getInterface(),
+                        'args' => [
+                            'id' => Type::nonNull(Type::int()),
+                            'title' => Type::string(),
+                            'body' => Type::string(),
+                        ],
+                        'resolve' => function ($root, $args) {
+                            $criteria = \craft\elements\Entry::find();
+                            $criteria->id($args['id']);
+                            $entry = $criteria->one();
+
+                            if (isset($args['title'])) {
+                                $entry->title = $args['title'];
+                            }
+
+                            $fields = $args;
+                            unset($fields['id']);
+                            unset($fields['title']);
+                            $entry->setFieldValues($fields);
+
+                            Craft::$app->elements->saveElement($entry);
+                            
+                            return $entry;
+                        }
+                    ]
+                ],
+            ]);
+        }
+        $this->schema = new Schema($schema);
+
+        // $this->timers['setup'] = microtime(true) * 1000;
         // $this->timers['total1'] = $this->timers['setup']-$this->timers['start'];
     }
 
     function execute($input, $variables = []) {
         $result = GraphQL::execute($this->schema, $input, null, null, $variables);
 
-        $this->timers['end'] = microtime(true) * 1000;
+        // $this->timers['end'] = microtime(true) * 1000;
         // $this->timers['total2'] = $this->timers['end']-$this->timers['start'];
 
         return $result;
     }
 
-    function getTimers() {
-        return $this->timers;
-    }
+    // function getTimers() {
+    //     return $this->timers;
+    // }
 
 }
