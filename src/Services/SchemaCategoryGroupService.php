@@ -18,11 +18,9 @@ class SchemaCategoryGroupService {
   private $categoryGroups;
 
   function __construct(
-    \markhuot\CraftQL\Services\FieldService $fields,
-    \markhuot\CraftQL\Services\SchemaElementService $elements
+    \markhuot\CraftQL\Services\FieldService $fields
   ) {
     $this->fields = $fields;
-    $this->elements = $elements;
   }
 
   function loadedGroups() {

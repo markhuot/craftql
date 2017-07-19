@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\FieldDefinitions;
+namespace markhuot\CraftQL\Craft\Fields;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -10,15 +10,9 @@ class Assets extends Component {
 
   private $assetVolumes;
 
-  function __construct(
-    \markhuot\CraftQL\Services\SchemaAssetVolumeService $assetVolumes
-  ) {
-    $this->assetVolumes = $assetVolumes;
-  }
-
   function getDefinition($field) {
     return [$field->handle => [
-      'type' => Type::listOf($this->assetVolumes->getInterface()),
+      'type' => Type::listOf(\markhuot\CraftQL\GraphQL\Types\Volume::interface()),
       'resolve' => function ($root, $args) use ($field) {
         return $root->{$field->handle}->find();
       }

@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\FieldDefinitions;
+namespace markhuot\CraftQL\Craft\Fields;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -9,21 +9,10 @@ use yii\base\Component;
 
 class Entries extends Component {
 
-  private $entries;
-  private $sections;
-
-  function __construct(
-    \markhuot\CraftQL\Services\SchemaEntryService $entries,
-    \markhuot\CraftQL\Services\SchemaSectionService $sections
-  ) {
-    $this->entries = $entries;
-    $this->sections = $sections;
-  }
-
   function getDefinition($field) {
     return [$field->handle => [
-      'type' => Type::listOf($this->entries->getInterface()),
-      'args' => $this->sections->getSectionArgs(),
+      'type' => Type::listOf(\markhuot\CraftQL\GraphQL\Types\Entry::interface()),
+      'args' => \markhuot\CraftQL\GraphQL\Types\Section::args(),
       'resolve' => function ($root, $args) use ($field) {
         $criteria = $root->{$field->handle};
         foreach ($args as $key => $value) {

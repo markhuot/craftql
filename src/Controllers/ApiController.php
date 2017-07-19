@@ -84,7 +84,10 @@ class ApiController extends Controller
             ];
         }
 
-        header('Content-Type: application/json; charset=UTF-8');
+        // You must set the header to JSON, otherwise Craft will see HTMl and try to insert
+        // javascript at the bottom to run pending tasks
+        $headers = \Craft::$app->response->headers;
+        $headers->add('Content-Type', 'application/json; charset=UTF-8');
 
         // $index = 1;
         // foreach ($this->graphQl->getTimers() as $key => $timer) {

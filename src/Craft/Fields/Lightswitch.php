@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\FieldDefinitions;
+namespace markhuot\CraftQL\Craft\Fields;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;

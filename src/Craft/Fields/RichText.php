@@ -1,11 +1,11 @@
 <?php
 
-namespace markhuot\CraftQL\FieldDefinitions;
+namespace markhuot\CraftQL\Craft\Fields;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 
-class Text {
+class RichText {
 
   function getDefinition($field) {
     return [
@@ -19,7 +19,7 @@ class Text {
             return $root->{$field->handle}->getPage($args['page']);
           }
 
-          return $root->{$field->handle};
+          return $root->{$field->handle}->getParsedContent();
         }
       ],
     ];

@@ -18,17 +18,17 @@ use craft\fields\MultiSelect as MultiSelectField;
 use craft\fields\Number as NumberField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
-use markhuot\CraftQL\FieldDefinitions\Text as TextTransformer;
-use markhuot\CraftQL\FieldDefinitions\RichText as RichTextTransformer;
-use markhuot\CraftQL\FieldDefinitions\Checkboxes as CheckboxTransformer;
-use markhuot\CraftQL\FieldDefinitions\Lightswitch as LightswitchTransformer;
-use markhuot\CraftQL\FieldDefinitions\Date as DateTransformer;
-use markhuot\CraftQL\FieldDefinitions\Entries as EntriesTransformer;
-use markhuot\CraftQL\FieldDefinitions\Tags as TagsTransformer;
-use markhuot\CraftQL\FieldDefinitions\Assets as AssetsTransformer;
-use markhuot\CraftQL\FieldDefinitions\Color as ColorTransformer;
-use markhuot\CraftQL\FieldDefinitions\Dropdown as DropdownTransformer;
-use markhuot\CraftQL\FieldDefinitions\Number as NumberTransformer;
+use markhuot\CraftQL\Craft\Fields\Text as TextTransformer;
+use markhuot\CraftQL\Craft\Fields\RichText as RichTextTransformer;
+use markhuot\CraftQL\Craft\Fields\Checkboxes as CheckboxTransformer;
+use markhuot\CraftQL\Craft\Fields\Lightswitch as LightswitchTransformer;
+use markhuot\CraftQL\Craft\Fields\Date as DateTransformer;
+use markhuot\CraftQL\Craft\Fields\Entries as EntriesTransformer;
+use markhuot\CraftQL\Craft\Fields\Tags as TagsTransformer;
+use markhuot\CraftQL\Craft\Fields\Assets as AssetsTransformer;
+use markhuot\CraftQL\Craft\Fields\Color as ColorTransformer;
+use markhuot\CraftQL\Craft\Fields\Dropdown as DropdownTransformer;
+use markhuot\CraftQL\Craft\Fields\Number as NumberTransformer;
 
 class FieldService {
 

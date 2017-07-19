@@ -16,8 +16,6 @@ use markhuot\CraftQL\Services\GraphQLService;
 use markhuot\CraftQL\Services\SchemaAssetSourceService;
 use markhuot\CraftQL\Services\SchemaCategoryGroupService;
 use markhuot\CraftQL\Services\SchemaElementService;
-use markhuot\CraftQL\Services\SchemaEntryService;
-use markhuot\CraftQL\Services\SchemaSectionService;
 use markhuot\CraftQL\Services\SchemaTagGroupService;
 use markhuot\CraftQL\Services\RequestService;
 use markhuot\CraftQL\Services\FieldService;
@@ -41,8 +39,6 @@ class Plugin extends BasePlugin
         \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaAssetSourceService::class);
         \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaCategoryGroupService::class);
         \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaElementService::class);
-        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaEntryService::class);
-        \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaSectionService::class);
         \Yii::$container->setSingleton(\markhuot\CraftQL\Services\SchemaTagGroupService::class);
 
         // Add in our console commands
