@@ -1,18 +1,91 @@
 A drop-in GraphQL server for your [Craft CMS](https://craftcms.com/) implementation. With zero configuration, _CraftQL_ allows you to access all of Craft's features through a familiar [GraphQL](http://graphql.org) interface.
 
-<div style="border: 1px solid red; padding: 10px;"><p><strong>NOTE:</strong> This software is in beta and while querying the database works quite well it has not been thoroughly tested. Use at your own risk.</p><p><strong>P.P.S</strong>, this plugin may or may not become a paid add-on when the Craft Plugin store becomes available. <strike>Buyer</strike> Downloader beware.</p></div>
+<hr>
+
+**NOTE:** This software is in beta and while querying the database works quite well it has not been thoroughly tested. Use at your own risk.
+
+**P.P.S**, this plugin may or may not become a paid add-on when the Craft Plugin store becomes available. <strike>Buyer</strike> Downloader beware.
+
+<hr>
 
 ## Example
 
 Once installed, you can query Craft CMS using almost the exact same syntax as your Twig templates.
 
-```gql
+```graphql
 {
-  news(limit: 10) {
-    title
-    url
-    body
+  entries(section:"news") {
+    ...on News {
+      title
+      url
+      body
+    }
   }
+}
+```
+
+_CraftQL_ takes a the convention over configuration approach today. That means the following types and fields are automatically provided for you.
+
+A top level `entries` field on `Query` that takes the same arguments as `craft.entries` does in your template. E.g.,
+
+```graphql
+query fetchNews {             # The query
+  entries(section:"News") {   # Arguments match `craft.entries`
+    ...on News {              # GraphQL is strongly typed, so you must specify each Entry Type you want data from
+      id                      # A field to return
+      title                   # A field to return
+      body                    # A field to return
+    }
+  }
+}
+```
+
+Types for every Entry Type in your install. If you have a section named `news` and an entry type named `news` the GraphQL type will be named `News`. If you have a section named `news` and an entry type named `pressRelease` the GraphQL type will be named `NewsPressRelease`. The convention is to mash the section handle and the entry type together, unless they are the same, in which case the section handle will be used.
+
+```graphql
+query fetchNews {
+  entries(section:"News") {
+    ...on News {              # Any fields on the News entry type
+      id
+      title
+      body
+    }
+    ...on NewsPressRelease {  # Any fields on the Press Release entry type
+      id
+      title
+      body
+      source
+      contactPeople {         # A nested Entries relationship
+        name
+        email
+      }
+    }
+  }
+}
+```
+
+A top level `upsertEntry` on `Mutation` that takes arguments of every field defined in Craft. 
+
+```graphql
+mutation createNewEntry($title:String, $body:String) {
+  upsertEntry(
+    sectionId:1,
+    typeId:1,
+    authorId:1,
+    title:$title,
+    body:$body,
+  ) {
+    id
+  }
+}
+```
+
+The above would be passed with variables such as,
+
+```json
+{
+  "title": "My first mutation!",
+  "body": "<p>Here's the body of my first mutation</p>",
 }
 ```
 
