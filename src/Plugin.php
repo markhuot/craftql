@@ -106,6 +106,7 @@ class Plugin extends BasePlugin
             foreach ($_POST['settings']['token'] as $tokenId => $values) {
                 $token = Token::find()->where(['id' => $tokenId])->one();
                 $token->name = @$values['name'];
+                $token->isWritable = @$values['isWritable'];
                 $token->save();
             }
         }

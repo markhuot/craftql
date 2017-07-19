@@ -1,4 +1,5 @@
 {% import "_includes/forms" as forms %}
+
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
 <style>
@@ -82,6 +83,7 @@ You can access your GraphQL endpoint in two ways,
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Token</th>
+                <th scope="col">Writable</th>
                 <td class="thin"></td>
             </tr>
         </thead>
@@ -89,6 +91,7 @@ You can access your GraphQL endpoint in two ways,
             <tr>
                 <td><input type="text" name="token[{{ token.id }}][name]" class="text" placeholder="Name..." value="{{ token.name }}" /></td>
                 <td>{{ token.token }}</td>
+                <td>{{ forms.lightswitch({"name": "token[" ~ token.id ~ "][isWritable]", "on": token.isWritable}) }}</td>
                 <td><a class="delete icon" title="Delete" role="button" href="/admin/craftql/token-del/{{ token.id }}"></a></td>
             </tr>
         {% endfor %}

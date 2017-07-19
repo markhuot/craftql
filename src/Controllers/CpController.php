@@ -15,6 +15,7 @@ class CpController extends Controller
         $token = new Token;
         $token->userId = Craft::$app->getUser()->getIdentity()->id;
         $token->token = Yii::$app->security->generateRandomString(64);
+        $token->isWritable = false;
         $token->save();
 
         $this->redirect('/admin/settings/plugins/craftql');
