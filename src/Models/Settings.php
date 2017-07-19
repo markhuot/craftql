@@ -19,7 +19,7 @@ class Settings extends Model
 
     function tokens()
     {
-        $tokens = Token::find()->where(['userId' => 1])->all();
+        $tokens = Token::find()->where(['userId' => \Craft::$app->user->id])->all();
         return $tokens;
     }
 }
