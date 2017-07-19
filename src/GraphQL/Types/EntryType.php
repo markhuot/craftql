@@ -21,6 +21,7 @@ class EntryType extends ObjectType {
             'name' => static::getName($entryType),
             'fields' => $fields,
             'interfaces' => [
+                // $sectionType,
                 \markhuot\CraftQL\GraphQL\Types\Entry::interface(),
                 \markhuot\CraftQL\GraphQL\Types\Element::interface(),
             ],

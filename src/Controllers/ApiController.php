@@ -69,13 +69,10 @@ class ApiController extends Controller
             ]);
         }
 
-        $input = $this->request->input();
-        $variables = $this->request->variables();
-
         $this->graphQl->bootstrap($writable);
 
         try {
-            $result = $this->graphQl->execute($input, $variables);
+            $result = $this->graphQl->execute($this->request->input(), $this->request->variables());
         } catch (\Exception $e) {
             $result = [
                 'errors' => [
@@ -84,7 +81,7 @@ class ApiController extends Controller
             ];
         }
 
-        // You must set the header to JSON, otherwise Craft will see HTMl and try to insert
+        // You must set the header to JSON, otherwise Craft will see HTML and try to insert
         // javascript at the bottom to run pending tasks
         $headers = \Craft::$app->response->headers;
         $headers->add('Content-Type', 'application/json; charset=UTF-8');

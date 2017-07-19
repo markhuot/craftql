@@ -61,29 +61,32 @@ class Query extends Component {
             }
         ];
 
-        foreach ($this->sections->loadedSections() as $handle => $sectionType) {
-            $sectionType = $this->sections->getSection($handle);
-            $isSingle = $sectionType->config['type'] == 'single';
+        // foreach ($this->sections->loadedSections() as $handle => $sectionType) {
+        //     $sectionType = $this->sections->getSection($handle);
+        //     $isSingle = $sectionType->config['type'] == 'single';
             
-            $type = \markhuot\CraftQL\GraphQL\Types\Entry::interface();
-            if (count($sectionType->config['entryTypes']) == 1) {
-                $type = $sectionType->config['entryTypes'][0];
-            }
+        //     $type = \markhuot\CraftQL\GraphQL\Types\Entry::interface();
+        //     // if (count($sectionType->config['entryTypes']) == 1) {
+        //     //     $type = $sectionType->config['entryTypes'][0];
+        //     // }
 
-            $queryTypeConfig['fields'][$handle] = [
-                'type' => $isSingle ? $type : Type::listOf($type),
-                'description' => 'Entries from the '.$handle.' section',
-                'args' => \markhuot\CraftQL\GraphQL\Types\Section::args(),
-                'resolve' => function ($root, $args) use ($handle, $isSingle) {
-                    $criteria = \craft\elements\Entry::find();
-                    $criteria = $criteria->section($handle);
-                    foreach ($args as $key => $value) {
-                        $criteria = $criteria->{$key}($value);
-                    }
-                    return $isSingle ? $criteria->one() : $criteria->all();
-                }
-            ];
-        }
+        //     // var_dump($sectionType);
+        //     // die;
+
+        //     $queryTypeConfig['fields'][$handle] = [
+        //         'type' => $isSingle ? $sectionType : Type::listOf($sectionType),
+        //         'description' => 'Entries from the '.$handle.' section',
+        //         'args' => \markhuot\CraftQL\GraphQL\Types\Section::args(),
+        //         'resolve' => function ($root, $args) use ($handle, $isSingle) {
+        //             $criteria = \craft\elements\Entry::find();
+        //             $criteria = $criteria->section($handle);
+        //             foreach ($args as $key => $value) {
+        //                 $criteria = $criteria->{$key}($value);
+        //             }
+        //             return $isSingle ? $criteria->one() : $criteria->all();
+        //         }
+        //     ];
+        // }
 
         // foreach ($this->categoryGroups->loadedGroups() as $handle => $group) {
         //     $queryTypeConfig['fields'][$handle] = [
@@ -102,13 +105,6 @@ class Query extends Component {
     function getTypes() {
         $this->volumes->loadAllVolumes();
         $this->categoryGroups->loadAllGroups();
-
-        // $entryTypes = [];
-        // foreach ($this->sections->getAllSections() as $section) {
-        //     foreach ($section->config['entryTypes'] as $entryType) {
-        //         $entryTypes[] = \markhuot\CraftQL\GraphQL\Types\EntryType::make($entryType);
-        //     }
-        // }
 
         return array_merge(
             $this->volumes->getAllVolumes(),

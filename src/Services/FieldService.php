@@ -34,6 +34,21 @@ use markhuot\CraftQL\Craft\Fields\Categories as CategoriesTransformer;
 
 class FieldService {
 
+  function getAllFieldArgs() {
+    $fields = [
+      'id' => Type::int(),
+      'sectionId' => Type::int(),
+      'typeId' => Type::int(),
+      'authorId' => Type::int(),
+      'title' => Type::string(),
+    ];
+    $allFields = Craft::$app->fields->getAllFields();
+    foreach ($allFields as $field) {
+      $fields[$field->handle] = Type::string();
+    }
+    return $fields;
+  }
+
   function getFields($fieldLayoutId) {
     $fields = [];
 

@@ -24,10 +24,10 @@ class Entry {
                 'name' => ['type' => Type::nonNull(Type::string())],
                 'handle' => ['type' => Type::nonNull(Type::string())],
                 'type' => ['type' => Type::nonNull(Type::string())],
-                'template' => ['type' => Type::nonNull(Type::string())],
-                'maxLevels' => ['type' => Type::nonNull(Type::int())],
-                'hasUrls' => ['type' => Type::nonNull(Type::boolean())],
-                'enableVersioning' => ['type' => Type::nonNull(Type::boolean())],
+                'template' => ['type' => Type::string()],
+                'maxLevels' => ['type' => Type::int()],
+                'hasUrls' => ['type' => Type::boolean()],
+                'enableVersioning' => ['type' => Type::boolean()],
             ],
         ]);
 

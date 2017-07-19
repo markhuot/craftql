@@ -6,32 +6,37 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
 
-class Section extends InterfaceType {
+class Section {
 
     static function make($section) {
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        // $fields = \markhuot\CraftQL\GraphQL\Types\Entry::baseFields();
 
-        $fields = \markhuot\CraftQL\GraphQL\Types\Entry::baseFields();
-
+        // $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
         // foreach ($section->entryTypes as $entryType) {
-        //     $fields = array_merge($fields, $fieldService->getFields($entryType->fieldLayoutId));
+        //     // $fields = array_merge($fields, $fieldService->getFields($entryType->fieldLayoutId));
         // }
+
+        // $sectionType = new static([
+        //     'name' => ucfirst($section->handle).'Section',
+        //     'fields' => $fields,
+        //     // 'interfaces' => [
+        //     //     \markhuot\CraftQL\GraphQL\Types\Entry::interface(),
+        //     //     \markhuot\CraftQL\GraphQL\Types\Element::interface(),
+        //     // ],
+        //     'resolveType' => function ($entry) {
+        //         return \markhuot\CraftQL\GraphQL\Types\EntryType::getName($entry->type);
+        //     },
+        //     'type' => $section->type, 
+        // ]);
 
         $entryTypes = [];
         foreach ($section->entryTypes as $entryType) {
             $entryTypes[] = \markhuot\CraftQL\GraphQL\Types\EntryType::make($entryType);
         }
 
-        return new static([
-            'name' => ucfirst($section->handle).'Section',
-            'fields' => $fields,
-            'interfaces' => [
-                \markhuot\CraftQL\GraphQL\Types\Entry::interface(),
-                \markhuot\CraftQL\GraphQL\Types\Element::interface(),
-            ],
-            'type' => $section->type,
-            'entryTypes' => $entryTypes,
-        ]);
+        // $sectionType->config['entryTypes'] = $entryTypes;
+
+        // return $sectionType;
     }
 
     static function args() {

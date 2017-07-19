@@ -11,19 +11,14 @@ use craft\elements\Entry;
 class Mutation extends Component {
 
     function getType() {
+        $fields = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+
         return new ObjectType([
             'name' => 'Mutation',
             'fields' => [
                 'upsertEntry' => [
                     'type' => \markhuot\CraftQL\GraphQL\Types\Entry::interface(),
-                    'args' => [
-                        'id' => Type::int(),
-                        'sectionId' => Type::int(),
-                        'typeId' => Type::int(),
-                        'authorId' => Type::int(),
-                        'title' => Type::string(),
-                        'body' => Type::string(),
-                    ],
+                    'args' => $fields->getAllFieldArgs(),
                     'resolve' => function ($root, $args) {
                         if (!empty($args['id'])) {
                             $criteria = Entry::find();
