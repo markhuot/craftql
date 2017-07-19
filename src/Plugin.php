@@ -12,13 +12,6 @@ use craft\events\RegisterUrlRulesEvent;
 use yii\base\Event;
 
 use markhuot\CraftQL\Models\Token;
-use markhuot\CraftQL\Services\GraphQLService;
-use markhuot\CraftQL\Services\SchemaAssetSourceService;
-use markhuot\CraftQL\Services\SchemaCategoryGroupService;
-use markhuot\CraftQL\Services\SchemaElementService;
-use markhuot\CraftQL\Services\SchemaTagGroupService;
-use markhuot\CraftQL\Services\RequestService;
-use markhuot\CraftQL\Services\FieldService;
 
 class Plugin extends BasePlugin
 {
