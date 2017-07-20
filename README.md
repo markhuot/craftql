@@ -10,7 +10,7 @@ A drop-in GraphQL server for your [Craft CMS](https://craftcms.com/) implementat
 
 <hr>
 
-## Example
+## Examples
 
 Once installed, you can test your installation with a simple Hello World,
 
@@ -34,12 +34,10 @@ If that worked, you can now query Craft CMS using almost the exact same syntax a
 }
 ```
 
-_CraftQL_ takes a the convention over configuration approach today. That means the following types and fields are automatically provided for you.
-
-A top level `entries` field on `Query` that takes the same arguments as `craft.entries` does in your template. E.g.,
+_CraftQL_ provides a top level `entries` field that takes the same arguments as `craft.entries` does in your template. This is the most commonly used field/access point. E.g.,
 
 ```graphql
-query fetchNews {             # The query
+query fetchNews {             # The query, `query fetchNews` is completely optional
   entries(section:"News") {   # Arguments match `craft.entries`
     ...on News {              # GraphQL is strongly typed, so you must specify each Entry Type you want data from
       id                      # A field to return
@@ -50,7 +48,7 @@ query fetchNews {             # The query
 }
 ```
 
-Types for every Entry Type in your install. If you have a section named `news` and an entry type named `news` the GraphQL type will be named `News`. If you have a section named `news` and an entry type named `pressRelease` the GraphQL type will be named `NewsPressRelease`. The convention is to mash the section handle and the entry type together, unless they are the same, in which case the section handle will be used.
+Types are automatically created for every Entry Type in your install. If you have a section named `news` and an entry type named `news` the GraphQL type will be named `News`. If you have a section named `news` and an entry type named `pressRelease` the GraphQL type will be named `NewsPressRelease`. The convention is to mash the section handle and the entry type handle together, unless they are the same, in which case the section handle will be used.
 
 ```graphql
 query fetchNews {
@@ -74,7 +72,7 @@ query fetchNews {
 }
 ```
 
-A top level `upsertEntry` on `Mutation` that takes arguments of every field defined in Craft. 
+To modify content make sure your token has write access and then use the top level `upsertEntry` `Mutation`. `upsertEntry` takes arguments for every field defined in Craft. 
 
 ```graphql
 mutation createNewEntry($title:String, $body:String) {
