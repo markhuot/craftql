@@ -37,6 +37,7 @@ use markhuot\CraftQL\Fields\Number as NumberTransformer;
 use markhuot\CraftQL\Fields\Categories as CategoriesTransformer;
 use markhuot\CraftQL\Fields\PositionSelect as PositionSelectTransformer;
 use markhuot\CraftQL\Fields\RadioButton as RadioButtonTransformer;
+use markhuot\CraftQL\Fields\Table as TableTransformer;
 
 class FieldService {
 
@@ -55,14 +56,8 @@ class FieldService {
     return $fields;
   }
 
-  function getFields($fieldLayoutId) {
-    $fields = [];
-
-    $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
-    foreach ($fieldLayout->getFields() as $field) {
-      $graphQlFields = [];
-
-      switch (get_class($field)) {
+  function getField($field) {
+    switch (get_class($field)) {
         case AssetsField::class: $transformer = Yii::$container->get(AssetsTransformer::class); break;
         case TagsField::class: $transformer = Yii::$container->get(TagsTransformer::class); break;
         case EntriesField::class: $transformer = Yii::$container->get(EntriesTransformer::class); break;
@@ -78,14 +73,22 @@ class FieldService {
         case NumberField::class: $transformer = Yii::$container->get(NumberTransformer::class); break;
         case CategoriesField::class: $transformer = Yii::$container->get(CategoriesTransformer::class); break;
         case PositionSelectField::class: $transformer = Yii::$container->get(PositionSelectTransformer::class); break;
-        case MatrixField::class: continue 2;
-        case TableField::class: continue 2;
+        case TableField::class: $transformer = Yii::$container->get(TableTransformer::class); break;
+        case MatrixField::class: return [];
       }
 
-      $fields = array_merge($fields, $transformer->getDefinition($field));
+      return $transformer->getDefinition($field);
+  }
+
+  function getFields($fieldLayoutId) {
+    $graphQlFields = [];
+
+    $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
+    foreach ($fieldLayout->getFields() as $field) {
+      $graphQlFields = array_merge($graphQlFields, $this->getField($field));
     }
 
-    return $fields;
+    return $graphQlFields;
   }
 
 }
