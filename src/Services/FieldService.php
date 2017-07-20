@@ -19,6 +19,8 @@ use craft\fields\Number as NumberField;
 use craft\fields\RadioButtons as RadioButtonsField;
 use craft\fields\Categories as CategoriesField;
 use craft\fields\PositionSelect as PositionSelectField;
+use craft\fields\Matrix as MatrixField;
+use craft\fields\Table as TableField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
 use markhuot\CraftQL\Fields\Text as TextTransformer;
@@ -76,6 +78,8 @@ class FieldService {
         case NumberField::class: $transformer = Yii::$container->get(NumberTransformer::class); break;
         case CategoriesField::class: $transformer = Yii::$container->get(CategoriesTransformer::class); break;
         case PositionSelectField::class: $transformer = Yii::$container->get(PositionSelectTransformer::class); break;
+        case MatrixField::class: continue 2;
+        case TableField::class: continue 2;
       }
 
       $fields = array_merge($fields, $transformer->getDefinition($field));
