@@ -1,6 +1,6 @@
 ![CraftQL seen through the GraphiQL UI](https://raw.githubusercontent.com/markhuot/craftql/master/assets/graphiql.png)
 
-A drop-in GraphQL server for your [Craft CMS](https://craftcms.com/) implementation. With zero configuration, _CraftQL_ allows you to access all of Craft's features through a familiar [GraphQL](http://graphql.org) interface.
+A drop-in [GraphQL](http://graphql.org) server for your [Craft CMS](https://craftcms.com/) implementation. With zero configuration, _CraftQL_ allows you to access all of Craft's features through a familiar GraphQL interface.
 
 <hr>
 
