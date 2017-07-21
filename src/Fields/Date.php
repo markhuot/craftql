@@ -29,4 +29,8 @@ class Date {
     ];
   }
 
+  function getGraphQlType($field) {
+    return Type::string();
+  }
+
 }

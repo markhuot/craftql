@@ -34,4 +34,8 @@ class SelectOne {
     ]];
   }
 
+  function getGraphQlType($field) {
+    return Type::string();
+  }
+
 }

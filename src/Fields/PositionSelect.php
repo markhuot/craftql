@@ -33,4 +33,8 @@ class PositionSelect {
         ];
     }
 
+  function getGraphQlType($field) {
+    return Type::string();
+  }
+
 }

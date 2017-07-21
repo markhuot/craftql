@@ -26,4 +26,8 @@ class RichText {
     ];
   }
 
+  function getGraphQlType($field) {
+    return Type::string();
+  }
+
 }

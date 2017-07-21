@@ -30,4 +30,8 @@ class Categories extends Component {
     ]];
   }
 
+  function getGraphQlType($field) {
+    return Type::string();
+  }
+
 }

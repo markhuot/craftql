@@ -40,21 +40,6 @@ use markhuot\CraftQL\Fields\Unknown as UnknownTransformer;
 
 class FieldService {
 
-  function getAllFieldArgs() {
-    $fields = [
-      'id' => Type::int(),
-      'sectionId' => Type::int(),
-      'typeId' => Type::int(),
-      'authorId' => Type::int(),
-      'title' => Type::string(),
-    ];
-    $allFields = Craft::$app->fields->getAllFields();
-    foreach ($allFields as $field) {
-      $fields[$field->handle] = Type::string();
-    }
-    return $fields;
-  }
-
   function getTransformer($field) {
     switch (get_class($field)) {
         case AssetsField::class: $transformer = Yii::$container->get(AssetsTransformer::class); break;
@@ -84,7 +69,7 @@ class FieldService {
 
   function getArg($field) {
     return [
-      $field->handle => ['type' => Type::string()],
+      $field->handle => ['type' => $this->getTransformer($field)->getGraphQlType($field)],
     ];
   }
 

@@ -16,4 +16,8 @@ class Number {
     ];
   }
 
+  function getGraphQlType($field) {
+    return Type::string();
+  }
+
 }

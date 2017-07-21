@@ -38,4 +38,8 @@ class Checkboxes {
     ]];
   }
 
+  function getGraphQlType($field) {
+    return Type::string();
+  }
+
 }
