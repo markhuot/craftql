@@ -63,9 +63,10 @@ query fetchNews {
       title
       body
       source
-      contactPeople {         # A nested Entries relationship
-        name
-        email
+      contactInfo
+      downloads {
+        title
+        url
       }
     }
   }
