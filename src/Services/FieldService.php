@@ -55,7 +55,7 @@ class FieldService {
     return $fields;
   }
 
-  function getField($field) {
+  function getTransformer($field) {
     switch (get_class($field)) {
         case AssetsField::class: $transformer = Yii::$container->get(AssetsTransformer::class); break;
         case TagsField::class: $transformer = Yii::$container->get(TagsTransformer::class); break;
@@ -79,7 +79,28 @@ class FieldService {
           $transformer = Yii::$container->get(UnknownTransformer::class); break;
       }
 
-      return $transformer->getDefinition($field);
+      return $transformer;
+  }
+
+  function getArg($field) {
+    return [
+      $field->handle => ['type' => Type::string()],
+    ];
+  }
+
+  function getArgs($fieldLayoutId) {
+    $graphQlFields = [];
+
+    $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
+    foreach ($fieldLayout->getFields() as $field) {
+      $graphQlFields = array_merge($graphQlFields, $this->getArg($field));
+    }
+
+    return $graphQlFields;
+  }
+
+  function getField($field) {
+    return $this->getTransformer($field)->getDefinition($field);
   }
 
   function getFields($fieldLayoutId) {

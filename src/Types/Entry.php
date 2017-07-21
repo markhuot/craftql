@@ -11,6 +11,14 @@ class Entry {
     static $interface;
     static $baseFields;
 
+    static function baseArgs() {
+        return [
+            'id' => ['type' => Type::int()],
+            'authorId' => ['type' => Type::int()],
+            'title' => ['type' => Type::string()],
+        ];
+    }
+
     static function baseFields() {
         if (!empty(static::$baseFields)) {
             return static::$baseFields;
@@ -45,6 +53,7 @@ class Entry {
             return 'Entry';
         }];
         $fields['id'] = ['type' => Type::nonNull(Type::int())];
+        $fields['authorId'] = ['type' => Type::nonNull(Type::int())];
         $fields['title'] = ['type' => Type::nonNull(Type::string())];
         $fields['slug'] = ['type' => Type::nonNull(Type::string())];
         $fields['dateCreatedTimestamp'] = ['type' => Type::nonNull(Type::int()), 'resolve' => function ($root, $args) {

@@ -26,14 +26,7 @@ class Query extends Component {
     }
 
     function getType() {
-        // var_dump(\yii::$container);
-        // die;
-        // var_dump('1');
-
-        // $this->tagGroups->loadAllGroups();
-        // $this->categoryGroups->loadAllGroups();
         $this->sections->loadAllSections();
-        // $this->assetVolumes->loadAllVolumes();
 
         $queryTypeConfig = [
             'name' => 'Query',

@@ -58,6 +58,7 @@ class ApiController extends Controller
                 if ($token) {
                     $writable = $token->isWritable;
                     $user = User::find()->where(['id' => $token->userId])->one();
+                    Craft::$app->getUser()->loginByUserId($user->id);
                 }
             }
         }

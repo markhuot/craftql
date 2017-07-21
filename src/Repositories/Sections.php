@@ -6,6 +6,7 @@ use Craft;
 
 class Sections {
 
+    private $loaded = false;
     private $sections = [];
 
     /**
@@ -15,9 +16,15 @@ class Sections {
      * @return void
      */
     function loadAllSections() {
+        if ($this->loaded) {
+            return;
+        }
+        
         foreach (Craft::$app->sections->allSections as $section) {
             $this->sections[$section->handle] = $this->parseSectionToObject($section);
         }
+
+        $this->loaded = true;
     }
 
     /**
