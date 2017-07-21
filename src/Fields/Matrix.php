@@ -22,17 +22,18 @@ class Matrix extends Component {
         $blockObjects = [];
         foreach ($field->getBlockTypes() as $block) {
             $blockObjects[] = new ObjectType([
-                'name' => ucfirst($field->handle).'Matrix'.ucfirst($block->handle),
+                'name' => ucfirst($field->handle).ucfirst($block->handle),
                 'fields' => $fieldService->getFields($block->fieldLayoutId),
             ]);
         }
 
         return static::$objects[$field->handle] = new UnionType([
             'name' => ucfirst($field->handle).'Matrix',
+            'description' => 'A union of possible blocks for this matrix field',
             'types' => $blockObjects,
             'resolveType' => function ($root, $args) use ($field) {
                 $block = $root->getType();
-                return ucfirst($field->handle).'Matrix'.ucfirst($block->handle);
+                return ucfirst($field->handle).ucfirst($block->handle);
             },
         ]);
     }
