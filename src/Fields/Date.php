@@ -11,14 +11,14 @@ class Date {
     return [
       "{$field->handle}Timestamp" => [
         'type' => Type::int(),
-        // 'description' => 'The date',
+        'description' => $field->instructions,
         'resolve' => function ($root, $args) use ($field) {
           return $root->{$field->handle} ? $root->{$field->handle}->format('U') : null;
         }
       ],
       $field->handle => [
         'type' => Type::string(),
-        // 'description' => '',
+        'description' => $field->instructions,
         'args' => [
           ['name' => 'format', 'type' => Type::string(), 'defaultValue' => 'r'],
         ],

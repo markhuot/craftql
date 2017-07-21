@@ -27,6 +27,7 @@ class Checkboxes {
 
     return [$field->handle => [
       'type' => Type::listOf(static::$enums[$field->handle]),
+      'description' => $field->instructions,
       'resolve' => function ($root, $args) use ($field) {
         $values = [];
         foreach ($root->{$field->handle} as $option) {

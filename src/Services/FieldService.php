@@ -38,6 +38,7 @@ use markhuot\CraftQL\Fields\Categories as CategoriesTransformer;
 use markhuot\CraftQL\Fields\PositionSelect as PositionSelectTransformer;
 use markhuot\CraftQL\Fields\RadioButton as RadioButtonTransformer;
 use markhuot\CraftQL\Fields\Table as TableTransformer;
+use markhuot\CraftQL\Fields\Matrix as MatrixTransformer;
 
 class FieldService {
 
@@ -74,7 +75,7 @@ class FieldService {
         case CategoriesField::class: $transformer = Yii::$container->get(CategoriesTransformer::class); break;
         case PositionSelectField::class: $transformer = Yii::$container->get(PositionSelectTransformer::class); break;
         case TableField::class: $transformer = Yii::$container->get(TableTransformer::class); break;
-        case MatrixField::class: return [];
+        case MatrixField::class: $transformer = Yii::$container->get(MatrixTransformer::class); break;
       }
 
       return $transformer->getDefinition($field);

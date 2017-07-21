@@ -11,6 +11,7 @@ class Lightswitch {
   function getDefinition($field) {
     return [$field->handle => [
       'type' => Type::boolean(),
+      'description' => $field->instructions,
       'resolve' => function ($root, $args) use ($field) {
         return $root->{$field->handle};
       }

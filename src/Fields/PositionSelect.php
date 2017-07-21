@@ -28,6 +28,7 @@ class PositionSelect {
         return [
             $field->handle => [
                 'type' => static::$enum,
+                'description' => $field->instructions,
             ],
         ];
     }

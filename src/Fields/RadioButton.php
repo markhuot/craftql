@@ -28,6 +28,7 @@ class RadioButton {
     return [
       $field->handle => [
         'type' => static::$enums[$field->handle],
+        'description' => $field->instructions,
         'resolve' => function ($root, $args) use ($field) {
           return (string)$root->{$field->handle} ?: null;
         },

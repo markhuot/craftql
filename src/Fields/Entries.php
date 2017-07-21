@@ -12,6 +12,7 @@ class Entries extends Component {
   function getDefinition($field) {
     return [$field->handle => [
       'type' => Type::listOf(\markhuot\CraftQL\GraphQL\Types\Entry::interface()),
+      'description' => $field->instructions,
       'args' => \markhuot\CraftQL\GraphQL\Types\Section::args(),
       'resolve' => function ($root, $args) use ($field) {
         $criteria = $root->{$field->handle};

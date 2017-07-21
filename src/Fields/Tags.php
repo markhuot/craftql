@@ -21,7 +21,8 @@ class Tags extends Component {
     if (preg_match('/taggroup:(\d+)/', $source, $matches)) {
       $groupId = $matches[1];
       return [$field->handle => [
-        'type' => Type::listOf($this->tagGroups->getGroup($groupId))
+        'type' => Type::listOf($this->tagGroups->getGroup($groupId)),
+        'description' => $field->instructions,
       ]];
     }
   }

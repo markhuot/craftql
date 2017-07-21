@@ -11,6 +11,7 @@ class Color {
     return [
       $field->handle => [
         'type' => Type::string(),
+        'description' => $field->instructions,
       ],
     ];
   }

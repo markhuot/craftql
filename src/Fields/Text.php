@@ -11,6 +11,7 @@ class Text {
     return [
       $field->handle => [
         'type' => Type::string(),
+        'description' => $field->instructions,
         'args' => [
           ['name' => 'page', 'type' => Type::int()],
         ],

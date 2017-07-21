@@ -13,6 +13,7 @@ class Assets extends Component {
   function getDefinition($field) {
     return [$field->handle => [
       'type' => Type::listOf(\markhuot\CraftQL\GraphQL\Types\Volume::interface()),
+      'description' => $field->instructions,
       'resolve' => function ($root, $args) use ($field) {
         return $root->{$field->handle}->all();
       }

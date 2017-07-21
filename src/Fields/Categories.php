@@ -25,6 +25,7 @@ class Categories extends Component {
     // die;
     return [$field->handle => [
       'type' => Type::listOf($this->categoryGroups->getGroup($groupId)),
+      'description' => $field->instructions,
       'resolve' => function ($root, $args) use ($field) {
         return $root->{$field->handle}->all();
       }

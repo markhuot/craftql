@@ -101,10 +101,10 @@ The above would be passed with variables such as,
 
 No software is ever done. There's a lot still to do in order to make _CraftQL_ feature complete. Some of the outstanding items include,
 
-- Matrix fields are not included in the schema yet
-- Table fields are not included in the schema yet
-- Automated testing is not functional yet
-- Mutations need a lot more testing
+- [x] Matrix fields are not included in the schema yet
+- [x] Table fields are not included in the schema yet
+- [ ] Automated testing is not functional yet
+- [ ] Mutations need a lot more testing
 
 ## Requirements
 

@@ -11,6 +11,7 @@ class Number {
     return [
       $field->handle => [
         'type' => $field->decimals == 0 ? Type::int() : Type::float(),
+        'description' => $field->instructions,
       ],
     ];
   }

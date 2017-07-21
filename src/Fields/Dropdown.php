@@ -11,6 +11,7 @@ class Dropdown {
     return [
       $field->handle => [
         'type' => Type::string(),
+        'description' => $field->instructions,
       ],
     ];
   }
