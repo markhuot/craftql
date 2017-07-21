@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\GraphQL\Types;
+namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -94,7 +94,7 @@ class Entry {
                 'description' => 'An entry in Craft',
                 'fields' => $fields,
                 'resolveType' => function ($entry) {
-                    return \markhuot\CraftQL\GraphQL\Types\EntryType::getName($entry->type);
+                    return \markhuot\CraftQL\Types\EntryType::getName($entry->type);
                 }
             ]);
         }

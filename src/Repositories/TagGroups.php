@@ -28,7 +28,7 @@ class TagGroups extends Component {
   }
 
   function parseGroupToObject($group) {
-    return \markhuot\CraftQL\GraphQL\Types\TagGroup::make($group);
+    return \markhuot\CraftQL\Types\TagGroup::make($group);
   }
 
 }

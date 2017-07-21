@@ -63,7 +63,7 @@ class Sections {
      * @return void
      */
     function parseSectionToObject($section) {
-        return \markhuot\CraftQL\GraphQL\Types\Section::make($section);
+        return \markhuot\CraftQL\Types\Section::make($section);
     }
 
 }

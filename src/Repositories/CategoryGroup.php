@@ -41,7 +41,7 @@ class CategoryGroup extends Component {
   }
 
   function parseGroupToObject($group) {
-    return \markhuot\CraftQL\GraphQL\Types\CategoryGroup::make($group);
+    return \markhuot\CraftQL\Types\CategoryGroup::make($group);
   }
 
 }

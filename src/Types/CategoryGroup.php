@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\GraphQL\Types;
+namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -13,12 +13,12 @@ class CategoryGroup extends ObjectType {
 
     static function make($group) {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-        $fields = array_merge(\markhuot\CraftQL\GraphQL\Types\Category::baseFields(), $fieldService->getFields($group->fieldLayoutId));
+        $fields = array_merge(\markhuot\CraftQL\Types\Category::baseFields(), $fieldService->getFields($group->fieldLayoutId));
 
         return new static([
             'name' => ucfirst($group->handle).'Category',
             'interfaces' => [
-                \markhuot\CraftQL\GraphQL\Types\Category::interface()
+                \markhuot\CraftQL\Types\Category::interface()
             ],
             'fields' => $fields,
         ]);

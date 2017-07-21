@@ -19,8 +19,8 @@ class GraphQLService extends Component {
     private $queryType;
 
     function __construct(
-        \markhuot\CraftQL\GraphQL\Types\Mutation $mutationType,
-        \markhuot\CraftQL\GraphQL\Types\Query $queryType
+        \markhuot\CraftQL\Types\Mutation $mutationType,
+        \markhuot\CraftQL\Types\Query $queryType
     ) {
         $this->mutationType = $mutationType;
         $this->queryType = $queryType;

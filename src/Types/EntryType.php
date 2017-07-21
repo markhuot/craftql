@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\GraphQL\Types;
+namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -13,7 +13,7 @@ class EntryType extends ObjectType {
     static function make($entryType) {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
 
-        $fields = \markhuot\CraftQL\GraphQL\Types\Entry::baseFields();
+        $fields = \markhuot\CraftQL\Types\Entry::baseFields();
         $fields = array_merge($fields, $fieldService->getFields($entryType->fieldLayoutId));
 
         // var_dump($entryType->id);
@@ -22,8 +22,8 @@ class EntryType extends ObjectType {
             'fields' => $fields,
             'interfaces' => [
                 // $sectionType,
-                \markhuot\CraftQL\GraphQL\Types\Entry::interface(),
-                \markhuot\CraftQL\GraphQL\Types\Element::interface(),
+                \markhuot\CraftQL\Types\Entry::interface(),
+                \markhuot\CraftQL\Types\Element::interface(),
             ],
         ]);
     }

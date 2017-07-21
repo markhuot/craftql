@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\GraphQL\Types;
+namespace markhuot\CraftQL\Types;
 
 use yii\base\Component;
 use GraphQL\Type\Definition\ObjectType;
@@ -49,9 +49,9 @@ class Query extends Component {
         ];
 
         $queryTypeConfig['fields']['entries'] = [
-            'type' => Type::listOf(\markhuot\CraftQL\GraphQL\Types\Entry::interface()),
+            'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
             'description' => 'Entries from the craft interface',
-            'args' => \markhuot\CraftQL\GraphQL\Types\Section::args(),
+            'args' => \markhuot\CraftQL\Types\Section::args(),
             'resolve' => function ($root, $args) {
                 $criteria = \craft\elements\Entry::find();
                 foreach ($args as $key => $value) {
@@ -65,7 +65,7 @@ class Query extends Component {
         //     $sectionType = $this->sections->getSection($handle);
         //     $isSingle = $sectionType->config['type'] == 'single';
             
-        //     $type = \markhuot\CraftQL\GraphQL\Types\Entry::interface();
+        //     $type = \markhuot\CraftQL\Types\Entry::interface();
         //     // if (count($sectionType->config['entryTypes']) == 1) {
         //     //     $type = $sectionType->config['entryTypes'][0];
         //     // }
@@ -76,7 +76,7 @@ class Query extends Component {
         //     $queryTypeConfig['fields'][$handle] = [
         //         'type' => $isSingle ? $sectionType : Type::listOf($sectionType),
         //         'description' => 'Entries from the '.$handle.' section',
-        //         'args' => \markhuot\CraftQL\GraphQL\Types\Section::args(),
+        //         'args' => \markhuot\CraftQL\Types\Section::args(),
         //         'resolve' => function ($root, $args) use ($handle, $isSingle) {
         //             $criteria = \craft\elements\Entry::find();
         //             $criteria = $criteria->section($handle);
@@ -109,7 +109,7 @@ class Query extends Component {
         return array_merge(
             $this->volumes->getAllVolumes(),
             $this->categoryGroups->getAllGroups(),
-            \markhuot\CraftQL\GraphQL\Types\EntryType::all()
+            \markhuot\CraftQL\Types\EntryType::all()
         );
     }
 

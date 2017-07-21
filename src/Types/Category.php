@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\GraphQL\Types;
+namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;

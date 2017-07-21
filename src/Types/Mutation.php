@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\GraphQL\Types;
+namespace markhuot\CraftQL\Types;
 
 use yii\base\Component;
 use GraphQL\Type\Definition\ObjectType;
@@ -17,7 +17,7 @@ class Mutation extends Component {
             'name' => 'Mutation',
             'fields' => [
                 'upsertEntry' => [
-                    'type' => \markhuot\CraftQL\GraphQL\Types\Entry::interface(),
+                    'type' => \markhuot\CraftQL\Types\Entry::interface(),
                     'args' => $fields->getAllFieldArgs(),
                     'resolve' => function ($root, $args) {
                         if (!empty($args['id'])) {

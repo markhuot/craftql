@@ -33,7 +33,7 @@ class Volumes {
   }
 
   function parseVolumeToObject($volume) {
-    return \markhuot\CraftQL\GraphQL\Types\Volume::make($volume);
+    return \markhuot\CraftQL\Types\Volume::make($volume);
   }
 
 }

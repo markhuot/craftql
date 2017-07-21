@@ -1,6 +1,6 @@
 <?php
 
-namespace markhuot\CraftQL\GraphQL\Types;
+namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -9,7 +9,7 @@ use GraphQL\Type\Definition\Type;
 class Section {
 
     static function make($section) {
-        // $fields = \markhuot\CraftQL\GraphQL\Types\Entry::baseFields();
+        // $fields = \markhuot\CraftQL\Types\Entry::baseFields();
 
         // $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
         // foreach ($section->entryTypes as $entryType) {
@@ -20,18 +20,18 @@ class Section {
         //     'name' => ucfirst($section->handle).'Section',
         //     'fields' => $fields,
         //     // 'interfaces' => [
-        //     //     \markhuot\CraftQL\GraphQL\Types\Entry::interface(),
-        //     //     \markhuot\CraftQL\GraphQL\Types\Element::interface(),
+        //     //     \markhuot\CraftQL\Types\Entry::interface(),
+        //     //     \markhuot\CraftQL\Types\Element::interface(),
         //     // ],
         //     'resolveType' => function ($entry) {
-        //         return \markhuot\CraftQL\GraphQL\Types\EntryType::getName($entry->type);
+        //         return \markhuot\CraftQL\Types\EntryType::getName($entry->type);
         //     },
         //     'type' => $section->type, 
         // ]);
 
         $entryTypes = [];
         foreach ($section->entryTypes as $entryType) {
-            $entryTypes[] = \markhuot\CraftQL\GraphQL\Types\EntryType::make($entryType);
+            $entryTypes[] = \markhuot\CraftQL\Types\EntryType::make($entryType);
         }
 
         // $sectionType->config['entryTypes'] = $entryTypes;
