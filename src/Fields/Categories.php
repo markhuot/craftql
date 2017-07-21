@@ -21,8 +21,6 @@ class Categories extends Component {
     preg_match('/^group:(\d+)$/', $field->source, $matches);
     $groupId = $matches[1];
 
-    // var_dump('2');
-    // die;
     return [$field->handle => [
       'type' => Type::listOf($this->categoryGroups->getGroup($groupId)),
       'description' => $field->instructions,

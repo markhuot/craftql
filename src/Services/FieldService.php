@@ -23,7 +23,6 @@ use craft\fields\Matrix as MatrixField;
 use craft\fields\Table as TableField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
-use markhuot\CraftQL\Fields\Text as TextTransformer;
 use markhuot\CraftQL\Fields\RichText as RichTextTransformer;
 use markhuot\CraftQL\Fields\Checkboxes as CheckboxTransformer;
 use markhuot\CraftQL\Fields\Lightswitch as LightswitchTransformer;
@@ -31,14 +30,13 @@ use markhuot\CraftQL\Fields\Date as DateTransformer;
 use markhuot\CraftQL\Fields\Entries as EntriesTransformer;
 use markhuot\CraftQL\Fields\Tags as TagsTransformer;
 use markhuot\CraftQL\Fields\Assets as AssetsTransformer;
-use markhuot\CraftQL\Fields\Color as ColorTransformer;
-use markhuot\CraftQL\Fields\Dropdown as DropdownTransformer;
+use markhuot\CraftQL\Fields\SelectOne as SelectOneTransformer;
 use markhuot\CraftQL\Fields\Number as NumberTransformer;
 use markhuot\CraftQL\Fields\Categories as CategoriesTransformer;
 use markhuot\CraftQL\Fields\PositionSelect as PositionSelectTransformer;
-use markhuot\CraftQL\Fields\RadioButton as RadioButtonTransformer;
 use markhuot\CraftQL\Fields\Table as TableTransformer;
 use markhuot\CraftQL\Fields\Matrix as MatrixTransformer;
+use markhuot\CraftQL\Fields\Unknown as UnknownTransformer;
 
 class FieldService {
 
@@ -66,16 +64,19 @@ class FieldService {
         case LightswitchField::class: $transformer = Yii::$container->get(LightswitchTransformer::class); break;
         case CheckboxesField::class: $transformer = Yii::$container->get(CheckboxTransformer::class); break;
         case RichTextField::class: $transformer = Yii::$container->get(RichTextTransformer::class); break;
-        case PlainTextField::class: $transformer = Yii::$container->get(TextTransformer::class); break;
-        case ColorField::class: $transformer = Yii::$container->get(ColorTransformer::class); break;
-        case DropdownField::class: $transformer = Yii::$container->get(DropdownTransformer::class); break;
-        case RadioButtonsField::class: $transformer = Yii::$container->get(RadioButtonTransformer::class); break;
         case MultiSelectField::class: $transformer = Yii::$container->get(CheckboxTransformer::class); break;
         case NumberField::class: $transformer = Yii::$container->get(NumberTransformer::class); break;
         case CategoriesField::class: $transformer = Yii::$container->get(CategoriesTransformer::class); break;
         case PositionSelectField::class: $transformer = Yii::$container->get(PositionSelectTransformer::class); break;
         case TableField::class: $transformer = Yii::$container->get(TableTransformer::class); break;
         case MatrixField::class: $transformer = Yii::$container->get(MatrixTransformer::class); break;
+        case RadioButtonsField::class: $transformer = Yii::$container->get(SelectOneTransformer::class); break;
+        case DropdownField::class: $transformer = Yii::$container->get(SelectOneTransformer::class); break;
+        
+        case ColorField::class:
+        case PlainTextField::class:
+        default:
+          $transformer = Yii::$container->get(UnknownTransformer::class); break;
       }
 
       return $transformer->getDefinition($field);
