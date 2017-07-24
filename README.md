@@ -104,6 +104,8 @@ No software is ever done. There's a lot still to do in order to make _CraftQL_ f
 
 - [x] Matrix fields are not included in the schema yet
 - [x] Table fields are not included in the schema yet
+- [x] Asset mutations (implemented by passing a URL or asset id)
+- [ ] File uploads to assets fields during a mutation
 - [ ] Automated testing is not functional yet
 - [ ] Mutations need a lot more testing
 
