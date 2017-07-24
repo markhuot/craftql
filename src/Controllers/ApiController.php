@@ -42,7 +42,8 @@ class ApiController extends Controller
     {
         // You must set the header to JSON, otherwise Craft will see HTML and try to insert
         // javascript at the bottom to run pending tasks
-        \Craft::$app->getResponse()->headers->add('Content-Type', 'application/json; charset=UTF-8');
+        $response = \Craft::$app->getResponse();
+        $response->headers->add('Content-Type', 'application/json; charset=UTF-8');
 
         $writable = true;
         $token = false;
@@ -66,7 +67,7 @@ class ApiController extends Controller
 
         if (!$user) {
             http_response_code(403);
-            return json_encode([
+            $this->asJson([
                 'errors' => [
                     ['message' => 'Not authorized']
                 ]
@@ -90,6 +91,6 @@ class ApiController extends Controller
         //     header('X-Timer-'.$index++.'-'.ucfirst($key).': '.$timer);
         // }
 
-        return json_encode($result);
+        $this->asJson($result);
     }
 }
