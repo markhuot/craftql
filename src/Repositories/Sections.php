@@ -7,7 +7,7 @@ use Craft;
 class Sections {
 
     private $loaded = false;
-    private $sections = [];
+    static $sections = [];
 
     /**
      * Load sections out of the Craft database and convert them to
@@ -21,7 +21,7 @@ class Sections {
         }
         
         foreach (Craft::$app->sections->allSections as $section) {
-            $this->sections[$section->handle] = $this->parseSectionToObject($section);
+            static::$sections[$section->handle] = $this->parseSectionToObject($section);
         }
 
         $this->loaded = true;
@@ -35,12 +35,12 @@ class Sections {
      * @return void
      */
     function getSection($sectionHandle) {
-        if (!isset($this->sections[$sectionHandle])) {
+        if (!isset(static::$sections[$sectionHandle])) {
             $section = Craft::$app->sections->getSectionByHandle($sectionHandle);
-            $this->sections[$sectionHandle] = $this->parseSectionToObject($section);
+            static::$sections[$sectionHandle] = $this->parseSectionToObject($section);
         }
 
-        return $this->sections[$sectionHandle];
+        return static::$sections[$sectionHandle];
     }
 
     /**
@@ -50,7 +50,7 @@ class Sections {
      * @return array
      */
     function loadedSections() {
-        return $this->sections;
+        return static::$sections;
     }
 
     /**
@@ -59,7 +59,7 @@ class Sections {
      * @return array
      */
     function getAllSections() {
-        return $this->sections;
+        return static::$sections;
     }
 
     /**
@@ -70,7 +70,11 @@ class Sections {
      * @return void
      */
     function parseSectionToObject($section) {
-        return \markhuot\CraftQL\Types\Section::make($section);
+        if (isset(static::$sections[$section->handle])) {
+            return static::$sections[$section->handle];
+        }
+
+        return static::$sections[$section->handle] = \markhuot\CraftQL\Types\Section::make($section);
     }
 
 }

@@ -10,31 +10,37 @@ class PositionSelect {
 
     static $enum;
 
-    function getDefinition($field) {
-        if (!static::$enum) {
-            static::$enum = new EnumType([
-                'name' => ucfirst($field->handle).'Enum',
-                'values' => [
-                    'left' => 'left',
-                    'center' => 'center',
-                    'right' => 'right',
-                    'full' => 'full',
-                    'dropleft' => 'drop-left',
-                    'dropright' => 'drop-right',
-                ],
-            ]);
+    function getEnum($field) {
+        if (static::$enum) {
+            return static::$enum;
         }
+        
+        return static::$enum = new EnumType([
+            'name' => ucfirst($field->handle).'Enum',
+            'values' => [
+                'left' => 'left',
+                'center' => 'center',
+                'right' => 'right',
+                'full' => 'full',
+                'dropleft' => 'drop-left',
+                'dropright' => 'drop-right',
+            ],
+        ]);
+    }
 
+    function getDefinition($field) {
         return [
             $field->handle => [
-                'type' => static::$enum,
+                'type' => $this->getEnum($field),
                 'description' => $field->instructions,
             ],
         ];
     }
 
-  function getGraphQlType($field) {
-    return Type::string();
+  function getArg($field) {
+    return [
+        $field->handle => ['type' => $this->getEnum($field)]
+    ];
   }
 
 }

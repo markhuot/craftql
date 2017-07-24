@@ -29,8 +29,10 @@ class Date {
     ];
   }
 
-  function getGraphQlType($field) {
-    return Type::string();
+  function getArg($field) {
+    return [
+      $field->handle => ['type' => Type::int()]
+    ];
   }
 
 }

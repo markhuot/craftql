@@ -2,13 +2,16 @@
 
 namespace markhuot\CraftQL\Fields;
 
+use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\UnionType;
 use yii\base\Component;
 
 class Assets extends Component {
 
   private $assetVolumes;
+  static $inputObjects = [];
 
   function getDefinition($field) {
     return [$field->handle => [
@@ -20,8 +23,24 @@ class Assets extends Component {
     ]];
   }
 
-  function getGraphQlType($field) {
-    return Type::string();
+  function getInputObject($field) {
+    if (isset(static::$inputObjects[$field->handle])) {
+      return static::$inputObjects[$field->handle];
+    }
+
+    return static::$inputObjects[$field->handle] = new InputObjectType([
+      'name' => ucfirst($field->handle).'AssetInput',
+      'fields' => [
+        'id' => ['type' => Type::int()],
+        'url' => ['type' => Type::string()],
+      ],
+    ]);
+  }
+
+  function getArg($field) {
+    return [
+      $field->handle => ['type' => Type::listOf($this->getInputObject($field))],
+    ];
   }
 
 }

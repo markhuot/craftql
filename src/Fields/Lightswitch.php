@@ -18,8 +18,10 @@ class Lightswitch {
     ]];
   }
 
-  function getGraphQlType($field) {
-    return Type::boolean();
+  function getArg($field) {
+    return [
+      $field->handle => ['type' => Type::boolean()]
+    ];
   }
 
 }

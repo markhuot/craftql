@@ -45,8 +45,10 @@ class Matrix extends Component {
         ]];
     }
 
-  function getGraphQlType($field) {
-    return Type::string();
+  function getArg($field) {
+    return [
+        $field->handle => ['type' => Type::string()]
+    ];
   }
 
 }

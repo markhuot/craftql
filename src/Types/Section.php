@@ -9,34 +9,10 @@ use GraphQL\Type\Definition\Type;
 class Section {
 
     static function make($section) {
-        // $fields = \markhuot\CraftQL\Types\Entry::baseFields();
-
-        // $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-        // foreach ($section->entryTypes as $entryType) {
-        //     // $fields = array_merge($fields, $fieldService->getFields($entryType->fieldLayoutId));
-        // }
-
-        // $sectionType = new static([
-        //     'name' => ucfirst($section->handle).'Section',
-        //     'fields' => $fields,
-        //     // 'interfaces' => [
-        //     //     \markhuot\CraftQL\Types\Entry::interface(),
-        //     //     \markhuot\CraftQL\Types\Element::interface(),
-        //     // ],
-        //     'resolveType' => function ($entry) {
-        //         return \markhuot\CraftQL\Types\EntryType::getName($entry->type);
-        //     },
-        //     'type' => $section->type, 
-        // ]);
-
         $entryTypes = [];
         foreach ($section->entryTypes as $entryType) {
             $entryTypes[] = \markhuot\CraftQL\Types\EntryType::make($entryType);
         }
-
-        // $sectionType->config['entryTypes'] = $entryTypes;
-
-        // return $sectionType;
     }
 
     static function args() {

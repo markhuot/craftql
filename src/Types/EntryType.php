@@ -41,6 +41,16 @@ class EntryType extends ObjectType {
     }
 
     static function all() {
+        if (!empty(static::$types)) {
+            return static::$types;
+        }
+
+        foreach (Craft::$app->sections->allSections as $section) {
+            foreach ($section->entryTypes as $entryType) {
+                static::$types[$entryType->id] = \markhuot\CraftQL\Types\EntryType::make($entryType);
+            }
+        }
+
         return static::$types;
     }
 
@@ -58,7 +68,17 @@ class EntryType extends ObjectType {
 
     function args() {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+
         return $fieldService->getArgs($this->craftType->fieldLayoutId);
+    }
+
+    function fields() {
+        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+
+        $fields = \markhuot\CraftQL\Types\Entry::baseFields();
+        $fields = array_merge($fields, $fieldService->getFields($entryType->fieldLayoutId));
+
+        return $fields;
     }
 
     function upsert() {
@@ -91,6 +111,15 @@ class EntryType extends ObjectType {
             unset($fields['sectionId']);
             unset($fields['typeId']);
             unset($fields['authorId']);
+            // var_dump($fields);
+            // die;
+
+            $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+
+            foreach ($fields as $handle => &$value) {
+                $value = $fieldService->upsertFieldValue($handle, $value);
+            }
+
             $entry->setFieldValues($fields);
 
             Craft::$app->elements->saveElement($entry);

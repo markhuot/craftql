@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Services;
 
 use Yii;
 use Craft;
+use craft\elements\Asset;
 use craft\fields\PlainText as PlainTextField;
 use craft\fields\RichText as RichTextField;
 use craft\fields\Checkboxes as CheckboxesField;
@@ -21,6 +22,7 @@ use craft\fields\Categories as CategoriesField;
 use craft\fields\PositionSelect as PositionSelectField;
 use craft\fields\Matrix as MatrixField;
 use craft\fields\Table as TableField;
+use craft\helpers\Assets;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
 use markhuot\CraftQL\Fields\RichText as RichTextTransformer;
@@ -68,9 +70,7 @@ class FieldService {
   }
 
   function getArg($field) {
-    return [
-      $field->handle => ['type' => $this->getTransformer($field)->getGraphQlType($field)],
-    ];
+    return $this->getTransformer($field)->getArg($field);
   }
 
   function getArgs($fieldLayoutId) {
@@ -97,6 +97,59 @@ class FieldService {
     }
 
     return $graphQlFields;
+  }
+
+  function upsertFieldValue($handle, $values) {
+    if ($handle == 'image') {
+      $images = [];
+
+      foreach ($values as $value) {
+        if (!empty($value['id'])) {
+          $images[] = $value['id'];
+        }
+        if (!empty($value['url'])) {
+          $remoteUrl = $value['url'];
+          $parts = parse_url($remoteUrl);
+          $basename = basename($parts['path']);
+          $filename = Assets::prepareAssetName($basename, true);
+
+          $temp = tmpfile();
+          fwrite($temp, file_get_contents($remoteUrl));
+          $uploadPath = stream_get_meta_data($temp)['uri'];
+
+          if (!pathinfo($filename, PATHINFO_EXTENSION)) {
+            $mimeType = mime_content_type($uploadPath);
+            $exts = \craft\helpers\FileHelper::getExtensionsByMimeType($mimeType);
+            if (count($exts)) {
+              $ext = $exts[count($exts)-1];
+              $filename = pathinfo($filename, PATHINFO_FILENAME).'.'.$ext;
+            }
+          }
+
+          $asset = new Asset();
+          $asset->tempFilePath = $uploadPath;
+          $asset->filename = $filename;
+          $asset->volumeId = 1;
+          $asset->newFolderId = 1;
+          $asset->newFilename = $filename;
+          $asset->newLocation = '{folder:1}'.$filename;
+          $asset->avoidFilenameConflicts = true;
+          $asset->setScenario(Asset::SCENARIO_CREATE);
+
+          $result = Craft::$app->getElements()->saveElement($asset);
+          if ($result) {
+            $images[] = $asset->id;
+          }
+          else {
+            throw new Exception(implode(' ', $asset->getFirstErrors()));
+          }
+
+          fclose($temp);
+        }
+      }
+
+      return $images;
+    }
   }
 
 }

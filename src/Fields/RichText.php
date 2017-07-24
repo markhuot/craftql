@@ -20,14 +20,16 @@ class RichText {
             return $root->{$field->handle}->getPage($args['page']);
           }
 
-          return $root->{$field->handle}->getParsedContent();
+          return (string)$root->{$field->handle};
         }
       ],
     ];
   }
 
-  function getGraphQlType($field) {
-    return Type::string();
+  function getArg($field) {
+    return [
+      $field->handle => ['type' => Type::string()]
+    ];
   }
 
 }

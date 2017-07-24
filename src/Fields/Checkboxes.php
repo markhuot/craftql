@@ -10,7 +10,11 @@ class Checkboxes {
 
   static $enums = [];
 
-  function getDefinition($field) {
+  function getEnumFor($field) {
+    if (isset(static::$enums[$field->handle])) {
+      return static::$enums[$field->handle];
+    }
+
     $options = [];
     foreach ($field['settings']['options'] as $option) {
       $options[$option['value']] = [
@@ -18,15 +22,17 @@ class Checkboxes {
       ];
     }
 
-    if (empty(static::$enums[$field->handle])) {
-      static::$enums[$field->handle] = new EnumType([
-        'name' => ucfirst($field->handle.'Enum'),
-        'values' => $options,
-      ]);
-    }
+    return static::$enums[$field->handle] = new EnumType([
+      'name' => ucfirst($field->handle.'Enum'),
+      'values' => $options,
+    ]);
+  }
+
+  function getDefinition($field) {
+    
 
     return [$field->handle => [
-      'type' => Type::listOf(static::$enums[$field->handle]),
+      'type' => Type::listOf($this->getEnumFor($field)),
       'description' => $field->instructions,
       'resolve' => function ($root, $args) use ($field) {
         $values = [];
@@ -38,8 +44,10 @@ class Checkboxes {
     ]];
   }
 
-  function getGraphQlType($field) {
-    return Type::string();
+  function getArg($field) {
+    return [
+      $field->handle => ['type' => Type::listOf($this->getEnumFor($field))]
+    ];
   }
 
 }
