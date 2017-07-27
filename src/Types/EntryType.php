@@ -111,8 +111,6 @@ class EntryType extends ObjectType {
             unset($fields['sectionId']);
             unset($fields['typeId']);
             unset($fields['authorId']);
-            // var_dump($fields);
-            // die;
 
             $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
 

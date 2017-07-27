@@ -72,4 +72,8 @@ class Table extends Component {
     ];
   }
 
+  function upsert($field, $values) {
+
+  }
+
 }

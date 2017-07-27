@@ -100,6 +100,9 @@ class FieldService {
   }
 
   function upsertFieldValue($handle, $values) {
+    if ($handle == 'testTableField') {
+      $table->upsert($field, $values);
+    }
     if ($handle == 'image') {
       $images = [];
 
