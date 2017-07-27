@@ -13,7 +13,7 @@ class Entries extends Component {
     return [$field->handle => [
       'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
       'description' => $field->instructions,
-      'args' => \markhuot\CraftQL\Types\Section::args(),
+      'args' => \markhuot\CraftQL\Types\Entry::args(),
       'resolve' => function ($root, $args) use ($field) {
         $criteria = $root->{$field->handle};
         foreach ($args as $key => $value) {

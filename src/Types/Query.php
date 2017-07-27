@@ -36,7 +36,7 @@ class Query extends Component {
                 'entries' => [
                     'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
                     'description' => 'Entries from the craft interface',
-                    'args' => \markhuot\CraftQL\Types\Section::args(),
+                    'args' => \markhuot\CraftQL\Types\Entry::args(),
                     'resolve' => function ($root, $args) {
                         $criteria = \craft\elements\Entry::find();
                         foreach ($args as $key => $value) {
@@ -46,7 +46,6 @@ class Query extends Component {
                     }
                 ],
             ],
-            'types' => $this->getTypes(),
         ];
 
         return new ObjectType($config);

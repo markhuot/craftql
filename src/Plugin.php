@@ -50,6 +50,11 @@ class Plugin extends BasePlugin
                 $event->rules["GET {$uri}"] = 'craftql/api/graphiql';
             }
         );
+
+        // Register monkeypatching
+        Event::on(\craft\fields\RichText::class, \craft\fields\RichText::EVENT_AFTER_INIT, function ($event) {
+            $event->sender->attachBehavior('richTextBehavior', \markhuot\CraftQL\Fields\RichTextBehavior::class);
+        });
     }
 
     /**

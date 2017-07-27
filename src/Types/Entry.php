@@ -11,11 +11,48 @@ class Entry {
     static $interface;
     static $baseFields;
 
-    static function baseArgs() {
+    static function baseInputArgs() {
         return [
             'id' => ['type' => Type::int()],
             'authorId' => ['type' => Type::int()],
             'title' => ['type' => Type::string()],
+        ];
+    }
+
+    static function args() {
+        return [
+            'after' => Type::string(),
+            'ancestorOf' => Type::int(),
+            'ancestorDist' => Type::int(),
+            'archived' => Type::boolean(),
+            'authorGroup' => Type::string(),
+            'authorGroupId' => Type::int(),
+            'authorId' => Type::int(),
+            'before' => Type::string(),
+            'level' => Type::int(),
+            'localeEnabled' => Type::boolean(),
+            'descendantOf' => Type::int(),
+            'descendantDist' => Type::int(),
+            'fixedOrder' => Type::boolean(),
+            'id' => Type::int(),
+            'limit' => Type::int(),
+            'locale' => Type::string(),
+            'nextSiblingOf' => Type::int(),
+            'offset' => Type::int(),
+            'order' => Type::string(),
+            'positionedAfter' => Type::id(),
+            'positionedBefore' => Type::id(),
+            'postDate' => Type::string(),
+            'prevSiblingOf' => Type::id(),
+            'relatedTo' => Type::id(),
+            'search' => Type::string(),
+            'section' => Type::string(),
+            'siblingOf' => Type::int(),
+            'slug' => Type::string(),
+            'status' => Type::string(),
+            'title' => Type::string(),
+            'type' => Type::string(),
+            'uri' => Type::string(),
         ];
     }
 
@@ -95,20 +132,14 @@ class Entry {
     }
 
     static function interface() {
-        if (!static::$interface) {
-            $fields = static::baseFields();
-
-            static::$interface = new InterfaceType([
-                'name' => 'EntryInterface',
-                'description' => 'An entry in Craft',
-                'fields' => $fields,
-                'resolveType' => function ($entry) {
-                    return \markhuot\CraftQL\Types\EntryType::getName($entry->type);
-                }
-            ]);
-        }
-
-        return static::$interface;
+        return static::$interface = static::$interface ?: new InterfaceType([
+            'name' => 'EntryInterface',
+            'description' => 'An entry in Craft',
+            'fields' => static::baseFields(),
+            'resolveType' => function ($entry) {
+                return \markhuot\CraftQL\Types\EntryType::getName($entry->type);
+            }
+        ]);
     }
 
 }

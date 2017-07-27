@@ -26,6 +26,13 @@ class GraphQLService extends Component {
         $this->queryType = $queryType;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @todo REMOVE $writable, this function needs to run the same way, all the time
+     * @param boolean $writable
+     * @return void
+     */
     function bootstrap($writable=false) {
         $schema = [];
         $schema['query'] = $this->queryType->getType();

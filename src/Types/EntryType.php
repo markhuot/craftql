@@ -27,12 +27,13 @@ class EntryType extends ObjectType {
             'name' => static::getName($entryType),
             'fields' => $fields,
             'interfaces' => [
-                // $sectionType,
                 \markhuot\CraftQL\Types\Entry::interface(),
                 \markhuot\CraftQL\Types\Element::interface(),
             ],
         ]);
+
         $type->craftType = $entryType;
+
         return $type;
     }
 
@@ -47,7 +48,7 @@ class EntryType extends ObjectType {
 
         foreach (Craft::$app->sections->allSections as $section) {
             foreach ($section->entryTypes as $entryType) {
-                static::$types[$entryType->id] = \markhuot\CraftQL\Types\EntryType::make($entryType);
+                static::$types[$entryType->id] = static::make($entryType);
             }
         }
 
@@ -55,15 +56,10 @@ class EntryType extends ObjectType {
     }
 
     static function getName($entryType) {
-        if ($entryType->section->handle == $entryType->handle) {
-            return ucfirst($entryType->handle);
-        }
-        
-        return ucfirst($entryType->section->handle).ucfirst($entryType->handle);
-    }
+        $typeHandle = ucfirst($entryType->handle);
+        $sectionHandle = ucfirst($entryType->section->handle);
 
-    function name() {
-        return static::getName($this->craftType);
+        return ($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle;
     }
 
     function args() {
@@ -72,14 +68,14 @@ class EntryType extends ObjectType {
         return $fieldService->getArgs($this->craftType->fieldLayoutId);
     }
 
-    function fields() {
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+    // function fields() {
+    //     $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
 
-        $fields = \markhuot\CraftQL\Types\Entry::baseFields();
-        $fields = array_merge($fields, $fieldService->getFields($entryType->fieldLayoutId));
+    //     $fields = \markhuot\CraftQL\Types\Entry::baseFields();
+    //     $fields = array_merge($fields, $fieldService->getFields($entryType->fieldLayoutId));
 
-        return $fields;
-    }
+    //     return $fields;
+    // }
 
     function upsert() {
         return function ($root, $args) {
