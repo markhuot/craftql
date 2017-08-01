@@ -53,10 +53,33 @@ class Plugin extends BasePlugin
             }
         );
 
+        $mappings = [
+            \craft\fields\RichText::class => \markhuot\CraftQL\Fields\RichTextBehavior::class,
+            \craft\fields\Lightswitch::class => \markhuot\CraftQL\Fields\LightswitchBehavior::class,
+            \craft\fields\Date::class => \markhuot\CraftQL\Fields\DateBehavior::class,
+            \craft\fields\Checkboxes::class => \markhuot\CraftQL\Fields\SelectMultipleBehavior::class,
+            \craft\fields\MultiSelect::class => \markhuot\CraftQL\Fields\SelectMultipleBehavior::class,
+            \craft\fields\Categories::class => \markhuot\CraftQL\Fields\CategoriesBehavior::class,
+            \craft\fields\PositionSelect::class => \markhuot\CraftQL\Fields\PositionSelectBehavior::class,
+            \craft\fields\Entries::class => \markhuot\CraftQL\Fields\EntriesBehavior::class,
+            \craft\fields\Number::class => \markhuot\CraftQL\Fields\NumberBehavior::class,
+            \craft\fields\RadioButtons::class => \markhuot\CraftQL\Fields\SelectOneBehavior::class,
+            \craft\fields\Dropdown::class => \markhuot\CraftQL\Fields\SelectOneBehavior::class,
+            \craft\fields\Assets::class => \markhuot\CraftQL\Fields\AssetsBehavior::class,
+            \craft\fields\Matrix::class => \markhuot\CraftQL\Fields\MatrixBehavior::class,
+            \craft\fields\Table::class => \markhuot\CraftQL\Fields\TableBehavior::class,
+            \craft\fields\Tags::class => \markhuot\CraftQL\Fields\TagsBehavior::class,
+            \craft\fields\Color::class => \markhuot\CraftQL\Fields\DefaultBehavior::class,
+            \craft\fields\PlainText::class => \markhuot\CraftQL\Fields\DefaultBehavior::class,
+            \craft\fields\PlainText::class => \markhuot\CraftQL\Fields\DefaultBehavior::class,
+        ];
+
         // Register monkeypatching
-        // Event::on(\craft\fields\RichText::class, \craft\fields\RichText::EVENT_AFTER_INIT, function ($event) {
-        //     $event->sender->attachBehavior('richTextBehavior', \markhuot\CraftQL\Fields\RichTextBehavior::class);
-        // });
+        foreach ($mappings as $fieldClass => $behaviorClass) {
+            Event::on($fieldClass, $fieldClass::EVENT_INIT, function ($event) use ($behaviorClass) {
+                $event->sender->attachBehavior($behaviorClass, $behaviorClass);
+            });
+        }
     }
 
     /**

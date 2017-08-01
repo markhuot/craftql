@@ -6,14 +6,14 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use yii\base\Behavior;
 
-class RichTextBehavior extends Behavior
+class LightswitchBehavior extends Behavior
 {
     
     public function getGraphQLMutationArgs() {
         $field = $this->owner;
-
+        
         return [
-            $field->handle => ['type' => Type::string()]
+            $field->handle => ['type' => Type::boolean()]
         ];
     }
 
@@ -22,17 +22,10 @@ class RichTextBehavior extends Behavior
 
         return [
             $field->handle => [
-                'type' => Type::string(),
+                'type' => Type::boolean(),
                 'description' => $field->instructions,
-                'args' => [
-                    ['name' => 'page', 'type' => Type::int()],
-                ],
                 'resolve' => function ($root, $args) use ($field) {
-                    if (!empty($args['page'])) {
-                        return $root->{$field->handle}->getPage($args['page']);
-                    }
-
-                    return (string)$root->{$field->handle};
+                    return $root->{$field->handle};
                 }
             ],
         ];

@@ -6,14 +6,14 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use yii\base\Behavior;
 
-class RichTextBehavior extends Behavior
+class DateBehavior extends Behavior
 {
     
     public function getGraphQLMutationArgs() {
         $field = $this->owner;
-
+        
         return [
-            $field->handle => ['type' => Type::string()]
+            $field->handle => ['type' => Type::int()]
         ];
     }
 
@@ -21,18 +21,21 @@ class RichTextBehavior extends Behavior
         $field = $this->owner;
 
         return [
+            "{$field->handle}Timestamp" => [
+                'type' => Type::int(),
+                'description' => $field->instructions,
+                'resolve' => function ($root, $args) use ($field) {
+                    return $root->{$field->handle} ? $root->{$field->handle}->format('U') : null;
+                }
+            ],
             $field->handle => [
                 'type' => Type::string(),
                 'description' => $field->instructions,
                 'args' => [
-                    ['name' => 'page', 'type' => Type::int()],
+                    ['name' => 'format', 'type' => Type::string(), 'defaultValue' => 'r'],
                 ],
                 'resolve' => function ($root, $args) use ($field) {
-                    if (!empty($args['page'])) {
-                        return $root->{$field->handle}->getPage($args['page']);
-                    }
-
-                    return (string)$root->{$field->handle};
+                    return $root->{$field->handle} ? $root->{$field->handle}->format($args['format']) : null;
                 }
             ],
         ];

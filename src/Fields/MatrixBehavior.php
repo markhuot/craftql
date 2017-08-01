@@ -5,12 +5,19 @@ namespace markhuot\CraftQL\Fields;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\UnionType;
 use GraphQL\Type\Definition\Type;
-use yii\base\Component;
+use yii\base\Behavior;
 
-class Matrix extends Component {
-
-    private $tagGroups;
+class MatrixBehavior extends Behavior
+{
     static $objects = [];
+    
+    public function getGraphQLMutationArgs() {
+        $field = $this->owner;
+
+        return [
+            $field->handle => ['type' => Type::string()]
+        ];
+    }
 
     function getGraphQlObject($field) {
         if (isset(static::$objects[$field->handle])) {
@@ -38,17 +45,19 @@ class Matrix extends Component {
         ]);
     }
 
-    function getDefinition($field) {
-        return [$field->handle => [
-            'type' => Type::listOf($this->getGraphQlObject($field)),
-            'description' => $field->instructions,
-        ]];
+    public function getGraphQLQueryFields() {
+        $field = $this->owner;
+
+        return [
+            $field->handle => [
+                'type' => Type::listOf($this->getGraphQlObject($field)),
+                'description' => $field->instructions,
+            ]
+        ];
     }
 
-  function getArg($field) {
-    return [
-        $field->handle => ['type' => Type::string()]
-    ];
-  }
+    public function upsert($value) {
+        return $value;
+    }
 
 }

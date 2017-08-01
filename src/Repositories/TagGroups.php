@@ -18,16 +18,16 @@ class TagGroups extends Component {
     }
   }
 
-  function getGroup($groupId) {
+  static function getGroup($groupId) {
     if (!isset(static::$groups[$groupId])) {
       $group = Craft::$app->tags->getTagGroupById($groupId);
-      static::$groups[$groupId] = $this->parseGroupToObject($group);
+      static::$groups[$groupId] = static::parseGroupToObject($group);
     }
 
     return static::$groups[$groupId];
   }
 
-  function parseGroupToObject($group) {
+  static function parseGroupToObject($group) {
     return \markhuot\CraftQL\Types\TagGroup::make($group);
   }
 

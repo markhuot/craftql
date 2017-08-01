@@ -4,10 +4,22 @@ namespace markhuot\CraftQL\Fields;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
+use yii\base\Behavior;
 
-class Unknown {
+class DefaultBehavior extends Behavior
+{
+    
+    public function getGraphQLMutationArgs() {
+        $field = $this->owner;
 
-    function getDefinition($field) {
+        return [
+            $field->handle => ['type' => Type::string()]
+        ];
+    }
+
+    public function getGraphQLQueryFields() {
+        $field = $this->owner;
+
         return [
             $field->handle => [
                 'type' => Type::string(),
@@ -19,10 +31,8 @@ class Unknown {
         ];
     }
 
-    function getArg($field) {
-        return [
-            $field->handle => ['type' => Type::string()]
-        ];
+    public function upsert($value) {
+        return $value;
     }
 
 }

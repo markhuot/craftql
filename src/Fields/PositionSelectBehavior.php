@@ -3,11 +3,12 @@
 namespace markhuot\CraftQL\Fields;
 
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\Type;
+use yii\base\Behavior;
 
-class PositionSelect {
-
+class PositionSelectBehavior extends Behavior
+{
     static $enum;
 
     function getEnum($field) {
@@ -28,7 +29,17 @@ class PositionSelect {
         ]);
     }
 
-    function getDefinition($field) {
+    public function getGraphQLMutationArgs() {
+        $field = $this->owner;
+
+        return [
+            $field->handle => ['type' => $this->getEnum($field)]
+        ];
+    }
+
+    public function getGraphQLQueryFields() {
+        $field = $this->owner;
+
         return [
             $field->handle => [
                 'type' => $this->getEnum($field),
@@ -37,10 +48,8 @@ class PositionSelect {
         ];
     }
 
-  function getArg($field) {
-    return [
-        $field->handle => ['type' => $this->getEnum($field)]
-    ];
-  }
+    public function upsert($value) {
+        return $value;
+    }
 
 }

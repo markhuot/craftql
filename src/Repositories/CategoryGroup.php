@@ -27,7 +27,7 @@ class CategoryGroup extends Component {
     }
   }
 
-  function getGroup($id) {
+  static function getGroup($id) {
     if (!isset(static::$groups[$id])) {
       $group = Craft::$app->categories->getGroupById($id);
       static::$groups[$group->id] = $this->parseGroupToObject($group);
