@@ -65,7 +65,7 @@ class ApiController extends Controller
             ]);
         }
 
-        $this->graphQl->bootstrap($writable);
+        $this->graphQl->bootstrap();
 
         try {
             $result = $this->graphQl->execute($this->request->input(), $this->request->variables());

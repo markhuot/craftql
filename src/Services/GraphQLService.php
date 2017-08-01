@@ -27,24 +27,18 @@ class GraphQLService extends Component {
     }
 
     /**
-     * Undocumented function
+     * Bootstrap the schema
      *
-     * @todo REMOVE $writable, this function needs to run the same way, all the time
-     * @param boolean $writable
      * @return void
      */
     function bootstrap($writable=false) {
         $schema = [];
         $schema['query'] = $this->queryType->getType();
+        $schema['types'] = $this->queryType->getTypes();
 
-        $schema['types'] = [];
-        $schema['types'] = array_merge($schema['types'], $this->queryType->getTypes());
-
-        if ($writable) {
-            $mutation = $this->mutationType->getType();
-            if (count($mutation->getFields()) > 0) {
-                $schema['mutation'] = $mutation;
-            }
+        $mutation = $this->mutationType->getType();
+        if (count($mutation->getFields()) > 0) {
+            $schema['mutation'] = $mutation;
         }
 
         $this->schema = new Schema($schema);

@@ -2,34 +2,36 @@
 
 namespace markhuot\CraftQL\Services;
 
+use Craft;
+
 class RequestService {
 
     private $schema;
 
     function input() {
-        if (!empty($_POST['query'])) {
-            return $_POST['query'];
+        if (Craft::$app->request->isPost && $query=Craft::$app->request->post('query')) {
+            return $query;
         }
 
-        if (!empty($_GET['query'])) {
-            return $_GET['query'];
+        if (Craft::$app->request->isGet && $query=Craft::$app->request->get('query')) {
+            return $query;
         }
 
-        $data = file_get_contents('php://input');
+        $data = Craft::$app->request->getRawBody();
         $data = json_decode($data, true);
         return @$data['query'];
     }
 
     function variables() {
-        if (!empty($_POST['variables'])) {
-            return $_POST['variables'];
+        if (Craft::$app->request->isPost && $query=Craft::$app->request->post('variables')) {
+            return $query;
         }
 
-        if (!empty($_GET['variables'])) {
-            return $_GET['variables'];
+        if (Craft::$app->request->isGet && $query=Craft::$app->request->get('variables')) {
+            return $query;
         }
 
-        $data = file_get_contents('php://input');
+        $data = Craft::$app->request->getRawBody();
         $data = json_decode($data, true);
         return @$data['variables'];
     }

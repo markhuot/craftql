@@ -68,15 +68,6 @@ class EntryType extends ObjectType {
         return $fieldService->getArgs($this->craftType->fieldLayoutId);
     }
 
-    // function fields() {
-    //     $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-
-    //     $fields = \markhuot\CraftQL\Types\Entry::baseFields();
-    //     $fields = array_merge($fields, $fieldService->getFields($entryType->fieldLayoutId));
-
-    //     return $fields;
-    // }
-
     function upsert() {
         return function ($root, $args) {
             if (!empty($args['id'])) {
@@ -108,10 +99,9 @@ class EntryType extends ObjectType {
             unset($fields['typeId']);
             unset($fields['authorId']);
 
-            $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-
             foreach ($fields as $handle => &$value) {
-                $value = $fieldService->upsertFieldValue($handle, $value);
+                $field = Craft::$app->fields->getFieldByHandle($handle);
+                $value = $field->upsert($value);
             }
 
             $entry->setFieldValues($fields);

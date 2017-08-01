@@ -36,9 +36,4 @@ class FieldService {
     return $graphQlFields;
   }
 
-  function upsertFieldValue($handle, $values) {
-    $field = Craft::$app->fields->getFieldByHandle($handle);
-    return $field->upsert($values);
-  }
-
 }
