@@ -13,6 +13,7 @@ class Mutation extends Component {
     private $sections;
 
     function getType() {
+        $fields = [];
         $entryTypes = \markhuot\CraftQL\Types\EntryType::all();
 
         foreach ($entryTypes as $entryType) {

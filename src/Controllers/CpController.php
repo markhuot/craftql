@@ -28,4 +28,20 @@ class CpController extends Controller
 
         $this->redirect('/admin/settings/plugins/craftql');
     }
+
+    function actionIndex()
+    {
+        $this->redirect('craftql/browse');
+    }
+
+    function actionGraphiql()
+    {
+        $url = \craft\helpers\UrlHelper::siteUrl();
+        $instance = \markhuot\CraftQL\Plugin::getInstance();
+        $uri = $instance->settings->uri;
+
+        $this->renderTemplate('craftql/graphiql', [
+            'url' => "{$url}{$uri}",
+        ]);
+    }
 }

@@ -18,6 +18,7 @@ class Plugin extends BasePlugin
     public $schemaVersion = '1.0.1';
     public $controllerNamespace = 'markhuot\\CraftQL\\Controllers';
     public $hasCpSettings = true;
+    public $hasCpSection = true;
 
     /**
      * Init for the entire plugin
@@ -35,8 +36,10 @@ class Plugin extends BasePlugin
             UrlManager::className(),
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function (RegisterUrlRulesEvent $event) {
+                $event->rules['craftql'] = 'craftql/cp/index';
                 $event->rules['craftql/token-gen'] = 'craftql/cp/tokengenerate';
                 $event->rules['craftql/token-del/<tokenId:\d+>'] = 'craftql/cp/tokendelete';
+                $event->rules['craftql/browse'] = 'craftql/cp/graphiql';
             }
         );
 
@@ -47,14 +50,13 @@ class Plugin extends BasePlugin
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
             function (RegisterUrlRulesEvent $event) use ($uri) {
                 $event->rules["POST {$uri}"] = 'craftql/api/index';
-                $event->rules["GET {$uri}"] = 'craftql/api/graphiql';
             }
         );
 
         // Register monkeypatching
-        Event::on(\craft\fields\RichText::class, \craft\fields\RichText::EVENT_AFTER_INIT, function ($event) {
-            $event->sender->attachBehavior('richTextBehavior', \markhuot\CraftQL\Fields\RichTextBehavior::class);
-        });
+        // Event::on(\craft\fields\RichText::class, \craft\fields\RichText::EVENT_AFTER_INIT, function ($event) {
+        //     $event->sender->attachBehavior('richTextBehavior', \markhuot\CraftQL\Fields\RichTextBehavior::class);
+        // });
     }
 
     /**
