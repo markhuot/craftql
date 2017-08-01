@@ -41,7 +41,10 @@ class GraphQLService extends Component {
         $schema['types'] = array_merge($schema['types'], $this->queryType->getTypes());
 
         if ($writable) {
-            $schema['mutation'] = $this->mutationType->getType();
+            $mutation = $this->mutationType->getType();
+            if (count($mutation->getFields()) > 0) {
+                $schema['mutation'] = $mutation;
+            }
         }
 
         $this->schema = new Schema($schema);

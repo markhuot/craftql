@@ -29,15 +29,6 @@ class ApiController extends Controller
         $this->request = $request;
     }
 
-    function actionGraphiql() {
-        $url = Craft::$app->request->getUrl();
-        $url = preg_replace('/\?.*$/', '', $url);
-
-        $html = file_get_contents(dirname(__FILE__) . '/../templates/graphiql.html');
-        $html = str_replace('{{ url }}', $url, $html);
-        return $html;
-    }
-
     function actionIndex()
     {
         // You must set the header to JSON, otherwise Craft will see HTML and try to insert
