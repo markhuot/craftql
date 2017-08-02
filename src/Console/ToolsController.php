@@ -13,7 +13,7 @@ use yii\console\Controller;
 use yii;
 use markhuot\CraftQL\Services\GraphQLService;
 
-class ServerController extends Controller
+class ToolsController extends Controller
 {
     public $port = 9001;
     public $host = '0.0.0.0';
@@ -37,10 +37,13 @@ class ServerController extends Controller
     }
 
     public function getActionHelpSummary($action) {
-        return 'An event-driven, non-blocking web server.';
+        switch ($action->actionMethod) {
+            case 'actionServe': return 'An event-driven, non-blocking web server.';
+            case 'actionSeed': return 'Create sample sections to test out CraftQL.';
+        }
     }
 
-    public function actionIndex()
+    public function actionServe()
     {
         $graphQl = Yii::$container->get(GraphQLService::class);
         $graphQl->bootstrap();
@@ -92,5 +95,10 @@ class ServerController extends Controller
 
         echo "Server is now listening at http://{$this->host}:{$this->port}\n";
         $loop->run();
+    }
+
+    public function actionSeed()
+    {
+
     }
 }

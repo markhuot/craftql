@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 
 class Entry {
@@ -85,38 +86,54 @@ class Entry {
             ],
         ]);
 
+        $userStatusEnum =  new EnumType([
+            'name' => 'UserStatusEnum',
+            'values' => [
+                'active',
+                'locked',
+                'suspended',
+                'pending',
+                'archived',
+            ],
+        ]);
+
+        $userFields = [
+            'id' => ['type' => Type::nonNull(Type::int())],
+            'name' => ['type' => Type::nonNull(Type::string())],
+            'fullName' => ['type' => Type::string()],
+            'friendlyName' => ['type' => Type::nonNull(Type::string())],
+            'firstName' => ['type' => Type::string()],
+            'lastName' => ['type' => Type::string()],
+            'username' => ['type' => Type::nonNull(Type::string())],
+            'email' => ['type' => Type::nonNull(Type::string())],
+            'admin' => ['type' => Type::nonNull(Type::boolean())],
+            'isCurrent' => ['type' => Type::nonNull(Type::boolean())],
+            'preferredLocale' => ['type' => Type::string()],
+            'status' => ['type' => Type::nonNull($userStatusEnum)],
+        ];
+        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('dateCreated'));
+        $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('dateUpdated'));
+        $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('lastLoginDate'));
+        // $userFields = array_merge($userFields, $fieldService->getFields(7));
+
+        $userType = new ObjectType([
+            'name' => 'User',
+            'fields' => $userFields,
+        ]);
+
         $fields = [];
         $fields['elementType'] = ['type' => Type::nonNull(Type::string()), 'resolve' => function ($root, $args) {
             return 'Entry';
         }];
         $fields['id'] = ['type' => Type::nonNull(Type::int())];
         $fields['authorId'] = ['type' => Type::nonNull(Type::int())];
+        $fields['author'] = ['type' => Type::nonNull($userType)];
         $fields['title'] = ['type' => Type::nonNull(Type::string())];
         $fields['slug'] = ['type' => Type::nonNull(Type::string())];
-        $fields['dateCreatedTimestamp'] = ['type' => Type::nonNull(Type::int()), 'resolve' => function ($root, $args) {
-            return $root->dateCreated->format('U');
-        }];
-        $fields['dateCreated'] = ['type' => Type::nonNull(Type::string()), 'args' => [
-            ['name' => 'format', 'type' => Type::string(), 'defaultValue' => 'r']
-        ], 'resolve' => function ($root, $args) {
-            return $root->dateCreated->format($args['format']);
-        }];
-        $fields['dateUpdatedTimestamp'] = ['type' => Type::nonNull(Type::int()), 'resolve' => function ($root, $args) {
-            return $root->dateUpdated->format('U');
-        }];
-        $fields['dateUpdated'] = ['type' => Type::nonNull(Type::int()), 'args' => [
-            ['name' => 'format', 'type' => Type::string(), 'defaultValue' => 'r']
-        ], 'resolve' => function ($root, $args) {
-            return $root->dateUpdated->format($args['format']);
-        }];
-        $fields['expiryDateTimestamp'] = ['type' => Type::int(), 'resolve' => function ($root, $args) {
-            return $root->expiryDate->format('U');
-        }];
-        $fields['expiryDate'] = ['type' => Type::nonNull(Type::int()), 'args' => [
-            ['name' => 'format', 'type' => Type::string(), 'defaultValue' => 'r']
-        ], 'resolve' => function ($root, $args) {
-            return $root->expiryDate->format($args['format']);
-        }];
+        $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateCreated'));
+        $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateUpdated'));
+        $fields = array_merge($fields, $fieldService->getDateFieldDefinition('expiryDate'));
         $fields['enabled'] = ['type' => Type::nonNull(Type::boolean())];
         $fields['status'] = ['type' => Type::nonNull(Type::string())];
         $fields['uri'] = ['type' => Type::string()];

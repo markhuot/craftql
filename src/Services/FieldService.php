@@ -36,4 +36,17 @@ class FieldService {
     return $graphQlFields;
   }
 
+  function getDateFieldDefinition($handle) {
+    return [
+      "{$handle}Timestamp" => ['type' => Type::nonNull(Type::int()), 'resolve' => function ($root, $args) use ($handle) {
+            return $root->{$handle}->format('U');
+      }],
+      "{$handle}" => ['type' => Type::nonNull(Type::string()), 'args' => [
+          ['name' => 'format', 'type' => Type::string(), 'defaultValue' => 'r']
+      ], 'resolve' => function ($root, $args) use ($handle) {
+          return $root->{$handle}->format($args['format']);
+      }],
+    ];
+  }
+
 }
