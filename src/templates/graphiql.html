@@ -3,6 +3,26 @@
 {% set title = "GraphiQL | CraftQL"|t %}
 
 {% set content %}
+    <!--
+      This GraphiQL example depends on Promise and fetch, which are available in
+      modern browsers, but can be "polyfilled" for older browsers.
+      GraphiQL itself depends on React DOM.
+      If you do not want to rely on a CDN, you can host these files locally or
+      include them directly in your favored resource bunder.
+    -->
+    <script src="//cdn.jsdelivr.net/es6-promise/4.0.5/es6-promise.auto.min.js"></script>
+    <script src="//cdn.jsdelivr.net/fetch/0.9.0/fetch.min.js"></script>
+    <script src="//cdn.jsdelivr.net/react/15.4.2/react.min.js"></script>
+    <script src="//cdn.jsdelivr.net/react/15.4.2/react-dom.min.js"></script>
+
+    <!--
+      These two files can be found in the npm module, however you may wish to
+      copy them directly into your environment, or perhaps include them in your
+      favored resource bundler.
+     -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/graphiql/0.11.2/graphiql.min.css" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/graphiql/0.11.2/graphiql.min.js"></script>
+
     <style>
       #graphiql {
         position: absolute;
@@ -26,27 +46,49 @@
       #main.single-pane .padded > .pane {
         overflow: visible;
       }
+      .graphiql-container .topBar,
+      .graphiql-container .docExplorerShow {
+        background: #ebedef;
+        padding: 20px 24px;
+        border: none;
+      }
+      .graphiql-container .topBar .title {
+        font-size: 24px;
+        font-family: "Helvetica Neue-Light", HelveticaNeue-Light, "Helvetica Neue", HelveticaNeue, sans-serif;
+        color: #da5a47;
+      }
+      .graphiql-container .docExplorerShow {
+        color: #da5a47;
+      }
+      .graphiql-container .docExplorerShow:before {
+        border-color: #da5a47;
+      }
+      .graphiql-container .toolbar-button {
+        display: flex;
+        align-items: center;
+        color: #fff;
+        background-image: linear-gradient(#da5a47, #cc5643);
+        font-weight: 600;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 20, 0.1);
+        height: 30px;
+        border-radius: 3px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 13px;
+        box-sizing: border-box;
+      }
+      .graphiql-container .toolbar-button:hover {
+        background-image: linear-gradient(#bf503f, #b34b3b);
+      }
+      .graphiql-container .result-window .CodeMirror-gutters,
+      .graphiql-container .variable-editor-title {
+        background: #ebedef;
+      }
+      .CodeMirror-gutters {
+        background: #fafafa;
+        border-right: 0;
+      }
     </style>
-
-    <!--
-      This GraphiQL example depends on Promise and fetch, which are available in
-      modern browsers, but can be "polyfilled" for older browsers.
-      GraphiQL itself depends on React DOM.
-      If you do not want to rely on a CDN, you can host these files locally or
-      include them directly in your favored resource bunder.
-    -->
-    <script src="//cdn.jsdelivr.net/es6-promise/4.0.5/es6-promise.auto.min.js"></script>
-    <script src="//cdn.jsdelivr.net/fetch/0.9.0/fetch.min.js"></script>
-    <script src="//cdn.jsdelivr.net/react/15.4.2/react.min.js"></script>
-    <script src="//cdn.jsdelivr.net/react/15.4.2/react-dom.min.js"></script>
-
-    <!--
-      These two files can be found in the npm module, however you may wish to
-      copy them directly into your environment, or perhaps include them in your
-      favored resource bundler.
-     -->
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/graphiql/0.11.2/graphiql.min.css" />
-    <script src="//cdnjs.cloudflare.com/ajax/libs/graphiql/0.11.2/graphiql.min.js"></script>
 
     <div id="graphiql">Loading...</div>
     <script>
