@@ -45,6 +45,18 @@ class Query extends Component {
                         return $criteria->all();
                     }
                 ],
+                // 'users' => [
+                //     'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
+                //     'description' => 'Entries from the craft interface',
+                //     'args' => \markhuot\CraftQL\Types\Entry::args(),
+                //     'resolve' => function ($root, $args) {
+                //         $criteria = \craft\elements\Entry::find();
+                //         foreach ($args as $key => $value) {
+                //             $criteria = $criteria->{$key}($value);
+                //         }
+                //         return $criteria->all();
+                //     }
+                // ],
             ],
         ];
 

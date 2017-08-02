@@ -20,7 +20,7 @@ class EntriesBehavior extends Behavior
     public function getGraphQLQueryFields() {
         $field = $this->owner;
 
-        return [
+        $foo = [
             $field->handle => [
                 'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
                 'description' => $field->instructions,
@@ -34,6 +34,10 @@ class EntriesBehavior extends Behavior
                 }
             ]
         ];
+
+        
+
+        return $foo;
     }
 
     public function upsert($values) {

@@ -111,11 +111,15 @@ class Entry {
             'preferredLocale' => ['type' => Type::string()],
             'status' => ['type' => Type::nonNull($userStatusEnum)],
         ];
+        
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+
         $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('dateCreated'));
         $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('dateUpdated'));
         $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('lastLoginDate'));
-        // $userFields = array_merge($userFields, $fieldService->getFields(7));
+
+        $userFieldLayout = \Craft::$app->fields->getLayoutByType(\craft\elements\User::class);
+        $userFields = array_merge($userFields, $fieldService->getFields($userFieldLayout->id));
 
         $userType = new ObjectType([
             'name' => 'User',
@@ -149,14 +153,23 @@ class Entry {
     }
 
     static function interface() {
-        return static::$interface = static::$interface ?: new InterfaceType([
+        if (!empty(static::$interface)) {
+            return static::$interface;
+        }
+
+        $entryInterface = new InterfaceType([
             'name' => 'EntryInterface',
             'description' => 'An entry in Craft',
-            'fields' => static::baseFields(),
+            'fields' => function () use (&$entryInterface) {
+                static::$interface = $entryInterface;
+                return static::baseFields();
+            },
             'resolveType' => function ($entry) {
                 return \markhuot\CraftQL\Types\EntryType::getName($entry->type);
             }
         ]);
+
+        return static::$interface = $entryInterface;
     }
 
 }

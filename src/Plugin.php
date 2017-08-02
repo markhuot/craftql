@@ -71,7 +71,6 @@ class Plugin extends BasePlugin
             \craft\fields\Tags::class => \markhuot\CraftQL\Fields\TagsBehavior::class,
             \craft\fields\Color::class => \markhuot\CraftQL\Fields\DefaultBehavior::class,
             \craft\fields\PlainText::class => \markhuot\CraftQL\Fields\DefaultBehavior::class,
-            \craft\fields\PlainText::class => \markhuot\CraftQL\Fields\DefaultBehavior::class,
         ];
 
         // Register monkeypatching
@@ -80,6 +79,8 @@ class Plugin extends BasePlugin
                 $event->sender->attachBehavior($behaviorClass, $behaviorClass);
             });
         }
+
+        error_log('1');
     }
 
     /**
