@@ -2,6 +2,9 @@ language: php
 php:
   - '7.1'
 install:
+  - rm -rf /tmp/craft3
+  - composer create-project craftcms/craft /tmp/craft3
   - php bin/setup/travis.php
+  - cd /tmp/craft3 && composer require markhuot/craftql dev-master && composer require phpunit
 script:
   - /tmp/craft3/vendor/bin/phpunit
