@@ -13,4 +13,9 @@ final class InstallTest extends TestCase
     {
         $this->assertEquals(1, 1);
     }
+
+    public function testCraftHasDatabase(): void
+    {
+        $this->assertTrue(\Craft::$app->getDb()->getIsActive());
+    }
 }

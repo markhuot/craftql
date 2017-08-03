@@ -1,6 +1,14 @@
 language: php
 php:
   - '7.1'
+services:
+  - mysql
+env:
+  - DB_USER="root"
+  - DB_PASSWORD=""
+  - DB_DATABASE="craftql"
+before_install:
+  - mysql -e 'CREATE DATABASE IF NOT EXISTS craftql;'
 install:
   - rm -rf /home/travis/build/craftcms/craft
   - composer create-project craftcms/craft /home/travis/build/craftcms/craft
@@ -8,5 +16,6 @@ install:
   - cd /home/travis/build/craftcms/craft
   - composer require markhuot/craftql dev-master
   - composer require phpunit/phpunit
+  - cp /home/travis/build/markhuot/craftql/bootstrap.php /home/travis/build/craftcms/craft/bootstrap.php
 script:
-  - vendor/bin/phpunit vendor/markhuot/craftql/tests/ --testdox
+  - vendor/bin/phpunit --bootstrap bootstrap.php vendor/markhuot/craftql/tests/ --testdox
