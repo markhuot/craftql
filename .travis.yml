@@ -4,9 +4,7 @@ php:
 services:
   - mysql
 env:
-  - DB_USER="root"
-  - DB_PASSWORD=""
-  - DB_DATABASE="craftql"
+  - DB_USER="root" DB_PASSWORD="" DB_DATABASE="craftql"
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS craftql;'
 install:
