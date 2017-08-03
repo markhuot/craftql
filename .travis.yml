@@ -5,6 +5,7 @@ install:
   - rm -rf /tmp/craft3
   - composer create-project craftcms/craft /tmp/craft3
   - php bin/setup/travis.php
-  - cd /tmp/craft3 && composer require markhuot/craftql dev-master && composer require phpunit
+  - cd /tmp/craft3 && composer require markhuot/craftql dev-master
+  - cd /tmp/craft3 && composer require phpunit/phpunit
 script:
-  - /tmp/craft3/vendor/bin/phpunit
+  - cd /tmp/craft3 && vendor/bin/phpunit vendor/markhuot/craftql/tests/ --testdox
