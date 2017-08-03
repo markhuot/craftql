@@ -1,1 +1,7 @@
 language: php
+php:
+  - '7.1'
+install:
+  - php bin/setup/travis.php
+script:
+  - /tmp/craft3/vendor/bin/phpunit
