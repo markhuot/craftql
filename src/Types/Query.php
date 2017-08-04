@@ -52,18 +52,18 @@ class Query extends Component {
         }
 
         if ($token->can('query:users')) {
-            // $config['fields']['users'] = [
-            //     'type' => Type::listOf(\markhuot\CraftQL\Types\User::interface()),
-            //     'description' => 'Entries from the craft interface',
-            //     'args' => \markhuot\CraftQL\Types\Entry::args(),
-            //     'resolve' => function ($root, $args) {
-            //         $criteria = \craft\elements\Entry::find();
-            //         foreach ($args as $key => $value) {
-            //             $criteria = $criteria->{$key}($value);
-            //         }
-            //         return $criteria->all();
-            //     }
-            // ];
+            $config['fields']['users'] = [
+                'type' => Type::listOf(\markhuot\CraftQL\Types\User::type()),
+                'description' => 'Entries from the craft interface',
+                'args' => \markhuot\CraftQL\Types\User::args(),
+                'resolve' => function ($root, $args) {
+                    $criteria = \craft\elements\User::find();
+                    foreach ($args as $key => $value) {
+                        $criteria = $criteria->{$key}($value);
+                    }
+                    return $criteria->all();
+                }
+            ];
         }
 
         return new ObjectType($config);

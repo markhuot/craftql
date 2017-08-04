@@ -85,46 +85,8 @@ class Entry {
                 'handle' => ['type' => Type::nonNull(Type::string())],
             ],
         ]);
-
-        $userStatusEnum =  new EnumType([
-            'name' => 'UserStatusEnum',
-            'values' => [
-                'active',
-                'locked',
-                'suspended',
-                'pending',
-                'archived',
-            ],
-        ]);
-
-        $userFields = [
-            'id' => ['type' => Type::nonNull(Type::int())],
-            'name' => ['type' => Type::nonNull(Type::string())],
-            'fullName' => ['type' => Type::string()],
-            'friendlyName' => ['type' => Type::nonNull(Type::string())],
-            'firstName' => ['type' => Type::string()],
-            'lastName' => ['type' => Type::string()],
-            'username' => ['type' => Type::nonNull(Type::string())],
-            'email' => ['type' => Type::nonNull(Type::string())],
-            'admin' => ['type' => Type::nonNull(Type::boolean())],
-            'isCurrent' => ['type' => Type::nonNull(Type::boolean())],
-            'preferredLocale' => ['type' => Type::string()],
-            'status' => ['type' => Type::nonNull($userStatusEnum)],
-        ];
         
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-
-        $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('dateCreated'));
-        $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('dateUpdated'));
-        $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('lastLoginDate'));
-
-        $userFieldLayout = \Craft::$app->fields->getLayoutByType(\craft\elements\User::class);
-        $userFields = array_merge($userFields, $fieldService->getFields($userFieldLayout->id));
-
-        $userType = new ObjectType([
-            'name' => 'User',
-            'fields' => $userFields,
-        ]);
 
         $fields = [];
         $fields['elementType'] = ['type' => Type::nonNull(Type::string()), 'resolve' => function ($root, $args) {
@@ -132,7 +94,7 @@ class Entry {
         }];
         $fields['id'] = ['type' => Type::nonNull(Type::int())];
         $fields['authorId'] = ['type' => Type::nonNull(Type::int())];
-        $fields['author'] = ['type' => Type::nonNull($userType)];
+        $fields['author'] = ['type' => Type::nonNull(\markhuot\CraftQL\Types\User::type())];
         $fields['title'] = ['type' => Type::nonNull(Type::string())];
         $fields['slug'] = ['type' => Type::nonNull(Type::string())];
         $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateCreated'));
