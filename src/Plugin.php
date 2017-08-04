@@ -39,6 +39,7 @@ class Plugin extends BasePlugin
                 $event->rules['craftql'] = 'craftql/cp/index';
                 $event->rules['craftql/token-gen'] = 'craftql/cp/tokengenerate';
                 $event->rules['craftql/token-del/<tokenId:\d+>'] = 'craftql/cp/tokendelete';
+                $event->rules['craftql/token/<tokenId:\d+>/scopes'] = 'craftql/cp/tokenscopes';
                 $event->rules['craftql/browse'] = 'craftql/cp/graphiql';
             }
         );

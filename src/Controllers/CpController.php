@@ -29,6 +29,13 @@ class CpController extends Controller
         $this->redirect('/admin/settings/plugins/craftql');
     }
 
+    function actionTokenscopes($tokenId)
+    {
+        $this->renderTemplate('craftql/scopes', [
+            'token' => Token::find()->where(['id' => $tokenId])->one()
+        ]);
+    }
+
     function actionIndex()
     {
         $this->redirect('craftql/browse');
