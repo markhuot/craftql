@@ -41,20 +41,33 @@ class EntryType extends ObjectType {
         return @static::$types[$entryTypeId];
     }
 
-    static function all($token) {
+    static function all() {
         if (!empty(static::$types)) {
             return static::$types;
         }
 
         foreach (Craft::$app->sections->allSections as $section) {
             foreach ($section->entryTypes as $entryType) {
-                if ($token->can('query:entryType:'.$entryType->id)) {
+                // if ($token->can('query:entryType:'.$entryType->id)) {
                     static::$types[$entryType->id] = static::make($entryType);
-                }
+                // }
             }
         }
 
         return static::$types;
+    }
+
+    static function some($ids) {
+        $entryTypes = static::all();
+        $some = [];
+
+        foreach ($entryTypes as $id => $entryType) {
+            if (in_array($id, $ids)) {
+                $some[$id] = $entryType;
+            }
+        }
+
+        return $some;
     }
 
     static function getName($entryType) {

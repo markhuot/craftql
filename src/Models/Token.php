@@ -32,4 +32,28 @@ class Token extends ActiveRecord
     function can($do): bool {
         return @$this->scopeArray[$do] ?: false;
     }
+
+    function mutatableEntryTypeIds(): array {
+        $ids = [];
+
+        foreach ($this->scopeArray as $scope => $enabled) {
+            if ($enabled && preg_match('/mutation:entryType:(\d+)/', $scope, $matches)) {
+                $ids[] = $matches[1];
+            }
+        }
+
+        return $ids;
+    }
+
+    function queryableEntryTypeIds(): array {
+        $ids = [];
+
+        foreach ($this->scopeArray as $scope => $enabled) {
+            if ($enabled && preg_match('/query:entryType:(\d+)/', $scope, $matches)) {
+                $ids[] = $matches[1];
+            }
+        }
+
+        return $ids;
+    }
 }

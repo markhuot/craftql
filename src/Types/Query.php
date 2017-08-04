@@ -76,7 +76,7 @@ class Query extends Component {
         return array_merge(
             $this->volumes->getAllVolumes(),
             $this->categoryGroups->getAllGroups(),
-            \markhuot\CraftQL\Types\EntryType::all($token)
+            \markhuot\CraftQL\Types\EntryType::some($token->queryableEntryTypeIds())
         );
     }
 

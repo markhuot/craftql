@@ -14,7 +14,8 @@ class Mutation extends Component {
 
     function getType($token) {
         $fields = [];
-        $entryTypes = \markhuot\CraftQL\Types\EntryType::all($token);
+
+        $entryTypes = \markhuot\CraftQL\Types\EntryType::some($token->mutatableEntryTypeIds());
 
         foreach ($entryTypes as $entryType) {
             $args = \markhuot\CraftQL\Types\Entry::baseInputArgs();
