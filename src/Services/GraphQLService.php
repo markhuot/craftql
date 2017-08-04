@@ -31,12 +31,12 @@ class GraphQLService extends Component {
      *
      * @return void
      */
-    function bootstrap($writable=false) {
+    function bootstrap($token) {
         $schema = [];
-        $schema['query'] = $this->queryType->getType();
-        $schema['types'] = $this->queryType->getTypes();
+        $schema['query'] = $this->queryType->getType($token);
+        $schema['types'] = $this->queryType->getTypes($token);
 
-        $mutation = $this->mutationType->getType();
+        $mutation = $this->mutationType->getType($token);
         if (count($mutation->getFields()) > 0) {
             $schema['mutation'] = $mutation;
         }

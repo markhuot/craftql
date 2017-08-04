@@ -15,7 +15,7 @@ use markhuot\CraftQL\Models\Token;
 
 class Plugin extends BasePlugin
 {
-    public $schemaVersion = '1.0.1';
+    public $schemaVersion = '1.1.0';
     public $controllerNamespace = 'markhuot\\CraftQL\\Controllers';
     public $hasCpSettings = true;
     public $hasCpSection = true;
@@ -36,11 +36,13 @@ class Plugin extends BasePlugin
             UrlManager::className(),
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function (RegisterUrlRulesEvent $event) {
-                $event->rules['craftql'] = 'craftql/cp/index';
-                $event->rules['craftql/token-gen'] = 'craftql/cp/tokengenerate';
-                $event->rules['craftql/token-del/<tokenId:\d+>'] = 'craftql/cp/tokendelete';
-                $event->rules['craftql/token/<tokenId:\d+>/scopes'] = 'craftql/cp/tokenscopes';
-                $event->rules['craftql/browse'] = 'craftql/cp/graphiql';
+                $event->rules['GET craftql'] = 'craftql/cp/index';
+                $event->rules['GET craftql/token-gen'] = 'craftql/cp/tokengenerate';
+                $event->rules['GET craftql/token-del/<tokenId:\d+>'] = 'craftql/cp/tokendelete';
+                $event->rules['GET craftql/token/<tokenId:\d+>/scopes'] = 'craftql/cp/tokenscopes';
+                $event->rules['POST craftql/token/<tokenId:\d+>/scopes'] = 'craftql/cp/savetokenscopes';
+                $event->rules['GET craftql/browse'] = 'craftql/cp/graphiql';
+                $event->rules['GET craftql/browse/<token:.+>'] = 'craftql/cp/graphiqlas';
             }
         );
 
@@ -80,8 +82,6 @@ class Plugin extends BasePlugin
                 $event->sender->attachBehavior($behaviorClass, $behaviorClass);
             });
         }
-
-        error_log('1');
     }
 
     /**

@@ -36,6 +36,18 @@ class CpController extends Controller
         ]);
     }
 
+    function actionSavetokenscopes($tokenId)
+    {
+        $token = Token::find()->where(['id' => $tokenId])->one();
+        $token->name = $_POST['token']['name'];
+        $token->scopes = json_encode(@$_POST['scope'] ?: []);
+        $token->save();
+
+        Craft::$app->getSession()->setNotice(Craft::t('app', 'Scopes saved.'));
+
+        $this->redirect('/admin/craftql/token/'.$tokenId.'/scopes');
+    }
+
     function actionIndex()
     {
         $this->redirect('craftql/browse');
@@ -49,6 +61,18 @@ class CpController extends Controller
 
         $this->renderTemplate('craftql/graphiql', [
             'url' => "{$url}{$uri}",
+        ]);
+    }
+
+    function actionGraphiqlas($token)
+    {
+        $url = \craft\helpers\UrlHelper::siteUrl();
+        $instance = \markhuot\CraftQL\Plugin::getInstance();
+        $uri = $instance->settings->uri;
+
+        $this->renderTemplate('craftql/graphiql', [
+            'url' => "{$url}{$uri}",
+            'token' => $token,
         ]);
     }
 }

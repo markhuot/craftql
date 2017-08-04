@@ -36,27 +36,24 @@ class ApiController extends Controller
         $response = \Craft::$app->getResponse();
         $response->headers->add('Content-Type', 'application/json; charset=UTF-8');
 
-        $writable = true;
         $token = false;
-        $user = Craft::$app->getUser()->getIdentity();
-
-        if (!$user) {
-            $authorization = Craft::$app->request->headers->get('Authorization');
-            preg_match('/^bearer\s+(?<tokenId>.+)/', $authorization, $matches);
-            $tokenId = @$matches['tokenId'];
-            if ($tokenId) {
-                $token = Token::find()->where(['token' => $tokenId])->one();
-                if ($token) {
-                    $writable = $token->isWritable;
-                    $user = User::find()->where(['id' => $token->userId])->one();
-                    Craft::$app->getUser()->loginByUserId($user->id);
-                }
+        
+        $authorization = Craft::$app->request->headers->get('authorization');
+        preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
+        $tokenId = @$matches['tokenId'];
+        if ($tokenId) {
+            $token = Token::find()->where(['token' => $tokenId])->one();
+        }
+        else {
+            $user = Craft::$app->getUser()->getIdentity();
+            if ($user) {
+                $token = Token::forUser($user);
             }
         }
 
         // @todo, check user permissions when PRO license
 
-        if (!$user) {
+        if (!$token) {
             http_response_code(403);
             $this->asJson([
                 'errors' => [
@@ -65,7 +62,7 @@ class ApiController extends Controller
             ]);
         }
 
-        $this->graphQl->bootstrap();
+        $this->graphQl->bootstrap($token);
 
         try {
             $result = $this->graphQl->execute($this->request->input(), $this->request->variables());

@@ -91,7 +91,6 @@ You can access your GraphQL endpoint in two ways,
             <tr>
                 <td><input type="text" name="token[{{ token.id }}][name]" class="text" placeholder="Name..." value="{{ token.name }}" /></td>
                 <td>{{ token.token }}</td>
-                {# <td>{{ forms.lightswitch({"name": "token[" ~ token.id ~ "][isWritable]", "on": token.isWritable}) }}</td> #}
                 <td><a href="/admin/craftql/token/{{ token.id }}/scopes">Scopes&hellip;</a></td>
                 <td><a class="delete icon" title="Delete" role="button" href="/admin/craftql/token-del/{{ token.id }}"></a></td>
             </tr>
