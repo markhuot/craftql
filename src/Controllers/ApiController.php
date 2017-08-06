@@ -37,7 +37,7 @@ class ApiController extends Controller
         $response->headers->add('Content-Type', 'application/json; charset=UTF-8');
 
         $token = false;
-        
+
         $authorization = Craft::$app->request->headers->get('authorization');
         preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
         $tokenId = @$matches['tokenId'];

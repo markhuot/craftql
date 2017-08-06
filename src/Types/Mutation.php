@@ -15,15 +15,12 @@ class Mutation extends Component {
     function getType($token) {
         $fields = [];
 
-        $entryTypes = \markhuot\CraftQL\Types\EntryType::some($token->mutatableEntryTypeIds());
+        $entryTypes = \markhuot\CraftQL\Types\EntryType::some($token->mutableEntryTypeIds());
 
         foreach ($entryTypes as $entryType) {
-            $args = \markhuot\CraftQL\Types\Entry::baseInputArgs();
-            $args = array_merge($args, $entryType->args());
-
             $fields['upsert'.ucfirst($entryType->name)] = [
                 'type' => $entryType,
-                'args' => $args,
+                'args' => $entryType->args(),
                 'resolve' => $entryType->upsert(),
             ];
         }

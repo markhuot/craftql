@@ -33,7 +33,7 @@ class Token extends ActiveRecord
         return @$this->scopeArray[$do] ?: false;
     }
 
-    function mutatableEntryTypeIds(): array {
+    function mutableEntryTypeIds(): array {
         $ids = [];
 
         foreach ($this->scopeArray as $scope => $enabled) {
@@ -55,5 +55,17 @@ class Token extends ActiveRecord
         }
 
         return $ids;
+    }
+
+    function allowsMatch($regex): bool {
+        $scopes = [];
+
+        foreach ($this->scopeArray as $key => $value) {
+            if ($value > 0 && preg_match($regex, $key)) {
+                $scopes[] = $key;
+            }
+        }
+
+        return count($scopes) > 0;
     }
 }

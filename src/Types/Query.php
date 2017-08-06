@@ -8,22 +8,9 @@ use GraphQL\Type\Definition\Type;
 use Craft;
 use craft\elements\Entry;
 
-class Query extends Component {
+class Query extends ObjectType {
 
-    private $sections;
-    private $volumes;
-    private $categoryGroups;
-    private $assetVolumes;
-
-    function __construct(
-        \markhuot\CraftQL\Repositories\Volumes $volumes,
-        \markhuot\CraftQL\Repositories\CategoryGroup $categoryGroups
-    ) {
-        $this->volumes = $volumes;
-        $this->categoryGroups = $categoryGroups;
-    }
-
-    function getType($token) {
+    function __construct($token) {
         $config = [
             'name' => 'Query',
             'fields' => [
@@ -36,13 +23,16 @@ class Query extends Component {
             ],
         ];
 
-        if ($token->can('query:entries')) {
+        if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
             $config['fields']['entries'] = [
                 'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
                 'description' => 'Entries from the craft interface',
-                'args' => \markhuot\CraftQL\Types\Entry::args(),
-                'resolve' => function ($root, $args) {
+                'args' => \markhuot\CraftQL\Types\Entry::args($token),
+                'resolve' => function ($root, $args) use ($token) {
                     $criteria = \craft\elements\Entry::find();
+                    if (empty($args['type'])) {
+                        $criteria->typeId = $token->queryableEntryTypeIds();
+                    }
                     foreach ($args as $key => $value) {
                         $criteria = $criteria->{$key}($value);
                     }
@@ -66,18 +56,7 @@ class Query extends Component {
             ];
         }
 
-        return new ObjectType($config);
-    }
-
-    function getTypes($token) {
-        $this->volumes->loadAllVolumes();
-        $this->categoryGroups->loadAllGroups();
-
-        return array_merge(
-            $this->volumes->getAllVolumes(),
-            $this->categoryGroups->getAllGroups(),
-            \markhuot\CraftQL\Types\EntryType::some($token->queryableEntryTypeIds())
-        );
+        parent::__construct($config);
     }
 
 }

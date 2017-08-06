@@ -16,14 +16,17 @@ class GraphQLService extends Component {
 
     private $schema;
     private $mutationType;
-    private $queryType;
+    private $volumes;
+    private $categoryGroups;
 
     function __construct(
         \markhuot\CraftQL\Types\Mutation $mutationType,
-        \markhuot\CraftQL\Types\Query $queryType
+        \markhuot\CraftQL\Repositories\Volumes $volumes,
+        \markhuot\CraftQL\Repositories\CategoryGroup $categoryGroups
     ) {
         $this->mutationType = $mutationType;
-        $this->queryType = $queryType;
+        $this->volumes = $volumes;
+        $this->categoryGroups = $categoryGroups;
     }
 
     /**
@@ -32,9 +35,19 @@ class GraphQLService extends Component {
      * @return void
      */
     function bootstrap($token) {
+        \markhuot\CraftQL\Types\Entry::bootstrap();
+        \markhuot\CraftQL\Types\EntryType::bootstrap();
+
         $schema = [];
-        $schema['query'] = $this->queryType->getType($token);
-        $schema['types'] = $this->queryType->getTypes($token);
+        $schema['query'] = new \markhuot\CraftQL\Types\Query($token);
+        
+        $this->volumes->loadAllVolumes();
+        $this->categoryGroups->loadAllGroups();
+        $schema['types'] = array_merge(
+            $this->volumes->getAllVolumes(),
+            $this->categoryGroups->getAllGroups(),
+            \markhuot\CraftQL\Types\EntryType::some($token->queryableEntryTypeIds())
+        );
 
         $mutation = $this->mutationType->getType($token);
         if (count($mutation->getFields()) > 0) {

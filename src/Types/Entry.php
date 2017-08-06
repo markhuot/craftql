@@ -11,6 +11,11 @@ class Entry {
 
     static $interface;
     static $baseFields;
+    static $baseArgs;
+
+    static function bootstrap() {
+        
+    }
 
     static function baseInputArgs() {
         return [
@@ -20,7 +25,30 @@ class Entry {
         ];
     }
 
-    static function args() {
+    static function args($token=false) {
+        if (!empty(static::$baseArgs)) {
+            return static::$baseArgs;
+        }
+
+        if ($token) {
+            $values = [];
+            foreach ($token->queryableEntryTypeIds() as $entryTypeId) {
+                $entryType = \markhuot\CraftQL\Types\EntryType::getRawType($entryTypeId);
+                $name = \markhuot\CraftQL\Types\EntryType::getName($entryType);
+                $values[$name] = $entryTypeId;
+            }
+
+            $entryTypeIdEnum = new EnumType([
+                'name' => 'EntryTypeEnum',
+                'values' => $values,
+            ]);
+
+            $type = Type::listOf($entryTypeIdEnum);
+        }
+        else {
+            $type = Type::listOf(Type::int());
+        }
+
         return [
             'after' => Type::string(),
             'ancestorOf' => Type::int(),
@@ -52,7 +80,7 @@ class Entry {
             'slug' => Type::string(),
             'status' => Type::string(),
             'title' => Type::string(),
-            'type' => Type::string(),
+            'type' => $type,
             'uri' => Type::string(),
         ];
     }

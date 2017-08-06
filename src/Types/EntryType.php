@@ -11,7 +11,21 @@ use craft\elements\Entry;
 class EntryType extends ObjectType {
 
     public $craftType;
+    static $rawCraftTypes = [];
     static $types = [];
+
+    static function bootstrap() {
+        foreach (Craft::$app->sections->allSections as $section) {
+            foreach ($section->entryTypes as $entryType) {
+                static::$rawCraftTypes[$entryType->id] = $entryType;
+            }
+        }
+    }
+
+    static function getRawType($id)
+    {
+        return @static::$rawCraftTypes[$id];
+    }
 
     static function make($entryType) {
         if (!empty(static::$types[$entryType->id])) {
@@ -46,12 +60,8 @@ class EntryType extends ObjectType {
             return static::$types;
         }
 
-        foreach (Craft::$app->sections->allSections as $section) {
-            foreach ($section->entryTypes as $entryType) {
-                // if ($token->can('query:entryType:'.$entryType->id)) {
-                    static::$types[$entryType->id] = static::make($entryType);
-                // }
-            }
+        foreach (static::$rawCraftTypes as $entryType) {
+            static::$types[$entryType->id] = static::make($entryType);
         }
 
         return static::$types;
@@ -80,7 +90,7 @@ class EntryType extends ObjectType {
     function args() {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
 
-        return $fieldService->getArgs($this->craftType->fieldLayoutId);
+        return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getArgs($this->craftType->fieldLayoutId));
     }
 
     function upsert() {
