@@ -22,8 +22,7 @@ class EntryType extends ObjectType {
         }
     }
 
-    static function getRawType($id)
-    {
+    static function getRawType($id) {
         return @static::$rawCraftTypes[$id];
     }
 

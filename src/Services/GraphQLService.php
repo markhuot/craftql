@@ -15,16 +15,13 @@ use Yii;
 class GraphQLService extends Component {
 
     private $schema;
-    private $mutationType;
     private $volumes;
     private $categoryGroups;
 
     function __construct(
-        \markhuot\CraftQL\Types\Mutation $mutationType,
         \markhuot\CraftQL\Repositories\Volumes $volumes,
         \markhuot\CraftQL\Repositories\CategoryGroup $categoryGroups
     ) {
-        $this->mutationType = $mutationType;
         $this->volumes = $volumes;
         $this->categoryGroups = $categoryGroups;
     }
@@ -49,7 +46,7 @@ class GraphQLService extends Component {
             \markhuot\CraftQL\Types\EntryType::some($token->queryableEntryTypeIds())
         );
 
-        $mutation = $this->mutationType->getType($token);
+        $mutation = new \markhuot\CraftQL\Types\Mutation($token);
         if (count($mutation->getFields()) > 0) {
             $schema['mutation'] = $mutation;
         }
