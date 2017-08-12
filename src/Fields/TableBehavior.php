@@ -66,7 +66,7 @@ class TableBehavior extends Behavior
         ]);
     }
 
-    public function getGraphQLQueryFields() {
+    public function getGraphQLQueryFields($token) {
         $field = $this->owner;
 
         return [

@@ -31,6 +31,8 @@ class ApiController extends Controller
 
     function actionIndex()
     {
+        // \Yii::beginProfile('craftQl');
+
         // You must set the header to JSON, otherwise Craft will see HTML and try to insert
         // javascript at the bottom to run pending tasks
         $response = \Craft::$app->getResponse();
@@ -62,21 +64,36 @@ class ApiController extends Controller
             ]);
         }
 
-        $this->graphQl->bootstrap($token);
+        $this->graphQl->bootstrap();
 
         try {
-            $result = $this->graphQl->execute($this->request->input(), $this->request->variables());
+            $schema = $this->graphQl->getSchema($token);
+            $result = $this->graphQl->execute($schema, $this->request->input(), $this->request->variables());
         } catch (\Exception $e) {
+            $backtrace = [];
+            foreach ($e->getTrace() as $index => $trace) {
+                if ($index > 10) { break; }
+
+                $backtrace[] = [
+                    'function' => $trace['function'],
+                    'file' => @$trace['file'],
+                    'line' => @$trace['line'],
+                ];
+            }
+
             $result = [
                 'errors' => [
-                    'message' => $e->getMessage()
+                    'message' => $e->getMessage(),
+                    'line' => $e->getLine(),
+                    'file' => $e->getFile(),
+                    'backtrace' => $backtrace,
                 ]
             ];
         }
 
-        // $index = 1;
-        // foreach ($this->graphQl->getTimers() as $key => $timer) {
-        //     header('X-Timer-'.$index++.'-'.ucfirst($key).': '.$timer);
+        // \Yii::endProfile('craftQl');
+        // if (true) {
+        //     $result['timings'] = \Yii::getLogger()->getProfiling(['yii\db*']);
         // }
 
         $this->asJson($result);

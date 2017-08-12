@@ -13,27 +13,18 @@ class Volumes {
 
   public $volumes = [];
 
-  function loadAllVolumes() {
+  function load() {
     foreach (Craft::$app->volumes->getAllVolumes() as $volume) {
-      $this->volumes[$volume->handle] = $this->parseVolumeToObject($volume);
+      $this->volumes[$volume->id] = $volume;
     }
   }
 
-  function getVolume($volumeHandle) {
-    if (!isset($this->volumes[$volumeHandle])) {
-      $volume = Craft::$app->volumes->getVolumeById($volumeHandle);
-      $this->volumes[$volumeHandle] = $this->parseVolumeToObject($volume);
-    }
-
-    return $this->volumes[$volumeHandle];
+  function get($id) {
+    return $this->volumes[$id];
   }
 
-  function getAllVolumes() {
-    return $this->volumes;
-  }
-
-  function parseVolumeToObject($volume) {
-    return \markhuot\CraftQL\Types\Volume::make($volume);
+  function all() {
+      return $this->volumes;
   }
 
 }

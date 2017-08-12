@@ -11,12 +11,11 @@ class Volume extends ObjectType {
     static $baseFields;
     static $interface;
 
-    static function make($volume) {
+    function __construct($volume, $token) {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fields = array_merge(static::baseFields(), $fieldService->getFields($volume->fieldLayoutId, $token));
 
-        $fields = array_merge(static::baseFields(), $fieldService->getFields($volume->fieldLayoutId));
-
-        return new static([
+        parent::__construct([
             'name' => ucfirst($volume->handle).'Assets',
             'fields' => $fields,
             'interfaces' => [

@@ -11,37 +11,22 @@ use yii\base\Component;
 
 class CategoryGroup extends Component {
 
-  static $groups = [];
-  private $elements;
-  private $categoryGroups;
+    private $groups = [];
 
-  function loadedGroups() {
-    return static::$groups;
-  }
-
-  function loadAllGroups() {
-    foreach (Craft::$app->categories->allGroups as $group) {
-      if (!isset(static::$groups[$group->id])) {
-        static::$groups[$group->id] = $this->parseGroupToObject($group);
-      }
-    }
-  }
-
-  static function getGroup($id) {
-    if (!isset(static::$groups[$id])) {
-      $group = Craft::$app->categories->getGroupById($id);
-      static::$groups[$group->id] = $this->parseGroupToObject($group);
+    function load() {
+        foreach (Craft::$app->categories->allGroups as $group) {
+            if (!isset($this->groups[$group->id])) {
+              $this->groups[$group->id] = $group;
+            }
+        }
     }
 
-    return static::$groups[$id];
-  }
+    function get($id) {
+      return $this->groups[$id];
+    }
 
-  function getAllGroups() {
-    return static::$groups;
-  }
-
-  function parseGroupToObject($group) {
-    return \markhuot\CraftQL\Types\CategoryGroup::make($group);
-  }
+    function all() {
+        return $this->groups;
+    }
 
 }

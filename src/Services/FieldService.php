@@ -30,13 +30,13 @@ class FieldService {
     return $graphQlArgs;
   }
 
-  function getFields($fieldLayoutId) {
+  function getFields($fieldLayoutId, $request) {
     $graphQlFields = [];
 
     $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
     foreach ($fieldLayout->getFields() as $field) {
       if ($field->hasMethod('getGraphQLQueryFields')) {
-        $graphQlFields = array_merge($graphQlFields, $field->getGraphQLQueryFields());
+        $graphQlFields = array_merge($graphQlFields, $field->getGraphQLQueryFields($request));
       }
       else {
         // error_log(get_class($field).' can not be converted to a Graph QL field.');

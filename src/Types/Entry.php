@@ -11,11 +11,6 @@ class Entry {
 
     static $interface;
     static $baseFields;
-    static $baseArgs;
-
-    static function bootstrap() {
-        
-    }
 
     static function baseInputArgs() {
         return [
@@ -25,31 +20,8 @@ class Entry {
         ];
     }
 
-    static function args($token=false) {
-        if (!empty(static::$baseArgs)) {
-            return static::$baseArgs;
-        }
-
-        if ($token) {
-            $values = [];
-            foreach ($token->queryableEntryTypeIds() as $entryTypeId) {
-                $entryType = \markhuot\CraftQL\Types\EntryType::getRawType($entryTypeId);
-                $name = \markhuot\CraftQL\Types\EntryType::getName($entryType);
-                $values[$name] = $entryTypeId;
-            }
-
-            $entryTypeIdEnum = new EnumType([
-                'name' => 'EntryTypeEnum',
-                'values' => $values,
-            ]);
-
-            $type = Type::listOf($entryTypeIdEnum);
-        }
-        else {
-            $type = Type::listOf(Type::int());
-        }
-
-        return [
+    static function args($request) {
+        $args = [
             'after' => Type::string(),
             'ancestorOf' => Type::int(),
             'ancestorDist' => Type::int(),
@@ -75,14 +47,16 @@ class Entry {
             'prevSiblingOf' => Type::id(),
             'relatedTo' => Type::id(),
             'search' => Type::string(),
-            'section' => Type::string(),
+            // 'section' => Type::listOf(\markhuot\CraftQL\Types\EntryType::sectionEnum()),
             'siblingOf' => Type::int(),
             'slug' => Type::string(),
             'status' => Type::string(),
             'title' => Type::string(),
-            'type' => $type,
+            'type' => Type::listOf($request->entryTypes()->enum()),
             'uri' => Type::string(),
         ];
+
+        return $args;
     }
 
     static function baseFields() {
@@ -90,30 +64,6 @@ class Entry {
             return static::$baseFields;
         }
 
-        $sectionType = new ObjectType([
-            'name' => 'Section',
-            'fields' => [
-                'id' => ['type' => Type::nonNull(Type::int())],
-                'structureId' => ['type' => Type::nonNull(Type::int())],
-                'name' => ['type' => Type::nonNull(Type::string())],
-                'handle' => ['type' => Type::nonNull(Type::string())],
-                'type' => ['type' => Type::nonNull(Type::string())],
-                'template' => ['type' => Type::string()],
-                'maxLevels' => ['type' => Type::int()],
-                'hasUrls' => ['type' => Type::boolean()],
-                'enableVersioning' => ['type' => Type::boolean()],
-            ],
-        ]);
-
-        $entryType = new ObjectType([
-            'name' => 'EntryType',
-            'fields' => [
-                'id' => ['type' => Type::nonNull(Type::int())],
-                'name' => ['type' => Type::nonNull(Type::string())],
-                'handle' => ['type' => Type::nonNull(Type::string())],
-            ],
-        ]);
-        
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
 
         $fields = [];
@@ -122,7 +72,7 @@ class Entry {
         }];
         $fields['id'] = ['type' => Type::nonNull(Type::int())];
         $fields['authorId'] = ['type' => Type::nonNull(Type::int())];
-        $fields['author'] = ['type' => Type::nonNull(\markhuot\CraftQL\Types\User::type())];
+        // $fields['author'] = ['type' => Type::nonNull(\markhuot\CraftQL\Types\User::type())];
         $fields['title'] = ['type' => Type::nonNull(Type::string())];
         $fields['slug'] = ['type' => Type::nonNull(Type::string())];
         $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateCreated'));
@@ -132,12 +82,8 @@ class Entry {
         $fields['status'] = ['type' => Type::nonNull(Type::string())];
         $fields['uri'] = ['type' => Type::string()];
         $fields['url'] = ['type' => Type::string()];
-        $fields['section'] = ['type' => $sectionType, 'resolve' => function ($root, $args) {
-            return $root->section;
-        }];
-        $fields['type'] = ['type' => $entryType, 'resolve' => function ($root, $args) {
-            return $root->type;
-        }];
+        $fields['section'] = ['type' => \markhuot\CraftQL\Types\Section::type()];
+        $fields['type'] = ['type' => \markhuot\CraftQL\Types\EntryType::type()];
 
         return static::$baseFields = $fields;
     }
@@ -147,19 +93,23 @@ class Entry {
             return static::$interface;
         }
 
-        $entryInterface = new InterfaceType([
+        return static::$interface = new InterfaceType([
             'name' => 'EntryInterface',
             'description' => 'An entry in Craft',
-            'fields' => function () use (&$entryInterface) {
-                static::$interface = $entryInterface;
+
+            // this has to be a callback because the `user` field references a User type
+            // that could have an Entries custom field. This is a problem because we have
+            // a circullar reference. Our EntryInterface defines a User which defines an
+            // Entries field which relies on the EntryInterface. The callback here ensures
+            // that the nested Entries field gets a resolved interface.
+            'fields' => function () {
                 return static::baseFields();
             },
+
             'resolveType' => function ($entry) {
                 return \markhuot\CraftQL\Types\EntryType::getName($entry->type);
             }
         ]);
-
-        return static::$interface = $entryInterface;
     }
 
 }

@@ -3,6 +3,10 @@
 namespace markhuot\CraftQL\Models;
 
 use craft\db\ActiveRecord;
+use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\Type;
 
 class Token extends ActiveRecord
 {
@@ -45,17 +49,46 @@ class Token extends ActiveRecord
         return $ids;
     }
 
-    function queryableEntryTypeIds(): array {
-        $ids = [];
+    // function queryableEntryTypeIds(): array {
+    //     $ids = [];
 
-        foreach ($this->scopeArray as $scope => $enabled) {
-            if ($enabled && preg_match('/query:entryType:(\d+)/', $scope, $matches)) {
-                $ids[] = $matches[1];
-            }
-        }
+    //     foreach ($this->scopeArray as $scope => $enabled) {
+    //         if ($enabled && preg_match('/query:entryType:(\d+)/', $scope, $matches)) {
+    //             $ids[] = $matches[1];
+    //         }
+    //     }
 
-        return $ids;
-    }
+    //     return $ids;
+    // }
+
+    // private $entryTypeEnum;
+
+    // function entryTypeEnum() {
+    //     if ($this->entryTypeEnum) {
+    //         return $this->entryTypeEnum;
+    //     }
+
+    //     $entryTypeEnumValues = [];
+    //     // $sectionEnumValues = [];
+
+    //     foreach (\markhuot\CraftQL\Repositories\EntryType::all() as $entryType) {
+    //         if (in_array($entryType->id, $this->queryableEntryTypeIds())) {
+    //             $name = \markhuot\CraftQL\Types\EntryType::getName($entryType);
+    //             $entryTypeEnumValues[$name] = $entryType->id;
+    //             // $sectionEnumValues[$entryType->section->handle] = $entryType->section->id;
+    //         }
+    //     }
+
+    //     return $this->entryTypeEnum = new EnumType([
+    //         'name' => 'EntryTypeEnum',
+    //         'values' => $entryTypeEnumValues,
+    //     ]);
+
+    //     // $this->sectionArgEnum = new EnumType([
+    //     //     'name' => 'SectionEnum',
+    //     //     'values' => $sectionEnumValues,
+    //     // ]);
+    // }
 
     function allowsMatch($regex): bool {
         $scopes = [];

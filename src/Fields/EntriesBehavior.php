@@ -17,27 +17,36 @@ class EntriesBehavior extends Behavior
         ];
     }
 
-    public function getGraphQLQueryFields() {
+    public function getGraphQLQueryFields($request) {
         $field = $this->owner;
 
-        $foo = [
+        // $sources = $field->sources;
+        // $values = [];
+        // foreach ($sources as $source) {
+        //     if (!preg_match('/section:(\d+)/', $source, $matches)) {
+        //         continue;
+        //     }
+        //     $id = $matches[1];
+        //     $name = 'foo';
+        //     $values[$name] = $id;
+        // }
+        // $enum = new EnumType([
+        //     'name' => ucfirst($field->handle).'Enum',
+        //     'values' => $values,
+        // ]);
+
+        // return [];
+
+        return [
             $field->handle => [
                 'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
                 'description' => $field->instructions,
-                'args' => \markhuot\CraftQL\Types\Entry::args(),
-                'resolve' => function ($root, $args) use ($field) {
-                    $criteria = $root->{$field->handle};
-                    foreach ($args as $key => $value) {
-                        $criteria->{$key} = $value;
-                    }
-                    return $criteria;
-                }
+                'args' => \markhuot\CraftQL\Types\Entry::args($request),
+                'resolve' => \markhuot\CraftQL\Types\Query::entriesFieldResolver(function($root, $args) use ($field) {
+                    return $root->{$field->handle};
+                }),
             ]
         ];
-
-        
-
-        return $foo;
     }
 
     public function upsert($values) {

@@ -84,19 +84,19 @@ class User extends ObjectType {
         return static::$baseFields = $fields;
     }
 
-    static function type() {
+    static function type($token) {
         if (!empty(static::$type)) {
             return static::$type;
         }
 
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
         $userFieldLayout = \Craft::$app->fields->getLayoutByType(\craft\elements\User::class);
-        $userFields = array_merge(static::baseFields(), $fieldService->getFields($userFieldLayout->id));
+        $userFields = array_merge(static::baseFields(), $fieldService->getFields($userFieldLayout->id, $token));
 
         return static::$type = new static([
             'name' => 'User',
             'description' => 'A user',
-            'fields' => static::baseFields(),
+            'fields' => $userFields,
         ]);
     }
 

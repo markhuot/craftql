@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use Craft;
 use craft\elements\Entry;
@@ -11,72 +12,29 @@ use craft\elements\Entry;
 class EntryType extends ObjectType {
 
     public $craftType;
-    static $rawCraftTypes = [];
+    static $rawCraftEntryTypes = [];
     static $types = [];
+    static $type;
+    static $typeArgEnum;
+    static $sectionArgEnum;
 
-    static function bootstrap() {
-        foreach (Craft::$app->sections->allSections as $section) {
-            foreach ($section->entryTypes as $entryType) {
-                static::$rawCraftTypes[$entryType->id] = $entryType;
-            }
-        }
-    }
-
-    static function getRawType($id) {
-        return @static::$rawCraftTypes[$id];
-    }
-
-    static function make($entryType) {
-        if (!empty(static::$types[$entryType->id])) {
-            return static::$types[$entryType->id];
-        }
-
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-
-        $fields = \markhuot\CraftQL\Types\Entry::baseFields();
-        $fields = array_merge($fields, $fieldService->getFields($entryType->fieldLayoutId));
-
-        $type = static::$types[$entryType->id] = new static([
-            'name' => static::getName($entryType),
-            'fields' => $fields,
+    public function __construct($craftEntryType, $request) {
+        $config = [
+            'name' => static::getName($craftEntryType),
+            'fields' => function () use ($craftEntryType, $request) {
+                $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+                $baseFields = \markhuot\CraftQL\Types\Entry::baseFields();
+                $entryTypeFields = $fieldService->getFields($craftEntryType->fieldLayoutId, $request);
+                return array_merge($baseFields, $entryTypeFields);
+            },
             'interfaces' => [
                 \markhuot\CraftQL\Types\Entry::interface(),
                 \markhuot\CraftQL\Types\Element::interface(),
             ],
-        ]);
+            'craftType' => $craftEntryType,
+        ];
 
-        $type->craftType = $entryType;
-
-        return $type;
-    }
-
-    static function get($entryTypeId) {
-        return @static::$types[$entryTypeId];
-    }
-
-    static function all() {
-        if (!empty(static::$types)) {
-            return static::$types;
-        }
-
-        foreach (static::$rawCraftTypes as $entryType) {
-            static::$types[$entryType->id] = static::make($entryType);
-        }
-
-        return static::$types;
-    }
-
-    static function some($ids) {
-        $entryTypes = static::all();
-        $some = [];
-
-        foreach ($entryTypes as $id => $entryType) {
-            if (in_array($id, $ids)) {
-                $some[$id] = $entryType;
-            }
-        }
-
-        return $some;
+        parent::__construct($config);
     }
 
     static function getName($entryType) {
@@ -84,6 +42,21 @@ class EntryType extends ObjectType {
         $sectionHandle = ucfirst($entryType->section->handle);
 
         return ($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle;
+    }
+
+    static function type() {
+        if (!empty(static::$type)) {
+            return static::$type;
+        }
+
+        return static::$type = new ObjectType([
+            'name' => 'EntryType',
+            'fields' => [
+                'id' => ['type' => Type::nonNull(Type::int())],
+                'name' => ['type' => Type::nonNull(Type::string())],
+                'handle' => ['type' => Type::nonNull(Type::string())],
+            ],
+        ]);
     }
 
     function args() {

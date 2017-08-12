@@ -14,21 +14,21 @@ class TagGroups extends Component {
 
   function loadAllGroups() {
     foreach (Craft::$app->tags->allTagGroups as $group) {
-      static::$groups[$group->id] = $this->parseGroupToObject($group);
+      static::$groups[$group->id] = $group;
     }
   }
 
   static function getGroup($groupId) {
     if (!isset(static::$groups[$groupId])) {
       $group = Craft::$app->tags->getTagGroupById($groupId);
-      static::$groups[$groupId] = static::parseGroupToObject($group);
+      static::$groups[$groupId] = $group;
     }
 
     return static::$groups[$groupId];
   }
 
-  static function parseGroupToObject($group) {
-    return \markhuot\CraftQL\Types\TagGroup::make($group);
-  }
+  // static function parseGroupToObject($group) {
+  //   return \markhuot\CraftQL\Types\TagGroup::make($group);
+  // }
 
 }
