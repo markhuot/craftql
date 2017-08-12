@@ -7,7 +7,7 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 
-class Section {
+class Section extends ObjectType {
 
     static $type;
     static $baseFields;
@@ -15,6 +15,17 @@ class Section {
 
     static function bootstrap() {
         
+    }
+
+    function __construct($section, $request) {
+        parent::__construct([
+            'name' => ucfirst($section->handle).'Section',
+            'description' => 'A section in Craft',
+            'fields' => [
+                'foo' => ['type' => Type::string()]
+            ],
+            'id' => $section->id
+        ]);
     }
 
     static function baseInputArgs() {

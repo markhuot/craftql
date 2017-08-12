@@ -6,8 +6,8 @@ use GraphQL\Type\Definition\EnumType;
 
 abstract class BaseFactory {
 
-    private $repository;
-    private $request;
+    protected $repository;
+    protected $request;
     private $objects = [];
     private $enum;
 
@@ -21,13 +21,14 @@ abstract class BaseFactory {
             return $this->objects[$id];
         }
 
-        if ($this->request->token()->can("query:entryType:{$id}") == false) {
+        if ($this->can($id) === false) {
             return false;
         }
 
         return $this->objects[$id] = $this->make($this->repository->get($id), $this->request);
     }
 
+    abstract function can($id);
     abstract function make($raw, $request);
 
     function all() {
@@ -42,6 +43,10 @@ abstract class BaseFactory {
         return $objects;
     }
 
+    function enumValueName($object) {
+        return $object->name;
+    }
+
     function enum() {
         if (!empty($this->enum)) {
             return $this->enum;
@@ -50,11 +55,12 @@ abstract class BaseFactory {
         $values = [];
 
         foreach ($this->all() as $index => $object) {
-            $values[$object->name] = $index;
+            $values[$this->enumValueName($object)] = @$object->config['id'];
         }
 
+        $reflect = new \ReflectionClass($this);
         return $this->enum = new EnumType([
-            'name' => 'EntryTypeEnum',
+            'name' => $reflect->getShortName().'Enum',
             'values' => $values,
         ]);
     }

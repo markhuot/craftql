@@ -21,6 +21,7 @@ class Volume extends ObjectType {
             'interfaces' => [
                 static::interface(),
             ],
+            'id' => $volume->id,
         ]);
     }
 

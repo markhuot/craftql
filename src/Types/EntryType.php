@@ -32,6 +32,7 @@ class EntryType extends ObjectType {
                 \markhuot\CraftQL\Types\Element::interface(),
             ],
             'craftType' => $craftEntryType,
+            'id' => $craftEntryType->id,
         ];
 
         parent::__construct($config);
@@ -41,7 +42,7 @@ class EntryType extends ObjectType {
         $typeHandle = ucfirst($entryType->handle);
         $sectionHandle = ucfirst($entryType->section->handle);
 
-        return ($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle;
+        return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
     }
 
     static function type() {

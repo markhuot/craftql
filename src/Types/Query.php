@@ -30,7 +30,10 @@ class Query extends ObjectType {
                 'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
                 'description' => 'Entries from the craft interface',
                 'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                'resolve' => static::entriesFieldResolver(function ($root, $args) {
+                // 'resolve' => static::entriesFieldResolver(function ($root, $args) {
+                //     return \craft\elements\Entry::find();
+                // }),
+                'resolve' => $request->entriesCriteria(function ($root, $args) {
                     return \craft\elements\Entry::find();
                 }),
             ];
@@ -68,11 +71,11 @@ class Query extends ObjectType {
     static function entriesFieldResolver($criteriaCallback) {
         return function ($root, $args) use ($criteriaCallback) {
             $criteria = $criteriaCallback($root, $args);
-            $criteria->typeId = [1];
-            if (!empty($args['section'])) {
-                $criteria->sectionId = $args['section'];
-                unset($args['section']);
-            }
+            // $criteria->typeId = [1];
+            // if (!empty($args['section'])) {
+            //     $criteria->sectionId = $args['section'];
+            //     unset($args['section']);
+            // }
             // if (empty($args['type'])) {
             //     $entryTypeIds = [];
             //     $enum = \markhuot\CraftQL\Types\EntryType::enum();

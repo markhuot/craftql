@@ -47,7 +47,7 @@ class Entry {
             'prevSiblingOf' => Type::id(),
             'relatedTo' => Type::id(),
             'search' => Type::string(),
-            // 'section' => Type::listOf(\markhuot\CraftQL\Types\EntryType::sectionEnum()),
+            'section' => Type::listOf($request->sections()->enum()),
             'siblingOf' => Type::int(),
             'slug' => Type::string(),
             'status' => Type::string(),

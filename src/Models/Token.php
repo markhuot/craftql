@@ -37,6 +37,10 @@ class Token extends ActiveRecord
         return @$this->scopeArray[$do] ?: false;
     }
 
+    function canNot($do): bool {
+        return !$this->can($do);
+    }
+
     function mutableEntryTypeIds(): array {
         $ids = [];
 

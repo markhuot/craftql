@@ -11,4 +11,8 @@ class CategoryGroup extends BaseFactory {
         return new CategoryGroupObjectType($raw, $request);
     }
 
+    function can($id) {
+        return true;
+    }
+
 }
