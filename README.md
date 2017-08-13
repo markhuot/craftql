@@ -4,9 +4,7 @@ A drop-in [GraphQL](http://graphql.org) server for your [Craft CMS](https://craf
 
 <hr>
 
-**NOTE:** This software is in beta and while querying the database works quite well it has not been thoroughly tested. Use at your own risk.
-
-**P.P.S**, this plugin may or may not become a paid add-on when the Craft Plugin store becomes available. <strike>Buyer</strike> Downloader beware.
+**Note:**, this plugin may or may not become a paid add-on when the Craft Plugin store becomes available. <strike>Buyer</strike> Downloader beware.
 
 <hr>
 
