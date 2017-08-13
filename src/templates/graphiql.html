@@ -93,6 +93,9 @@
     <div id="graphiql">Loading...</div>
     <script>
 
+      var header = document.querySelector('#page-header');
+      header.parentNode.removeChild(header);
+
       /**
        * This GraphiQL example illustrates how to use some of GraphiQL's props
        * in order to enable reading and updating the URL parameters, making
