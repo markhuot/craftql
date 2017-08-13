@@ -99,6 +99,18 @@ class ToolsController extends Controller
 
     public function actionSeed()
     {
+        $section = new \craft\models\Section;
+        $section->name = 'Stories';
+        $section->handle = 'stories';
+        $section->type = 'channel';
+        $section->enableVersioning = false;
+
+        $siteSettings = new \craft\models\Section_SiteSettings();
+        $siteSettings->hasUrls = true;
+        $siteSettings->uriFormat = 'stories/{slug}';
+        $siteSettings->template = 'stories/_story';
+        $section->setSiteSettings([1 => $siteSettings]);
         
+        Craft::$app->sections->saveSection($section);
     }
 }

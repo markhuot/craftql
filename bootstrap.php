@@ -4,7 +4,7 @@
  */
 
 // Project root path
-$root = __DIR__;
+$root = get_cwd();
 
 // Composer autoloader
 require_once $root.'/vendor/autoload.php';

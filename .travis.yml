@@ -16,5 +16,6 @@ install:
   - composer require phpunit/phpunit
   - mysql -u root --password="" craftql < /home/travis/build/markhuot/craftql/sql/bootstrap.sql
   - php vendor/markhuot/craftql/bin/setup/install.php
+  - craft craftql/tools/seed
 script:
-  - vendor/bin/phpunit --bootstrap bootstrap.php vendor/markhuot/craftql/tests/ --testdox
+  - vendor/bin/phpunit --bootstrap vendor/markhuot/craftql/bootstrap.php vendor/markhuot/craftql/tests/ --testdox
