@@ -47,6 +47,11 @@ abstract class BaseFactory {
         return $objects;
     }
 
+    function getEnumName($object) {
+        $rawObject = $this->repository->get($object->config['id']);
+        return $rawObject->handle;
+    }
+
     function enum() {
         if (!empty($this->enum)) {
             return $this->enum;
@@ -55,8 +60,7 @@ abstract class BaseFactory {
         $values = [];
 
         foreach ($this->all() as $index => $object) {
-            $rawObject = $this->repository->get($object->config['id']);
-            $values[$rawObject->handle] = $rawObject->id;
+            $values[$this->getEnumName($object)] = $object->config['id'];
         }
 
         $reflect = new \ReflectionClass($this);
