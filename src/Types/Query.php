@@ -8,22 +8,11 @@ use GraphQL\Type\Definition\Type;
 use Craft;
 use craft\elements\Entry;
 
-class Query extends Component {
+class Query extends ObjectType {
 
-    private $sections;
-    private $volumes;
-    private $categoryGroups;
-    private $assetVolumes;
+    function __construct($request) {
+        $token = $request->token();
 
-    function __construct(
-        \markhuot\CraftQL\Repositories\Volumes $volumes,
-        \markhuot\CraftQL\Repositories\CategoryGroup $categoryGroups
-    ) {
-        $this->volumes = $volumes;
-        $this->categoryGroups = $categoryGroups;
-    }
-
-    function getType() {
         $config = [
             'name' => 'Query',
             'fields' => [
@@ -33,45 +22,77 @@ class Query extends Component {
                       return 'Welcome to GraphQL! You now have a fully functional GraphQL endpoint.';
                     }
                 ],
-                'entries' => [
-                    'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
-                    'description' => 'Entries from the craft interface',
-                    'args' => \markhuot\CraftQL\Types\Entry::args(),
-                    'resolve' => function ($root, $args) {
-                        $criteria = \craft\elements\Entry::find();
-                        foreach ($args as $key => $value) {
-                            $criteria = $criteria->{$key}($value);
-                        }
-                        return $criteria->all();
-                    }
-                ],
-                // 'users' => [
-                //     'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
-                //     'description' => 'Entries from the craft interface',
-                //     'args' => \markhuot\CraftQL\Types\Entry::args(),
-                //     'resolve' => function ($root, $args) {
-                //         $criteria = \craft\elements\Entry::find();
-                //         foreach ($args as $key => $value) {
-                //             $criteria = $criteria->{$key}($value);
-                //         }
-                //         return $criteria->all();
-                //     }
-                // ],
             ],
         ];
 
-        return new ObjectType($config);
+        if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
+            $config['fields']['entries'] = [
+                'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
+                'description' => 'Entries from the craft interface',
+                'args' => \markhuot\CraftQL\Types\Entry::args($request),
+                // 'resolve' => static::entriesFieldResolver(function ($root, $args) {
+                //     return \craft\elements\Entry::find();
+                // }),
+                'resolve' => $request->entriesCriteria(function ($root, $args) {
+                    return \craft\elements\Entry::find();
+                }),
+            ];
+        }
+
+        if ($token->can('query:users')) {
+            $config['fields']['users'] = [
+                'type' => Type::listOf(\markhuot\CraftQL\Types\User::type($request)),
+                'description' => 'Users registered in Craft',
+                'args' => \markhuot\CraftQL\Types\User::args(),
+                'resolve' => function ($root, $args) {
+                    $criteria = \craft\elements\User::find();
+                    foreach ($args as $key => $value) {
+                        $criteria = $criteria->{$key}($value);
+                    }
+                    return $criteria->all();
+                }
+            ];
+        }
+
+        if ($token->can('query:sections')) {
+            $config['fields']['sections'] = [
+                'type' => Type::listOf(\markhuot\CraftQL\Types\Section::type()),
+                'description' => 'Sections defined in Craft',
+                'args' => [],
+                'resolve' => function ($root, $args) {
+                    return \Craft::$app->sections->getAllSections();
+                }
+            ];
+        }
+
+        parent::__construct($config);
     }
 
-    function getTypes() {
-        $this->volumes->loadAllVolumes();
-        $this->categoryGroups->loadAllGroups();
-
-        return array_merge(
-            $this->volumes->getAllVolumes(),
-            $this->categoryGroups->getAllGroups(),
-            \markhuot\CraftQL\Types\EntryType::all()
-        );
+    static function entriesFieldResolver($criteriaCallback) {
+        return function ($root, $args) use ($criteriaCallback) {
+            $criteria = $criteriaCallback($root, $args);
+            // $criteria->typeId = [1];
+            // if (!empty($args['section'])) {
+            //     $criteria->sectionId = $args['section'];
+            //     unset($args['section']);
+            // }
+            // if (empty($args['type'])) {
+            //     $entryTypeIds = [];
+            //     $enum = \markhuot\CraftQL\Types\EntryType::enum();
+            //     foreach ($enum->getValues() as $value) {
+            //         $entryTypeIds[] = $value->value;
+            //     }
+            //     $criteria->typeId = $entryTypeIds;
+            // }
+            // else {
+            //     $criteria->typeId = $args['type'];
+            //     unset($args['type']);
+            // }
+            foreach ($args as $key => $value) {
+                $criteria = $criteria->{$key}($value);
+            }
+            return $criteria->all();
+        };
     }
 
 }

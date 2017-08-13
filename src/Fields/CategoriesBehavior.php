@@ -37,7 +37,7 @@ class CategoriesBehavior extends Behavior
         ];
     }
 
-    public function getGraphQLQueryFields() {
+    public function getGraphQLQueryFields($request) {
         $field = $this->owner;
 
         preg_match('/^group:(\d+)$/', $field->source, $matches);
@@ -45,7 +45,7 @@ class CategoriesBehavior extends Behavior
 
         return [
             $field->handle => [
-                'type' => Type::listOf(\markhuot\CraftQL\Repositories\CategoryGroup::getGroup($groupId)),
+                'type' => Type::listOf($request->categoryGroup($groupId)),
                 'description' => $field->instructions,
                 'resolve' => function ($root, $args) use ($field) {
                     return $root->{$field->handle}->all();

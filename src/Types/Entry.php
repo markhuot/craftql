@@ -20,22 +20,22 @@ class Entry {
         ];
     }
 
-    static function args() {
-        return [
+    static function args($request) {
+        $args = [
             'after' => Type::string(),
             'ancestorOf' => Type::int(),
             'ancestorDist' => Type::int(),
             'archived' => Type::boolean(),
             'authorGroup' => Type::string(),
             'authorGroupId' => Type::int(),
-            'authorId' => Type::int(),
+            'authorId' => Type::listOf(Type::int()),
             'before' => Type::string(),
             'level' => Type::int(),
             'localeEnabled' => Type::boolean(),
             'descendantOf' => Type::int(),
             'descendantDist' => Type::int(),
             'fixedOrder' => Type::boolean(),
-            'id' => Type::int(),
+            'id' => Type::listOf(Type::int()),
             'limit' => Type::int(),
             'locale' => Type::string(),
             'nextSiblingOf' => Type::int(),
@@ -47,14 +47,16 @@ class Entry {
             'prevSiblingOf' => Type::id(),
             'relatedTo' => Type::id(),
             'search' => Type::string(),
-            'section' => Type::string(),
+            'section' => Type::listOf($request->sections()->enum()),
             'siblingOf' => Type::int(),
             'slug' => Type::string(),
             'status' => Type::string(),
             'title' => Type::string(),
-            'type' => Type::string(),
+            'type' => Type::listOf($request->entryTypes()->enum()),
             'uri' => Type::string(),
         ];
+
+        return $args;
     }
 
     static function baseFields() {
@@ -62,69 +64,7 @@ class Entry {
             return static::$baseFields;
         }
 
-        $sectionType = new ObjectType([
-            'name' => 'Section',
-            'fields' => [
-                'id' => ['type' => Type::nonNull(Type::int())],
-                'structureId' => ['type' => Type::nonNull(Type::int())],
-                'name' => ['type' => Type::nonNull(Type::string())],
-                'handle' => ['type' => Type::nonNull(Type::string())],
-                'type' => ['type' => Type::nonNull(Type::string())],
-                'template' => ['type' => Type::string()],
-                'maxLevels' => ['type' => Type::int()],
-                'hasUrls' => ['type' => Type::boolean()],
-                'enableVersioning' => ['type' => Type::boolean()],
-            ],
-        ]);
-
-        $entryType = new ObjectType([
-            'name' => 'EntryType',
-            'fields' => [
-                'id' => ['type' => Type::nonNull(Type::int())],
-                'name' => ['type' => Type::nonNull(Type::string())],
-                'handle' => ['type' => Type::nonNull(Type::string())],
-            ],
-        ]);
-
-        $userStatusEnum =  new EnumType([
-            'name' => 'UserStatusEnum',
-            'values' => [
-                'active',
-                'locked',
-                'suspended',
-                'pending',
-                'archived',
-            ],
-        ]);
-
-        $userFields = [
-            'id' => ['type' => Type::nonNull(Type::int())],
-            'name' => ['type' => Type::nonNull(Type::string())],
-            'fullName' => ['type' => Type::string()],
-            'friendlyName' => ['type' => Type::nonNull(Type::string())],
-            'firstName' => ['type' => Type::string()],
-            'lastName' => ['type' => Type::string()],
-            'username' => ['type' => Type::nonNull(Type::string())],
-            'email' => ['type' => Type::nonNull(Type::string())],
-            'admin' => ['type' => Type::nonNull(Type::boolean())],
-            'isCurrent' => ['type' => Type::nonNull(Type::boolean())],
-            'preferredLocale' => ['type' => Type::string()],
-            'status' => ['type' => Type::nonNull($userStatusEnum)],
-        ];
-        
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-
-        $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('dateCreated'));
-        $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('dateUpdated'));
-        $userFields = array_merge($userFields, $fieldService->getDateFieldDefinition('lastLoginDate'));
-
-        $userFieldLayout = \Craft::$app->fields->getLayoutByType(\craft\elements\User::class);
-        $userFields = array_merge($userFields, $fieldService->getFields($userFieldLayout->id));
-
-        $userType = new ObjectType([
-            'name' => 'User',
-            'fields' => $userFields,
-        ]);
 
         $fields = [];
         $fields['elementType'] = ['type' => Type::nonNull(Type::string()), 'resolve' => function ($root, $args) {
@@ -132,7 +72,7 @@ class Entry {
         }];
         $fields['id'] = ['type' => Type::nonNull(Type::int())];
         $fields['authorId'] = ['type' => Type::nonNull(Type::int())];
-        $fields['author'] = ['type' => Type::nonNull($userType)];
+        // $fields['author'] = ['type' => Type::nonNull(\markhuot\CraftQL\Types\User::type())];
         $fields['title'] = ['type' => Type::nonNull(Type::string())];
         $fields['slug'] = ['type' => Type::nonNull(Type::string())];
         $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateCreated'));
@@ -142,12 +82,8 @@ class Entry {
         $fields['status'] = ['type' => Type::nonNull(Type::string())];
         $fields['uri'] = ['type' => Type::string()];
         $fields['url'] = ['type' => Type::string()];
-        $fields['section'] = ['type' => $sectionType, 'resolve' => function ($root, $args) {
-            return $root->section;
-        }];
-        $fields['type'] = ['type' => $entryType, 'resolve' => function ($root, $args) {
-            return $root->type;
-        }];
+        $fields['section'] = ['type' => \markhuot\CraftQL\Types\Section::type()];
+        $fields['type'] = ['type' => \markhuot\CraftQL\Types\EntryType::type()];
 
         return static::$baseFields = $fields;
     }
@@ -157,19 +93,23 @@ class Entry {
             return static::$interface;
         }
 
-        $entryInterface = new InterfaceType([
+        return static::$interface = new InterfaceType([
             'name' => 'EntryInterface',
             'description' => 'An entry in Craft',
-            'fields' => function () use (&$entryInterface) {
-                static::$interface = $entryInterface;
+
+            // this has to be a callback because the `user` field references a User type
+            // that could have an Entries custom field. This is a problem because we have
+            // a circullar reference. Our EntryInterface defines a User which defines an
+            // Entries field which relies on the EntryInterface. The callback here ensures
+            // that the nested Entries field gets a resolved interface.
+            'fields' => function () {
                 return static::baseFields();
             },
+
             'resolveType' => function ($entry) {
                 return \markhuot\CraftQL\Types\EntryType::getName($entry->type);
             }
         ]);
-
-        return static::$interface = $entryInterface;
     }
 
 }

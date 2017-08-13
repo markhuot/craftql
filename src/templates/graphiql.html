@@ -162,10 +162,12 @@
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer {{ token }}',
           },
           body: JSON.stringify(graphQLParams),
           credentials: 'include',
         }).then(function (response) {
+          console.log('response', response);
           return response.text();
         }).then(function (responseBody) {
           try {

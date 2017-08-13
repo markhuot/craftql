@@ -15,15 +15,21 @@ use Yii;
 class GraphQLService extends Component {
 
     private $schema;
-    private $mutationType;
-    private $queryType;
+    private $volumes;
+    private $categoryGroups;
+    private $entryTypes;
+    private $sections;
 
     function __construct(
-        \markhuot\CraftQL\Types\Mutation $mutationType,
-        \markhuot\CraftQL\Types\Query $queryType
+        \markhuot\CraftQL\Repositories\Volumes $volumes,
+        \markhuot\CraftQL\Repositories\CategoryGroup $categoryGroups,
+        \markhuot\CraftQL\Repositories\EntryType $entryTypes,
+        \markhuot\CraftQL\Repositories\Section $sections
     ) {
-        $this->mutationType = $mutationType;
-        $this->queryType = $queryType;
+        $this->volumes = $volumes;
+        $this->categoryGroups = $categoryGroups;
+        $this->entryTypes = $entryTypes;
+        $this->sections = $sections;
     }
 
     /**
@@ -31,21 +37,39 @@ class GraphQLService extends Component {
      *
      * @return void
      */
-    function bootstrap($writable=false) {
-        $schema = [];
-        $schema['query'] = $this->queryType->getType();
-        $schema['types'] = $this->queryType->getTypes();
+    function bootstrap() {
+        $this->volumes->load();
+        $this->categoryGroups->load();
+        $this->entryTypes->load();
+        $this->sections->load();
+    }
 
-        $mutation = $this->mutationType->getType();
+    function getSchema($token) {
+        $request = new \markhuot\CraftQL\Request($token);
+        $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
+        $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
+        $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
+        $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
+
+        $schema = [];
+        $schema['query'] = new \markhuot\CraftQL\Types\Query($request);
+        $schema['types'] = array_merge(
+            $request->volumes()->all(),
+            $request->entryTypes()->all(),
+            $request->categoryGroups()->all(),
+            $request->sections()->all()
+        );
+
+        $mutation = new \markhuot\CraftQL\Types\Mutation($request);
         if (count($mutation->getFields()) > 0) {
             $schema['mutation'] = $mutation;
         }
 
-        $this->schema = new Schema($schema);
+        return new Schema($schema);
     }
 
-    function execute($input, $variables = []) {
-        return GraphQL::execute($this->schema, $input, null, null, $variables);
+    function execute($schema, $input, $variables = []) {
+        return GraphQL::execute($schema, $input, null, null, $variables);
     }
 
 }

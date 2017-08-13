@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use Craft;
 use craft\elements\Entry;
@@ -11,64 +12,61 @@ use craft\elements\Entry;
 class EntryType extends ObjectType {
 
     public $craftType;
+    static $rawCraftEntryTypes = [];
     static $types = [];
+    static $type;
+    static $typeArgEnum;
+    static $sectionArgEnum;
 
-    static function make($entryType) {
-        if (!empty(static::$types[$entryType->id])) {
-            return static::$types[$entryType->id];
-        }
-
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-
-        $fields = \markhuot\CraftQL\Types\Entry::baseFields();
-        $fields = array_merge($fields, $fieldService->getFields($entryType->fieldLayoutId));
-
-        $type = static::$types[$entryType->id] = new static([
-            'name' => static::getName($entryType),
-            'fields' => $fields,
+    public function __construct($craftEntryType, $request) {
+        $config = [
+            'name' => static::getName($craftEntryType),
+            'fields' => function () use ($craftEntryType, $request) {
+                $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+                $baseFields = \markhuot\CraftQL\Types\Entry::baseFields();
+                $entryTypeFields = $fieldService->getFields($craftEntryType->fieldLayoutId, $request);
+                return array_merge($baseFields, $entryTypeFields);
+            },
             'interfaces' => [
                 \markhuot\CraftQL\Types\Entry::interface(),
                 \markhuot\CraftQL\Types\Element::interface(),
             ],
-        ]);
+            'craftType' => $craftEntryType,
+            'id' => $craftEntryType->id,
+        ];
 
-        $type->craftType = $entryType;
-
-        return $type;
-    }
-
-    static function get($entryTypeId) {
-        return @static::$types[$entryTypeId];
-    }
-
-    static function all() {
-        if (!empty(static::$types)) {
-            return static::$types;
-        }
-
-        foreach (Craft::$app->sections->allSections as $section) {
-            foreach ($section->entryTypes as $entryType) {
-                static::$types[$entryType->id] = static::make($entryType);
-            }
-        }
-
-        return static::$types;
+        parent::__construct($config);
     }
 
     static function getName($entryType) {
         $typeHandle = ucfirst($entryType->handle);
         $sectionHandle = ucfirst($entryType->section->handle);
 
-        return ($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle;
+        return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
     }
 
-    function args() {
+    static function type() {
+        if (!empty(static::$type)) {
+            return static::$type;
+        }
+
+        return static::$type = new ObjectType([
+            'name' => 'EntryType',
+            'fields' => [
+                'id' => ['type' => Type::nonNull(Type::int())],
+                'name' => ['type' => Type::nonNull(Type::string())],
+                'handle' => ['type' => Type::nonNull(Type::string())],
+            ],
+        ]);
+    }
+
+    function args($request) {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
 
-        return $fieldService->getArgs($this->craftType->fieldLayoutId);
+        return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getArgs($this->config['craftType']->fieldLayoutId, $request));
     }
 
-    function upsert() {
+    function upsert($request) {
         return function ($root, $args) {
             if (!empty($args['id'])) {
                 $criteria = Entry::find();
@@ -80,8 +78,8 @@ class EntryType extends ObjectType {
             }
             else {
                 $entry = new Entry();
-                $entry->sectionId = $this->craftType->section->id;
-                $entry->typeId = $this->craftType->id;
+                $entry->sectionId = $this->config['craftType']->section->id;
+                $entry->typeId = $this->config['craftType']->id;
             }
 
             if (isset($args['authorId']) || !$entry->authorId) {

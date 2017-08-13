@@ -29,7 +29,7 @@ class SelectOneBehavior extends Behavior
         ]);
     }
 
-    function getGraphQLQueryFields() {
+    function getGraphQLQueryFields($token) {
         $field = $this->owner;
 
         return [

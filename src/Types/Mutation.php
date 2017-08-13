@@ -8,26 +8,21 @@ use GraphQL\Type\Definition\Type;
 use Craft;
 use craft\elements\Entry;
 
-class Mutation extends Component {
+class Mutation extends ObjectType {
 
-    private $sections;
-
-    function getType() {
+    function __construct($request) {
         $fields = [];
-        $entryTypes = \markhuot\CraftQL\Types\EntryType::all();
 
+        $entryTypes = $request->entryTypes()->all('mutate');
         foreach ($entryTypes as $entryType) {
-            $args = \markhuot\CraftQL\Types\Entry::baseInputArgs();
-            $args = array_merge($args, $entryType->args());
-
             $fields['upsert'.ucfirst($entryType->name)] = [
                 'type' => $entryType,
-                'args' => $args,
-                'resolve' => $entryType->upsert(),
+                'args' => $entryType->args($request),
+                'resolve' => $entryType->upsert($request),
             ];
         }
 
-        return new ObjectType([
+        parent::__construct([
             'name' => 'Mutation',
             'fields' => $fields
         ]);

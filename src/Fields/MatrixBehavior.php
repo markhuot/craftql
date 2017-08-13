@@ -19,7 +19,7 @@ class MatrixBehavior extends Behavior
         ];
     }
 
-    function getGraphQlObject($field) {
+    function getGraphQlObject($token, $field) {
         if (isset(static::$objects[$field->handle])) {
             return static::$objects[$field->handle];
         }
@@ -30,7 +30,7 @@ class MatrixBehavior extends Behavior
         foreach ($field->getBlockTypes() as $block) {
             $blockObjects[] = new ObjectType([
                 'name' => ucfirst($field->handle).ucfirst($block->handle),
-                'fields' => $fieldService->getFields($block->fieldLayoutId),
+                'fields' => $fieldService->getFields($block->fieldLayoutId, $token),
             ]);
         }
 
@@ -45,12 +45,12 @@ class MatrixBehavior extends Behavior
         ]);
     }
 
-    public function getGraphQLQueryFields() {
+    public function getGraphQLQueryFields($token) {
         $field = $this->owner;
 
         return [
             $field->handle => [
-                'type' => Type::listOf($this->getGraphQlObject($field)),
+                'type' => Type::listOf($this->getGraphQlObject($token, $field)),
                 'description' => $field->instructions,
             ]
         ];

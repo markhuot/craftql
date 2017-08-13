@@ -21,9 +21,7 @@ class Category extends ObjectType {
         $fields['title'] = ['type' => Type::nonNull(Type::string())];
         $fields['slug'] = ['type' => Type::string()];
         $fields['uri'] = ['type' => Type::string()];
-        // $fields['group'] = ['type' => $categoryGroup, 'resolve' => function ($root, $args) {
-        //     return $root->group;
-        // }];
+        $fields['group'] = ['type' => \markhuot\CraftQL\Types\CategoryGroup::type()];
 
         return static::$baseFields = $fields;
     }

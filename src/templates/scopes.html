@@ -1,0 +1,128 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set fullPageForm = true %}
+{% set title = "Token Scopes"|t %}
+{% set crumbs = [
+    {'label': 'Settings', 'url': '/admin/settings'},
+    {'label': 'Plugins', 'url': '/admin/settings/plugins'},
+    {'label': 'CraftQL', 'url': '/admin/settings/plugins/craftql'},
+] %}
+
+{% set content %}
+<style>
+    table.editable tbody tr td {
+        text-align: left;
+    }
+</style>
+<h2>Name</h2>
+{{ forms.textField({
+    first: true,
+    name: 'token[name]',
+    value: token.name,
+    instructions: 'A descriptive label for this token',
+}) }}
+
+<hr>
+
+<div class="field">
+    <h2>Query Fields</h2>
+    <div class="field first last"><div class="heading"><div class="instructions"><p>Enable top level GraphQL fields when accessed through this token.</p></div></div></div>
+
+    <table id="sites" class="shadow-box editable">
+        <thead>
+            <tr>
+                <th scope="col" class="header thin">Field Name</th>
+                <th scope="col" class="header">Description</th>
+                <th scope="col" class="header thin"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-id="default">
+                <th>entries</th>
+                <td>Query any entry type that is enabled, below.</td>
+                <td>{{ forms.lightswitch({"name": "scope[query:entries]", "value": 1, "on": token.can('query:entries'), "small": true}) }}</td>
+            </tr>
+            <tr data-id="default">
+                <th>users</th>
+                <td>Query the Craft users. Note: disabling this will not disable the ability to pull users from the <code>entries</code> field.</td>
+                <td>{{ forms.lightswitch({"name": "scope[query:users]", "value": 1, "on": token.can('query:users'), "small": true}) }}</td>
+            </tr>
+            <tr data-id="default">
+                <th>sections</th>
+                <td>Query the sections (and nested Entry Types) that have been enabled below.</td>
+                <td>{{ forms.lightswitch({"name": "scope[query:sections]", "value": 1, "on": token.can('query:sections'), "small": true}) }}</td>
+            </tr>
+            <tr data-id="default">
+                <th>fields</th>
+                <td>Query a field's instructions and options. Note: this will return all fields, regardless of whether it is used in an entry type that has been disabled.</td>
+                <td>{{ forms.lightswitch({"name": "scope[query:fields]", "value": 1, "on": token.can('query:fields'), "small": true}) }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<div class="field">
+    <h2>Query Entry Types</h2>
+    <div class="field first last"><div class="heading"><div class="instructions"><p>Only the enabled entry types will be visible in the GraphQL schema.</p></div></div></div>
+
+    <table id="sites" class="shadow-box editable">
+        <thead>
+            <tr>
+                <th scope="col" class="header thin">Type</th>
+                <th scope="col" class="header">Section</th>
+                <th scope="col" class="header">Entry Type</th>
+                <th scope="col" class="header thin"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for section in craft.sections.getAllSections() %}
+                {% for entryType in section.entryTypes %}
+                    <tr data-id="default">
+                        <th>{{ section.type|ucfirst }}</th>
+                        <td>{{ section.name }}</td>
+                        <td>{{ entryType.name }}</td>
+                        <td>{{ forms.lightswitch({"name": "scope[query:entryType:" ~ entryType.id ~ "]", "value": 1, "on": token.can("query:entryType:" ~ entryType.id), "small": true}) }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<div class="field">
+    <h2>Mutation Entry Types</h2>
+    <div class="field first last"><div class="heading"><div class="instructions"><p>Enable the entry types that should be editable through GraphQL.</p></div></div></div>
+
+    <table id="sites" class="shadow-box editable">
+        <thead>
+            <tr>
+                <th scope="col" class="header thin">Type</th>
+                <th scope="col" class="header">Section</th>
+                <th scope="col" class="header">Entry Type</th>
+                <th scope="col" class="header thin"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for section in craft.sections.getAllSections() %}
+                {% for entryType in section.entryTypes %}
+                    <tr data-id="default">
+                        <th>{{ section.type|ucfirst }}</th>
+                        <td>{{ section.name }}</td>
+                        <td>{{ entryType.name }}</td>
+                        <td>{{ forms.lightswitch({"name": "scope[mutate:entryType:" ~ entryType.id ~ "]", "value": 1, "on": token.can("mutate:entryType:" ~ entryType.id), "small": true}) }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endset %}
+
+{% set extraPageHeaderHtml %}
+<input type="submit" class="btn submit" value="Save">
+{% endset %}
