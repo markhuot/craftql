@@ -13,10 +13,6 @@ class Section extends ObjectType {
     static $baseFields;
     static $baseArgs;
 
-    static function bootstrap() {
-        
-    }
-
     function __construct($section, $request) {
         parent::__construct([
             'name' => ucfirst($section->handle).'Section',

@@ -51,9 +51,6 @@ class GraphQLService extends Component {
         $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
         $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
 
-        // var_dump($request->sections()->enum());
-        // die;
-
         $schema = [];
         $schema['query'] = new \markhuot\CraftQL\Types\Query($request);
         $schema['types'] = array_merge(

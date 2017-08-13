@@ -16,6 +16,10 @@ abstract class BaseFactory {
         $this->request = $request;
     }
 
+    // function repository() {
+    //     return $this->repository;
+    // }
+
     function get($id) {
         if (isset($this->objects[$id])) {
             return $this->objects[$id];
@@ -60,7 +64,7 @@ abstract class BaseFactory {
 
         $reflect = new \ReflectionClass($this);
         return $this->enum = new EnumType([
-            'name' => $reflect->getShortName().'Enum',
+            'name' => $reflect->getShortName().'sEnum',
             'values' => $values,
         ]);
     }
