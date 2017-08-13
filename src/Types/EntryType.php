@@ -23,12 +23,12 @@ class EntryType extends ObjectType {
             'name' => static::getName($craftEntryType),
             'fields' => function () use ($craftEntryType, $request) {
                 $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-                $baseFields = \markhuot\CraftQL\Types\Entry::baseFields();
+                $baseFields = \markhuot\CraftQL\Types\Entry::baseFields($request);
                 $entryTypeFields = $fieldService->getFields($craftEntryType->fieldLayoutId, $request);
                 return array_merge($baseFields, $entryTypeFields);
             },
             'interfaces' => [
-                \markhuot\CraftQL\Types\Entry::interface(),
+                \markhuot\CraftQL\Types\Entry::interface($request),
                 \markhuot\CraftQL\Types\Element::interface(),
             ],
             'craftType' => $craftEntryType,

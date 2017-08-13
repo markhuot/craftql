@@ -14,12 +14,12 @@ class Section extends BaseFactory {
     function can($id, $mode='query') {
         $section = $this->repository->get($id);
         foreach ($section->entryTypes as $type) {
-            if ($this->request->token()->canNot("{$mode}:entryType:{$type->id}")) {
-                return false;
+            if ($this->request->token()->can("{$mode}:entryType:{$type->id}")) {
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     function enumValueName($object) {

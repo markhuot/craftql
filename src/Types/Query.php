@@ -27,12 +27,9 @@ class Query extends ObjectType {
 
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
             $config['fields']['entries'] = [
-                'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
+                'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)),
                 'description' => 'Entries from the craft interface',
                 'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                // 'resolve' => static::entriesFieldResolver(function ($root, $args) {
-                //     return \craft\elements\Entry::find();
-                // }),
                 'resolve' => $request->entriesCriteria(function ($root, $args) {
                     return \craft\elements\Entry::find();
                 }),

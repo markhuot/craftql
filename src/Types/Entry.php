@@ -59,7 +59,7 @@ class Entry {
         return $args;
     }
 
-    static function baseFields() {
+    static function baseFields($request) {
         if (!empty(static::$baseFields)) {
             return static::$baseFields;
         }
@@ -71,8 +71,11 @@ class Entry {
             return 'Entry';
         }];
         $fields['id'] = ['type' => Type::nonNull(Type::int())];
-        $fields['authorId'] = ['type' => Type::nonNull(Type::int())];
-        // $fields['author'] = ['type' => Type::nonNull(\markhuot\CraftQL\Types\User::type())];
+
+        if ($request->token()->can('query:entry.author')) {
+            $fields['author'] = ['type' => Type::nonNull(\markhuot\CraftQL\Types\User::type($request))];
+        }
+        
         $fields['title'] = ['type' => Type::nonNull(Type::string())];
         $fields['slug'] = ['type' => Type::nonNull(Type::string())];
         $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateCreated'));
@@ -88,7 +91,7 @@ class Entry {
         return static::$baseFields = $fields;
     }
 
-    static function interface() {
+    static function interface($request) {
         if (!empty(static::$interface)) {
             return static::$interface;
         }
@@ -102,8 +105,8 @@ class Entry {
             // a circullar reference. Our EntryInterface defines a User which defines an
             // Entries field which relies on the EntryInterface. The callback here ensures
             // that the nested Entries field gets a resolved interface.
-            'fields' => function () {
-                return static::baseFields();
+            'fields' => function () use ($request) {
+                return static::baseFields($request);
             },
 
             'resolveType' => function ($entry) {

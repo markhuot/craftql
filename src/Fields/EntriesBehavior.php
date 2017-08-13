@@ -72,11 +72,11 @@ class EntriesBehavior extends Behavior
 
         return [
             $field->handle => [
-                'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface()),
+                'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)),
                 // 'type' => Type::listOf($union),
                 'description' => $field->instructions,
                 'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                'resolve' => \markhuot\CraftQL\Types\Query::entriesFieldResolver(function($root, $args) use ($field) {
+                'resolve' => $request->entriesCriteria(function($root, $args) use ($field) {
                     return $root->{$field->handle};
                 }),
             ]

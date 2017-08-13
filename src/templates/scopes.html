@@ -44,8 +44,13 @@
                 <td>{{ forms.lightswitch({"name": "scope[query:entries]", "value": 1, "on": token.can('query:entries'), "small": true}) }}</td>
             </tr>
             <tr data-id="default">
+                <th>entries.author</th>
+                <td>Access to users through an entries author field</td>
+                <td>{{ forms.lightswitch({"name": "scope[query:entry.author]", "value": 1, "on": token.can('query:entry.author'), "small": true}) }}</td>
+            </tr>
+            <tr data-id="default">
                 <th>users</th>
-                <td>Query the Craft users. Note: disabling this will not disable the ability to pull users from the <code>entries</code> field.</td>
+                <td>Query the Craft users. Note: this only affects the ability to search users.</td>
                 <td>{{ forms.lightswitch({"name": "scope[query:users]", "value": 1, "on": token.can('query:users'), "small": true}) }}</td>
             </tr>
             <tr data-id="default">
