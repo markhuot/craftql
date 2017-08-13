@@ -14,7 +14,20 @@
     table.editable tbody tr td {
         text-align: left;
     }
+    .fieldlayoutform {
+        text-transform: none;
+    }
+    .fieldlayoutform h2 {
+        text-transform: uppercase;
+    }
 </style>
+<div class="fieldlayoutform">
+    <h2>Try it out</h2>
+    <p>You can explore your API with the permissions of this token by navigating to <a href="/admin/craftql/browse/{{ token.token }}">/admin/craftql/browse/{token}</a>.
+</div>
+
+<hr>
+
 <h2>Name</h2>
 {{ forms.textField({
     first: true,
