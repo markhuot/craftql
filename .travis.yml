@@ -14,7 +14,7 @@ install:
   - cd /home/travis/build/craftcms/craft
   - composer require markhuot/craftql dev-master
   - composer require phpunit/phpunit
-  - cp /home/travis/build/markhuot/craftql/bootstrap.php .
-  - php bin/setup/database.php
+  - mysql -u root -p="" craftql < /home/travis/build/markhuot/craftql/sql/bootstrap.sql
+  - php vendor/markhuot/craftql/setup/seed.php
 script:
   - vendor/bin/phpunit --bootstrap bootstrap.php vendor/markhuot/craftql/tests/ --testdox
