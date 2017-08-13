@@ -18,4 +18,9 @@ final class InstallTest extends TestCase
     {
         $this->assertTrue(\Craft::$app->getDb()->getIsActive());
     }
+
+    public function testCraftqlIsInstalled(): void
+    {
+        $this->assertNotNull(\Craft::$app->plugins->getPlugin('craftql'));
+    }
 }
