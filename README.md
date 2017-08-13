@@ -24,7 +24,7 @@ If that worked, you can now query Craft CMS using almost the exact same syntax a
 
 ```graphql
 {
-  entries(section:"news", limit:5, search:"body:salty") {
+  entries(section:[News], limit:5, search:"body:salty") {
     ...on News {
       title
       url
@@ -38,7 +38,7 @@ _CraftQL_ provides a top level `entries` field that takes the same arguments as 
 
 ```graphql
 query fetchNews {             # The query, `query fetchNews` is completely optional
-  entries(section:"News") {   # Arguments match `craft.entries`
+  entries(section:[News]) {   # Arguments match `craft.entries`
     ...on News {              # GraphQL is strongly typed, so you must specify each Entry Type you want data from
       id                      # A field to return
       title                   # A field to return
@@ -52,7 +52,7 @@ Types are automatically created for every Entry Type in your install. If you hav
 
 ```graphql
 query fetchNews {
-  entries(section:"News") {
+  entries(section:[News]) {
     ...on News {              # Any fields on the News entry type
       id
       title
@@ -77,14 +77,12 @@ To modify content make sure your token has write access and then use the top lev
 
 ```graphql
 mutation createNewEntry($title:String, $body:String) {
-  upsertEntry(
-    sectionId:1,
-    typeId:1,
-    authorId:1,
+  upsertNews(
     title:$title,
     body:$body,
   ) {
     id
+    url
   }
 }
 ```
@@ -100,11 +98,11 @@ The above would be passed with variables such as,
 
 ## Security
 
-CraftQL supports per-field level permissioning. By default a token will have no rights. You must click into the "Scopes" section to adjust what each token can do.
+CraftQL supports GraphQl field level permissions. By default a token will have no rights. You must click into the "Scopes" section to adjust what each token can do.
 
 ![token scopes](https://raw.githubusercontent.com/markhuot/craftql/master/assets/scopes.png)
 
-Scopes allow you to configure what fields can be searched and what entry types can be mutated.
+Scopes allow you to configure which GraphQL fields and entry types are included in the schema.
 
 ## Roadmap
 
@@ -115,7 +113,7 @@ No software is ever done. There's a lot still to do in order to make _CraftQL_ f
 - [x] Asset mutations (implemented by passing a URL or asset id)
 - [ ] File uploads to assets fields during a mutation
 - [ ] Automated testing is not functional yet
-- [ ] Mutations need a lot more testing
+- [x] Mutations need a lot more testing
 
 ## Requirements
 
