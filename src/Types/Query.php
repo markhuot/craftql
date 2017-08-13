@@ -65,31 +65,4 @@ class Query extends ObjectType {
         parent::__construct($config);
     }
 
-    static function entriesFieldResolver($criteriaCallback) {
-        return function ($root, $args) use ($criteriaCallback) {
-            $criteria = $criteriaCallback($root, $args);
-            // $criteria->typeId = [1];
-            // if (!empty($args['section'])) {
-            //     $criteria->sectionId = $args['section'];
-            //     unset($args['section']);
-            // }
-            // if (empty($args['type'])) {
-            //     $entryTypeIds = [];
-            //     $enum = \markhuot\CraftQL\Types\EntryType::enum();
-            //     foreach ($enum->getValues() as $value) {
-            //         $entryTypeIds[] = $value->value;
-            //     }
-            //     $criteria->typeId = $entryTypeIds;
-            // }
-            // else {
-            //     $criteria->typeId = $args['type'];
-            //     unset($args['type']);
-            // }
-            foreach ($args as $key => $value) {
-                $criteria = $criteria->{$key}($value);
-            }
-            return $criteria->all();
-        };
-    }
-
 }

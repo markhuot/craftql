@@ -10,14 +10,18 @@ use GraphQL\Type\Definition\Type;
 
 class Token extends ActiveRecord
 {
+    private $admin = false;
+
     public static function forUser(): Token
     {
         $token = new static;
-        $token->scopes = json_encode([
-            'query:entries' => 1,
-            'query:users' => 1,
-        ]);
+        $token->scopes = json_encode([]);
+        $token->makeAdmin();
         return $token;
+    }
+
+    public function makeAdmin() {
+        $this->admin = true;
     }
 
     /**
@@ -34,7 +38,7 @@ class Token extends ActiveRecord
     } 
 
     function can($do): bool {
-        return @$this->scopeArray[$do] ?: false;
+        return $this->admin || @$this->scopeArray[$do] ?: false;
     }
 
     function canNot($do): bool {
@@ -95,6 +99,10 @@ class Token extends ActiveRecord
     // }
 
     function allowsMatch($regex): bool {
+        if ($this->admin) {
+            return true;
+        }
+
         $scopes = [];
 
         foreach ($this->scopeArray as $key => $value) {
