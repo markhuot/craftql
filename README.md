@@ -73,7 +73,7 @@ query fetchNews {
 }
 ```
 
-To modify content make sure your token has write access and then use the top level `upsertEntry` `Mutation`. `upsertEntry` takes arguments for every field defined in Craft. 
+To modify content make sure your token has write access and then use the top level `upsert{EntryType}` `Mutation`. `upsert{EntryType}` takes arguments for each field defined in Craft. 
 
 ```graphql
 mutation createNewEntry($title:String, $body:String) {
