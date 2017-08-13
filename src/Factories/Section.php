@@ -22,8 +22,4 @@ class Section extends BaseFactory {
         return false;
     }
 
-    function enumValueName($object) {
-        return preg_replace('/Section$/', '', $object->name);
-    }
-
 }

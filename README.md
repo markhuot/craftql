@@ -24,7 +24,7 @@ If that worked, you can now query Craft CMS using almost the exact same syntax a
 
 ```graphql
 {
-  entries(section:[News], limit:5, search:"body:salty") {
+  entries(section:[news], limit:5, search:"body:salty") {
     ...on News {
       title
       url
@@ -38,7 +38,7 @@ _CraftQL_ provides a top level `entries` field that takes the same arguments as 
 
 ```graphql
 query fetchNews {             # The query, `query fetchNews` is completely optional
-  entries(section:[News]) {   # Arguments match `craft.entries`
+  entries(section:[news]) {   # Arguments match `craft.entries`
     ...on News {              # GraphQL is strongly typed, so you must specify each Entry Type you want data from
       id                      # A field to return
       title                   # A field to return
@@ -52,7 +52,7 @@ Types are automatically created for every Entry Type in your install. If you hav
 
 ```graphql
 query fetchNews {
-  entries(section:[News]) {
+  entries(section:[news]) {
     ...on News {              # Any fields on the News entry type
       id
       title

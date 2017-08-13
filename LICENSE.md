@@ -7,13 +7,13 @@ Effective date: Aug 13, 2017
 2. License Grant: Licensor hereby grants Licensee a Personal, Non-assignable & non-transferable, Pepetual, Non-commercial, Without the rights to create derivative works, Non-exclusive license, all with accordance with the terms set forth and other legal restrictions set forth in 3rd party software used while running Software.
 
     1. Licensee may use Software for the purpose of:
-        - Running Software on Licensee’s Website[s] and Server[s];
-        - Allowing 3rd Parties to run Software on Licensee’s Website[s] and Server[s];
-        - Publishing Software’s output to Licensee and 3rd Parties;
+        1.  Running Software on Licensee’s Website[s] and Server[s];
+        2.  Allowing 3rd Parties to run Software on Licensee’s Website[s] and Server[s];
+        3.  Publishing Software’s output to Licensee and 3rd Parties;
 
     2. Licensee may _not_ use Software, under any circumstances, to:
-        - Distribute verbatim copies of Software’s output (including compiled binaries);
-        - Modify Software to suit Licensee’s needs and specifications.
+        1.  Distribute verbatim copies of Software’s output (including compiled binaries);
+        2.  Modify Software to suit Licensee’s needs and specifications.
 
     3. This license is granted perpetually, as long as you do not materially breach it.
 
