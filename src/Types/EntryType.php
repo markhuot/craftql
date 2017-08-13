@@ -60,13 +60,13 @@ class EntryType extends ObjectType {
         ]);
     }
 
-    function args() {
+    function args($request) {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
 
-        return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getArgs($this->craftType->fieldLayoutId));
+        return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getArgs($this->config['craftType']->fieldLayoutId, $request));
     }
 
-    function upsert() {
+    function upsert($request) {
         return function ($root, $args) {
             if (!empty($args['id'])) {
                 $criteria = Entry::find();
@@ -78,8 +78,8 @@ class EntryType extends ObjectType {
             }
             else {
                 $entry = new Entry();
-                $entry->sectionId = $this->craftType->section->id;
-                $entry->typeId = $this->craftType->id;
+                $entry->sectionId = $this->config['craftType']->section->id;
+                $entry->typeId = $this->config['craftType']->id;
             }
 
             if (isset($args['authorId']) || !$entry->authorId) {

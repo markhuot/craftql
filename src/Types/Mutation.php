@@ -10,16 +10,15 @@ use craft\elements\Entry;
 
 class Mutation extends ObjectType {
 
-    function __construct($token) {
+    function __construct($request) {
         $fields = [];
 
-
-        $entryTypes = \markhuot\CraftQL\Types\EntryType::some($token->mutableEntryTypeIds());
+        $entryTypes = $request->entryTypes()->all('mutate');
         foreach ($entryTypes as $entryType) {
             $fields['upsert'.ucfirst($entryType->name)] = [
                 'type' => $entryType,
-                'args' => $entryType->args(),
-                'resolve' => $entryType->upsert(),
+                'args' => $entryType->args($request),
+                'resolve' => $entryType->upsert($request),
             ];
         }
 

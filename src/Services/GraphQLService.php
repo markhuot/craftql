@@ -60,10 +60,10 @@ class GraphQLService extends Component {
             $request->sections()->all()
         );
 
-        // $mutation = new \markhuot\CraftQL\Types\Mutation($token);
-        // if (count($mutation->getFields()) > 0) {
-        //     // $schema['mutation'] = $mutation;
-        // }
+        $mutation = new \markhuot\CraftQL\Types\Mutation($request);
+        if (count($mutation->getFields()) > 0) {
+            $schema['mutation'] = $mutation;
+        }
 
         return new Schema($schema);
     }

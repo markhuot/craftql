@@ -20,26 +20,26 @@ abstract class BaseFactory {
     //     return $this->repository;
     // }
 
-    function get($id) {
-        if (isset($this->objects[$id])) {
-            return $this->objects[$id];
+    function get($id, $mode='query') {
+        if ($this->can($id, $mode) === false) {
+            return false;
         }
 
-        if ($this->can($id) === false) {
-            return false;
+        if (isset($this->objects[$id])) {
+            return $this->objects[$id];
         }
 
         return $this->objects[$id] = $this->make($this->repository->get($id), $this->request);
     }
 
-    abstract function can($id);
+    abstract function can($id, $mode='query');
     abstract function make($raw, $request);
 
-    function all() {
+    function all($mode='query') {
         $objects = [];
-
+        
         foreach ($this->repository->all() as $raw) {
-            if ($object = $this->get($raw->id)) {
+            if ($object = $this->get($raw->id, $mode)) {
                 $objects[] = $object;
             }
         }

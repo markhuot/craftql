@@ -11,8 +11,8 @@ class EntryType extends BaseFactory {
         return new EntryTypeObjectType($raw, $request);
     }
 
-    function can($id) {
-        return $this->request->token()->can("query:entryType:{$id}");
+    function can($id, $mode='query') {
+        return $this->request->token()->can("{$mode}:entryType:{$id}");
     }
 
 }

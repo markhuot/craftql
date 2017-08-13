@@ -114,7 +114,7 @@
                         <th>{{ section.type|ucfirst }}</th>
                         <td>{{ section.name }}</td>
                         <td>{{ entryType.name }}</td>
-                        <td>{{ forms.lightswitch({"name": "scope[mutation:entryType:" ~ entryType.id ~ "]", "value": 1, "on": token.can("mutation:entryType:" ~ entryType.id), "small": true}) }}</td>
+                        <td>{{ forms.lightswitch({"name": "scope[mutate:entryType:" ~ entryType.id ~ "]", "value": 1, "on": token.can("mutate:entryType:" ~ entryType.id), "small": true}) }}</td>
                     </tr>
                 {% endfor %}
             {% endfor %}

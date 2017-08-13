@@ -11,7 +11,7 @@ class Volume extends BaseFactory {
         return new VolumeObjectType($raw, $request);
     }
 
-    function can($id) {
+    function can($id, $mode='query') {
         return true;
     }
 

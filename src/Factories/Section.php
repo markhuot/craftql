@@ -11,10 +11,10 @@ class Section extends BaseFactory {
         return new SectionObjectType($raw, $request);
     }
 
-    function can($id) {
+    function can($id, $mode='query') {
         $section = $this->repository->get($id);
         foreach ($section->entryTypes as $type) {
-            if ($this->request->token()->canNot("query:entryType:{$type->id}")) {
+            if ($this->request->token()->canNot("{$mode}:entryType:{$type->id}")) {
                 return false;
             }
         }

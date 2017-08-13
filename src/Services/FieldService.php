@@ -14,13 +14,13 @@ use markhuot\CraftQL\Plugin;
 
 class FieldService {
 
-  function getArgs($fieldLayoutId) {
+  function getArgs($fieldLayoutId, $request) {
     $graphQlArgs = [];
 
     $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
     foreach ($fieldLayout->getFields() as $field) {
       if ($field->hasMethod('getGraphQLMutationArgs')) {
-        $graphQlArgs = array_merge($graphQlArgs, $field->getGraphQLMutationArgs());
+        $graphQlArgs = array_merge($graphQlArgs, $field->getGraphQLMutationArgs($request));
       }
       else {
         // error_log(get_class($field).' can not be converted to a Graph QL field.');
