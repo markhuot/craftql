@@ -9,4 +9,5 @@ $package['repositories'][] = [
     "url" => realpath(dirname(__FILE__)."/../../"),
 ];
 $package['minimum-stability'] = 'dev';
+echo 'Putting back: '.json_encode($package)."\r\n";
 file_put_contents('/home/travis/build/craftcms/craft/composer.json', json_encode($package));
