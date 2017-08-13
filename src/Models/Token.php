@@ -34,7 +34,7 @@ class Token extends ActiveRecord
 
     function getScopeArray(): array
     {
-        return json_decode($this->scopes, true);
+        return json_decode($this->scopes ?: '[]', true);
     } 
 
     function can($do): bool {
@@ -45,17 +45,17 @@ class Token extends ActiveRecord
         return !$this->can($do);
     }
 
-    function mutableEntryTypeIds(): array {
-        $ids = [];
+    // function mutableEntryTypeIds(): array {
+    //     $ids = [];
 
-        foreach ($this->scopeArray as $scope => $enabled) {
-            if ($enabled && preg_match('/mutation:entryType:(\d+)/', $scope, $matches)) {
-                $ids[] = $matches[1];
-            }
-        }
+    //     foreach ($this->scopeArray as $scope => $enabled) {
+    //         if ($enabled && preg_match('/mutation:entryType:(\d+)/', $scope, $matches)) {
+    //             $ids[] = $matches[1];
+    //         }
+    //     }
 
-        return $ids;
-    }
+    //     return $ids;
+    // }
 
     // function queryableEntryTypeIds(): array {
     //     $ids = [];
