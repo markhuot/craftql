@@ -7,7 +7,7 @@ env:
   - DB_USER="root" DB_PASSWORD="" DB_DATABASE="craftql"
 cache:
   directories:
-    - /home/travis/build/vendor
+    - /home/travis/build/vendor_cache
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS craftql;'
   - composer create-project --no-install craftcms/craft /home/travis/build/craftcms/craft
