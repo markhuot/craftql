@@ -98,6 +98,14 @@ The above would be passed with variables such as,
 }
 ```
 
+## Security
+
+CraftQL supports per-field level permissioning. By default a token will have no rights. You must click into the "Scopes" section to adjust what each token can do.
+
+![token scopes](https://raw.githubusercontent.com/markhuot/craftql/master/assets/scopes.png)
+
+Scopes allow you to configure what fields can be searched and what entry types can be mutated.
+
 ## Roadmap
 
 No software is ever done. There's a lot still to do in order to make _CraftQL_ feature complete. Some of the outstanding items include,
