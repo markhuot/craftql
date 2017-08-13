@@ -7,11 +7,12 @@ env:
   - DB_USER="root" DB_PASSWORD="" DB_DATABASE="craftql"
 cache:
   directories:
-    - /home/travis/build/craftcms/craft/vendor
+    - /home/travis/build/vendor
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS craftql;'
   - composer create-project --no-install craftcms/craft /home/travis/build/craftcms/craft
   - php bin/setup/travis.php
+  - mv /home/travis/build/vendor_cache /home/travis/build/craftcms/craft/vendor 2>/dev/null
 install:
   - cd /home/travis/build/craftcms/craft
   - composer require markhuot/craftql @dev
@@ -22,3 +23,6 @@ install:
   - ./craft craftql/tools/seed
 script:
   - vendor/bin/phpunit --bootstrap vendor/markhuot/craftql/bootstrap.php vendor/markhuot/craftql/tests/ --testdox
+before_cache:
+  - mv /home/travis/build/craftcms/craft/vendor /home/travis/build/vendor_cache
+  - rm -rf /home/travis/build/vendor_cache/markhuot
