@@ -6,14 +6,14 @@ services:
 env:
   - DB_USER="root" DB_PASSWORD="" DB_DATABASE="craftql"
 before_cache:
-  - composer create-project craftcms/craft /home/travis/build/craftcms/craft
+  - composer create-project --no-install craftcms/craft /home/travis/build/craftcms/craft
+  - php bin/setup/travis.php
 cache:
   directories:
-    - /home/travis/build/craftcms/craft
+    - /home/travis/build/craftcms/craft/vendor
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS craftql;'
 install:
-  - php bin/setup/travis.php
   - cd /home/travis/build/craftcms/craft
   - composer require markhuot/craftql @dev
   - composer require phpunit/phpunit
