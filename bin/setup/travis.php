@@ -11,3 +11,7 @@ $package['repositories'][] = [
 $package['minimum-stability'] = 'dev';
 echo 'Putting back: '.json_encode($package)."\r\n";
 file_put_contents('/home/travis/build/craftcms/craft/composer.json', json_encode($package));
+
+$env = file_get_contents('/home/travis/build/craftcms/craft/.env');
+$env = str_replace('DB_DATABASE=""', 'DB_DATABASE="craftql"', $env);
+file_put_contents('/home/travis/build/craftcms/craft/.env', $env);
