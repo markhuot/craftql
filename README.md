@@ -1,8 +1,8 @@
 ![CraftQL seen through the GraphiQL UI](https://raw.githubusercontent.com/markhuot/craftql/master/assets/graphiql.png)
 
-A drop-in [GraphQL](http://graphql.org) server for your [Craft CMS](https://craftcms.com/) implementation. With zero configuration, _CraftQL_ allows you to access all of Craft's features through a familiar GraphQL interface.
+[![Build Status](https://travis-ci.org/markhuot/craftql.svg?branch=master)](https://travis-ci.org/markhuot/craftql)
 
-<hr>
+A drop-in [GraphQL](http://graphql.org) server for your [Craft CMS](https://craftcms.com/) implementation. With zero configuration, _CraftQL_ allows you to access all of Craft's features through a familiar GraphQL interface.
 
 **Note:**, this plugin may or may not become a paid add-on when the Craft Plugin store becomes available. <strike>Buyer</strike> Downloader beware.
 
