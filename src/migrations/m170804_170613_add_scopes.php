@@ -15,7 +15,7 @@ class m170804_170613_add_scopes extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('craftql_tokens', 'scopes', $this->string(2048));
+        $this->addColumn('craftql_tokens', 'scopes', $this->string(2048, '[]'));
         $this->dropColumn('craftql_tokens', 'isWritable');
     }
 
