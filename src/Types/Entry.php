@@ -88,6 +88,14 @@ class Entry {
         $fields['section'] = ['type' => \markhuot\CraftQL\Types\Section::type()];
         $fields['type'] = ['type' => \markhuot\CraftQL\Types\EntryType::type()];
 
+        $fields['ancestors'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];
+        $fields['children'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];
+        $fields['descendants'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];
+        $fields['hasDescendants'] = ['type' => Type::nonNull(Type::boolean())];
+        $fields['level'] = ['type' => Type::int()];
+        $fields['parent'] = ['type' => \markhuot\CraftQL\Types\Entry::interface($request)];
+        $fields['siblings'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];
+
         return static::$baseFields = $fields;
     }
 
