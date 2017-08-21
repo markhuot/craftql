@@ -8,7 +8,7 @@ use yii\base\Behavior;
 
 class DefaultBehavior extends Behavior
 {
-    
+
     public function getGraphQLMutationArgs() {
         $field = $this->owner;
 
@@ -25,7 +25,7 @@ class DefaultBehavior extends Behavior
                 'type' => Type::string(),
                 'description' => $field->instructions,
                 'resolve' => function ($root, $args) use ($field) {
-                    return $field->normalizeValue($root->{$field->handle});
+                    return (string)$root->{$field->handle};
                 }
             ],
         ];

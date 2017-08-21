@@ -19,12 +19,11 @@ class FieldService {
 
     $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
     foreach ($fieldLayout->getFields() as $field) {
-      if ($field->hasMethod('getGraphQLMutationArgs')) {
-        $graphQlArgs = array_merge($graphQlArgs, $field->getGraphQLMutationArgs($request));
+      if (!$field->hasMethod('getGraphQLMutationArgs')) {
+        $field->attachBehavior(get_class($field), \markhuot\CraftQL\Fields\DefaultBehavior::class);
       }
-      else {
-        // error_log(get_class($field).' can not be converted to a Graph QL field.');
-      }
+
+      $graphQlArgs = array_merge($graphQlArgs, $field->getGraphQLMutationArgs($request));
     }
 
     return $graphQlArgs;
@@ -35,12 +34,11 @@ class FieldService {
 
     $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
     foreach ($fieldLayout->getFields() as $field) {
-      if ($field->hasMethod('getGraphQLQueryFields')) {
-        $graphQlFields = array_merge($graphQlFields, $field->getGraphQLQueryFields($request));
+      if (!$field->hasMethod('getGraphQLQueryFields')) {
+        $field->attachBehavior(get_class($field), \markhuot\CraftQL\Fields\DefaultBehavior::class);
       }
-      else {
-        // error_log(get_class($field).' can not be converted to a Graph QL field.');
-      }
+
+      $graphQlFields = array_merge($graphQlFields, $field->getGraphQLQueryFields($request));
     }
 
 

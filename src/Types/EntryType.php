@@ -99,6 +99,11 @@ class EntryType extends ObjectType {
 
             foreach ($fields as $handle => &$value) {
                 $field = Craft::$app->fields->getFieldByHandle($handle);
+
+                if (!$field->hasMethod('upsert')) {
+                    $field->attachBehavior(get_class($field), \markhuot\CraftQL\Fields\DefaultBehavior::class);
+                }
+
                 $value = $field->upsert($value);
             }
 
