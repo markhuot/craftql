@@ -29,6 +29,17 @@ class ApiController extends Controller
         $this->request = $request;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function beforeAction($action)
+    {
+        // disable csrf
+        $this->enableCsrfValidation = false;
+
+        return parent::beforeAction($action);
+    }
+
     function actionIndex()
     {
         // \Yii::beginProfile('craftQl');
