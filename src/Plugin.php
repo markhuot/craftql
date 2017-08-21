@@ -72,16 +72,19 @@ class Plugin extends BasePlugin
             \craft\fields\Matrix::class => \markhuot\CraftQL\Fields\MatrixBehavior::class,
             \craft\fields\Table::class => \markhuot\CraftQL\Fields\TableBehavior::class,
             \craft\fields\Tags::class => \markhuot\CraftQL\Fields\TagsBehavior::class,
-            \craft\fields\Color::class => \markhuot\CraftQL\Fields\DefaultBehavior::class,
-            \craft\fields\PlainText::class => \markhuot\CraftQL\Fields\DefaultBehavior::class,
         ];
 
-        // Register monkeypatching
+        // Register monkeypatching for specific field types
         foreach ($mappings as $fieldClass => $behaviorClass) {
             Event::on($fieldClass, $fieldClass::EVENT_INIT, function ($event) use ($behaviorClass) {
                 $event->sender->attachBehavior($behaviorClass, $behaviorClass);
             });
         }
+
+        // Every other field falls back to the default behavior. e.g. color field, plain text field, 3rd party fields
+        Event::on(\craft\base\Field::class, \craft\base\Field::EVENT_INIT, function ($event) {
+            $event->sender->attachBehavior(\craft\base\Field::class, \markhuot\CraftQL\Fields\DefaultBehavior::class);
+        });
     }
 
     /**

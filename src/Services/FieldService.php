@@ -19,10 +19,6 @@ class FieldService {
 
     $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
     foreach ($fieldLayout->getFields() as $field) {
-      if (!$field->hasMethod('getGraphQLMutationArgs')) {
-        $field->attachBehavior(get_class($field), \markhuot\CraftQL\Fields\DefaultBehavior::class);
-      }
-
       $graphQlArgs = array_merge($graphQlArgs, $field->getGraphQLMutationArgs($request));
     }
 
@@ -34,10 +30,6 @@ class FieldService {
 
     $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
     foreach ($fieldLayout->getFields() as $field) {
-      if (!$field->hasMethod('getGraphQLQueryFields')) {
-        $field->attachBehavior(get_class($field), \markhuot\CraftQL\Fields\DefaultBehavior::class);
-      }
-
       $graphQlFields = array_merge($graphQlFields, $field->getGraphQLQueryFields($request));
     }
 
