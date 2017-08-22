@@ -27,28 +27,20 @@ class DoxterBehavior extends Behavior
 
         return [
             $field->handle => [
-                'type' => static::type(),
+                'type' => Type::string(),
+                'args' => [
+                    'raw' => Type::boolean(),
+                ],
                 'description' => $field->instructions,
+                'resolve' => function ($root, $args) use ($field) {
+                    if (!empty($args['raw'])) {
+                        return $root->{$field->handle}->getRaw();
+                    }
+                    
+                    return $root->{$field->handle}->getHtml();
+                },
             ],
         ];
-    }
-
-    static function type() {
-        if (static::$type) {
-            return static::$type;
-        }
-
-        return static::$type = new ObjectType([
-            'name' => 'DoxterFieldData',
-            'fields' => [
-                'markdown' => ['type' => Type::string(), 'resolve' => function ($root, $args) {
-                    return $root->getRaw();
-                }],
-                'html' => ['type' => Type::string(), 'resolve' => function ($root, $args) {
-                    return $root->getHtml();
-                }],
-            ]
-        ]);
     }
 
 }
