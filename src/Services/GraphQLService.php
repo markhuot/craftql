@@ -59,6 +59,9 @@ class GraphQLService extends Component {
             $request->categoryGroups()->all(),
             $request->sections()->all()
         );
+        $schema['directives'] = [
+            \markhuot\CraftQL\Directives\Date::directive(),
+        ];
 
         $mutation = new \markhuot\CraftQL\Types\Mutation($request);
         if (count($mutation->getFields()) > 0) {

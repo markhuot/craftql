@@ -39,14 +39,26 @@ class FieldService {
 
   function getDateFieldDefinition($handle) {
     return [
-      "{$handle}Timestamp" => ['type' => Type::nonNull(Type::int()), 'resolve' => function ($root, $args) use ($handle) {
-            return $root->{$handle}->format('U');
-      }],
-      "{$handle}" => ['type' => Type::nonNull(Type::string()), 'args' => [
-          ['name' => 'format', 'type' => Type::string(), 'defaultValue' => 'r']
-      ], 'resolve' => function ($root, $args) use ($handle) {
-          return $root->{$handle}->format($args['format']);
-      }],
+      "{$handle}" => [
+        'type' => Type::nonNull(\markhuot\CraftQL\Types\Timestamp::type()),
+        'resolve' => function ($root, $args, $context, $info) use ($handle) {
+          $format = 'U';
+
+          if (!empty($info->fieldNodes)) {
+            if (!empty($info->fieldNodes[0]->directives)) {
+              $directive = $info->fieldNodes[0]->directives[0];
+              if ($directive->arguments) {
+                foreach ($directive->arguments as $arg) {
+                  $format = $arg->value->value;
+                }
+              }
+            }
+          }
+
+          $date = $root->{$handle}->format($format);
+          return ($format == 'U') ? (int)$date : (string)$date;
+        }
+      ],
     ];
   }
 

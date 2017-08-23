@@ -94,6 +94,28 @@ The above would be passed with variables such as,
 }
 ```
 
+## Dates
+
+All Dates in _CraftQL_ are output as `Timestamp` scalars, which represent a unix timestamp. E.g.,
+
+```graphql
+{
+  entries {
+    dateCreated  # outputs 1503368510
+  }
+}
+```
+
+Dates can be converted to a human friendly format with the `@date` directive,
+
+```graphql
+{
+  entries {
+    dateCreated @date(as:"F j, Y") # outputs August 21, 2017
+  }
+}
+```
+
 ## Security
 
 CraftQL supports GraphQl field level permissions. By default a token will have no rights. You must click into the "Scopes" section to adjust what each token can do.
