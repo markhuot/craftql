@@ -72,13 +72,16 @@ class Plugin extends BasePlugin
             \craft\fields\Matrix::class => \markhuot\CraftQL\Fields\MatrixBehavior::class,
             \craft\fields\Table::class => \markhuot\CraftQL\Fields\TableBehavior::class,
             \craft\fields\Tags::class => \markhuot\CraftQL\Fields\TagsBehavior::class,
+            \selvinortiz\doxter\fields\DoxterField::class => \markhuot\CraftQL\Fields\DoxterBehavior::class,
         ];
 
         // Register monkeypatching for specific field types
         foreach ($mappings as $fieldClass => $behaviorClass) {
-            Event::on($fieldClass, $fieldClass::EVENT_INIT, function ($event) use ($behaviorClass) {
-                $event->sender->attachBehavior($behaviorClass, $behaviorClass);
-            });
+            if (class_exists($fieldClass)) {
+                Event::on($fieldClass, $fieldClass::EVENT_INIT, function ($event) use ($behaviorClass) {
+                    $event->sender->attachBehavior($behaviorClass, $behaviorClass);
+                });
+            }
         }
 
         // Every other field falls back to the default behavior. e.g. color field, plain text field, 3rd party fields
