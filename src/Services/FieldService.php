@@ -10,6 +10,7 @@ use craft\fields\Table as TableField;
 use craft\helpers\Assets;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
+use GraphQL\Error\Error;
 
 
 class FieldService {
@@ -37,11 +38,14 @@ class FieldService {
     return $graphQlFields;
   }
 
-  function getDateFieldDefinition($handle) {
+  function getDateFieldDefinition($handle, $description=null, $required=false) {
+    $type = \markhuot\CraftQL\Types\Timestamp::type();
+
     return [
       "{$handle}" => [
-        'type' => Type::nonNull(\markhuot\CraftQL\Types\Timestamp::type()),
-        'resolve' => function ($root, $args, $context, $info) use ($handle) {
+        'type' => $required ? Type::nonNull($type) : $type,
+        'description' => $description,
+        'resolve' => function ($root, $args, $context, $info) use ($handle, $required) {
           $format = 'U';
 
           if (!empty($info->fieldNodes)) {
@@ -55,8 +59,19 @@ class FieldService {
             }
           }
 
-          $date = $root->{$handle}->format($format);
-          return ($format == 'U') ? (int)$date : (string)$date;
+          $date = $root->{$handle};
+
+          if ($required && !$date) {
+            throw new Error("`{$handle}` is a required field but has no value");
+          }
+
+          if (!$date) {
+            return null;
+          }
+
+          $date = $date->format($format);
+          $cast = ($format === 'U') ? 'intval' : 'strval';
+          return $cast($date);
         }
       ],
     ];

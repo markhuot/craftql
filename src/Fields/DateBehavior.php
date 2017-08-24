@@ -18,27 +18,8 @@ class DateBehavior extends Behavior
     }
 
     public function getGraphQLQueryFields($token) {
-        $field = $this->owner;
-
-        return [
-            "{$field->handle}Timestamp" => [
-                'type' => Type::int(),
-                'description' => $field->instructions,
-                'resolve' => function ($root, $args) use ($field) {
-                    return $root->{$field->handle} ? $root->{$field->handle}->format('U') : null;
-                }
-            ],
-            $field->handle => [
-                'type' => Type::string(),
-                'description' => $field->instructions,
-                'args' => [
-                    ['name' => 'format', 'type' => Type::string(), 'defaultValue' => 'r'],
-                ],
-                'resolve' => function ($root, $args) use ($field) {
-                    return $root->{$field->handle} ? $root->{$field->handle}->format($args['format']) : null;
-                }
-            ],
-        ];
+        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        return $fieldService->getDateFieldDefinition($this->owner->handle, $this->owner->instructions, !!$this->owner->required);
     }
 
     public function upsert($value) {
