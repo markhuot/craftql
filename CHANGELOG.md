@@ -1,10 +1,10 @@
-## 1.0.0-beta.6 - 2017-08-24
+## 1.0.0-beta.8 - 2017-08-24
 
 ### Fixed
 
 - Date fields now use the Timestamp scalar type
 
-## 1.0.0-beta.5 - 2017-08-23
+## 1.0.0-beta.7 - 2017-08-23
 
 ### Added
 
