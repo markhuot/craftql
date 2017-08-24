@@ -55,8 +55,8 @@ class Request {
     }
 
     function entriesCriteria($callback) {
-        return function ($root, $args) use ($callback) {
-            $criteria = $callback($root, $args);
+        return function ($root, $args, $context, $info) use ($callback) {
+            $criteria = $callback($root, $args, $context, $info);
 
             if (empty($args['section'])) {
                 $args['sectionId'] = array_map(function ($value) {
