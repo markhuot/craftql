@@ -12,6 +12,14 @@ class Token extends ActiveRecord
 {
     private $admin = false;
 
+    public static function admin(): Token
+    {
+        $token = new static;
+        $token->scopes = json_encode([]);
+        $token->makeAdmin();
+        return $token;
+    }
+
     public static function forUser(): Token
     {
         $token = new static;

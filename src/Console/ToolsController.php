@@ -112,5 +112,45 @@ class ToolsController extends Controller
         $section->setSiteSettings([1 => $siteSettings]);
         
         Craft::$app->sections->saveSection($section);
+
+        $groupModel = new \craft\models\FieldGroup();
+        $groupModel->name = 'Default';
+
+        Craft::$app->fields->saveGroup($groupModel);
+
+        $groups = Craft::$app->fields->getAllGroups();
+        foreach ($groups as $group) {
+            if ($group->name == 'Default') {
+                $groupModel = $group;
+            }
+        }
+
+        $bodyField = new \craft\fields\RichText();
+        $bodyField->groupId = $groupModel->id;
+        $bodyField->name = 'Body';
+        $bodyField->handle = 'body';
+        $bodyField->required = false;
+        $bodyField->sortOrder = 0;
+
+        Craft::$app->fields->saveField($bodyField);
+
+        $layout = new \craft\models\FieldLayout();
+        $layout->type = \craft\elements\Entry::class;
+
+        $contentTab = new \craft\models\FieldLayoutTab();
+        $contentTab->setLayout($layout);
+        $contentTab->name = 'Content';
+        $contentTab->setFields([
+            $bodyField,
+        ]);
+
+        if (!empty($section->getEntryTypes())) {
+            $entryType = $section->getEntryTypes()[0];
+            $layout = Craft::$app->fields->getLayoutById($entryType->fieldLayoutId);
+            $layout->setTabs([
+                $contentTab,
+            ]);
+            Craft::$app->fields->saveLayout($layout);
+        }
     }
 }
