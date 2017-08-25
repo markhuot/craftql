@@ -53,6 +53,7 @@ class Plugin extends BasePlugin
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
             function (RegisterUrlRulesEvent $event) use ($uri) {
                 $event->rules["POST {$uri}"] = 'craftql/api/index';
+                $event->rules["GET {$uri}/debug"] = 'craftql/api/debug';
             }
         );
 

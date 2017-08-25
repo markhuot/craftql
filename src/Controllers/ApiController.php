@@ -40,15 +40,16 @@ class ApiController extends Controller
         return parent::beforeAction($action);
     }
 
+    function actionDebug() {
+        $oldMode = \Craft::$app->getView()->getTemplateMode();
+        \Craft::$app->getView()->setTemplateMode(\craft\web\View::TEMPLATE_MODE_CP);
+        $data = $this->getView()->renderPageTemplate('craftql/debug-input', []);
+        \Craft::$app->getView()->setTemplateMode($oldMode);
+        return $data;
+    }
+
     function actionIndex()
     {
-        // \Yii::beginProfile('craftQl');
-
-        // You must set the header to JSON, otherwise Craft will see HTML and try to insert
-        // javascript at the bottom to run pending tasks
-        $response = \Craft::$app->getResponse();
-        $response->headers->add('Content-Type', 'application/json; charset=UTF-8');
-
         $token = false;
 
         $authorization = Craft::$app->request->headers->get('authorization');
@@ -75,22 +76,33 @@ class ApiController extends Controller
             ]);
         }
 
+        Craft::trace('CraftQL: Bootstrapping');
         $this->graphQl->bootstrap();
+        Craft::trace('CraftQL: Bootstrapping complete');
 
         try {
+            Craft::trace('CraftQL: Fetching schema');
             $schema = $this->graphQl->getSchema($token);
+            Craft::trace('CraftQL: Schema built');
+            Craft::trace('CraftQL: Executing query');
             $result = $this->graphQl->execute($schema, $this->request->input(), $this->request->variables());
+            Craft::trace('CraftQL: Execution complete');
         } catch (\Exception $e) {
-            $backtrace = [];
-            foreach ($e->getTrace() as $index => $trace) {
-                if ($index > 10) { break; }
+            // $backtrace = [];
 
-                $backtrace[] = [
-                    'function' => $trace['function'],
-                    'file' => @$trace['file'],
-                    'line' => @$trace['line'],
-                ];
-            }
+            ob_start();
+            debug_print_backtrace();
+            $backtrace = ob_get_contents(); ob_end_clean();
+
+            // foreach ($e->getTrace() as $index => $trace) {
+            //     if ($index > 10) { break; }
+
+            //     $backtrace[] = [
+            //         'function' => $trace['function'],
+            //         'file' => @$trace['file'],
+            //         'line' => @$trace['line'],
+            //     ];
+            // }
 
             $result = [
                 'errors' => [
@@ -102,11 +114,23 @@ class ApiController extends Controller
             ];
         }
 
-        // \Yii::endProfile('craftQl');
-        // if (true) {
-        //     $result['timings'] = \Yii::getLogger()->getProfiling(['yii\db*']);
-        // }
+        if ($this->request->isDebugging() || false) {
+            $response = \Yii::$app->getResponse();
+            $response->format = \craft\web\Response::FORMAT_HTML;
+    
+            $oldMode = \Craft::$app->getView()->getTemplateMode();
+            \Craft::$app->getView()->setTemplateMode(\craft\web\View::TEMPLATE_MODE_CP);
+            $response->data = $this->getView()->renderPageTemplate('craftql/debug-response', ['json' => json_encode($result)]);
+            \Craft::$app->getView()->setTemplateMode($oldMode);
+    
+            return $response;
+        }
 
-        $this->asJson($result);
+        // You must set the header to JSON, otherwise Craft will see HTML and try to insert
+        // javascript at the bottom to run pending tasks
+        $response = \Craft::$app->getResponse();
+        $response->headers->add('Content-Type', 'application/json; charset=UTF-8');
+
+        return $this->asJson($result);
     }
 }

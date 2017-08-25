@@ -82,6 +82,14 @@ class Request {
                 $criteria = $criteria->{$key}($value);
             }
 
+            if (!empty($info->fieldNodes)) {
+                foreach ($info->fieldNodes[0]->selectionSet->selections as $selection) {
+                    if ($selection->name->value == 'author') {
+                        $criteria->with('author');
+                    }
+                }
+            }
+
             return $criteria->all();
         };
     }

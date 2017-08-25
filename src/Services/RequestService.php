@@ -36,4 +36,8 @@ class RequestService {
         return @$data['variables'];
     }
 
+    function isDebugging() {
+        return !!Craft::$app->request->post('debug');
+    }
+
 }

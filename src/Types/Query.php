@@ -32,13 +32,7 @@ class Query extends ObjectType {
                     'description' => 'Entries from the craft interface',
                     'args' => \markhuot\CraftQL\Types\Entry::args($request),
                     'resolve' => $request->entriesCriteria(function ($root, $args, $context, $info) {
-                        $criteria = \craft\elements\Entry::find();
-                        foreach ($info->fieldNodes[0]->selectionSet->selections as $selection) {
-                            if ($selection->name->value == 'author') {
-                                $criteria->with('author');
-                            }
-                        }
-                        return $criteria;
+                        return \craft\elements\Entry::find();
                     }),
                 ];
             }
