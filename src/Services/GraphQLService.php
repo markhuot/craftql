@@ -17,17 +17,20 @@ class GraphQLService extends Component {
     private $schema;
     private $volumes;
     private $categoryGroups;
+    private $tagGroups;
     private $entryTypes;
     private $sections;
 
     function __construct(
         \markhuot\CraftQL\Repositories\Volumes $volumes,
         \markhuot\CraftQL\Repositories\CategoryGroup $categoryGroups,
+        \markhuot\CraftQL\Repositories\TagGroup $tagGroups,
         \markhuot\CraftQL\Repositories\EntryType $entryTypes,
         \markhuot\CraftQL\Repositories\Section $sections
     ) {
         $this->volumes = $volumes;
         $this->categoryGroups = $categoryGroups;
+        $this->tagGroups = $tagGroups;
         $this->entryTypes = $entryTypes;
         $this->sections = $sections;
     }
@@ -40,6 +43,7 @@ class GraphQLService extends Component {
     function bootstrap() {
         $this->volumes->load();
         $this->categoryGroups->load();
+        $this->tagGroups->load();
         $this->entryTypes->load();
         $this->sections->load();
     }
@@ -50,6 +54,7 @@ class GraphQLService extends Component {
         $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
         $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
         $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
+        $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
 
         $schema = [];
         $schema['query'] = new \markhuot\CraftQL\Types\Query($request);

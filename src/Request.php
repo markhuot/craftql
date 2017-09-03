@@ -8,6 +8,7 @@ class Request {
     private $entryTypes;
     private $volumes;
     private $categoryGroups;
+    private $tagGroups;
     private $sections;
 
     function __construct($token) {
@@ -16,6 +17,10 @@ class Request {
 
     function addCategoryGroups($categoryGroups) {
         $this->categoryGroups = $categoryGroups;
+    }
+
+    function addTagGroups($tagGroups) {
+        $this->tagGroups = $tagGroups;
     }
 
     function addEntryTypes($entryTypes) {
@@ -40,6 +45,14 @@ class Request {
 
     function categoryGroups() {
         return $this->categoryGroups;
+    }
+
+    function tagGroup($id) {
+        return $this->tagGroups->get($id);
+    }
+ 
+    function tagGroups() {
+        return $this->tagGroups;
     }
 
     function entryTypes() {
