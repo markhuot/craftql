@@ -97,7 +97,7 @@ class Request {
 
             if (!empty($info->fieldNodes)) {
                 foreach ($info->fieldNodes[0]->selectionSet->selections as $selection) {
-                    if ($selection->name->value == 'author') {
+                    if (isset($selection->name->value) && $selection->name->value == 'author') {
                         $criteria->with('author');
                     }
                 }

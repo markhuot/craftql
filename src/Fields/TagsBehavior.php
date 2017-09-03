@@ -28,9 +28,9 @@ class TagsBehavior extends Behavior
                 $field->handle => [
                     'type' => Type::listOf($request->tagGroup($groupId)),
                     'description' => $field->instructions,
-                    // 'resolve' => function ($root, $args) use ($field) {
-                    //     return $root->{$field->handle};
-                    // }
+                    'resolve' => function ($root, $args) use ($field) {
+                        return $root->{$field->handle}->all();
+                    }
                 ]
             ];
         }

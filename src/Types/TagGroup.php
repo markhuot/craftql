@@ -19,7 +19,7 @@ class TagGroup extends ObjectType {
 
         parent::__construct([
             'name' => ucfirst($group->handle).'Tags',
-            'fields' => $baseFields,
+            'fields' => $fields,
             'id' => $group->id,
         ]);
     }
