@@ -35,6 +35,7 @@ final class InstallTest extends TestCase
         $service = new GraphQLService(
             new \markhuot\CraftQL\Repositories\Volumes,
             new \markhuot\CraftQL\Repositories\CategoryGroup,
+            new \markhuot\CraftQL\Repositories\TagGroup,
             new \markhuot\CraftQL\Repositories\EntryType,
             new \markhuot\CraftQL\Repositories\Section
         );
