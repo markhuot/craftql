@@ -31,7 +31,7 @@ class Query extends ObjectType {
                     'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)),
                     'description' => 'Entries from the craft interface',
                     'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                    'resolve' => $request->entriesCriteria(function ($root, $args) {
+                    'resolve' => $request->entriesCriteria(function ($root, $args, $context, $info) {
                         return \craft\elements\Entry::find();
                     }),
                 ];

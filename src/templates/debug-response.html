@@ -1,0 +1,39 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/codemirror.css">
+        <!-- thanks http://farhadg.github.io/code-mirror-themes/ -->
+        <link rel='stylesheet' href='http://farhadg.github.io/code-mirror-themes/themes/oceanic.css'>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/codemirror.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/addon/edit/matchbrackets.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/addon/comment/continuecomment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/addon/comment/comment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/mode/javascript/javascript.min.js"></script>
+        <style>
+            .CodeMirror-wrap {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+            }
+        </style>
+    </head>
+    <body>
+        <pre>
+<textarea id="code">
+    
+</textarea>
+        </pre>
+        <script>
+            var el = document.getElementById('code');
+            el.innerHTML = JSON.stringify(JSON.parse('{{ json|raw }}'), null, 2);
+            var editor = CodeMirror.fromTextArea(el, {
+                matchBrackets: true,
+                autoCloseBrackets: true,
+                lineWrapping: true,
+                theme: 'oceanic',
+                readOnly: true
+            });
+        </script>
+    </body>
+</html>

@@ -8,17 +8,34 @@ use GraphQL\Type\Definition\Type;
 
 class TagGroup extends ObjectType {
 
-    static function make($group) {
+    static $type;
+
+    function __construct($group, $request) {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $baseFields = [];
+        $baseFields['id'] = ['type' => Type::int()];
+        $baseFields['title'] = ['type' => Type::string()];
+        $fields = array_merge($baseFields, $fieldService->getFields($group->fieldLayoutId, $request));
 
-        $tagGroupFields = [];
-        $tagGroupFields['id'] = ['type' => Type::int()];
-        $tagGroupFields['title'] = ['type' => Type::string()];
-        $tagGroupFields = array_merge($tagGroupFields, $fieldService->getFields($group->fieldLayoutId));
-
-        return new static([
+        parent::__construct([
             'name' => ucfirst($group->handle).'Tags',
-            'fields' => $tagGroupFields,
+            'fields' => $fields,
+            'id' => $group->id,
+        ]);
+    }
+
+    static function type() {
+        if (!empty(static::$type)) {
+            return static::$type;
+        }
+
+        return static::$type = new ObjectType([
+            'name' => 'CategoryGroup',
+            'fields' => [
+                'id' => ['type' => Type::int()],
+                'name' => ['type' => Type::string()],
+                'handle' => ['type' => Type::string()],
+            ],
         ]);
     }
 

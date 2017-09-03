@@ -17,7 +17,7 @@ class TagsBehavior extends Behavior
         ];
     }
 
-    public function getGraphQLQueryFields($token) {
+    public function getGraphQLQueryFields($request) {
         $field = $this->owner;
 
         $source = $field->settings['source'];
@@ -26,8 +26,11 @@ class TagsBehavior extends Behavior
 
             return [
                 $field->handle => [
-                    'type' => Type::string(), // Type::listOf(\markhuot\CraftQL\Repositories\TagGroups::getGroup($groupId)),
+                    'type' => Type::listOf($request->tagGroup($groupId)),
                     'description' => $field->instructions,
+                    'resolve' => function ($root, $args) use ($field) {
+                        return $root->{$field->handle}->all();
+                    }
                 ]
             ];
         }

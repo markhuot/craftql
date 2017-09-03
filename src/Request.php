@@ -8,6 +8,7 @@ class Request {
     private $entryTypes;
     private $volumes;
     private $categoryGroups;
+    private $tagGroups;
     private $sections;
 
     function __construct($token) {
@@ -16,6 +17,10 @@ class Request {
 
     function addCategoryGroups($categoryGroups) {
         $this->categoryGroups = $categoryGroups;
+    }
+
+    function addTagGroups($tagGroups) {
+        $this->tagGroups = $tagGroups;
     }
 
     function addEntryTypes($entryTypes) {
@@ -42,6 +47,14 @@ class Request {
         return $this->categoryGroups;
     }
 
+    function tagGroup($id) {
+        return $this->tagGroups->get($id);
+    }
+ 
+    function tagGroups() {
+        return $this->tagGroups;
+    }
+
     function entryTypes() {
         return $this->entryTypes;
     }
@@ -55,8 +68,8 @@ class Request {
     }
 
     function entriesCriteria($callback) {
-        return function ($root, $args) use ($callback) {
-            $criteria = $callback($root, $args);
+        return function ($root, $args, $context, $info) use ($callback) {
+            $criteria = $callback($root, $args, $context, $info);
 
             if (empty($args['section'])) {
                 $args['sectionId'] = array_map(function ($value) {
@@ -80,6 +93,14 @@ class Request {
             
             foreach ($args as $key => $value) {
                 $criteria = $criteria->{$key}($value);
+            }
+
+            if (!empty($info->fieldNodes)) {
+                foreach ($info->fieldNodes[0]->selectionSet->selections as $selection) {
+                    if (isset($selection->name->value) && $selection->name->value == 'author') {
+                        $criteria->with('author');
+                    }
+                }
             }
 
             return $criteria->all();
