@@ -40,18 +40,21 @@ class CategoriesBehavior extends Behavior
     public function getGraphQLQueryFields($request) {
         $field = $this->owner;
 
-        preg_match('/^group:(\d+)$/', $field->source, $matches);
-        $groupId = $matches[1];
+        if (preg_match('/^group:(\d+)$/', $field->source, $matches)) {
+            $groupId = $matches[1];
 
-        return [
-            $field->handle => [
-                'type' => Type::listOf($request->categoryGroup($groupId)),
-                'description' => $field->instructions,
-                'resolve' => function ($root, $args) use ($field) {
-                    return $root->{$field->handle}->all();
-                }
-            ]
-        ];
+            return [
+                $field->handle => [
+                    'type' => Type::listOf($request->categoryGroup($groupId)),
+                    'description' => $field->instructions,
+                    'resolve' => function ($root, $args) use ($field) {
+                        return $root->{$field->handle}->all();
+                    }
+                ]
+            ];
+        }
+
+        return [];
     }
 
     public function upsert($value) {

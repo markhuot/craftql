@@ -34,6 +34,8 @@ class TagsBehavior extends Behavior
                 ]
             ];
         }
+
+        return [];
     }
 
     public function upsert($values) {
