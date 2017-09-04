@@ -59,12 +59,15 @@ class Plugin extends BasePlugin
         );
 
         // Register our site routes
+        $verbs = $this->getSettings()->verbs;
         $uri = $this->settings->uri;
         Event::on(
             UrlManager::className(),
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
-            function (RegisterUrlRulesEvent $event) use ($uri) {
-                $event->rules["POST {$uri}"] = 'craftql/api/index';
+            function (RegisterUrlRulesEvent $event) use ($uri, $verbs) {
+                foreach ($verbs as $verb) {
+                    $event->rules["{$verb} {$uri}"] = 'craftql/api/index';
+                }
                 $event->rules["GET {$uri}/debug"] = 'craftql/api/debug';
             }
         );

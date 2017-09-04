@@ -8,6 +8,7 @@ use markhuot\CraftQL\Models\Token;
 class Settings extends Model
 {
     public $uri = 'api';
+    public $verbs = ['POST'];
     public $headers = [];
 
     function rules()
