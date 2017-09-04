@@ -31,6 +31,18 @@ class Plugin extends BasePlugin
             $this->controllerNamespace = 'markhuot\CraftQL\Console';
         }
 
+        $headers = !empty($this->getSettings()->headers) && is_array($this->getSettings()->headers) ? $this->getSettings()->headers : [];
+
+        Event::on(
+            \yii\web\Response::class,
+            \yii\web\Response::EVENT_AFTER_PREPARE,
+            function ($event) use ($headers) {
+                foreach ($headers as $key => $value) {
+                    $event->sender->getHeaders()->set($key, $value);
+                }
+            }
+        );
+
         // Register cp routes
         Event::on(
             UrlManager::className(),
