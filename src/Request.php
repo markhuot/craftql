@@ -15,23 +15,23 @@ class Request {
         $this->token = $token;
     }
 
-    function addCategoryGroups($categoryGroups) {
+    function addCategoryGroups(\markhuot\CraftQL\Factories\CategoryGroup $categoryGroups) {
         $this->categoryGroups = $categoryGroups;
     }
 
-    function addTagGroups($tagGroups) {
+    function addTagGroups(\markhuot\CraftQL\Factories\TagGroup $tagGroups) {
         $this->tagGroups = $tagGroups;
     }
 
-    function addEntryTypes($entryTypes) {
+    function addEntryTypes(\markhuot\CraftQL\Factories\EntryType $entryTypes) {
         $this->entryTypes = $entryTypes;
     }
 
-    function addVolumes($volumes) {
+    function addVolumes(\markhuot\CraftQL\Factories\Volume $volumes) {
         $this->volumes = $volumes;
     }
 
-    function addSections($sections) {
+    function addSections(\markhuot\CraftQL\Factories\Section $sections) {
         $this->sections = $sections;
     }
 
@@ -43,7 +43,7 @@ class Request {
         return $this->categoryGroups->get($id);
     }
 
-    function categoryGroups() {
+    function categoryGroups(): \markhuot\CraftQL\Factories\CategoryGroup {
         return $this->categoryGroups;
     }
 
@@ -51,19 +51,19 @@ class Request {
         return $this->tagGroups->get($id);
     }
  
-    function tagGroups() {
+    function tagGroups(): \markhuot\CraftQL\Factories\TagGroup {
         return $this->tagGroups;
     }
 
-    function entryTypes() {
+    function entryTypes(): \markhuot\CraftQL\Factories\EntryType {
         return $this->entryTypes;
     }
 
-    function volumes() {
+    function volumes(): \markhuot\CraftQL\Factories\Volume {
         return $this->volumes;
     }
 
-    function sections() {
+    function sections(): \markhuot\CraftQL\Factories\Section {
         return $this->sections;
     }
 
