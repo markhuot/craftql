@@ -76,7 +76,7 @@ class EntriesBehavior extends Behavior
                 // 'type' => Type::listOf($union),
                 'description' => $field->instructions,
                 'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                'resolve' => $request->entriesCriteria(function($root, $args) use ($field) {
+                'resolve' => $request->entriesCriteria('all', function($root, $args) use ($field) {
                     return $root->{$field->handle};
                 }),
             ]

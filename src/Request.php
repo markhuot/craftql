@@ -67,8 +67,8 @@ class Request {
         return $this->sections;
     }
 
-    function entriesCriteria($callback) {
-        return function ($root, $args, $context, $info) use ($callback) {
+    function entriesCriteria($amount, $callback) {
+        return function ($root, $args, $context, $info) use ($amount, $callback) {
             $criteria = $callback($root, $args, $context, $info);
 
             if (empty($args['section'])) {
@@ -103,7 +103,7 @@ class Request {
                 }
             }
 
-            return $criteria->all();
+            return $criteria->{$amount}();
         };
     }
 

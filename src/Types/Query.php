@@ -29,9 +29,18 @@ class Query extends ObjectType {
             if (!empty($request->entryTypes()->all())) {
                 $config['fields']['entries'] = [
                     'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)),
-                    'description' => 'Entries from the craft interface',
+                    'description' => 'An array of entries from Craft',
                     'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                    'resolve' => $request->entriesCriteria(function ($root, $args, $context, $info) {
+                    'resolve' => $request->entriesCriteria('all', function ($root, $args, $context, $info) {
+                        return \craft\elements\Entry::find();
+                    }),
+                ];
+
+                $config['fields']['entry'] = [
+                    'type' => \markhuot\CraftQL\Types\Entry::interface($request),
+                    'description' => 'One entry from Craft',
+                    'args' => \markhuot\CraftQL\Types\Entry::args($request),
+                    'resolve' => $request->entriesCriteria('one', function ($root, $args, $context, $info) {
                         return \craft\elements\Entry::find();
                     }),
                 ];
