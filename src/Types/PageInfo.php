@@ -19,6 +19,10 @@ class PageInfo extends ObjectType {
                 'hasNextPage' => ['type' => Type::nonNull(Type::boolean()), 'resolve' => function ($root, $args) {
                     return $root->currentPage < $root->totalPages;
                 }],
+                'currentPage' => Type::int(),
+                'totalPages' => Type::int(),
+                'first' => Type::int(),
+                'last' => Type::int(),
             ],
         ]);
     }
