@@ -73,12 +73,26 @@ class EntriesBehavior extends Behavior
         return [
             $field->handle => [
                 'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)),
-                // 'type' => Type::listOf($union),
                 'description' => $field->instructions,
                 'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                'resolve' => $request->entriesCriteria('all', function($root, $args) use ($field) {
-                    return $root->{$field->handle};
-                }),
+                'resolve' => function ($root, $args, $context, $info) use ($request, $field) {
+                    return $request->entries($root->{$field->handle}, $args, $info)->all();
+                },
+            ],
+            "{$field->handle}Connection" => [
+                'type' => \markhuot\CraftQL\Types\EntryConnection::type($request),
+                'description' => $field->instructions,
+                'args' => \markhuot\CraftQL\Types\Entry::args($request),
+                'resolve' => function ($root, $args, $context, $info) use ($request, $field) {
+                    $criteria = $request->entries($root->{$field->handle}, $args, $info);
+                    list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
+
+                    return [
+                        'totalCount' => $pageInfo->total,
+                        'pageInfo' => $pageInfo,
+                        'edges' => $entries,
+                    ];
+                }
             ]
         ];
     }

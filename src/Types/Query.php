@@ -31,18 +31,34 @@ class Query extends ObjectType {
                     'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)),
                     'description' => 'An array of entries from Craft',
                     'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                    'resolve' => $request->entriesCriteria('all', function ($root, $args, $context, $info) {
-                        return \craft\elements\Entry::find();
-                    }),
+                    'resolve' => function ($root, $args, $context, $info) use ($request) {
+                        return $request->entries(\craft\elements\Entry::find(), $args, $info)->all();
+                    },
+                ];
+
+                $config['fields']['entriesConnection'] = [
+                    'type' => \markhuot\CraftQL\Types\EntryConnection::type($request),
+                    'description' => 'A connection to entries in Craft',
+                    'args' => \markhuot\CraftQL\Types\Entry::args($request),
+                    'resolve' => function ($root, $args, $context, $info) use ($request) {
+                        $criteria = $request->entries(\craft\elements\Entry::find(), $args, $info);
+                        list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
+
+                        return [
+                            'totalCount' => $pageInfo->total,
+                            'pageInfo' => $pageInfo,
+                            'edges' => $entries,
+                        ];
+                    }
                 ];
 
                 $config['fields']['entry'] = [
                     'type' => \markhuot\CraftQL\Types\Entry::interface($request),
                     'description' => 'One entry from Craft',
                     'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                    'resolve' => $request->entriesCriteria('one', function ($root, $args, $context, $info) {
-                        return \craft\elements\Entry::find();
-                    }),
+                    'resolve' => function ($root, $args, $context, $info) use ($request) {
+                        return $request->entries(\craft\elements\Entry::find(), $args, $info)->one();
+                    },
                 ];
             }
         }

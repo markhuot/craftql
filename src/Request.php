@@ -67,44 +67,40 @@ class Request {
         return $this->sections;
     }
 
-    function entriesCriteria($amount, $callback) {
-        return function ($root, $args, $context, $info) use ($amount, $callback) {
-            $criteria = $callback($root, $args, $context, $info);
+    function entries($criteria, $args, $info) {
+        if (empty($args['section'])) {
+            $args['sectionId'] = array_map(function ($value) {
+                return $value->value;
+            }, $this->sections()->enum()->getValues());
+        }
+        else {
+            $args['sectionId'] = $args['section'];
+            unset($args['section']);
+        }
 
-            if (empty($args['section'])) {
-                $args['sectionId'] = array_map(function ($value) {
-                    return $value->value;
-                }, $this->sections()->enum()->getValues());
-            }
-            else {
-                $args['sectionId'] = $args['section'];
-                unset($args['section']);
-            }
+        if (empty($args['type'])) {
+            $args['typeId'] = array_map(function ($value) {
+                return $value->value;
+            }, $this->entryTypes()->enum()->getValues());
+        }
+        else {
+            $args['typeId'] = $args['type'];
+            unset($args['type']);
+        }
+        
+        foreach ($args as $key => $value) {
+            $criteria = $criteria->{$key}($value);
+        }
 
-            if (empty($args['type'])) {
-                $args['typeId'] = array_map(function ($value) {
-                    return $value->value;
-                }, $this->entryTypes()->enum()->getValues());
-            }
-            else {
-                $args['typeId'] = $args['type'];
-                unset($args['type']);
-            }
-            
-            foreach ($args as $key => $value) {
-                $criteria = $criteria->{$key}($value);
-            }
-
-            if (!empty($info->fieldNodes)) {
-                foreach ($info->fieldNodes[0]->selectionSet->selections as $selection) {
-                    if (isset($selection->name->value) && $selection->name->value == 'author') {
-                        $criteria->with('author');
-                    }
+        if (!empty($info->fieldNodes)) {
+            foreach ($info->fieldNodes[0]->selectionSet->selections as $selection) {
+                if (isset($selection->name->value) && $selection->name->value == 'author') {
+                    $criteria->with('author');
                 }
             }
+        }
 
-            return $criteria->{$amount}();
-        };
+        return $criteria;
     }
 
 }
