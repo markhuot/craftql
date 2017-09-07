@@ -2,6 +2,7 @@
 
 namespace markhuot\CraftQL\Models;
 
+use Craft;
 use craft\db\ActiveRecord;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
@@ -12,7 +13,7 @@ class Token extends ActiveRecord
 {
     private $admin = false;
 
-    public static function findId($tokenId=false): Token
+    public static function findId($tokenId=false)
     {
         if ($tokenId) {
             return Token::find()->where(['token' => $tokenId])->one();

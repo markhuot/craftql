@@ -70,12 +70,17 @@ class ToolsController extends Controller
                     // @todo, check user permissions when PRO license
 
                     if (!$token) {
-                        http_response_code(403);
-                        $this->asJson([
-                            'errors' => [
-                                ['message' => 'Not authorized']
-                            ]
-                        ]);
+                        $response = new Response(403, [
+                                'Content-Type' => 'application/json; charset=UTF-8',
+                                'Access-Control-Allow-Origin' => '*',
+                            ],
+                            json_encode([
+                                'errors' => [
+                                    ['message' => 'Not authorized']
+                                ]
+                            ])
+                        );
+                        return $resolve($response);
                     }
 
                     if ($postBody) {
