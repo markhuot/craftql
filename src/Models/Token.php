@@ -12,6 +12,21 @@ class Token extends ActiveRecord
 {
     private $admin = false;
 
+    public static function findId($tokenId=false): Token
+    {
+        if ($tokenId) {
+            return Token::find()->where(['token' => $tokenId])->one();
+        }
+        else {
+            $user = Craft::$app->getUser()->getIdentity();
+            if ($user) {
+                return Token::forUser($user);
+            }
+        }
+
+        return false;
+    }
+
     public static function admin(): Token
     {
         $token = new static;

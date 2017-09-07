@@ -54,16 +54,7 @@ class ApiController extends Controller
 
         $authorization = Craft::$app->request->headers->get('authorization');
         preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
-        $tokenId = @$matches['tokenId'];
-        if ($tokenId) {
-            $token = Token::find()->where(['token' => $tokenId])->one();
-        }
-        else {
-            $user = Craft::$app->getUser()->getIdentity();
-            if ($user) {
-                $token = Token::forUser($user);
-            }
-        }
+        $token = Token::findId(@$matches['tokenId']);
 
         // @todo, check user permissions when PRO license
 

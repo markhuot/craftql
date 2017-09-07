@@ -63,6 +63,21 @@ class ToolsController extends Controller
                     $query = false;
                     $variables = [];
 
+                    $authorization = @$request->getHeaders()['Authorization'][0];
+                    preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
+                    $token = Token::findId(@$matches['tokenId']);
+
+                    // @todo, check user permissions when PRO license
+
+                    if (!$token) {
+                        http_response_code(403);
+                        $this->asJson([
+                            'errors' => [
+                                ['message' => 'Not authorized']
+                            ]
+                        ]);
+                    }
+
                     if ($postBody) {
                         $body = json_decode($postBody, true);
                         $query = @$body['query'];
@@ -71,7 +86,6 @@ class ToolsController extends Controller
 
                     try {
                         if ($this->debug) { echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n"; }
-                        $token = Token::forUser();
                         $graphQl->bootstrap();
                         $schema = $graphQl->getSchema($token);
                         $result = $graphQl->execute($schema, $query, $variables);
