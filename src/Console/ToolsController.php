@@ -12,6 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use yii\console\Controller;
 use yii;
 use markhuot\CraftQL\Services\GraphQLService;
+use markhuot\CraftQL\Models\Token;
 
 class ToolsController extends Controller
 {
@@ -70,7 +71,10 @@ class ToolsController extends Controller
 
                     try {
                         if ($this->debug) { echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n"; }
-                        $result = $graphQl->execute($query, $variables);
+                        $token = Token::forUser();
+                        $graphQl->bootstrap();
+                        $schema = $graphQl->getSchema($token);
+                        $result = $graphQl->execute($schema, $query, $variables);
                     } catch (\Exception $e) {
                         $result = [
                             'error' => [
