@@ -11,7 +11,7 @@ cache:
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS craftql;'
   - composer create-project --no-install craftcms/craft /home/travis/build/craftcms/craft
-  - php bin/setup/travis.php
+  - printf \nDB_DATABASE="craftql"' >> /home/travis/build/craftcms/craft/.env
   - mv /home/travis/build/vendor_cache /home/travis/build/craftcms/craft/vendor 2>/dev/null
 install:
   - cd /home/travis/build/craftcms/craft
