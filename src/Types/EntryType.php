@@ -82,8 +82,8 @@ class EntryType extends ObjectType {
                 $entry->typeId = $this->config['craftType']->id;
             }
 
-            if (isset($args['authorId']) || !$entry->authorId) {
-                $entry->authorId = @$args['authorId'] ?: Craft::$app->getUser()->getIdentity()->id;
+            if (isset($args['authorId'])) {
+                $entry->authorId = $args['authorId'];
             }
 
             if (isset($args['title'])) {

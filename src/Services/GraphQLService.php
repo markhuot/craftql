@@ -6,8 +6,8 @@ use Craft;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use GraphQL\GraphQL;
-use GraphQL\Schema;
-use Underscore\Types\Arrays;
+use GraphQL\Error\Debug;
+use GraphQL\Type\Schema;
 use markhuot\CraftQL\Plugin;
 use yii\base\Component;
 use Yii;
@@ -77,7 +77,8 @@ class GraphQLService extends Component {
     }
 
     function execute($schema, $input, $variables = []) {
-        return GraphQL::execute($schema, $input, null, null, $variables);
+        $debug = Craft::$app->config->getGeneral()->devMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::RETHROW_INTERNAL_EXCEPTIONS : null;
+        return GraphQL::executeQuery($schema, $input, null, null, $variables)->toArray($debug);
     }
 
 }

@@ -91,7 +91,6 @@ class ToolsController extends Controller
 
                     try {
                         if ($this->debug) { echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n"; }
-                        $graphQl->bootstrap();
                         $schema = $graphQl->getSchema($token);
                         $result = $graphQl->execute($schema, $query, $variables);
                     } catch (\Exception $e) {

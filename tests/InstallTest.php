@@ -28,9 +28,9 @@ final class InstallTest extends TestCase
 
     public function testSimpleMutation(): void
     {
-        $input = '{ helloWorld }';
-        // $input = 'mutation { upsertStories(title:"foobar", body:"foobar") { id } }';
-
+        // $input = '{ helloWorld }';
+        $input = 'mutation { story: upsertStories(title:"foobar", body:"foobar") { id, title, body } }';
+        
         $token = Token::admin();
         $service = new GraphQLService(
             new \markhuot\CraftQL\Repositories\Volumes,
@@ -42,6 +42,6 @@ final class InstallTest extends TestCase
         $service->bootstrap();
         $schema = $service->getSchema($token);
         $result = $service->execute($schema, $input, []);
-        $this->assertTrue(isset($result['data']['helloWorld']));
+        $this->assertEquals('foobar', @$result['data']['story']['body']);
     }
 }
