@@ -29,7 +29,7 @@ class RichTextBehavior extends Behavior
                 ],
                 'resolve' => function ($root, $args) use ($field) {
                     if (!empty($args['page'])) {
-                        return $root->{$field->handle}->getPage($args['page']);
+                        return (string)$root->{$field->handle}->getPage($args['page']);
                     }
 
                     return (string)$root->{$field->handle};

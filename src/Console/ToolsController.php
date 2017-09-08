@@ -153,8 +153,51 @@ class ToolsController extends Controller
         $bodyField->handle = 'body';
         $bodyField->required = false;
         $bodyField->sortOrder = 0;
-
         Craft::$app->fields->saveField($bodyField);
+
+        $dateField = new \craft\fields\Date();
+        $dateField->groupId = $groupModel->id;
+        $dateField->name = 'Release Date';
+        $dateField->handle = 'releaseDate';
+        $dateField->required = false;
+        $dateField->sortOrder = 0;
+        Craft::$app->fields->saveField($dateField);
+
+        $lightswitchField = new \craft\fields\Lightswitch();
+        $lightswitchField->groupId = $groupModel->id;
+        $lightswitchField->name = 'Promoted';
+        $lightswitchField->handle = 'promoted';
+        $lightswitchField->required = false;
+        $lightswitchField->sortOrder = 0;
+        Craft::$app->fields->saveField($lightswitchField);
+
+        $checkboxesField = new \craft\fields\Checkboxes();
+        $checkboxesField->groupId = $groupModel->id;
+        $checkboxesField->name = 'Social Links';
+        $checkboxesField->handle = 'socialLinks';
+        $checkboxesField->required = false;
+        $checkboxesField->sortOrder = 0;
+        $checkboxesField->options = [
+            ['label' => 'Facebook', 'value' => 'fb', 'default' => false],
+            ['label' => 'Twitter', 'value' => 'tw', 'default' => false],
+            ['label' => 'LinkedIn', 'value' => 'ln', 'default' => false],
+            ['label' => 'Instagram', 'value' => 'in', 'default' => false],
+        ];
+        Craft::$app->fields->saveField($checkboxesField);
+
+        $dropdownField = new \craft\fields\Dropdown();
+        $dropdownField->groupId = $groupModel->id;
+        $dropdownField->name = 'Language';
+        $dropdownField->handle = 'language';
+        $dropdownField->required = false;
+        $dropdownField->sortOrder = 0;
+        $dropdownField->options = [
+            ['label' => 'English', 'value' => 'en', 'default' => false],
+            ['label' => 'French', 'value' => 'fr', 'default' => false],
+            ['label' => 'German', 'value' => 'de', 'default' => true],
+            ['label' => 'Chinese', 'value' => 'cn', 'default' => false],
+        ];
+        Craft::$app->fields->saveField($dropdownField);
 
         $layout = new \craft\models\FieldLayout();
         $layout->type = \craft\elements\Entry::class;
@@ -164,6 +207,10 @@ class ToolsController extends Controller
         $contentTab->name = 'Content';
         $contentTab->setFields([
             $bodyField,
+            $dateField,
+            $lightswitchField,
+            $checkboxesField,
+            $dropdownField,
         ]);
 
         if (!empty($section->getEntryTypes())) {

@@ -26,10 +26,9 @@ final class InstallTest extends TestCase
         $this->assertNotNull(Craft::$app->plugins->getPlugin('craftql'));
     }
 
-    public function testSimpleMutation(): void
+    public function testSimpleQuery(): void
     {
-        // $input = '{ helloWorld }';
-        $input = 'mutation { story: upsertStories(title:"foobar", body:"foobar") { id, title, body } }';
+        $input = '{ helloWorld }';
         
         $token = Token::admin();
         $service = new GraphQLService(
@@ -42,6 +41,7 @@ final class InstallTest extends TestCase
         $service->bootstrap();
         $schema = $service->getSchema($token);
         $result = $service->execute($schema, $input, []);
-        $this->assertEquals('foobar', @$result['data']['story']['body']);
+        $this->assertEquals('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.', @$result['data']['helloWorld']);
     }
+
 }
