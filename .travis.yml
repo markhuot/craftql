@@ -15,6 +15,8 @@ before_install:
   - mv /home/travis/build/vendor_cache /home/travis/build/craftcms/craft/vendor 2>/dev/null
 install:
   - cd /home/travis/build/craftcms/craft
+  - composer config repositories.craftql path /home/travis/build/markhuot/craftql
+  - composer config minimum-stability dev
   - composer require markhuot/craftql:dev-master phpunit/phpunit
   - ./craft install --email=foo@example.com --username=admin --password=foobar --siteName="Test Site" --siteUrl="http://localhost" --language=en
   - php vendor/markhuot/craftql/bin/setup/install.php
