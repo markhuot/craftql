@@ -9,23 +9,24 @@ use yii\base\Behavior;
 
 class PositionSelectBehavior extends Behavior
 {
-    static $enum;
+    static $enums;
 
     function getEnum($field) {
-        if (static::$enum) {
-            return static::$enum;
+        if (!empty(static::$enums[$field->handle])) {
+            return static::$enums[$field->handle];
         }
+
+        $values = [];
+        if (in_array('left', $field->options)) { $values['left'] = 'left'; }
+        if (in_array('center', $field->options)) { $values['center'] = 'center'; }
+        if (in_array('right', $field->options)) { $values['right'] = 'right'; }
+        if (in_array('full', $field->options)) { $values['full'] = 'full'; }
+        if (in_array('drop-left', $field->options)) { $values['dropleft'] = 'drop-left'; }
+        if (in_array('drop-right', $field->options)) { $values['dropright'] = 'drop-right'; }
         
-        return static::$enum = new EnumType([
+        return static::$enums[$field->handle] = new EnumType([
             'name' => ucfirst($field->handle).'Enum',
-            'values' => [
-                'left' => 'left',
-                'center' => 'center',
-                'right' => 'right',
-                'full' => 'full',
-                'dropleft' => 'drop-left',
-                'dropright' => 'drop-right',
-            ],
+            'values' => $values,
         ]);
     }
 

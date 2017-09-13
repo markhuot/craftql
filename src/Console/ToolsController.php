@@ -199,6 +199,40 @@ class ToolsController extends Controller
         ];
         Craft::$app->fields->saveField($dropdownField);
 
+        $entriesField = new \craft\fields\Dropdown();
+        $entriesField->groupId = $groupModel->id;
+        $entriesField->name = 'Related Entry';
+        $entriesField->handle = 'relatedEntry';
+        $entriesField->required = false;
+        $entriesField->sortOrder = 0;
+        Craft::$app->fields->saveField($entriesField);
+
+        $multiSelectField = new \craft\fields\MultiSelect();
+        $multiSelectField->groupId = $groupModel->id;
+        $multiSelectField->name = 'Social Links';
+        $multiSelectField->handle = 'socialLinksTwo';
+        $multiSelectField->required = false;
+        $multiSelectField->sortOrder = 0;
+        $multiSelectField->options = [
+            ['label' => 'Facebook', 'value' => 'fb', 'default' => false],
+            ['label' => 'Twitter', 'value' => 'tw', 'default' => false],
+            ['label' => 'LinkedIn', 'value' => 'ln', 'default' => false],
+            ['label' => 'Instagram', 'value' => 'in', 'default' => false],
+        ];
+        Craft::$app->fields->saveField($multiSelectField);
+
+        $heroImagePosition = new \craft\fields\Position();
+        $heroImagePosition->groupId = $groupModel->id;
+        $heroImagePosition->name = 'Hero Image Position';
+        $heroImagePosition->handle = 'heroImagePosition';
+        $heroImagePosition->required = false;
+        $heroImagePosition->sortOrder = 0;
+        $heroImagePosition->options = [
+            'left',
+            'drop-right',
+        ];
+        Craft::$app->fields->saveField($heroImagePosition);
+
         $layout = new \craft\models\FieldLayout();
         $layout->type = \craft\elements\Entry::class;
 
