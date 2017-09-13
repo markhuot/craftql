@@ -22,13 +22,26 @@ class DefaultBehavior extends Behavior
 
         return [
             $field->handle => [
-                'type' => Type::string(),
+                'type' => $this->getGraphQLDefaultFieldType($token, $field),
+                'args' => $this->getGraphQLDefaultFieldArgs($token, $field),
                 'description' => $field->instructions,
-                'resolve' => function ($root, $args) use ($field) {
-                    return (string)$root->{$field->handle};
+                'resolve' => function ($root, $args) use ($token, $field) {
+                    return $this->getGraphQLDefaultFieldResolver($token, $field, $root, $args);
                 }
             ],
         ];
+    }
+
+    public function getGraphQLDefaultFieldType($token, $field) {
+        return Type::string();
+    }
+
+    public function getGraphQLDefaultFieldArgs($token, $field) {
+        return [];
+    }
+
+    public function getGraphQLDefaultFieldResolver($token, $field, $root, $args) {
+        return (string)$root->{$field->handle};
     }
 
     public function upsert($value) {

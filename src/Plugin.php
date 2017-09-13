@@ -91,6 +91,7 @@ class Plugin extends BasePlugin
             \selvinortiz\doxter\fields\DoxterField::class => \markhuot\CraftQL\Fields\DoxterBehavior::class,
             \newism\fields\fields\Telephone::class => \markhuot\CraftQL\Fields\NSMTelephoneBehavior::class,
             \newism\fields\fields\Gender::class => \markhuot\CraftQL\Fields\NSMGenderBehavior::class,
+            \newism\fields\fields\Address::class => \markhuot\CraftQL\Fields\NSMAddressBehavior::class,
         ];
 
         // Register monkeypatching for specific field types

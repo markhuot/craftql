@@ -4,25 +4,11 @@ namespace markhuot\CraftQL\Fields;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use yii\base\Behavior;
 use \newism\fields\models\GenderModel;
 
-class NSMGenderBehavior extends Behavior
+class NSMGenderBehavior extends DefaultBehavior
 {
-    static $type;
     static $genderObject;
-
-    public function getGraphQLMutationArgs() {
-        $field = $this->owner;
-
-        return [
-            $field->handle => ['type' => Type::string()]
-        ];
-    }
-
-    public function upsert($value) {
-        return $value;
-    }
 
     private static function object() {
         if (!empty(static::$genderObject)) {
@@ -30,7 +16,7 @@ class NSMGenderBehavior extends Behavior
         }
 
         return static::$genderObject = new ObjectType([
-            'name' => 'NSMGender',
+            'name' => 'NSMGenderModel',
             'fields' => [
                 'sex' => Type::string(),
                 'identity' => Type::string(),
@@ -38,20 +24,14 @@ class NSMGenderBehavior extends Behavior
         ]);
     }
 
-    public function getGraphQLQueryFields($token) {
-        $field = $this->owner;
+    public function getGraphQLDefaultFieldType($token, $field) {
+        return static::object();
+    }
 
+    public function getGraphQLDefaultFieldResolver($token, $field, $root, $args) {
         return [
-            $field->handle => [
-                'type' => static::object(),
-                'description' => $field->instructions,
-                'resolve' => function ($root, $args) use ($field) {
-                    return [
-                        'sex' => GenderModel::$sexLabels[$root->{$field->handle}->sex],
-                        'identity' => $root->{$field->handle}->identity,
-                    ];
-                },
-            ],
+            'sex' => GenderModel::$sexLabels[$root->{$field->handle}->sex],
+            'identity' => $root->{$field->handle}->identity,
         ];
     }
 
