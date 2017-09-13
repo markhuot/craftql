@@ -89,6 +89,8 @@ class Plugin extends BasePlugin
             \craft\fields\Table::class => \markhuot\CraftQL\Fields\TableBehavior::class,
             \craft\fields\Tags::class => \markhuot\CraftQL\Fields\TagsBehavior::class,
             \selvinortiz\doxter\fields\DoxterField::class => \markhuot\CraftQL\Fields\DoxterBehavior::class,
+            \newism\fields\fields\Telephone::class => \markhuot\CraftQL\Fields\NSMTelephoneBehavior::class,
+            \newism\fields\fields\Gender::class => \markhuot\CraftQL\Fields\NSMGenderBehavior::class,
         ];
 
         // Register monkeypatching for specific field types
