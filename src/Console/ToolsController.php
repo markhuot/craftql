@@ -19,12 +19,12 @@ class ToolsController extends Controller
     public $port = 9001;
     public $host = '0.0.0.0';
     public $debug = false;
-    
+
     public function options($actionID)
     {
         return ['port', 'host', 'debug'];
     }
-    
+
     public function optionAliases()
     {
         return [
@@ -54,7 +54,7 @@ class ToolsController extends Controller
         $server = new HttpServer(function (ServerRequestInterface $request) use ($graphQl) {
             return new Promise(function ($resolve, $reject) use ($request, $graphQl) {
                 $postBody = '';
-                
+
                 $request->getBody()->on('data', function ($data) use (&$postBody) {
                     $postBody .= $data;
                 });
@@ -132,7 +132,7 @@ class ToolsController extends Controller
         $siteSettings->uriFormat = 'stories/{slug}';
         $siteSettings->template = 'stories/_story';
         $section->setSiteSettings([1 => $siteSettings]);
-        
+
         Craft::$app->sections->saveSection($section);
 
         $groupModel = new \craft\models\FieldGroup();
@@ -221,7 +221,7 @@ class ToolsController extends Controller
         ];
         Craft::$app->fields->saveField($multiSelectField);
 
-        $heroImagePosition = new \craft\fields\Position();
+        $heroImagePosition = new \craft\fields\PositionSelect();
         $heroImagePosition->groupId = $groupModel->id;
         $heroImagePosition->name = 'Hero Image Position';
         $heroImagePosition->handle = 'heroImagePosition';
