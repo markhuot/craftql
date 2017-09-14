@@ -88,6 +88,9 @@
         background: #fafafa;
         border-right: 0;
       }
+      .CodeMirror-hints {
+        z-index: 100;
+      }
     </style>
 
     <div id="graphiql">Loading...</div>
@@ -170,7 +173,6 @@
           body: JSON.stringify(graphQLParams),
           credentials: 'include',
         }).then(function (response) {
-          console.log('response', response);
           return response.text();
         }).then(function (responseBody) {
           try {
@@ -188,13 +190,13 @@
       ReactDOM.render(
         React.createElement(GraphiQL, {
           fetcher: graphQLFetcher,
-          schema: undefined,
-          query: parameters.query,
-          variables: parameters.variables,
-          operationName: parameters.operationName,
-          onEditQuery: onEditQuery,
-          onEditVariables: onEditVariables,
-          onEditOperationName: onEditOperationName
+          // schema: undefined,
+          // query: parameters.query,
+          // variables: parameters.variables,
+          // operationName: parameters.operationName,
+          // onEditQuery: onEditQuery,
+          // onEditVariables: onEditVariables,
+          // onEditOperationName: onEditOperationName
         }),
         document.getElementById('graphiql')
       );
