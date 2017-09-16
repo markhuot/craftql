@@ -48,13 +48,11 @@ class FieldService {
         'resolve' => function ($root, $args, $context, $info) use ($handle, $required) {
           $format = 'U';
 
-          if (!empty($info->fieldNodes)) {
-            if (!empty($info->fieldNodes[0]->directives)) {
-              $directive = $info->fieldNodes[0]->directives[0];
-              if ($directive->arguments) {
-                foreach ($directive->arguments as $arg) {
-                  $format = $arg->value->value;
-                }
+          if (isset($info->fieldNodes[0]->directives[0])) {
+            $directive = $info->fieldNodes[0]->directives[0];
+            if ($directive->arguments) {
+              foreach ($directive->arguments as $arg) {
+                $format = $arg->value->value;
               }
             }
           }

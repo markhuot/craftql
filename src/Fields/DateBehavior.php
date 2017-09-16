@@ -8,10 +8,10 @@ use yii\base\Behavior;
 
 class DateBehavior extends Behavior
 {
-    
+
     public function getGraphQLMutationArgs() {
         $field = $this->owner;
-        
+
         return [
             $field->handle => ['type' => Type::int()]
         ];
