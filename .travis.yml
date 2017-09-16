@@ -4,14 +4,14 @@ php:
 services:
   - mysql
 env:
-  - CRAFT_DB_USER="root" CRAFT_DB_PASSWORD="" CRAFT_DB_DATABASE="craftql"
+  - CRAFT_ENVIRONMENT="dev" CRAFT_SECURITY_KEY="12345" CRAFT_DB_DRIVER="mysql" CRAFT_DB_SERVER="localhost" CRAFT_DB_USER="root" CRAFT_DB_PASSWORD="" CRAFT_DB_DATABASE="craftql"
 cache:
   directories:
-    - /home/travis/build/vendor_cache
+    # - /home/travis/build/vendor_cache
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS craftql;'
   - composer create-project craftcms/craft /home/travis/build/craftcms/craft
-  - mv /home/travis/build/vendor_cache /home/travis/build/craftcms/craft/vendor 2>/dev/null
+  # - mv /home/travis/build/vendor_cache /home/travis/build/craftcms/craft/vendor 2>/dev/null
 install:
   - cd /home/travis/build/craftcms/craft
   - composer config repositories.craftql path /home/travis/build/markhuot/craftql
@@ -21,7 +21,7 @@ install:
   - ./craft install/plugin craftql
   - ./craft craftql/tools/seed
 script:
-  - vendor/bin/phpunit --bootstrap vendor/markhuot/craftql/bootstrap.php vendor/markhuot/craftql/tests/
-before_cache:
-  - mv /home/travis/build/craftcms/craft/vendor /home/travis/build/vendor_cache
-  - rm -rf /home/travis/build/vendor_cache/markhuot
+  - vendor/bin/phpunit --bootstrap vendor/craftcms/cms/bootstrap/console.php vendor/markhuot/craftql/tests/
+# before_cache:
+#   - mv /home/travis/build/craftcms/craft/vendor /home/travis/build/vendor_cache
+#   - rm -rf /home/travis/build/vendor_cache/markhuot

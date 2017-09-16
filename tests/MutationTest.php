@@ -41,11 +41,12 @@ final class MutationTest extends TestCase
 
     public function testDateMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Date Test", releaseDate:'.date('U', strtotime('2017-02-04 03:12:18')).') { id, releaseDate @date(as:"Y-m-d H:i:s") } }';
+        $input = 'mutation { story: upsertStories(title:"Date Test", releaseDate:'.date('U', strtotime('2017-02-04 03:12:18')).') { id, releaseDateTimestamp: releaseDate, releaseDateFormatted: releaseDate @date(as:"Y-m-d H:i:s") } }';
 
         $result = $this->execute($input);
 
-        $this->assertEquals('2017-02-04 03:12:18', @$result['data']['story']['releaseDate']);
+        $this->assertEquals(date('U', strtotime('2017-02-04 03:12:18')), @$result['data']['story']['releaseDateTimestamp']);
+        $this->assertEquals('2017-02-04 03:12:18', @$result['data']['story']['releaseDateFormatted']);
     }
 
     public function testLightswitchMutation(): void
@@ -98,7 +99,7 @@ final class MutationTest extends TestCase
 
     public function testPositionSelectMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Position Select Test", heroImagePosition:left) { id, heroImagePosition } }';
+        $input = 'mutation { story: upsertStories(title:"Position Select Test", heroImagePosition:right) { id, heroImagePosition } }';
 
         $result = $this->execute($input);
 
@@ -107,10 +108,10 @@ final class MutationTest extends TestCase
 
     public function testPositionSelectFailureMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Position Select Test", heroImagePosition:right) { id, heroImagePosition } }';
+        $input = 'mutation { story: upsertStories(title:"FOOPosition Select Failure Test", heroImagePosition:left) { id, heroImagePosition } }';
 
         $result = $this->execute($input);
 
-        $this->assertEquals('right', @$result['data']['story']['heroImagePosition']);
+        $this->assertEquals("Argument \"heroImagePosition\" has invalid value left.\nExpected type \"HeroImagePositionEnum\", found left.", @$result['errors'][0]['message']);
     }
 }

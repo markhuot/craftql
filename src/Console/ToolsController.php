@@ -228,7 +228,7 @@ class ToolsController extends Controller
         $heroImagePosition->required = false;
         $heroImagePosition->sortOrder = 0;
         $heroImagePosition->options = [
-            'left',
+            'right',
             'drop-right',
         ];
         Craft::$app->fields->saveField($heroImagePosition);
@@ -245,6 +245,9 @@ class ToolsController extends Controller
             $lightswitchField,
             $checkboxesField,
             $dropdownField,
+            $entriesField,
+            $multiSelectField,
+            $heroImagePosition,
         ]);
 
         if (!empty($section->getEntryTypes())) {
