@@ -199,7 +199,7 @@ class ToolsController extends Controller
         ];
         Craft::$app->fields->saveField($dropdownField);
 
-        $entriesField = new \craft\fields\Dropdown();
+        $entriesField = new \craft\fields\Entries();
         $entriesField->groupId = $groupModel->id;
         $entriesField->name = 'Related Entry';
         $entriesField->handle = 'relatedEntry';
