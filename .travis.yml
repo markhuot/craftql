@@ -16,7 +16,7 @@ install:
   - cd /home/travis/build/craftcms/craft
   - composer config repositories.craftql path /home/travis/build/markhuot/craftql
   - composer config minimum-stability dev
-  - composer require craftcms/cms:dev-develop markhuot/craftql:dev-master phpunit/phpunit
+  - composer require markhuot/craftql:dev-master phpunit/phpunit
   - ./craft install --email=foo@example.com --username=admin --password=foobar --siteName="Test Site" --siteUrl="http://localhost" --language=en
   - ./craft install/plugin craftql
   - ./craft craftql/tools/seed
