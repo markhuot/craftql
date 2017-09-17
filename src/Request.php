@@ -50,7 +50,7 @@ class Request {
     function tagGroup($id) {
         return $this->tagGroups->get($id);
     }
- 
+
     function tagGroups(): \markhuot\CraftQL\Factories\TagGroup {
         return $this->tagGroups;
     }
@@ -87,7 +87,17 @@ class Request {
             $args['typeId'] = $args['type'];
             unset($args['type']);
         }
-        
+
+        if (!empty($args['relatedTo'])) {
+            $criteria->relatedTo(array_merge(['and'], $args['relatedTo']));
+            unset($args['relatedTo']);
+        }
+
+        if (!empty($args['orRelatedTo'])) {
+            $criteria->relatedTo(array_merge(['or'], $args['orRelatedTo']));
+            unset($args['orRelatedTo']);
+        }
+
         foreach ($args as $key => $value) {
             $criteria = $criteria->{$key}($value);
         }

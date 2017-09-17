@@ -71,7 +71,7 @@ query fetchNews {
 }
 ```
 
-To modify content make sure your token has write access and then use the top level `upsert{EntryType}` `Mutation`. `upsert{EntryType}` takes arguments for each field defined in Craft. 
+To modify content make sure your token has write access and then use the top level `upsert{EntryType}` `Mutation`. `upsert{EntryType}` takes arguments for each field defined in Craft.
 
 ```graphql
 mutation createNewEntry($title:String, $body:String) {
@@ -112,6 +112,57 @@ Dates can be converted to a human friendly format with the `@date` directive,
 {
   entries {
     dateCreated @date(as:"F j, Y") # outputs August 21, 2017
+  }
+}
+```
+
+## Relationships
+
+Related entries can be fetched in several ways, depending on your needs.
+
+Similar to `craft.entries.relatedTo(entry)` you can use the `relatedTo` argument on the `entries` top level query field. For example, if you have a `Post` with an ID of `63` that is related to comments you could use the following.
+
+```graphql
+{
+  entries(relatedTo:[{element:63}], section:comments) {
+    ...on Comments {
+      id
+      author {
+        name
+      }
+      commentText
+    }
+  }
+}
+```
+
+Note, the `relatedTo:` argument accepts an array of relations. By default `relatedTo:` looks for elements matching _all_ relations. If you would like to switch to elements relating to _any_ relation you can use `orRelatedTo:`.
+
+The above approach, typically, requires separate requests for the source content and the related content. That equates to extra HTTP requests and added latency. If you're using the "connection" approach to CraftQL you can fetch relationships in a single request using the `relatedTo` field of the `EntryEdge` type. The same request could be rewritten as follows to grab both the post and the comments in a single request.
+
+```graphql
+{
+  entriesConnection(id:63) {
+    edges {
+      node {
+        ...on Post {
+          title
+          body
+        }
+      }
+      relatedTo(section:comments) {
+        edges {
+          node {
+            ...on Comment {
+              author {
+                name
+              }
+              commentText
+            }
+          }
+        }
+      }
+    }
   }
 }
 ```

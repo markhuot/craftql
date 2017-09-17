@@ -3,6 +3,7 @@
 namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
@@ -11,6 +12,7 @@ class Entry {
 
     static $interface;
     static $baseFields;
+    static $relatedToObject;
 
     static function baseInputArgs() {
         return [
@@ -18,6 +20,23 @@ class Entry {
             'authorId' => ['type' => Type::int()],
             'title' => ['type' => Type::string()],
         ];
+    }
+
+    static function relatedToObject() {
+        if (static::$relatedToObject) {
+            return static::$relatedToObject;
+        }
+
+        return static::$relatedToObject = new InputObjectType([
+            'name' => 'RelatedTo',
+            'fields' => [
+                'element' => Type::id(),
+                'sourceElement' => Type::id(),
+                'targetElement' => Type::id(),
+                'field' => Type::string(),
+                'sourceLocale' => Type::string(),
+            ],
+        ]);
     }
 
     static function args($request) {
@@ -45,7 +64,8 @@ class Entry {
             'positionedBefore' => Type::id(),
             'postDate' => Type::string(),
             'prevSiblingOf' => Type::id(),
-            'relatedTo' => Type::id(),
+            'relatedTo' => Type::listOf(static::relatedToObject()),
+            'orRelatedTo' => Type::listOf(static::relatedToObject()),
             'search' => Type::string(),
             'section' => Type::listOf($request->sections()->enum()),
             'siblingOf' => Type::int(),
@@ -75,7 +95,7 @@ class Entry {
         if ($request->token()->can('query:entry.author')) {
             $fields['author'] = ['type' => Type::nonNull(\markhuot\CraftQL\Types\User::type($request))];
         }
-        
+
         $fields['title'] = ['type' => Type::nonNull(Type::string())];
         $fields['slug'] = ['type' => Type::nonNull(Type::string())];
         $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateCreated'));

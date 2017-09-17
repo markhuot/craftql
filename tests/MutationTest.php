@@ -11,22 +11,33 @@ use markhuot\CraftQL\Services\GraphQLService;
  */
 final class MutationTest extends TestCase
 {
-    public function setUp(): void
+    static $service;
+    static $schema;
+
+    public static function setUpBeforeClass(): void
     {
-        $this->token = Token::admin();
-        $this->service = new GraphQLService(
+        self::$service = new GraphQLService(
             new \markhuot\CraftQL\Repositories\Volumes,
             new \markhuot\CraftQL\Repositories\CategoryGroup,
             new \markhuot\CraftQL\Repositories\TagGroup,
             new \markhuot\CraftQL\Repositories\EntryType,
             new \markhuot\CraftQL\Repositories\Section
         );
-        $this->service->bootstrap();
+        self::$service->bootstrap();
+        self::$schema = self::$service->getSchema(Token::admin());
     }
 
     protected function execute($input, $variables=[]) {
-        $schema = $this->service->getSchema($this->token);
-        return $this->service->execute($schema, $input, $variables);
+        return self::$service->execute(self::$schema, $input, $variables);
+    }
+
+    public function testSimpleQuery(): void
+    {
+        $input = '{ helloWorld }';
+
+        $result = $this->execute($input);
+
+        $this->assertEquals('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.', @$result['data']['helloWorld']);
     }
 
     public function testRichTextMutation(): void
@@ -85,7 +96,16 @@ final class MutationTest extends TestCase
 
         $input = 'mutation { story: upsertStories(title:"Entries Test Two", relatedEntry:['.$firstId.']) { id, relatedEntry { id } } }';
         $second = $this->execute($input);
+        $secondId = @$second['data']['story']['id'];
         $this->assertEquals($firstId, @$second['data']['story']['relatedEntry'][0]['id']);
+
+        $input = 'query { entry(relatedTo:[{element:'.$firstId.'}]) { id } }';
+        $third = $this->execute($input);
+        $this->assertEquals($secondId, @$third['data']['entry']['id']);
+
+        $input = 'query { entriesConnection(id:'.$firstId.') { edges { relatedTo { entries { id } } } } }';
+        $fourth = $this->execute($input);
+        $this->assertEquals($secondId, @$fourth['data']['entriesConnection']['edges'][0]['relatedTo']['entries'][0]['id']);
     }
 
     public function testMultiSelectMutation(): void

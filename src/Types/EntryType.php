@@ -66,6 +66,10 @@ class EntryType extends ObjectType {
         return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getArgs($this->config['craftType']->fieldLayoutId, $request));
     }
 
+    function handle() {
+        return $this->config['craftType']->handle;
+    }
+
     function upsert($request) {
         return function ($root, $args) {
             if (!empty($args['id'])) {
@@ -105,7 +109,7 @@ class EntryType extends ObjectType {
             $entry->setFieldValues($fields);
 
             Craft::$app->elements->saveElement($entry);
-            
+
             return $entry;
         };
     }

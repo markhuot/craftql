@@ -21,7 +21,7 @@ install:
   - ./craft install/plugin craftql
   - ./craft craftql/tools/seed
 script:
-  - vendor/bin/phpunit --bootstrap vendor/craftcms/cms/bootstrap/console.php vendor/markhuot/craftql/tests/
+  - vendor/bin/phpunit --bootstrap vendor/craftcms/cms/bootstrap/web.php vendor/markhuot/craftql/tests/
 # before_cache:
 #   - mv /home/travis/build/craftcms/craft/vendor /home/travis/build/vendor_cache
 #   - rm -rf /home/travis/build/vendor_cache/markhuot

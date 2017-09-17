@@ -26,22 +26,4 @@ final class InstallTest extends TestCase
         $this->assertNotNull(Craft::$app->plugins->getPlugin('craftql'));
     }
 
-    public function testSimpleQuery(): void
-    {
-        $input = '{ helloWorld }';
-        
-        $token = Token::admin();
-        $service = new GraphQLService(
-            new \markhuot\CraftQL\Repositories\Volumes,
-            new \markhuot\CraftQL\Repositories\CategoryGroup,
-            new \markhuot\CraftQL\Repositories\TagGroup,
-            new \markhuot\CraftQL\Repositories\EntryType,
-            new \markhuot\CraftQL\Repositories\Section
-        );
-        $service->bootstrap();
-        $schema = $service->getSchema($token);
-        $result = $service->execute($schema, $input, []);
-        $this->assertEquals('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.', @$result['data']['helloWorld']);
-    }
-
 }

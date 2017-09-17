@@ -29,6 +29,9 @@ class EntryConnection extends ObjectType {
                         ];
                     }, $root['edges']);
                 }],
+                'entries' => ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)), 'resolve' => function ($root, $args) {
+                    return $root['edges'];
+                }],
             ],
         ]);
     }

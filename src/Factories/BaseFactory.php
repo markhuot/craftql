@@ -37,7 +37,7 @@ abstract class BaseFactory {
 
     function all($mode='query') {
         $objects = [];
-        
+
         foreach ($this->repository->all() as $raw) {
             if ($object = $this->get($raw->id, $mode)) {
                 $objects[] = $object;

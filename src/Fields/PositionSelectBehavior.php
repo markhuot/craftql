@@ -23,7 +23,7 @@ class PositionSelectBehavior extends Behavior
         if (in_array('full', $field->options)) { $values['full'] = 'full'; }
         if (in_array('drop-left', $field->options)) { $values['dropleft'] = 'drop-left'; }
         if (in_array('drop-right', $field->options)) { $values['dropright'] = 'drop-right'; }
-        
+
         return static::$enums[$field->handle] = new EnumType([
             'name' => ucfirst($field->handle).'Enum',
             'values' => $values,

@@ -29,7 +29,7 @@ class Query extends ObjectType {
             if (!empty($request->entryTypes()->all())) {
                 $config['fields']['entries'] = [
                     'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)),
-                    'description' => 'An array of entries from Craft',
+                    'description' => 'A list of entries from Craft',
                     'args' => \markhuot\CraftQL\Types\Entry::args($request),
                     'resolve' => function ($root, $args, $context, $info) use ($request) {
                         return $request->entries(\craft\elements\Entry::find(), $args, $info)->all();
@@ -48,6 +48,8 @@ class Query extends ObjectType {
                             'totalCount' => $pageInfo->total,
                             'pageInfo' => $pageInfo,
                             'edges' => $entries,
+                            'criteria' => $criteria,
+                            'args' => $args,
                         ];
                     }
                 ];
