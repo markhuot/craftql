@@ -184,8 +184,9 @@ No software is ever done. There's a lot still to do in order to make _CraftQL_ f
 - [x] Asset mutations (implemented by passing a URL or asset id)
 - [ ] File uploads to assets via POST $_FILES during a mutation
 - [x] Automated testing is not functional yet
-- [ ] Automated testing doesn't actually _test_ anything yet
+- [x] Automated testing doesn't actually _test_ anything yet
 - [x] Mutations need a lot more testing
+- [x] `relatedTo:` improvements to take source/target
 - [ ] [Persisted queries](https://github.com/markhuot/craftql/issues/10)
 
 ## Requirements
