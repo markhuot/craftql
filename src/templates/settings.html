@@ -11,33 +11,35 @@
 
 {% set welcome %}
 _CraftQL_ exposes the configuration of this Craft website to a [GraphQL](http://graphql.org) API. Without any additional configuration all your sections, assets, categories, and tags can be queried using the native GraphQL syntax.
-    
+
 For example, if you had a section named `news` you could ask _CraftQL_ for five recent entries while limiting the response to only the uri, title, and body fields. _CraftQL_ would then respond with a JSON structure matching the query structure, populated with only the requested data.
 
 <div style="background: whiteSmoke; overflow: hidden;">
 <div style="float:left; width: 40%; padding: 15px; box-sizing: border-box;">
 <p><strong>Query</strong></p>
 <pre><code>{
-    news(limit:5) {
-        uri
-        title
-        body
+  entries(limit:5) {
+    ...on News {
+      uri
+      title
+      body
     }
+  }
 }</code></pre>
 </div>
 <div style="float:left; width: 50%; border-left: 1px solid #fff; padding: 15px; box-sizing: border-box;">
 <p><strong>Response</strong></p>
 <pre><code class="json">{
-    "data": {
-        "news": [
-            {
-                "uri": "news/a-news-article",
-                "title": "A News Article",
-                "body": "&lt;p>This is the body&hellip;&lt;/p>"
-            },
-            // ...
-        ]
-    }
+  "data": {
+    "entries": [
+      {
+        "uri": "news/a-news-article",
+        "title": "A News Article",
+        "body": "&lt;p>This is the body&hellip;&lt;/p>"
+      },
+      // ...
+    ]
+  }
 }</code></pre>
 </div>
 </div>
@@ -64,7 +66,7 @@ You can access your GraphQL endpoint in two ways,
 
 <div class="" style="width: 70%">
     <h2>URI</h2>
-    
+
     {{ forms.textField({
         first: true,
         name: 'uri',
