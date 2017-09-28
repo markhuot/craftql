@@ -65,6 +65,7 @@ class Plugin extends BasePlugin
             UrlManager::className(),
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
             function (RegisterUrlRulesEvent $event) use ($uri, $verbs) {
+                $event->rules["OPTIONS {$uri}"] = 'craftql/api/index';
                 foreach ($verbs as $verb) {
                     $event->rules["{$verb} {$uri}"] = 'craftql/api/index';
                 }

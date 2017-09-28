@@ -9,6 +9,7 @@ class Settings extends Model
 {
     public $uri = 'api';
     public $verbs = ['POST'];
+    public $allowedOrigins = [];
     public $headers = [];
 
     function rules()

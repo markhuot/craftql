@@ -5,7 +5,7 @@ namespace markhuot\CraftQL\Controllers;
 use Craft;
 use craft\web\Controller;
 use craft\records\User;
-use markhuot\CraftQL\Plugin;
+use markhuot\CraftQL\Plugin as CraftQL;
 use markhuot\CraftQL\Models\Token;
 use yii\web\ForbiddenHttpException;
 
@@ -18,7 +18,7 @@ class ApiController extends Controller
 
     function __construct(
         $id,
-        $module, 
+        $module,
         \markhuot\CraftQL\Services\GraphQLService $graphQl,
         \markhuot\CraftQL\Services\RequestService $request,
         $config = []
@@ -58,13 +58,28 @@ class ApiController extends Controller
 
         // @todo, check user permissions when PRO license
 
+        $response = \Craft::$app->getResponse();
+        if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
+            $origin = \Craft::$app->getRequest()->headers->get('Origin');
+            if (in_array($origin, $allowedOrigins)) {
+                $response->headers->add('Access-Control-Allow-Origin', $origin);
+            }
+            $response->headers->add('Access-Control-Allow-Credentials', 'true');
+            $response->headers->add('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+        }
+        $response->headers->add('Allow', implode(', ', CraftQL::getInstance()->getSettings()->verbs));
+
         if (!$token) {
             http_response_code(403);
-            $this->asJson([
+            return $this->asJson([
                 'errors' => [
                     ['message' => 'Not authorized']
                 ]
             ]);
+        }
+
+        if (\Craft::$app->getRequest()->isOptions) {
+            return '';
         }
 
         Craft::trace('CraftQL: Bootstrapping');
@@ -108,12 +123,12 @@ class ApiController extends Controller
         if ($this->request->isDebugging() || false) {
             $response = \Yii::$app->getResponse();
             $response->format = \craft\web\Response::FORMAT_HTML;
-    
+
             $oldMode = \Craft::$app->getView()->getTemplateMode();
             \Craft::$app->getView()->setTemplateMode(\craft\web\View::TEMPLATE_MODE_CP);
             $response->data = $this->getView()->renderPageTemplate('craftql/debug-response', ['json' => json_encode($result)]);
             \Craft::$app->getView()->setTemplateMode($oldMode);
-    
+
             return $response;
         }
 

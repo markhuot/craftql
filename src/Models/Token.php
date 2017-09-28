@@ -59,7 +59,7 @@ class Token extends ActiveRecord
     function getScopeArray(): array
     {
         return json_decode($this->scopes ?: '[]', true);
-    } 
+    }
 
     function can($do): bool {
         return $this->admin || @$this->scopeArray[$do] ?: false;
