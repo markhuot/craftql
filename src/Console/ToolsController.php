@@ -13,6 +13,7 @@ use yii\console\Controller;
 use yii;
 use markhuot\CraftQL\Services\GraphQLService;
 use markhuot\CraftQL\Models\Token;
+use markhuot\CraftQL\Plugin as CraftQL;
 
 class ToolsController extends Controller
 {
@@ -69,11 +70,28 @@ class ToolsController extends Controller
 
                     // @todo, check user permissions when PRO license
 
+                    $headers = [
+                        'Content-Type' => 'application/json; charset=UTF-8',
+                    ];
+                    if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
+                        if (is_string($allowedOrigins)) {
+                            $allowedOrigins = [$allowedOrigins];
+                        }
+                        $origin = $request->getHeaderLine('Origin');
+                        if (in_array($origin, $allowedOrigins) || in_array('*', $allowedOrigins)) {
+                            $headers['Access-Control-Allow-Origin'] = $origin;
+                        }
+                        $headers['Access-Control-Allow-Credentials'] = 'true';
+                        $headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type';
+                    }
+                    $headers['Allow'] = implode(', ', CraftQL::getInstance()->getSettings()->verbs);
+
+                    if ($request->getMethod() == 'OPTIONS') {
+                        return $resolve(new Response(200, $headers, ''));
+                    }
+
                     if (!$token) {
-                        $response = new Response(403, [
-                                'Content-Type' => 'application/json; charset=UTF-8',
-                                'Access-Control-Allow-Origin' => '*',
-                            ],
+                        $response = new Response(403, $headers,
                             json_encode([
                                 'errors' => [
                                     ['message' => 'Not authorized']
@@ -101,13 +119,7 @@ class ToolsController extends Controller
                         ];
                     }
 
-                    $response = new Response(200, [
-                            'Content-Type' => 'application/json; charset=UTF-8',
-                            'Access-Control-Allow-Origin' => '*',
-                        ],
-                        json_encode($result)
-                    );
-                    $resolve($response);
+                    $resolve(new Response(200, $headers, json_encode($result)));
                 });
             });
         });

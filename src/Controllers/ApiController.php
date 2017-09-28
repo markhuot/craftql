@@ -60,14 +60,21 @@ class ApiController extends Controller
 
         $response = \Craft::$app->getResponse();
         if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
+            if (is_string($allowedOrigins)) {
+                $allowedOrigins = [$allowedOrigins];
+            }
             $origin = \Craft::$app->getRequest()->headers->get('Origin');
-            if (in_array($origin, $allowedOrigins)) {
+            if (in_array($origin, $allowedOrigins) || in_array('*', $allowedOrigins)) {
                 $response->headers->add('Access-Control-Allow-Origin', $origin);
             }
             $response->headers->add('Access-Control-Allow-Credentials', 'true');
             $response->headers->add('Access-Control-Allow-Headers', 'Authorization, Content-Type');
         }
         $response->headers->add('Allow', implode(', ', CraftQL::getInstance()->getSettings()->verbs));
+
+        if (\Craft::$app->getRequest()->isOptions) {
+            return '';
+        }
 
         if (!$token) {
             http_response_code(403);
@@ -76,10 +83,6 @@ class ApiController extends Controller
                     ['message' => 'Not authorized']
                 ]
             ]);
-        }
-
-        if (\Craft::$app->getRequest()->isOptions) {
-            return '';
         }
 
         Craft::trace('CraftQL: Bootstrapping');
