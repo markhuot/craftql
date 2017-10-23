@@ -4,7 +4,7 @@ php:
 services:
   - mysql
 env:
-  - CRAFT_ENVIRONMENT="dev" CRAFT_SECURITY_KEY="12345" CRAFT_DB_DRIVER="mysql" CRAFT_DB_SERVER="localhost" CRAFT_DB_USER="root" CRAFT_DB_PASSWORD="" CRAFT_DB_DATABASE="craftql"
+  - ENVIRONMENT="dev" SECURITY_KEY="12345" DB_DRIVER="mysql" DB_SERVER="localhost" DB_USER="root" DB_PASSWORD="" DB_DATABASE="craftql"
 cache:
   directories:
     # - /home/travis/build/vendor_cache
