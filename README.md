@@ -167,6 +167,39 @@ The above approach, typically, requires separate requests for the source content
 }
 ```
 
+## Drafts
+
+Drafts are best fetched through an edge node on the `entriesConnection` query. You can get all drafts for an entry with the following query,
+
+```graphql
+{
+  entriesConnection(id:63) {
+    edges {
+      node { # the published node, as `craft.entries` would return
+        id
+        title
+      }
+      drafts { # an array of drafts
+        edges {
+          node { # the draft content
+            id
+            title
+            ...on Post { # draft fields are still referenced by entry type, as usual
+              body
+            }
+          }
+          draftInfo { # the `draftInfo` field returns the meta data about the draft
+            draftId
+            name
+            notes
+          }
+        }
+      }
+    }
+  }
+}
+```
+
 ## Security
 
 CraftQL supports GraphQl field level permissions. By default a token will have no rights. You must click into the "Scopes" section to adjust what each token can do.
