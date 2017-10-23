@@ -22,20 +22,28 @@ class EntryType extends ObjectType {
         $config = [
             'name' => static::getName($craftEntryType),
             'fields' => function () use ($craftEntryType, $request) {
-                $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-                $baseFields = \markhuot\CraftQL\Types\Entry::baseFields($request);
-                $entryTypeFields = $fieldService->getFields($craftEntryType->fieldLayoutId, $request);
-                return array_merge($baseFields, $entryTypeFields);
+                return $this->fields($craftEntryType, $request);
             },
-            'interfaces' => [
-                \markhuot\CraftQL\Types\Entry::interface($request),
-                \markhuot\CraftQL\Types\Element::interface(),
-            ],
+            'interfaces' => $this->interfaces($request),
             'craftType' => $craftEntryType,
             'id' => $craftEntryType->id,
         ];
 
         parent::__construct($config);
+    }
+
+    function fields($craftEntryType, $request) {
+        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $baseFields = \markhuot\CraftQL\Types\Entry::baseFields($request);
+        $entryTypeFields = $fieldService->getFields($craftEntryType->fieldLayoutId, $request);
+        return array_merge($baseFields, $entryTypeFields);
+    }
+
+    function interfaces($request) {
+        return [
+            \markhuot\CraftQL\Types\Entry::interface($request),
+            \markhuot\CraftQL\Types\Element::interface(),
+        ];
     }
 
     static function getName($entryType) {

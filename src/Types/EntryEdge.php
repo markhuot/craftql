@@ -54,6 +54,23 @@ class EntryEdge extends ObjectType {
                         ];
                     },
                 ];
+                $fields['drafts'] = [
+                    'type' => \markhuot\CraftQL\Types\EntryDraftConnection::type($request),
+                    'resolve' => function ($root, $args, $context, $info) use ($request) {
+                        $drafts = \Craft::$app->entryRevisions->getDraftsByEntryId($root['node']->id);
+
+                        return [
+                            'totalCount' => count($drafts),
+                            'pageInfo' => [
+                                'currentPage' => 1,
+                                'totalPages' => 1,
+                                'first' => 1,
+                                'last' => 1,
+                            ],
+                            'edges' => $drafts,
+                        ];
+                    },
+                ];
 
                 // @optional could expose each entry type next to the generic node
                 // foreach ($request->entryTypes()->all() as $entryType) {

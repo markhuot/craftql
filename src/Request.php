@@ -6,6 +6,7 @@ class Request {
 
     private $token;
     private $entryTypes;
+    private $draftEntryTypes;
     private $volumes;
     private $categoryGroups;
     private $tagGroups;
@@ -25,6 +26,10 @@ class Request {
 
     function addEntryTypes(\markhuot\CraftQL\Factories\EntryType $entryTypes) {
         $this->entryTypes = $entryTypes;
+    }
+
+    function addDraftEntryTypes(\markhuot\CraftQL\Factories\DraftEntryType $draftEntryTypes) {
+        $this->draftEntryTypes = $draftEntryTypes;
     }
 
     function addVolumes(\markhuot\CraftQL\Factories\Volume $volumes) {
@@ -57,6 +62,10 @@ class Request {
 
     function entryTypes(): \markhuot\CraftQL\Factories\EntryType {
         return $this->entryTypes;
+    }
+
+    function draftEntryTypes(): \markhuot\CraftQL\Factories\DraftEntryType {
+        return $this->draftEntryTypes;
     }
 
     function volumes(): \markhuot\CraftQL\Factories\Volume {

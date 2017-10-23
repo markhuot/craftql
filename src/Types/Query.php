@@ -62,6 +62,19 @@ class Query extends ObjectType {
                         return $request->entries(\craft\elements\Entry::find(), $args, $info)->one();
                     },
                 ];
+
+                $config['fields']['drafts'] = [
+                    'type' => Type::listOf(\markhuot\CraftQL\Types\EntryDraft::interface($request)),
+                    'args' => [
+                        'id' => [
+                            'type' => Type::nonNull(Type::int()),
+                            'description' => 'The entry id to query for drafts'
+                        ],
+                    ],
+                    'resolve' => function ($root, $args) {
+                        return \Craft::$app->entryRevisions->getDraftsByEntryId($args['id']);
+                    },
+                ];
             }
         }
 

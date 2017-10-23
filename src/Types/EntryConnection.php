@@ -11,17 +11,23 @@ class EntryConnection extends ObjectType {
 
     static $type;
 
+    static function listsType($request) {
+        return EntryEdge::type($request);
+    }
+
     static function type($request) {
         if (!empty(static::$type)) {
             return static::$type;
         }
 
+        $reflect = new \ReflectionClass(static::class);
+
         return static::$type = new static([
-            'name' => 'EntryConnection',
+            'name' => $reflect->getShortName(),
             'fields' => [
                 'totalCount' => Type::nonNull(Type::int()),
                 'pageInfo' => PageInfo::type($request),
-                'edges' => ['type' => Type::listOf(EntryEdge::type($request)), 'resolve' => function ($root, $args) {
+                'edges' => ['type' => Type::listOf(static::listsType($request)), 'resolve' => function ($root, $args) {
                     return array_map(function ($entry) {
                         return [
                             'cursor' => '',

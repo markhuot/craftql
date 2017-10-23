@@ -52,6 +52,7 @@ class GraphQLService extends Component {
         $request = new \markhuot\CraftQL\Request($token);
         $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
         $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
+        $request->addDraftEntryTypes(new \markhuot\CraftQL\Factories\DraftEntryType($this->entryTypes, $request));
         $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
         $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
@@ -61,6 +62,7 @@ class GraphQLService extends Component {
         $schema['types'] = array_merge(
             $request->volumes()->all(),
             $request->entryTypes()->all(),
+            $request->draftEntryTypes()->all(),
             $request->categoryGroups()->all(),
             $request->sections()->all()
         );

@@ -10,7 +10,7 @@ use GraphQL\Type\Definition\Type;
 
 class Entry {
 
-    static $interface;
+    static $interfaces = [];
     static $baseFields;
     static $relatedToObject;
 
@@ -119,13 +119,20 @@ class Entry {
         return static::$baseFields = $fields;
     }
 
+    static function resolveType($entry) {
+        return \markhuot\CraftQL\Types\EntryType::getName($entry->type);
+    }
+
     static function interface($request) {
-        if (!empty(static::$interface)) {
-            return static::$interface;
+        $reflect = new \ReflectionClass(static::class);
+        $shortName = $reflect->getShortName();
+
+        if (!empty(static::$interfaces[$shortName])) {
+            return static::$interfaces[$shortName];
         }
 
-        return static::$interface = new InterfaceType([
-            'name' => 'EntryInterface',
+        return static::$interfaces[$shortName] = new InterfaceType([
+            'name' => $shortName.'Interface',
             'description' => 'An entry in Craft',
 
             // this has to be a callback because the `user` field references a User type
@@ -138,7 +145,7 @@ class Entry {
             },
 
             'resolveType' => function ($entry) {
-                return \markhuot\CraftQL\Types\EntryType::getName($entry->type);
+                return static::resolveType($entry);
             }
         ]);
     }

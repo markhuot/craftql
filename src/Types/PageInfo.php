@@ -9,8 +9,14 @@ use GraphQL\Type\Definition\Type;
 
 class PageInfo extends ObjectType {
 
+    static $type;
+
     static function type($request) {
-        return new static([
+        if (static::$type) {
+            return static::$type;
+        }
+
+        return static::$type = new static([
             'name' => 'PageInfo',
             'fields' => [
                 'hasPreviousPage' => ['type' => Type::nonNull(Type::boolean()), 'resolve' => function ($root, $args) {
