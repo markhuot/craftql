@@ -53,7 +53,7 @@ class EntryType extends ObjectType {
         return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
     }
 
-    static function type() {
+    static function make() {
         if (!empty(static::$type)) {
             return static::$type;
         }

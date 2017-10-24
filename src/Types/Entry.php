@@ -12,7 +12,7 @@ class Entry {
 
     static $interfaces = [];
     static $baseFields;
-    static $relatedToObject;
+    static $relatedToInputObject;
 
     static function baseInputArgs() {
         return [
@@ -22,12 +22,12 @@ class Entry {
         ];
     }
 
-    static function relatedToObject() {
-        if (static::$relatedToObject) {
-            return static::$relatedToObject;
+    static function relatedToInputObject() {
+        if (static::$relatedToInputObject) {
+            return static::$relatedToInputObject;
         }
 
-        return static::$relatedToObject = new InputObjectType([
+        return static::$relatedToInputObject = new InputObjectType([
             'name' => 'RelatedTo',
             'fields' => [
                 'element' => Type::id(),
@@ -64,8 +64,8 @@ class Entry {
             'positionedBefore' => Type::id(),
             'postDate' => Type::string(),
             'prevSiblingOf' => Type::id(),
-            'relatedTo' => Type::listOf(static::relatedToObject()),
-            'orRelatedTo' => Type::listOf(static::relatedToObject()),
+            'relatedTo' => Type::listOf(static::relatedToInputObject()),
+            'orRelatedTo' => Type::listOf(static::relatedToInputObject()),
             'search' => Type::string(),
             'section' => Type::listOf($request->sections()->enum()),
             'siblingOf' => Type::int(),
@@ -106,7 +106,7 @@ class Entry {
         $fields['uri'] = ['type' => Type::string()];
         $fields['url'] = ['type' => Type::string()];
         $fields['section'] = ['type' => \markhuot\CraftQL\Types\Section::type()];
-        $fields['type'] = ['type' => \markhuot\CraftQL\Types\EntryType::type()];
+        $fields['type'] = ['type' => \markhuot\CraftQL\Types\EntryType::make()];
 
         $fields['ancestors'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];
         $fields['children'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];

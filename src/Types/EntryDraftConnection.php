@@ -11,8 +11,8 @@ class EntryDraftConnection extends EntryConnection {
 
     static $type;
 
-    static function listsType($request) {
-        return EntryDraftEdge::type($request);
+    static function edgesType($request) {
+        return EntryDraftEdge::make($request);
     }
 
 }

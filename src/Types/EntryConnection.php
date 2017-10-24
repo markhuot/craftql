@@ -6,16 +6,17 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Request;
 
 class EntryConnection extends ObjectType {
 
     static $type;
 
-    static function listsType($request) {
-        return EntryEdge::type($request);
+    static function edgesType($request) {
+        return EntryEdge::make($request);
     }
 
-    static function type($request) {
+    static function make(Request $request) {
         if (!empty(static::$type)) {
             return static::$type;
         }
@@ -27,7 +28,7 @@ class EntryConnection extends ObjectType {
             'fields' => [
                 'totalCount' => Type::nonNull(Type::int()),
                 'pageInfo' => PageInfo::type($request),
-                'edges' => ['type' => Type::listOf(static::listsType($request)), 'resolve' => function ($root, $args) {
+                'edges' => ['type' => Type::listOf(static::edgesType($request)), 'resolve' => function ($root, $args) {
                     return array_map(function ($entry) {
                         return [
                             'cursor' => '',

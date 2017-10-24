@@ -37,7 +37,7 @@ class Query extends ObjectType {
                 ];
 
                 $config['fields']['entriesConnection'] = [
-                    'type' => \markhuot\CraftQL\Types\EntryConnection::type($request),
+                    'type' => \markhuot\CraftQL\Types\EntryConnection::make($request),
                     'description' => 'A connection to entries in Craft',
                     'args' => \markhuot\CraftQL\Types\Entry::args($request),
                     'resolve' => function ($root, $args, $context, $info) use ($request) {

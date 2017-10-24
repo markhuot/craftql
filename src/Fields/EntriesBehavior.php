@@ -14,7 +14,7 @@ class EntriesBehavior extends Behavior
 
     public function getGraphQLMutationArgs() {
         $field = $this->owner;
-        
+
         return [
             $field->handle => ['type' => Type::listOf(Type::int())]
         ];
@@ -80,7 +80,7 @@ class EntriesBehavior extends Behavior
                 },
             ],
             "{$field->handle}Connection" => [
-                'type' => \markhuot\CraftQL\Types\EntryConnection::type($request),
+                'type' => \markhuot\CraftQL\Types\EntryConnection::make($request),
                 'description' => $field->instructions,
                 'args' => \markhuot\CraftQL\Types\Entry::args($request),
                 'resolve' => function ($root, $args, $context, $info) use ($request, $field) {
