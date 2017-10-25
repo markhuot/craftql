@@ -93,6 +93,32 @@ The above would be passed with variables such as,
   "body": "<p>Here's the body of my first mutation</p>",
 }
 ```
+## Matrix Fields
+Working with Matrix Fields are similar to working with Entry Types: if you have a Matrix Field named `pagebuilder`, the containing Block Types are named `PageBuilder` + the block name. For instance `PageBuilderText` or `PageBuilderImage`. You can use the key `__typename` from the resulting response to map over the blocks and display the appropriate component.
+
+```graphql
+{
+  entries(section: [pages]) {
+    ... on Pages {
+      id
+      title
+      url
+      uri
+      pageBuilder {                  # Your Matrix Field
+        ... on PageBuilderText {     # Block Type
+          sectionTitle               # Fields on Block Type
+          text
+        }
+        ... on PageBuilderImage {    # Block Type
+          image {
+            id
+          }
+        }
+      }
+    }
+  }
+}
+```
 
 ## Dates
 
