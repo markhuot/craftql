@@ -98,20 +98,19 @@ Working with Matrix Fields are similar to working with Entry Types: if you have 
 
 ```graphql
 {
-  entries(section: [pages]) {
-    ... on Pages {
+  entries(section: [news]) {
+    ... on News {
       id
       title
-      url
-      uri
-      pageBuilder {                  # Your Matrix Field
-        ... on PageBuilderText {     # Block Type
-          sectionTitle               # Fields on Block Type
-          text
+      body {                  # Your Matrix Field
+        ... on BodyText {     # Block Type
+          blockHeading        # Fields on Block Type, uses field handle
+          blockContent        # Fields on Block Type, uses field handle
         }
-        ... on PageBuilderImage {    # Block Type
-          image {
-            id
+        ... on BodyImage {    # Block Type
+          blockDescription    # Fields on Block Type, uses field handle
+          image {             # Fields on Block Type, uses field handle
+            id                # Fields on image field on Block Type, uses field handles
           }
         }
       }
