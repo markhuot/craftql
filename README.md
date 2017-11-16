@@ -94,7 +94,7 @@ The above would be passed with variables such as,
 }
 ```
 ## Matrix Fields
-Working with Matrix Fields are similar to working with Entry Types: if you have a Matrix Field named `pagebuilder`, the containing Block Types are named `PageBuilder` + the block name. For instance `PageBuilderText` or `PageBuilderImage`. You can use the key `__typename` from the resulting response to map over the blocks and display the appropriate component.
+Working with Matrix Fields are similar to working with Entry Types: if you have a Matrix Field with a handle of `body`, the containing Block Types are named `Body` + the block handle. For instance `BodyText` or `BodyImage`. You can use the key `__typename` from the resulting response to map over the blocks and display the appropriate component.
 
 ```graphql
 {
@@ -104,10 +104,12 @@ Working with Matrix Fields are similar to working with Entry Types: if you have 
       title
       body {                  # Your Matrix Field
         ... on BodyText {     # Block Type
+          __typename          # Ensures the response has a field describing the type of block
           blockHeading        # Fields on Block Type, uses field handle
           blockContent        # Fields on Block Type, uses field handle
         }
         ... on BodyImage {    # Block Type
+          __typename          # Ensures the response has a field describing the type of block
           blockDescription    # Fields on Block Type, uses field handle
           image {             # Fields on Block Type, uses field handle
             id                # Fields on image field on Block Type, uses field handles
