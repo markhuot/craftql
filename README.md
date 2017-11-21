@@ -93,6 +93,33 @@ The above would be passed with variables such as,
   "body": "<p>Here's the body of my first mutation</p>",
 }
 ```
+## Matrix Fields
+Working with Matrix Fields are similar to working with Entry Types: if you have a Matrix Field with a handle of `body`, the containing Block Types are named `Body` + the block handle. For instance `BodyText` or `BodyImage`. You can use the key `__typename` from the resulting response to map over the blocks and display the appropriate component.
+
+```graphql
+{
+  entries(section: [news]) {
+    ... on News {
+      id
+      title
+      body {                  # Your Matrix Field
+        ... on BodyText {     # Block Type
+          __typename          # Ensures the response has a field describing the type of block
+          blockHeading        # Fields on Block Type, uses field handle
+          blockContent        # Fields on Block Type, uses field handle
+        }
+        ... on BodyImage {    # Block Type
+          __typename          # Ensures the response has a field describing the type of block
+          blockDescription    # Fields on Block Type, uses field handle
+          image {             # Fields on Block Type, uses field handle
+            id                # Fields on image field on Block Type, uses field handles
+          }
+        }
+      }
+    }
+  }
+}
+```
 
 ## Dates
 
