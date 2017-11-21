@@ -217,7 +217,7 @@ You can also specify the exact crop by using the `crop`, `fit`, or `stretch` arg
   entries {
     ...on Post {
       imageFieldHandle {
-        poster: url(crop: {width: 1280, height: 720, position: topLeft, quality: 50, format: 'jpg'})
+        poster: url(crop: {width: 1280, height: 720, position: topLeft, quality: 50, format: jpg})
       }
     }
   }
