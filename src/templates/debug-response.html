@@ -21,12 +21,12 @@
     <body>
         <pre>
 <textarea id="code">
-    
+
 </textarea>
         </pre>
         <script>
             var el = document.getElementById('code');
-            el.innerHTML = JSON.stringify(JSON.parse('{{ json|raw }}'), null, 2);
+            el.innerHTML = JSON.stringify(JSON.parse('{{ json|replace({"\\": "\\\\", "\'": "\\\'"})|raw }}'), null, 2);
             var editor = CodeMirror.fromTextArea(el, {
                 matchBrackets: true,
                 autoCloseBrackets: true,
