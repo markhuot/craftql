@@ -3,13 +3,18 @@
 namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
+use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 
 class Volume extends ObjectType {
 
     static $baseFields;
     static $interface;
+    static $transformEnum;
+    static $cropInputObject;
+    static $positionInputEnum;
 
     function __construct($volume, $token) {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
@@ -25,6 +30,60 @@ class Volume extends ObjectType {
         ]);
     }
 
+    static function getTransformsEnum() {
+        if (!empty(static::$transformEnum)) {
+            return static::$transformEnum;
+        }
+
+        $values = [];
+
+        foreach (\Craft::$app->getAssetTransforms()->getAllTransforms() as $transform) {
+            $values[$transform->handle] = $transform->name;
+        }
+
+        return static::$transformEnum = new EnumType([
+            'name' => 'NamedTransformsEnum',
+            'values' => $values,
+        ]);
+    }
+
+    static function positionInputEnum() {
+        if (!empty(static::$positionInputEnum)) {
+            return static::$positionInputEnum;
+        }
+
+        return static::$positionInputEnum = new EnumType([
+            'name' => 'PositionInputEnum',
+            'values' => [
+                'topLeft' => 'Top Left',
+                'topCenter' => 'Top Center',
+                'topRight' => 'Top Right',
+                'centerLeft' => 'Center Left',
+                'centerCenter' => 'Center Center',
+                'centerRight' => 'Center Right',
+                'bottomLeft' => 'Bottom Left',
+                'bottomCenter' => 'Bottom Center',
+                'bottomRight' => 'Bottom Right',
+            ],
+        ]);
+    }
+
+    static function cropInputObject() {
+        if (!empty(static::$cropInputObject)) {
+            return static::$cropInputObject;
+        }
+
+        return static::$cropInputObject = new InputObjectType([
+            'name' => 'CropInputObject',
+            'fields' => [
+                'width' => ['type' => Type::int()],
+                'height' => ['type' => Type::int()],
+                'quality' => ['type' => Type::int()],
+                'position' => ['type' => static::positionInputEnum()],
+            ],
+        ]);
+    }
+
     static function baseFields() {
         if (!empty(static::$baseFields)) {
             return static::$baseFields;
@@ -33,7 +92,36 @@ class Volume extends ObjectType {
         $fields = [];
         $fields['id'] = ['type' => Type::int()];
         $fields['uri'] = ['type' => Type::string()];
-        $fields['url'] = ['type' => Type::string()];
+        $fields['url'] = [
+            'type' => Type::string(),
+            'args' => [
+                'transform' => static::getTransformsEnum(),
+                'crop' => static::cropInputObject(),
+                'fit' => static::cropInputObject(),
+                'stretch' => static::cropInputObject(),
+            ],
+            'resolve' => function ($root, $args) {
+                if (!empty($args['transform'])) {
+                    $transform = $args['transform'];
+                }
+                else if (!empty($args['crop'])) {
+                    $transform = $args['crop'];
+                    $transform['mode'] = 'crop';
+                }
+                else if (!empty($args['fit'])) {
+                    $transform = $args['fit'];
+                    $transform['mode'] = 'fit';
+                }
+                else if (!empty($args['stretch'])) {
+                    $transform = $args['stretch'];
+                    $transform['mode'] = 'stretch';
+                }
+                else {
+                    $transform = null;
+                }
+                return $root->getUrl($transform);
+            },
+        ];
         $fields['width'] = ['type' => Type::string()];
         $fields['height'] = ['type' => Type::string()];
         $fields['size'] = ['type' => Type::int()];
