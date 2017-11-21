@@ -194,6 +194,36 @@ The above approach, typically, requires separate requests for the source content
 }
 ```
 
+## Transforms
+
+You can ask CraftQL for image transforms by specifying an argument to any asset field. If you have defined named transforms within the Craft UI you can reference the transform by its handle,
+
+```graphql
+{
+  entries {
+    ...on Post {
+      imageFieldHandle {
+        thumbnail: url(transform: thumb)
+      }
+    }
+  }
+}
+```
+
+You can also specify the exact crop by using the `crop`, `fit`, or `stretch` arguments as specified in the [Craft docs](https://craftcms.com/docs/image-transforms).
+
+```graphql
+{
+  entries {
+    ...on Post {
+      imageFieldHandle {
+        poster: url(crop: {width: 1280, height: 720, position: topLeft, quality: 50, format: 'jpg'})
+      }
+    }
+  }
+}
+```
+
 ## Drafts
 
 Drafts are best fetched through an edge node on the `entriesConnection` query. You can get all drafts for an entry with the following query,

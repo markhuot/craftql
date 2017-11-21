@@ -15,6 +15,7 @@ class Volume extends ObjectType {
     static $transformEnum;
     static $cropInputObject;
     static $positionInputEnum;
+    static $formatInputEnum;
 
     function __construct($volume, $token) {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
@@ -68,6 +69,22 @@ class Volume extends ObjectType {
         ]);
     }
 
+    static function formatInputEnum() {
+        if (!empty(static::$formatInputEnum)) {
+            return static::$formatInputEnum;
+        }
+
+        return static::$formatInputEnum = new EnumType([
+            'name' => 'CropFormatInputEnum',
+            'values' => [
+                'jpg' => 'JPG',
+                'gif' => 'GIF',
+                'png' => 'PNG',
+                'Auto' => 'Auto',
+            ],
+        ]);
+    }
+
     static function cropInputObject() {
         if (!empty(static::$cropInputObject)) {
             return static::$cropInputObject;
@@ -80,6 +97,7 @@ class Volume extends ObjectType {
                 'height' => ['type' => Type::int()],
                 'quality' => ['type' => Type::int()],
                 'position' => ['type' => static::positionInputEnum()],
+                'format' => ['type' => static::formatInputEnum()],
             ],
         ]);
     }
