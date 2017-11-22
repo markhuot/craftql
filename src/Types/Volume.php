@@ -42,6 +42,10 @@ class Volume extends ObjectType {
             $values[$transform->handle] = $transform->name;
         }
 
+        if (empty($values)) {
+            $values[] = 'Empty';
+        }
+
         return static::$transformEnum = new EnumType([
             'name' => 'NamedTransformsEnum',
             'values' => $values,
