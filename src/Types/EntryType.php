@@ -111,7 +111,7 @@ class EntryType extends ObjectType {
 
             foreach ($fields as $handle => &$value) {
                 $field = Craft::$app->fields->getFieldByHandle($handle);
-                $value = $field->upsert($value);
+                $value = $field->upsert($value, $entry);
             }
 
             $entry->setFieldValues($fields);

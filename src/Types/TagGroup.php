@@ -13,14 +13,19 @@ class TagGroup extends ObjectType {
     function __construct($group, $request) {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
         $baseFields = [];
-        $baseFields['id'] = ['type' => Type::int()];
-        $baseFields['title'] = ['type' => Type::string()];
+        $baseFields['id'] = ['type' => Type::nonNull(Type::int())];
+        $baseFields['title'] = ['type' => Type::nonNull(Type::string())];
+        $baseFields['slug'] = ['type' => Type::string()];
+        $baseFields['group'] = ['type' => \markhuot\CraftQL\Types\TagGroup::type()];
         $fields = array_merge($baseFields, $fieldService->getFields($group->fieldLayoutId, $request));
 
         parent::__construct([
             'name' => ucfirst($group->handle).'Tags',
             'fields' => $fields,
             'id' => $group->id,
+            'interfaces' => [
+                Tag::interface(),
+            ],
         ]);
     }
 
@@ -30,7 +35,7 @@ class TagGroup extends ObjectType {
         }
 
         return static::$type = new ObjectType([
-            'name' => 'CategoryGroup',
+            'name' => 'TagGroup',
             'fields' => [
                 'id' => ['type' => Type::int()],
                 'name' => ['type' => Type::string()],

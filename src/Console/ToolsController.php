@@ -245,6 +245,36 @@ class ToolsController extends Controller
         ];
         Craft::$app->fields->saveField($heroImagePosition);
 
+        if (!file_exists('./web/uploads')) {
+            mkdir('./web/uploads');
+        }
+
+        $volume = Craft::$app->volumes->createVolume([
+            'type' => 'craft\volumes\Local',
+            'name' => 'Default Volume',
+            'handle' => 'defaultVolume',
+            'hasUrls' => true,
+            'url' => '/uploads',
+            'settings' => json_encode(['path' => realpath('./web/uploads')]),
+        ]);
+
+        Craft::$app->volumes->saveVolume($volume);
+
+        $assetsField = new \craft\fields\Assets();
+        $assetsField->groupId = $groupModel->id;
+        $assetsField->name = 'Hero Image';
+        $assetsField->handle = 'heroImage';
+        $assetsField->required = false;
+        $assetsField->sortOrder = 0;
+        $assetsField->useSingleFolder = false;
+        $assetsField->defaultUploadLocationSource = "folder:1";
+        $assetsField->defaultUploadLocationSubpath = "";
+        $assetsField->singleUploadLocationSource = "folder:1";
+        $assetsField->singleUploadLocationSubpath = "";
+        $assetsField->restrictFiles = "";
+        $assetsField->allowedKinds = null;
+        Craft::$app->fields->saveField($assetsField);
+
         $layout = new \craft\models\FieldLayout();
         $layout->type = \craft\elements\Entry::class;
 
@@ -260,6 +290,7 @@ class ToolsController extends Controller
             $entriesField,
             $multiSelectField,
             $heroImagePosition,
+            $assetsField,
         ]);
 
         if (!empty($section->getEntryTypes())) {

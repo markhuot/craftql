@@ -27,81 +27,29 @@ class Query extends ObjectType {
 
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
             if (!empty($request->entryTypes()->all())) {
-                $config['fields']['entries'] = [
-                    'type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)),
-                    'description' => 'A list of entries from Craft',
-                    'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                    'resolve' => function ($root, $args, $context, $info) use ($request) {
-                        return $request->entries(\craft\elements\Entry::find(), $args, $info)->all();
-                    },
-                ];
-
-                $config['fields']['entriesConnection'] = [
-                    'type' => \markhuot\CraftQL\Types\EntryConnection::make($request),
-                    'description' => 'A connection to entries in Craft',
-                    'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                    'resolve' => function ($root, $args, $context, $info) use ($request) {
-                        $criteria = $request->entries(\craft\elements\Entry::find(), $args, $info);
-                        list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
-
-                        return [
-                            'totalCount' => $pageInfo->total,
-                            'pageInfo' => $pageInfo,
-                            'edges' => $entries,
-                            'criteria' => $criteria,
-                            'args' => $args,
-                        ];
-                    }
-                ];
-
-                $config['fields']['entry'] = [
-                    'type' => \markhuot\CraftQL\Types\Entry::interface($request),
-                    'description' => 'One entry from Craft',
-                    'args' => \markhuot\CraftQL\Types\Entry::args($request),
-                    'resolve' => function ($root, $args, $context, $info) use ($request) {
-                        return $request->entries(\craft\elements\Entry::find(), $args, $info)->one();
-                    },
-                ];
-
-                $config['fields']['drafts'] = [
-                    'type' => Type::listOf(\markhuot\CraftQL\Types\EntryDraft::interface($request)),
-                    'args' => [
-                        'id' => [
-                            'type' => Type::nonNull(Type::int()),
-                            'description' => 'The entry id to query for drafts'
-                        ],
-                    ],
-                    'resolve' => function ($root, $args) {
-                        return \Craft::$app->entryRevisions->getDraftsByEntryId($args['id']);
-                    },
-                ];
+                $config['fields']['entries'] = (new \markhuot\CraftQL\GraphQLFields\Entries($request))->toArray();
+                $config['fields']['entriesConnection'] = (new \markhuot\CraftQL\GraphQLFields\EntriesConnection($request))->toArray();
+                $config['fields']['entry'] = (new \markhuot\CraftQL\GraphQLFields\Entry($request))->toArray();
+                $config['fields']['drafts'] = (new \markhuot\CraftQL\GraphQLFields\Drafts($request))->toArray();
             }
         }
 
+        if ($token->can('query:tags')) {
+            $config['fields']['tags'] = (new \markhuot\CraftQL\GraphQLFields\Tags($request))->toArray();
+            $config['fields']['tagsConnection'] = (new \markhuot\CraftQL\GraphQLFields\TagsConnection($request))->toArray();
+        }
+
+        if ($token->can('query:categories')) {
+            $config['fields']['categories'] = (new \markhuot\CraftQL\GraphQLFields\Categories($request))->toArray();
+            $config['fields']['categoriesConnection'] = (new \markhuot\CraftQL\GraphQLFields\CategoriesConnection($request))->toArray();
+        }
+
         if ($token->can('query:users')) {
-            $config['fields']['users'] = [
-                'type' => Type::listOf(\markhuot\CraftQL\Types\User::type($request)),
-                'description' => 'Users registered in Craft',
-                'args' => \markhuot\CraftQL\Types\User::args(),
-                'resolve' => function ($root, $args) {
-                    $criteria = \craft\elements\User::find();
-                    foreach ($args as $key => $value) {
-                        $criteria = $criteria->{$key}($value);
-                    }
-                    return $criteria->all();
-                }
-            ];
+            $config['fields']['users'] = (new \markhuot\CraftQL\GraphQLFields\Users($request))->toArray();
         }
 
         if ($token->can('query:sections')) {
-            $config['fields']['sections'] = [
-                'type' => Type::listOf(\markhuot\CraftQL\Types\Section::type()),
-                'description' => 'Sections defined in Craft',
-                'args' => [],
-                'resolve' => function ($root, $args) {
-                    return \Craft::$app->sections->getAllSections();
-                }
-            ];
+            $config['fields']['sections'] = (new \markhuot\CraftQL\GraphQLFields\Sections($request))->toArray();
         }
 
         parent::__construct($config);

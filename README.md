@@ -257,6 +257,39 @@ Drafts are best fetched through an edge node on the `entriesConnection` query. Y
 }
 ```
 
+## Categories and Tags
+
+Taxonomy can be queried through the top level `categories` or `tags` field. Both work identically to their [`craft.entries`](https://craftcms.com/docs/templating/craft.entries) and [`craft.tags`](https://craftcms.com/docs/templating/craft.tags) counterparts.
+
+```graphql
+{
+  categories { # lists all categories, or use `tags` to get all tags
+    id
+    title
+  }
+}
+```
+
+For added functionality query categories and tags through their related `Connection` fields. This provides a spot in the return to get related entries too,
+
+```graphql
+{
+  categoriesConnection {
+    totalCount
+    edges {
+      node {
+        title   # the category title
+      }
+      relatedTo {
+        entries {
+          title # an entry title, that's related to this category
+        }
+      }
+    }
+  }
+}
+```
+
 ## Security
 
 CraftQL supports GraphQl field level permissions. By default a token will have no rights. You must click into the "Scopes" section to adjust what each token can do.

@@ -28,10 +28,10 @@ class CategoriesBehavior extends Behavior
             'values' => $options,
         ]);
     }
-    
+
     public function getGraphQLMutationArgs() {
         $field = $this->owner;
-        
+
         return [
             $field->handle => ['type' => Type::listOf(Type::int())]
         ];
@@ -39,6 +39,10 @@ class CategoriesBehavior extends Behavior
 
     public function getGraphQLQueryFields($request) {
         $field = $this->owner;
+
+        if (!$request->token()->can('query:categories')) {
+            return [];
+        }
 
         if (preg_match('/^group:(\d+)$/', $field->source, $matches)) {
             $groupId = $matches[1];

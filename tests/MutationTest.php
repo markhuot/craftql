@@ -42,7 +42,7 @@ final class MutationTest extends TestCase
 
     public function testRichTextMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Text Test", body:"page one<!--pagebreak-->page two") { id, title, body, pageOne:body(page:1) } }';
+        $input = 'mutation { story: upsertStories(title:"Text Test'.date('U').'", body:"page one<!--pagebreak-->page two") { id, title, body, pageOne:body(page:1) } }';
 
         $result = $this->execute($input);
 
@@ -52,7 +52,7 @@ final class MutationTest extends TestCase
 
     public function testDateMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Date Test", releaseDate:'.date('U', strtotime('2017-02-04 03:12:18')).') { id, releaseDateTimestamp: releaseDate, releaseDateFormatted: releaseDate @date(as:"Y-m-d H:i:s") } }';
+        $input = 'mutation { story: upsertStories(title:"Date Test'.date('U').'", releaseDate:'.date('U', strtotime('2017-02-04 03:12:18')).') { id, releaseDateTimestamp: releaseDate, releaseDateFormatted: releaseDate @date(as:"Y-m-d H:i:s") } }';
 
         $result = $this->execute($input);
 
@@ -62,7 +62,7 @@ final class MutationTest extends TestCase
 
     public function testLightswitchMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Lightswitch Test", promoted:true) { id, promoted } }';
+        $input = 'mutation { story: upsertStories(title:"Lightswitch Test'.date('U').'", promoted:true) { id, promoted } }';
 
         $result = $this->execute($input);
 
@@ -71,7 +71,7 @@ final class MutationTest extends TestCase
 
     public function testCheckboxMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Checkbox Test", socialLinks:[fb, tw]) { id, socialLinks } }';
+        $input = 'mutation { story: upsertStories(title:"Checkbox Test'.date('U').'", socialLinks:[fb, tw]) { id, socialLinks } }';
 
         $result = $this->execute($input);
 
@@ -80,7 +80,7 @@ final class MutationTest extends TestCase
 
     public function testDropdownMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Dropdown Test", language:cn) { id, language } }';
+        $input = 'mutation { story: upsertStories(title:"Dropdown Test'.date('U').'", language:cn) { id, language } }';
 
         $result = $this->execute($input);
 
@@ -89,15 +89,16 @@ final class MutationTest extends TestCase
 
     public function testEntriesMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Entries Test One", body:"My first test") { id } }';
+        $input = 'mutation { story: upsertStories(title:"Entries Test One'.date('U').'", body:"My first test") { id } }';
         $first = $this->execute($input);
         $firstId = @$first['data']['story']['id'];
         $this->assertGreaterThan(0, $firstId);
 
-        $input = 'mutation { story: upsertStories(title:"Entries Test Two", relatedEntry:['.$firstId.']) { id, relatedEntry { id } } }';
+        $input = 'mutation { story: upsertStories(title:"Entries Test Two'.date('U').'", relatedEntry:['.$firstId.']) { id, relatedEntry { id } } }';
         $second = $this->execute($input);
         $secondId = @$second['data']['story']['id'];
-        $this->assertEquals($firstId, @$second['data']['story']['relatedEntry'][0]['id']);
+        $this->assertEquals(1, count(@$second['data']['story']['relatedEntry']), 'Entries field behavior is not properly limiting to the field.');
+        $this->assertEquals($firstId, @$second['data']['story']['relatedEntry'][0]['id'], 'Entries field behavior is not returning the correct entries.');
 
         $input = 'query { entry(relatedTo:[{element:'.$firstId.'}]) { id } }';
         $third = $this->execute($input);
@@ -110,7 +111,7 @@ final class MutationTest extends TestCase
 
     public function testMultiSelectMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Multi Select Test", socialLinksTwo:[fb, tw]) { id, socialLinksTwo } }';
+        $input = 'mutation { story: upsertStories(title:"Multi Select Test'.date('U').'", socialLinksTwo:[fb, tw]) { id, socialLinksTwo } }';
 
         $result = $this->execute($input);
 
@@ -119,7 +120,7 @@ final class MutationTest extends TestCase
 
     public function testPositionSelectMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Position Select Test", heroImagePosition:right) { id, heroImagePosition } }';
+        $input = 'mutation { story: upsertStories(title:"Position Select Test'.date('U').'", heroImagePosition:right) { id, heroImagePosition } }';
 
         $result = $this->execute($input);
 
@@ -128,10 +129,19 @@ final class MutationTest extends TestCase
 
     public function testPositionSelectFailureMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"FOOPosition Select Failure Test", heroImagePosition:left) { id, heroImagePosition } }';
+        $input = 'mutation { story: upsertStories(title:"Position Select Failure Test'.date('U').'", heroImagePosition:left) { id, heroImagePosition } }';
 
         $result = $this->execute($input);
 
         $this->assertEquals("Argument \"heroImagePosition\" has invalid value left.\nExpected type \"HeroImagePositionEnum\", found left.", @$result['errors'][0]['message']);
+    }
+
+    public function testAssetsMutation(): void
+    {
+        $input = 'mutation { story: upsertStories(title:"Asset Test'.date('U').'", heroImage:{url:"https://assets.imgix.net/examples/treefrog.jpg"}) { id, ...on Stories { heroImage { url } } } }';
+
+        $result = $this->execute($input);
+
+        $this->assertEquals('/uploads/treefrog', substr(@$result['data']['story']['heroImage'][0]['url'], 0, 17));
     }
 }

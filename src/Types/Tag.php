@@ -6,7 +6,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
 
-class Category extends ObjectType {
+class Tag extends ObjectType {
 
     static $interface;
     static $baseFields;
@@ -20,8 +20,7 @@ class Category extends ObjectType {
         $fields['id'] = ['type' => Type::nonNull(Type::int())];
         $fields['title'] = ['type' => Type::nonNull(Type::string())];
         $fields['slug'] = ['type' => Type::string()];
-        $fields['uri'] = ['type' => Type::string()];
-        $fields['group'] = ['type' => \markhuot\CraftQL\Types\CategoryGroup::type()];
+        $fields['group'] = ['type' => \markhuot\CraftQL\Types\TagGroup::type()];
 
         return static::$baseFields = $fields;
     }
@@ -31,11 +30,11 @@ class Category extends ObjectType {
             $fields = static::baseFields();
 
             static::$interface = new InterfaceType([
-                'name' => 'CategoryInterface',
-                'description' => 'A category in Craft',
+                'name' => 'TagInterface',
+                'description' => 'A tag in Craft',
                 'fields' => $fields,
                 'resolveType' => function ($category) {
-                    return ucfirst($category->group->handle).'Category';
+                    return ucfirst($category->group->handle).'Tags';
                 }
             ]);
         }

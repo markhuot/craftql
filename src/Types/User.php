@@ -6,52 +6,16 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\GraphQLFields\Users as UsersField;
 
 class User extends ObjectType {
 
     static $type;
     static $baseFields;
-    static $statusEnum;
 
     static function baseInputArgs() {
         return [
-            
-        ];
-    }
 
-    static function statusEnum() {
-        if (!empty(static::$statusEnum)) {
-            return static::$statusEnum;
-        }
-
-        return static::$statusEnum =  new EnumType([
-            'name' => 'UserStatusEnum',
-            'values' => [
-                'active',
-                'locked',
-                'suspended',
-                'pending',
-                'archived',
-            ],
-        ]);
-    }
-
-    static function args() {
-        return [
-            'admin' => Type::boolean(),
-            'email' => Type::string(),
-            'firstName' => Type::string(),
-            'group' => Type::string(),
-            'groupId' => Type::string(),
-            'id' => Type::int(),
-            'lastLoginDate' => Type::int(),
-            'lastName' => Type::string(),
-            'limit' => Type::int(),
-            'offset' => Type::int(),
-            'order' => Type::string(),
-            'search' => Type::string(),
-            'status' => static::statusEnum(),
-            'username' => Type::string(),
         ];
     }
 
@@ -72,7 +36,7 @@ class User extends ObjectType {
             'admin' => ['type' => Type::nonNull(Type::boolean())],
             'isCurrent' => ['type' => Type::nonNull(Type::boolean())],
             'preferredLocale' => ['type' => Type::string()],
-            'status' => ['type' => Type::nonNull(static::statusEnum())],
+            'status' => ['type' => Type::nonNull(UsersField::statusEnum())],
         ];
 
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);

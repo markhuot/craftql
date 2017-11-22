@@ -68,6 +68,12 @@ abstract class BaseFactory {
             $values[$this->getEnumName($object)] = $object->config['id'];
         }
 
+        // Enums can't be emtpy so fake it. Craft can expose the Category or
+        // Tag top level fields without any category or tag groups defined.
+        if (empty($values)) {
+            $values['empty'] = 'Empty';
+        }
+
         return static::$enums[$name] = new EnumType([
             'name' => $reflect->getShortName().'sEnum',
             'values' => $values,

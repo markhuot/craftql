@@ -8,7 +8,7 @@ use yii\base\Behavior;
 
 class TagsBehavior extends Behavior
 {
-    
+
     public function getGraphQLMutationArgs() {
         $field = $this->owner;
 
@@ -19,6 +19,10 @@ class TagsBehavior extends Behavior
 
     public function getGraphQLQueryFields($request) {
         $field = $this->owner;
+
+        if (!$request->token()->can('query:tags')) {
+            return [];
+        }
 
         $source = $field->settings['source'];
         if (preg_match('/taggroup:(\d+)/', $source, $matches)) {
