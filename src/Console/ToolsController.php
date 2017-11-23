@@ -159,7 +159,7 @@ class ToolsController extends Controller
             }
         }
 
-        $bodyField = new \craft\fields\RichText();
+        $bodyField = new \craft\fields\PlainText();
         $bodyField->groupId = $groupModel->id;
         $bodyField->name = 'Body';
         $bodyField->handle = 'body';
@@ -233,17 +233,17 @@ class ToolsController extends Controller
         ];
         Craft::$app->fields->saveField($multiSelectField);
 
-        $heroImagePosition = new \craft\fields\PositionSelect();
-        $heroImagePosition->groupId = $groupModel->id;
-        $heroImagePosition->name = 'Hero Image Position';
-        $heroImagePosition->handle = 'heroImagePosition';
-        $heroImagePosition->required = false;
-        $heroImagePosition->sortOrder = 0;
-        $heroImagePosition->options = [
-            'right',
-            'drop-right',
-        ];
-        Craft::$app->fields->saveField($heroImagePosition);
+        // $heroImagePosition = new \craft\fields\PositionSelect();
+        // $heroImagePosition->groupId = $groupModel->id;
+        // $heroImagePosition->name = 'Hero Image Position';
+        // $heroImagePosition->handle = 'heroImagePosition';
+        // $heroImagePosition->required = false;
+        // $heroImagePosition->sortOrder = 0;
+        // $heroImagePosition->options = [
+        //     'right',
+        //     'drop-right',
+        // ];
+        // Craft::$app->fields->saveField($heroImagePosition);
 
         if (!file_exists('./web/uploads')) {
             mkdir('./web/uploads');
@@ -289,7 +289,7 @@ class ToolsController extends Controller
             $dropdownField,
             $entriesField,
             $multiSelectField,
-            $heroImagePosition,
+            // $heroImagePosition,
             $assetsField,
         ]);
 

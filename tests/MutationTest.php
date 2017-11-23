@@ -40,15 +40,24 @@ final class MutationTest extends TestCase
         $this->assertEquals('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.', @$result['data']['helloWorld']);
     }
 
-    public function testRichTextMutation(): void
+    public function testPlainTextMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Text Test'.date('U').'", body:"page one<!--pagebreak-->page two") { id, title, body, pageOne:body(page:1) } }';
+        $input = 'mutation { story: upsertStories(title:"Text Test'.date('U').'", body:"text in the body") { id, title, body } }';
 
         $result = $this->execute($input);
 
-        $this->assertEquals('page one<!--pagebreak-->page two', @$result['data']['story']['body']);
-        $this->assertEquals('page one', @$result['data']['story']['pageOne']);
+        $this->assertEquals('text in the body', @$result['data']['story']['body']);
     }
+
+    // public function testRichTextMutation(): void
+    // {
+    //     $input = 'mutation { story: upsertStories(title:"Text Test'.date('U').'", body:"page one<!--pagebreak-->page two") { id, title, body, pageOne:body(page:1) } }';
+
+    //     $result = $this->execute($input);
+
+    //     $this->assertEquals('page one<!--pagebreak-->page two', @$result['data']['story']['body']);
+    //     $this->assertEquals('page one', @$result['data']['story']['pageOne']);
+    // }
 
     public function testDateMutation(): void
     {
@@ -118,23 +127,23 @@ final class MutationTest extends TestCase
         $this->assertEquals('["fb","tw"]', json_encode(@$result['data']['story']['socialLinksTwo']));
     }
 
-    public function testPositionSelectMutation(): void
-    {
-        $input = 'mutation { story: upsertStories(title:"Position Select Test'.date('U').'", heroImagePosition:right) { id, heroImagePosition } }';
+    // public function testPositionSelectMutation(): void
+    // {
+    //     $input = 'mutation { story: upsertStories(title:"Position Select Test'.date('U').'", heroImagePosition:right) { id, heroImagePosition } }';
 
-        $result = $this->execute($input);
+    //     $result = $this->execute($input);
 
-        $this->assertEquals('right', @$result['data']['story']['heroImagePosition']);
-    }
+    //     $this->assertEquals('right', @$result['data']['story']['heroImagePosition']);
+    // }
 
-    public function testPositionSelectFailureMutation(): void
-    {
-        $input = 'mutation { story: upsertStories(title:"Position Select Failure Test'.date('U').'", heroImagePosition:left) { id, heroImagePosition } }';
+    // public function testPositionSelectFailureMutation(): void
+    // {
+    //     $input = 'mutation { story: upsertStories(title:"Position Select Failure Test'.date('U').'", heroImagePosition:left) { id, heroImagePosition } }';
 
-        $result = $this->execute($input);
+    //     $result = $this->execute($input);
 
-        $this->assertEquals("Argument \"heroImagePosition\" has invalid value left.\nExpected type \"HeroImagePositionEnum\", found left.", @$result['errors'][0]['message']);
-    }
+    //     $this->assertEquals("Argument \"heroImagePosition\" has invalid value left.\nExpected type \"HeroImagePositionEnum\", found left.", @$result['errors'][0]['message']);
+    // }
 
     public function testAssetsMutation(): void
     {

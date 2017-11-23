@@ -7,38 +7,8 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\EnumType;
 use yii\base\Behavior;
 
-class SelectMultipleBehavior extends Behavior
+class SelectMultipleBehavior extends SelectOneBehavior
 {
-    static $enums = [];
-
-    function getEnumFor($field) {
-        if (isset(static::$enums[$field->handle])) {
-            return static::$enums[$field->handle];
-        }
-
-        $options = [];
-        foreach ($field['settings']['options'] as $option) {
-            $value = $option['value'];
-            $value = preg_replace('/[^a-z0-9]+/', ' ', $value);
-            $value = \craft\helpers\StringHelper::toSnakeCase($value);
-            $options[$value] = [
-                'description' => $option['label'],
-            ];
-        }
-
-        return static::$enums[$field->handle] = new EnumType([
-            'name' => ucfirst($field->handle.'Enum'),
-            'values' => $options,
-        ]);
-    }
-
-    public function getGraphQLMutationArgs() {
-        $field = $this->owner;
-
-        return [
-            $field->handle => ['type' => Type::listOf($this->getEnumFor($field))]
-        ];
-    }
 
     public function getGraphQLQueryFields($token) {
         $field = $this->owner;
@@ -58,8 +28,12 @@ class SelectMultipleBehavior extends Behavior
         ];
     }
 
-    public function upsert($values) {
-        return $values;
+    public function getGraphQLMutationArgs() {
+        $field = $this->owner;
+
+        return [
+            $field->handle => ['type' => Type::listOf($this->getEnumFor($field))]
+        ];
     }
 
 }
