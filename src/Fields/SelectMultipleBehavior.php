@@ -15,7 +15,7 @@ class SelectMultipleBehavior extends SelectOneBehavior
 
         return [
             $field->handle => [
-                'type' => Type::listOf($this->getEnumFor($field)),
+                'type' => Type::listOf($this->getEnum($field)),
                 'description' => $field->instructions,
                 'resolve' => function ($root, $args) use ($field) {
                     $values = [];
@@ -32,7 +32,7 @@ class SelectMultipleBehavior extends SelectOneBehavior
         $field = $this->owner;
 
         return [
-            $field->handle => ['type' => Type::listOf($this->getEnumFor($field))]
+            $field->handle => ['type' => Type::listOf($this->getEnum($field))]
         ];
     }
 
