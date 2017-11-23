@@ -17,12 +17,12 @@ class PositionSelectBehavior extends Behavior
         }
 
         $values = [];
-        if (in_array('left', $field->options)) { $values['left'] = 'left'; }
-        if (in_array('center', $field->options)) { $values['center'] = 'center'; }
-        if (in_array('right', $field->options)) { $values['right'] = 'right'; }
-        if (in_array('full', $field->options)) { $values['full'] = 'full'; }
-        if (in_array('drop-left', $field->options)) { $values['dropleft'] = 'drop-left'; }
-        if (in_array('drop-right', $field->options)) { $values['dropright'] = 'drop-right'; }
+        if (in_array('left', $field->options)) { $values['left'] = 'Left'; }
+        if (in_array('center', $field->options)) { $values['center'] = 'Center'; }
+        if (in_array('right', $field->options)) { $values['right'] = 'Right'; }
+        if (in_array('full', $field->options)) { $values['full'] = 'Full'; }
+        if (in_array('drop-left', $field->options)) { $values['dropLeft'] = 'Drop Left'; }
+        if (in_array('drop-right', $field->options)) { $values['dropRight'] = 'Drop Right'; }
 
         return static::$enums[$field->handle] = new EnumType([
             'name' => ucfirst($field->handle).'Enum',

@@ -37,11 +37,8 @@
       #page-header, #footer {
         display: none;
       }
-      .body, .content {
-        position: static;
-      }
-      .pane {
-        height: 100vh;
+      #content {
+        position: relative;
       }
       #main.single-pane .padded > .pane {
         overflow: visible;
@@ -55,13 +52,13 @@
       .graphiql-container .topBar .title {
         font-size: 24px;
         font-family: "Helvetica Neue-Light", HelveticaNeue-Light, "Helvetica Neue", HelveticaNeue, sans-serif;
-        color: #da5a47;
+        color: #29323d;
       }
       .graphiql-container .docExplorerShow {
-        color: #da5a47;
+        color: #29323d;
       }
       .graphiql-container .docExplorerShow:before {
-        border-color: #da5a47;
+        border-color: #29323d;
       }
       .graphiql-container .toolbar-button {
         display: flex;
@@ -96,8 +93,10 @@
     <div id="graphiql">Loading...</div>
     <script>
 
-      var header = document.querySelector('#page-header');
-      header.parentNode.removeChild(header);
+      var header = document.querySelector('#header');
+      if (header) {
+        header.parentNode.removeChild(header);
+      }
 
       /**
        * This GraphiQL example illustrates how to use some of GraphiQL's props

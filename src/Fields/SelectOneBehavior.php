@@ -18,7 +18,10 @@ class SelectOneBehavior extends Behavior
 
         $options = [];
         foreach ($field['settings']['options'] as $option) {
-            $options[$option['value']] = [
+            $value = $option['value'];
+            $value = preg_replace('/[^a-z0-9]+/', ' ', $value);
+            $value = \craft\helpers\StringHelper::toCamelCase($value);
+            $options[$value] = [
                 'description' => $option['label'],
             ];
         }
