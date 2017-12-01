@@ -58,6 +58,9 @@ class Entry {
         $fields['level'] = ['type' => Type::int()];
         $fields['parent'] = ['type' => \markhuot\CraftQL\Types\Entry::interface($request)];
         $fields['siblings'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];
+        // $fields['json'] = ['type' => Type::string(), 'resolve' => function($root, $args) {
+        //     return json_encode($root->toArray());
+        // }];
 
         return static::$baseFields = $fields;
     }

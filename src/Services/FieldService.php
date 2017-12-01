@@ -18,9 +18,11 @@ class FieldService {
   function getArgs($fieldLayoutId, $request) {
     $graphQlArgs = [];
 
-    $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
-    foreach ($fieldLayout->getFields() as $field) {
-      $graphQlArgs = array_merge($graphQlArgs, $field->getGraphQLMutationArgs($request));
+    if ($fieldLayoutId) {
+      $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
+      foreach ($fieldLayout->getFields() as $field) {
+        $graphQlArgs = array_merge($graphQlArgs, $field->getGraphQLMutationArgs($request));
+      }
     }
 
     return $graphQlArgs;
@@ -29,9 +31,11 @@ class FieldService {
   function getFields($fieldLayoutId, $request) {
     $graphQlFields = [];
 
-    $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
-    foreach ($fieldLayout->getFields() as $field) {
-      $graphQlFields = array_merge($graphQlFields, $field->getGraphQLQueryFields($request));
+    if ($fieldLayoutId) {
+      $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
+      foreach ($fieldLayout->getFields() as $field) {
+        $graphQlFields = array_merge($graphQlFields, $field->getGraphQLQueryFields($request));
+      }
     }
 
 
