@@ -10,7 +10,7 @@ use yii\base\Behavior;
 class MatrixBehavior extends Behavior
 {
     static $objects = [];
-    
+
     public function getGraphQLMutationArgs() {
         $field = $this->owner;
 
@@ -23,7 +23,7 @@ class MatrixBehavior extends Behavior
         if (isset(static::$objects[$field->handle])) {
             return static::$objects[$field->handle];
         }
-        
+
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
 
         $blockObjects = [];
@@ -31,6 +31,16 @@ class MatrixBehavior extends Behavior
             $blockObjects[] = new ObjectType([
                 'name' => ucfirst($field->handle).ucfirst($block->handle),
                 'fields' => $fieldService->getFields($block->fieldLayoutId, $token),
+            ]);
+        }
+
+        if (empty($blockObjects)) {
+            $blockObjects[] = new ObjectType([
+                'name' => ucfirst($field->handle).'Empty',
+                'description' => 'This matrix block is empty',
+                'fields' => [
+                    'empty' => Type::string(),
+                ],
             ]);
         }
 
