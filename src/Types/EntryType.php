@@ -71,10 +71,10 @@ class EntryType extends ObjectType {
         ]);
     }
 
-    function args($request) {
+    function getGraphQLMutationArgs($request) {
         $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
 
-        return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getArgs($this->config['craftType']->fieldLayoutId, $request));
+        return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getGraphQLMutationArgs($this->config['craftType']->fieldLayoutId, $request));
     }
 
     function handle() {

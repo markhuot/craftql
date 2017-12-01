@@ -6,18 +6,12 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\GraphQLFields\Users as UsersField;
+use markhuot\CraftQL\GraphQLFields\Query\Users as UsersField;
 
 class User extends ObjectType {
 
     static $type;
     static $baseFields;
-
-    static function baseInputArgs() {
-        return [
-
-        ];
-    }
 
     static function baseFields() {
         if (!empty(static::$baseFields)) {

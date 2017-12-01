@@ -15,7 +15,7 @@ use GraphQL\Error\Error;
 
 class FieldService {
 
-  function getArgs($fieldLayoutId, $request) {
+  function getGraphQLMutationArgs($fieldLayoutId, $request) {
     $graphQlArgs = [];
 
     if ($fieldLayoutId) {

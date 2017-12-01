@@ -24,22 +24,6 @@ class Section extends ObjectType {
         ]);
     }
 
-    static function baseInputArgs() {
-        return [
-            'id' => ['type' => Type::int()],
-            'authorId' => ['type' => Type::int()],
-            'title' => ['type' => Type::string()],
-        ];
-    }
-
-    static function args($token=false) {
-        if (!empty(static::$baseArgs)) {
-            return static::$baseArgs;
-        }
-
-        return static::$baseArgs = [];
-    }
-
     static function baseFields() {
         if (!empty(static::$baseFields)) {
             return static::$baseFields;

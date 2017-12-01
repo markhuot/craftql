@@ -9,13 +9,23 @@ class Base {
 
     protected $description = 'Unknown description';
     protected $args = [];
+    protected $type = null;
 
     function __construct($request) {
         $this->request = $request;
     }
 
     function getType() {
-        return Type::string();
+        if ($this->type !== null) {
+            return $this->type;
+        }
+
+        return $this->type = Type::string();
+    }
+
+    function setType($type) {
+        $this->type = $type;
+        return $this;
     }
 
     function getDescription() {

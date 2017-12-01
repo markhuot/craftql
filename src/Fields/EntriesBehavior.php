@@ -27,8 +27,8 @@ class EntriesBehavior extends Behavior
         $field = $this->owner;
 
         return [
-            $field->handle => (new \markhuot\CraftQL\GraphQLFields\Entries($request))->setCriteria([$this, 'getCriteria'])->toArray(),
-            "{$field->handle}Connection" => (new \markhuot\CraftQL\GraphQLFields\EntriesConnection($request))->setCriteria([$this, 'getCriteria'])->toArray(),
+            $field->handle => (new \markhuot\CraftQL\GraphQLFields\Query\Entries($request))->setCriteria([$this, 'getCriteria'])->toArray(),
+            "{$field->handle}Connection" => (new \markhuot\CraftQL\GraphQLFields\Query\EntriesConnection($request))->setCriteria([$this, 'getCriteria'])->toArray(),
         ];
     }
 

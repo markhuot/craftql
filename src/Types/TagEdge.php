@@ -2,26 +2,24 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Request;
 
-class TagEdge extends Edge {
+class TagEdge extends ObjectType {
 
-    static function baseFields($request) {
-        $fields = [];
-
-        $fields['cursor'] = Type::string();
-        $fields['node'] = [
-            'type' => \markhuot\CraftQL\Types\Tag::interface($request),
-            'resolve' => function ($root, $args, $context, $info) {
-                return $root['node'];
-            }
-        ];
-        $fields['relatedTo'] = (new \markhuot\CraftQL\GraphQLFields\Edge\RelatedTo($request))->toArray();
-
-        return $fields;
+    protected function fields(Request $request) {
+        return function () use ($request) {
+            return [
+                'cursor' => Type::string(),
+                'node' => [
+                    'type' => \markhuot\CraftQL\Types\Tag::interface($request),
+                    'resolve' => function ($root, $args, $context, $info) {
+                        return $root['node'];
+                    }
+                ],
+                'relatedTo' => (new \markhuot\CraftQL\GraphQLFields\Query\Edge\RelatedTo($request))->toArray(),
+            ];
+        };
     }
 
 }

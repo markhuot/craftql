@@ -17,7 +17,7 @@ class Mutation extends ObjectType {
         foreach ($entryTypes as $entryType) {
             $fields['upsert'.ucfirst($entryType->name)] = [
                 'type' => $entryType,
-                'args' => $entryType->args($request),
+                'args' => $entryType->getGraphQLMutationArgs($request),
                 'resolve' => $entryType->upsert($request),
             ];
         }

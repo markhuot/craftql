@@ -26,7 +26,7 @@ class TagConnection extends ObjectType {
                 'totalCount' => Type::nonNull(Type::int()),
                 'pageInfo' => PageInfo::type($request),
                 'edges' => [
-                    'type' => Type::listOf(TagEdge::make($request)),
+                    'type' => Type::listOf(TagEdge::singleton($request)),
                     'resolve' => function ($root, $args) {
                         return array_map(function ($category) {
                             return [
