@@ -10,6 +10,7 @@ use craft\fields\Table as TableField;
 use craft\helpers\Assets;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Plugin;
+use markhuot\CraftQL\Events\GetFieldSchema as GetFieldSchemaEvent;
 use GraphQL\Error\Error;
 
 
@@ -21,7 +22,7 @@ class FieldService {
     if ($fieldLayoutId) {
       $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
       foreach ($fieldLayout->getFields() as $field) {
-        $graphQlArgs = array_merge($graphQlArgs, $field->getGraphQLMutationArgs($request));
+        // $graphQlArgs = array_merge($graphQlArgs, $field->getGraphQLMutationArgs($request));
       }
     }
 
@@ -34,7 +35,14 @@ class FieldService {
     if ($fieldLayoutId) {
       $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
       foreach ($fieldLayout->getFields() as $field) {
-        $graphQlFields = array_merge($graphQlFields, $field->getGraphQLQueryFields($request));
+        $event = new GetFieldSchemaEvent;
+        $event->field = $field;
+        $event->builder = new \markhuot\CraftQL\Builders\ObjectType;
+        $field->trigger(\markhuot\CraftQL\Plugin::EVENT_GET_FIELD_SCHEMA, $event);
+        $graphQlFields = array_merge($graphQlFields, $event->builder->getFields());
+        // var_dump($result, $event);
+        // die;
+        // $graphQlFields = array_merge($graphQlFields, $field->getGraphQLQueryFields($request));
       }
     }
 
