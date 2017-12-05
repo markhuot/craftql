@@ -38,7 +38,7 @@ class FieldService {
         $event = new GetFieldSchemaEvent;
         $event->field = $field;
         $event->builder = new \markhuot\CraftQL\Builders\ObjectType;
-        $field->trigger(\markhuot\CraftQL\Plugin::EVENT_GET_FIELD_SCHEMA, $event);
+        $field->trigger('craftQlGetFieldSchema', $event);
         $graphQlFields = array_merge($graphQlFields, $event->builder->getFields());
         // var_dump($result, $event);
         // die;

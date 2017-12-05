@@ -298,6 +298,40 @@ CraftQL supports GraphQl field level permissions. By default a token will have n
 
 Scopes allow you to configure which GraphQL fields and entry types are included in the schema.
 
+## Third-pary Field Support
+
+To add CraftQL support to your third-party field plugin you will need to listen to the `craftQlGetFieldSchema` event. This event, triggered on your custom field, will pass a "schema builder" into the event handler, allowing you to specify the field schema your custom field provides. For example, in your plugin's `::init` method you could specify,
+
+```php
+Event::on(\craft\base\Field::class, 'craftQlGetFieldSchema', function ($event) {
+  $event->builder->addStringField($event->sender);
+});
+```
+
+The above, when called for a Post entry type on the `excerpt` field would generate a schema approximately equlilivant to,
+
+```graphql
+type Post {
+  # The field instructions are automatically included
+  excerpt: String
+}
+```
+
+If your custom field resolves an object you can expose that to CraftQL as well. For example, if you are implementing a custom field that exposes a map, with a latitude, longitute, and a zoom level, it may look like,
+
+```php
+Event::on(\craft\base\Field::class, 'craftQlGetFieldSchema', function ($event) {
+  $field = $event->sender;
+
+  $object = $event->builder->newObjectType('MapPoint')
+        ->addStringField('lat')
+        ->addStringField('lng')
+        ->addStringField('zoom');
+
+  return $event->builder->addObjectField($field, $object);
+});
+```
+
 ## Roadmap
 
 No software is ever done. There's a lot still to do in order to make _CraftQL_ feature complete. Some of the outstanding items include,

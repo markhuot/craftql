@@ -15,7 +15,7 @@ use markhuot\CraftQL\Models\Token;
 
 class Plugin extends BasePlugin
 {
-    const EVENT_GET_FIELD_SCHEMA = 'getFieldSchema';
+    // const EVENT_GET_FIELD_SCHEMA = 'getFieldSchema';
 
     public $schemaVersion = '1.1.0';
     public $controllerNamespace = 'markhuot\\CraftQL\\Controllers';
@@ -111,14 +111,17 @@ class Plugin extends BasePlugin
         //     $event->sender->attachBehavior(\craft\base\Field::class, \markhuot\CraftQL\Fields\DefaultBehavior::class);
         // });
 
-        Event::on(\craft\fields\Dropdown::class, static::EVENT_GET_FIELD_SCHEMA, function ($event) {
-            // var_dump($event);
-            // die;
-            // $event->builder->addStringField($event->sender->handle);
+        Event::on(\craft\fields\Dropdown::class, 'craftQlGetFieldSchema', function ($event) {
+            $field = $event->sender;
+
+            $event->builder->addStringField($event->sender, function ($root, $args, $context, $info) use ($field) {
+                return $root->{$field->handle}->value;
+            });
+
             $event->handled = true;
         });
 
-        Event::on(\craft\base\Field::class, static::EVENT_GET_FIELD_SCHEMA, function ($event) {
+        Event::on(\craft\base\Field::class, 'craftQlGetFieldSchema', function ($event) {
             $event->builder->addStringField($event->sender);
         });
     }

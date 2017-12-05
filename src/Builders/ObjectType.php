@@ -10,17 +10,19 @@ class ObjectType {
 
     function addField($name, array $config=[]) {
         $this->fields[$name] = $config;
-    }
-
-    function addStringField(\craft\base\Field $field) {
-        $this->addField($field->handle, [
-            'type' => Type::string(),
-            'description' => $field->instructions,
-        ]);
+        return $this;
     }
 
     function getFields() {
         return $this->fields;
+    }
+
+    function addStringField(\craft\base\Field $field, callable $resolve=null) {
+        return $this->addField($field->handle, [
+            'type' => Type::string(),
+            'description' => $field->instructions,
+            'resolve' => $resolve,
+        ]);
     }
 
 }
