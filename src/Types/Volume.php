@@ -18,7 +18,7 @@ class Volume extends ObjectType {
     static $formatInputEnum;
 
     function __construct($volume, $token) {
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
         $fields = array_merge(static::baseFields(), $fieldService->getFields($volume->fieldLayoutId, $token));
 
         parent::__construct([

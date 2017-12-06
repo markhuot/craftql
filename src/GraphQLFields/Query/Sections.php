@@ -16,7 +16,7 @@ class Sections extends BaseField {
     }
 
     function getResolve($root, $args, $context, $info) {
-        return \Craft::$app->sections->getAllSections();
+        return \Craft::$app->sections->allSections;
     }
 
 }

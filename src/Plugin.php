@@ -33,6 +33,9 @@ class Plugin extends BasePlugin
             $this->controllerNamespace = 'markhuot\CraftQL\Console';
         }
 
+        // make sure there's only one instance of our field service
+        Craft::$container->setSingleton('fieldService', \markhuot\CraftQL\Services\FieldService::class);
+
         $headers = !empty($this->getSettings()->headers) && is_array($this->getSettings()->headers) ? $this->getSettings()->headers : [];
 
         Event::on(
@@ -75,55 +78,19 @@ class Plugin extends BasePlugin
             }
         );
 
-        // $mappings = [
-        //     \craft\fields\RichText::class => \markhuot\CraftQL\Fields\RichTextBehavior::class,
-        //     \craft\fields\Lightswitch::class => \markhuot\CraftQL\Fields\LightswitchBehavior::class,
-        //     \craft\fields\Date::class => \markhuot\CraftQL\Fields\DateBehavior::class,
-        //     \craft\fields\Checkboxes::class => \markhuot\CraftQL\Fields\SelectMultipleBehavior::class,
-        //     \craft\fields\MultiSelect::class => \markhuot\CraftQL\Fields\SelectMultipleBehavior::class,
-        //     \craft\fields\Categories::class => \markhuot\CraftQL\Fields\CategoriesBehavior::class,
-        //     \craft\fields\PositionSelect::class => \markhuot\CraftQL\Fields\PositionSelectBehavior::class,
-        //     \craft\fields\Entries::class => \markhuot\CraftQL\Fields\EntriesBehavior::class,
-        //     \craft\fields\Number::class => \markhuot\CraftQL\Fields\NumberBehavior::class,
-        //     \craft\fields\RadioButtons::class => \markhuot\CraftQL\Fields\SelectOneBehavior::class,
-        //     \craft\fields\Dropdown::class => \markhuot\CraftQL\Fields\SelectOneBehavior::class,
-        //     \craft\fields\Assets::class => \markhuot\CraftQL\Fields\AssetsBehavior::class,
-        //     \craft\fields\Matrix::class => \markhuot\CraftQL\Fields\MatrixBehavior::class,
-        //     \craft\fields\Table::class => \markhuot\CraftQL\Fields\TableBehavior::class,
-        //     \craft\fields\Tags::class => \markhuot\CraftQL\Fields\TagsBehavior::class,
-        //     \selvinortiz\doxter\fields\DoxterField::class => \markhuot\CraftQL\Fields\DoxterBehavior::class,
-        //     \newism\fields\fields\Telephone::class => \markhuot\CraftQL\Fields\NSMTelephoneBehavior::class,
-        //     \newism\fields\fields\Gender::class => \markhuot\CraftQL\Fields\NSMGenderBehavior::class,
-        //     \newism\fields\fields\Address::class => \markhuot\CraftQL\Fields\NSMAddressBehavior::class,
-        // ];
-
-        // // Register monkeypatching for specific field types
-        // foreach ($mappings as $fieldClass => $behaviorClass) {
-        //     if (class_exists($fieldClass)) {
-        //         Event::on($fieldClass, $fieldClass::EVENT_INIT, function ($event) use ($behaviorClass) {
-        //             $event->sender->attachBehavior($behaviorClass, $behaviorClass);
-        //         });
-        //     }
-        // }
-
-        // Every other field falls back to the default behavior. e.g. color field, plain text field, 3rd party fields
-        // Event::on(\craft\base\Field::class, \craft\base\Field::EVENT_INIT, function ($event) {
-        //     $event->sender->attachBehavior(\craft\base\Field::class, \markhuot\CraftQL\Fields\DefaultBehavior::class);
-        // });
-
-        Event::on(\craft\fields\Dropdown::class, 'craftQlGetFieldSchema', function ($event) {
-            $field = $event->sender;
-
-            $event->builder->addStringField($event->sender, function ($root, $args, $context, $info) use ($field) {
-                return $root->{$field->handle}->value;
-            });
-
-            $event->handled = true;
-        });
-
-        Event::on(\craft\base\Field::class, 'craftQlGetFieldSchema', function ($event) {
-            $event->builder->addStringField($event->sender);
-        });
+        // register our events and listeners
+        foreach (require('events.php') as $class => $events) {
+            foreach ($events as $eventName => $listeners) {
+                foreach ($listeners as $listener) {
+                    if (is_array($listener)) {
+                        Event::on($class, $eventName, $listener);
+                    }
+                    else {
+                        Event::on($class, $eventName, [$listener, 'handle']);
+                    }
+                }
+            }
+        }
     }
 
     /**

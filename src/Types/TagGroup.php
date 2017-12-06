@@ -11,7 +11,7 @@ class TagGroup extends ObjectType {
     static $type;
 
     function __construct($group, $request) {
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
         $baseFields = [];
         $baseFields['id'] = ['type' => Type::nonNull(Type::int())];
         $baseFields['title'] = ['type' => Type::nonNull(Type::string())];

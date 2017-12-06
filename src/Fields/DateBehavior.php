@@ -18,7 +18,7 @@ class DateBehavior extends Behavior
     }
 
     public function getGraphQLQueryFields($token) {
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
         return $fieldService->getDateFieldDefinition($this->owner->handle, $this->owner->instructions, !!$this->owner->required);
     }
 

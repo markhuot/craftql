@@ -12,7 +12,7 @@ class Category extends ObjectType {
     static $baseFields;
 
     function __construct($group, $request) {
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
         $fields = array_merge(\markhuot\CraftQL\Types\Category::baseFields($request), $fieldService->getFields($group->fieldLayoutId, $request));
 
         parent::__construct([

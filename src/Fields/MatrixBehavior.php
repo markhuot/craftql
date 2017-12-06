@@ -24,7 +24,7 @@ class MatrixBehavior extends Behavior
             return static::$objects[$field->handle];
         }
 
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
 
         $blockObjects = [];
         foreach ($field->getBlockTypes() as $block) {

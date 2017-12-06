@@ -16,13 +16,23 @@ use GraphQL\Error\Error;
 
 class FieldService {
 
+  private $fieldSchemas = [];
+
   function getGraphQLMutationArgs($fieldLayoutId, $request) {
     $graphQlArgs = [];
 
     if ($fieldLayoutId) {
       $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
       foreach ($fieldLayout->getFields() as $field) {
-        // $graphQlArgs = array_merge($graphQlArgs, $field->getGraphQLMutationArgs($request));
+        if (!isset($this->fieldSchemas[$field->id])) {
+          $event = new GetFieldSchemaEvent;
+          $event->field = $field;
+          $event->builder = new \markhuot\CraftQL\Builders\ObjectType;
+          $field->trigger('craftQlGetFieldSchema', $event);
+          $this->fieldSchemas[$field->id] = $event->builder;
+        }
+
+        $graphQlArgs = array_merge($graphQlArgs, $this->fieldSchemas[$field->id]->getArgs());
       }
     }
 
@@ -35,14 +45,15 @@ class FieldService {
     if ($fieldLayoutId) {
       $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
       foreach ($fieldLayout->getFields() as $field) {
-        $event = new GetFieldSchemaEvent;
-        $event->field = $field;
-        $event->builder = new \markhuot\CraftQL\Builders\ObjectType;
-        $field->trigger('craftQlGetFieldSchema', $event);
-        $graphQlFields = array_merge($graphQlFields, $event->builder->getFields());
-        // var_dump($result, $event);
-        // die;
-        // $graphQlFields = array_merge($graphQlFields, $field->getGraphQLQueryFields($request));
+        if (!isset($this->fieldSchemas[$field->id])) {
+          $event = new GetFieldSchemaEvent;
+          $event->field = $field;
+          $event->builder = new \markhuot\CraftQL\Builders\ObjectType;
+          $field->trigger('craftQlGetFieldSchema', $event);
+          $this->fieldSchemas[$field->id] = $event->builder;
+        }
+
+        $graphQlFields = array_merge($graphQlFields, $this->fieldSchemas[$field->id]->getFields());
       }
     }
 
@@ -85,6 +96,20 @@ class FieldService {
         }
       ],
     ];
+  }
+
+  function mutateValueForField($field, $value, $entry) {
+    if (!isset($this->fieldSchemas[$field->id])) {
+      $event = new GetFieldSchemaEvent;
+      $event->field = $field;
+      $event->builder = new \markhuot\CraftQL\Builders\ObjectType;
+      $field->trigger('craftQlGetFieldSchema', $event);
+      $this->fieldSchemas[$field->id] = $event->builder;
+    }
+
+    $value = $this->fieldSchemas[$field->id]->mutate($field, $value);
+
+    return $value;
   }
 
 }

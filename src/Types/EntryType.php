@@ -33,7 +33,7 @@ class EntryType extends ObjectType {
     }
 
     function fields($craftEntryType, $request) {
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
         $baseFields = \markhuot\CraftQL\Types\Entry::baseFields($request);
         $entryTypeFields = $fieldService->getFields($craftEntryType->fieldLayoutId, $request);
         return array_merge($baseFields, $entryTypeFields);
@@ -72,7 +72,7 @@ class EntryType extends ObjectType {
     }
 
     function getGraphQLMutationArgs($request) {
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
 
         return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getGraphQLMutationArgs($this->config['craftType']->fieldLayoutId, $request));
     }
@@ -112,9 +112,12 @@ class EntryType extends ObjectType {
             unset($fields['typeId']);
             unset($fields['authorId']);
 
+            $fieldService = \Yii::$container->get('fieldService');
+
             foreach ($fields as $handle => &$value) {
                 $field = Craft::$app->fields->getFieldByHandle($handle);
-                $value = $field->upsert($value, $entry);
+                $value = $fieldService->mutateValueForField($field, $value, $entry);
+                // $value = $field->upsert($value, $entry);
             }
 
             $entry->setFieldValues($fields);

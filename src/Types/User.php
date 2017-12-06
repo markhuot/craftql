@@ -33,7 +33,7 @@ class User extends ObjectType {
             'status' => ['type' => Type::nonNull(UsersField::statusEnum())],
         ];
 
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
 
         $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateCreated'));
         $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateUpdated'));
@@ -47,7 +47,7 @@ class User extends ObjectType {
             return static::$type;
         }
 
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
         $userFieldLayout = \Craft::$app->fields->getLayoutByType(\craft\elements\User::class);
 
         $userFields = static::baseFields();

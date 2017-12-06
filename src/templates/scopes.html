@@ -106,7 +106,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for section in craft.sections.getAllSections() %}
+            {% for section in craft.sections.allSections %}
                 {% for entryType in section.entryTypes %}
                     <tr data-id="default">
                         <th>{{ section.type|ucfirst }}</th>
@@ -136,7 +136,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for section in craft.sections.getAllSections() %}
+            {% for section in craft.sections.allSections %}
                 {% for entryType in section.entryTypes %}
                     <tr data-id="default">
                         <th>{{ section.type|ucfirst }}</th>

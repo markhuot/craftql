@@ -19,7 +19,7 @@ class EntryTypeDraft extends EntryType {
     }
 
     function fields($craftEntryType, $request) {
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
         $baseFields = \markhuot\CraftQL\Types\EntryDraft::baseFields($request);
         $entryTypeFields = $fieldService->getFields($craftEntryType->fieldLayoutId, $request);
         return array_merge($baseFields, $entryTypeFields);

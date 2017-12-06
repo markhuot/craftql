@@ -27,7 +27,7 @@ class Entry {
             return static::$baseFields;
         }
 
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+        $fieldService = \Yii::$container->get('fieldService');
 
         $fields = [];
         $fields['elementType'] = ['type' => Type::nonNull(Type::string()), 'resolve' => function ($root, $args) {
