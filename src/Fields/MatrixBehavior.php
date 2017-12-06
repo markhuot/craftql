@@ -30,7 +30,15 @@ class MatrixBehavior extends Behavior
         foreach ($field->getBlockTypes() as $block) {
             $blockObjects[] = new ObjectType([
                 'name' => ucfirst($field->handle).ucfirst($block->handle),
-                'fields' => $fieldService->getFields($block->fieldLayoutId, $token),
+                'fields' => $fieldService->getFields($block->fieldLayoutId, $token) ?: [
+                    'EMPTY' => [
+                        'type' => Type::string(),
+                        'description' => 'This block has no fields defined, which GraphQL does not support. A placeholder field was added on the GraphQL side automatically.',
+                        'resolve' => function ($root, $args) {
+                            return 'This block has no fields defined, which GraphQL does not support. A placeholder field was added on the GraphQL side automatically.';
+                        }
+                ],
+                ],
             ]);
         }
 
@@ -39,7 +47,13 @@ class MatrixBehavior extends Behavior
                 'name' => ucfirst($field->handle).'Empty',
                 'description' => 'This matrix block is empty',
                 'fields' => [
-                    'empty' => Type::string(),
+                    'empty' => [
+                        'type' => Type::string(),
+                        'description' => 'This matrix has no blocks defined, which GraphQL does not support. A placeholder block was added on the GraphQL side automatically.',
+                        'resolve' => function ($root, $args) {
+                            return 'This matrix has no blocks defined, which GraphQL does not support. A placeholder block was added on the GraphQL side automatically.';
+                        }
+                    ],
                 ],
             ]);
         }

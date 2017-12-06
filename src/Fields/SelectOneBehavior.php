@@ -21,8 +21,11 @@ class SelectOneBehavior extends Behavior
             $value = $option['value'];
             $value = preg_replace('/[^a-z0-9]+/', ' ', $value);
             $value = \craft\helpers\StringHelper::toCamelCase($value);
+            if ($value === '') {
+                $value = 'empty';
+            }
             $options[$value] = [
-                'description' => $option['label'],
+                'description' => $option['label'] ?: 'empty',
             ];
         }
 
