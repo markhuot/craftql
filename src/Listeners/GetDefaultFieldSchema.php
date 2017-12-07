@@ -16,6 +16,6 @@ class GetDefaultFieldSchema
 
         return $event->builder
             ->addStringField($event->field)
-            ->addStringMutation($event->field);
+            ->addStringArgument($event->field);
     }
 }

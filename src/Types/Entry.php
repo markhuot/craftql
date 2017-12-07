@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
 
 class Entry {
 
@@ -41,9 +42,9 @@ class Entry {
 
         $fields['title'] = ['type' => Type::nonNull(Type::string())];
         $fields['slug'] = ['type' => Type::nonNull(Type::string())];
-        $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateCreated'));
-        $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateUpdated'));
-        $fields = array_merge($fields, $fieldService->getDateFieldDefinition('expiryDate'));
+        $fields['dateCreated'] = (new DateField($request))->toArray();
+        $fields['dateUpdated'] = (new DateField($request))->toArray();
+        $fields['expiryDate'] = (new DateField($request))->toArray();
         $fields['enabled'] = ['type' => Type::nonNull(Type::boolean())];
         $fields['status'] = ['type' => Type::nonNull(Type::string())];
         $fields['uri'] = ['type' => Type::string()];

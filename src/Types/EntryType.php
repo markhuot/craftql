@@ -82,7 +82,7 @@ class EntryType extends ObjectType {
     }
 
     function upsert($request) {
-        return function ($root, $args) {
+        return function ($root, $args) use ($request) {
             if (!empty($args['id'])) {
                 $criteria = Entry::find();
                 $criteria->id($args['id']);
@@ -116,7 +116,7 @@ class EntryType extends ObjectType {
 
             foreach ($fields as $handle => &$value) {
                 $field = Craft::$app->fields->getFieldByHandle($handle);
-                $value = $fieldService->mutateValueForField($field, $value, $entry);
+                $value = $fieldService->mutateValueForField($request, $field, $value, $entry);
                 // $value = $field->upsert($value, $entry);
             }
 

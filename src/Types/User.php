@@ -7,13 +7,14 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\GraphQLFields\Query\Users as UsersField;
+use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
 
 class User extends ObjectType {
 
     static $type;
     static $baseFields;
 
-    static function baseFields() {
+    static function baseFields($request) {
         if (!empty(static::$baseFields)) {
             return static::$baseFields;
         }
@@ -35,9 +36,9 @@ class User extends ObjectType {
 
         $fieldService = \Yii::$container->get('fieldService');
 
-        $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateCreated'));
-        $fields = array_merge($fields, $fieldService->getDateFieldDefinition('dateUpdated'));
-        $fields = array_merge($fields, $fieldService->getDateFieldDefinition('lastLoginDate'));
+        $fields['dateCreated'] = (new DateField($request))->toArray();
+        $fields['dateUpdated'] = (new DateField($request))->toArray();
+        $fields['lastLoginDate'] = (new DateField($request))->toArray();
 
         return static::$baseFields = $fields;
     }
@@ -50,7 +51,7 @@ class User extends ObjectType {
         $fieldService = \Yii::$container->get('fieldService');
         $userFieldLayout = \Craft::$app->fields->getLayoutByType(\craft\elements\User::class);
 
-        $userFields = static::baseFields();
+        $userFields = static::baseFields($request);
         if (!empty($userFieldLayout->id)) {
             $userFields = array_merge($userFields, $fieldService->getFields($userFieldLayout->id, $request));
         }

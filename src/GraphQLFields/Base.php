@@ -28,6 +28,11 @@ class Base {
         return $this;
     }
 
+    function setDescription($description) {
+        $this->description = $description;
+        return $this;
+    }
+
     function getDescription() {
         return $this->description;
     }

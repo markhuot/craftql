@@ -31,6 +31,6 @@ class GetSelectOneSchema
             ->addEnumField($field, $enum, function ($root, $args) use ($field) {
                 return (string)$root->{$field->handle} ?: null;
             })
-            ->addEnumMutation($field, $enum);
+            ->addEnumArgument($field, $enum);
     }
 }
