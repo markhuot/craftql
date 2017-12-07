@@ -140,12 +140,14 @@ class ToolsController extends Controller
         $section->enableVersioning = false;
 
         $siteSettings = new \craft\models\Section_SiteSettings();
+        $siteSettings->siteId = 1;
         $siteSettings->hasUrls = true;
         $siteSettings->uriFormat = 'stories/{slug}';
         $siteSettings->template = 'stories/_story';
+        $siteSettings->enabledByDefault = true;
         $section->setSiteSettings([1 => $siteSettings]);
 
-        Craft::$app->sections->saveSection($section);
+        Craft::$app->getSections()->saveSection($section);
 
         $groupModel = new \craft\models\FieldGroup();
         $groupModel->name = 'Default';
