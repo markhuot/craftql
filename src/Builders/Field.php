@@ -77,8 +77,8 @@ class Field {
         return $this->description;
     }
 
-    function lists(): self {
-        $this->isList = true;
+    function lists($isList=true): self {
+        $this->isList = $isList;
         return $this;
     }
 

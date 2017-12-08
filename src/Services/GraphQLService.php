@@ -8,6 +8,8 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use markhuot\CraftQL\Builders\Schema as Builder;
+use markhuot\CraftQL\Schema\RelatedToGlobal;
 use markhuot\CraftQL\Plugin;
 use yii\base\Component;
 use Yii;
@@ -57,6 +59,8 @@ class GraphQLService extends Component {
         $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
 
+        Builder::addGlobalFields($request, new RelatedToGlobal);
+
         $schema = [];
         $schema['query'] = new \markhuot\CraftQL\Types\Query($request);
         $schema['types'] = array_merge(
@@ -64,7 +68,8 @@ class GraphQLService extends Component {
             $request->entryTypes()->all(),
             $request->draftEntryTypes()->all(),
             $request->categoryGroups()->all(),
-            $request->sections()->all()
+            $request->sections()->all(),
+            $request->tagGroups()->all()
         );
         $schema['directives'] = [
             \markhuot\CraftQL\Directives\Date::directive(),

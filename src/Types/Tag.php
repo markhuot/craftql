@@ -25,6 +25,24 @@ class Tag extends ObjectType {
         return static::$baseFields = $fields;
     }
 
+    static function args($request) {
+        return [
+            'fixedOrder' => Type::boolean(),
+            'group' => $request->tagGroups()->enum(),
+            'groupId' => Type::int(),
+            'id' => Type::int(),
+            'indexBy' => Type::string(),
+            'limit' => Type::int(),
+            'locale' => Type::string(),
+            'offset' => Type::int(),
+            'order' => Type::string(),
+            'relatedTo' => Type::listOf(Entry::relatedToInputObject()),
+            'search' => Type::string(),
+            'slug' => Type::string(),
+            'title' => Type::string(),
+        ];
+    }
+
     static function interface() {
         if (!static::$interface) {
             $fields = static::baseFields();
@@ -33,8 +51,8 @@ class Tag extends ObjectType {
                 'name' => 'TagInterface',
                 'description' => 'A tag in Craft',
                 'fields' => $fields,
-                'resolveType' => function ($category) {
-                    return ucfirst($category->group->handle).'Tags';
+                'resolveType' => function ($tag) {
+                    return ucfirst($tag->group->handle).'Tags';
                 }
             ]);
         }

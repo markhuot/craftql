@@ -7,9 +7,6 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Craft;
 use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\Types\Entry;
-use markhuot\CraftQL\Types\EntryDraft;
-use markhuot\CraftQL\Types\EntryConnection;
 
 class Query extends ObjectType {
 
@@ -28,42 +25,6 @@ class Query extends ObjectType {
             ],
         ];
 
-        Schema::addGlobal($request, function ($schema) use ($request) {
-            $schema->addRawField('relatedTo')
-                ->type(\markhuot\CraftQL\Types\EntryConnection::singleton($schema->getRequest()))
-                ->arguments([
-                    'source' => Type::boolean(),
-                    'target' => Type::boolean(),
-                    'field' => Type::string(),
-                    'sourceLocale' => Type::string(),
-                ])
-                ->resolve(function ($root, $args, $context, $info) use ($request) {
-                    $criteria = \craft\elements\Entry::find();
-
-                    $criteria = $criteria->relatedTo([
-                        'element' => !@$args['source'] && !@$args['target'] ? $root['node']->id : null,
-                        'sourceElement' => @$args['source'] == true ? $root['node']->id : null,
-                        'targetElement' => @$args['target'] == true ? $root['node']->id : null,
-                        'field' => @$args['field'] ?: null,
-                        'sourceLocale' => @$args['sourceLocale'] ?: null,
-                    ]);
-
-                    unset($args['source']);
-                    unset($args['target']);
-                    unset($args['field']);
-                    unset($args['sourceLocale']);
-
-                    $criteria = $request->entries($criteria, $root, $args, $context, $info);
-                    list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
-
-                    return [
-                        'totalCount' => $pageInfo->total,
-                        'pageInfo' => $pageInfo,
-                        'edges' => $entries,
-                    ];
-                });
-        });
-
         $schema = new Schema($request);
 
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
@@ -72,12 +33,14 @@ class Query extends ObjectType {
             }
         }
 
-        $config['fields'] = array_merge($config['fields'], $schema->config());
-
         if ($token->can('query:tags')) {
-            $config['fields']['tags'] = (new \markhuot\CraftQL\GraphQLFields\Query\Tags($request))->toArray();
-            $config['fields']['tagsConnection'] = (new \markhuot\CraftQL\GraphQLFields\Query\TagsConnection($request))->toArray();
+            $this->addTagsSchema($schema);
+
+            // $config['fields']['tags'] = (new \markhuot\CraftQL\GraphQLFields\Query\Tags($request))->toArray();
+            // $config['fields']['tagsConnection'] = (new \markhuot\CraftQL\GraphQLFields\Query\TagsConnection($request))->toArray();
         }
+
+        $config['fields'] = array_merge($config['fields'], $schema->config());
 
         if ($token->can('query:categories')) {
             $config['fields']['categories'] = (new \markhuot\CraftQL\GraphQLFields\Query\Categories($request))->toArray();
@@ -144,6 +107,58 @@ class Query extends ObjectType {
             ])
             ->resolve(function ($root, $args) {
                 return \Craft::$app->entryRevisions->getDraftsByEntryId($args['id']);
+            });
+    }
+
+    /**
+     * The fields you can query that return tags
+     *
+     * @return Schema
+     */
+    function addTagsSchema($schema) {
+        $schema->addRawField('tags')
+            ->lists()
+            ->type(Tag::interface($schema->getRequest()))
+            ->arguments(Tag::args($schema->getRequest()))
+            ->resolve(function ($root, $args, $context, $info) {
+                $criteria = \craft\elements\Tag::find();
+
+                if (isset($args['group'])) {
+                    $args['groupId'] = $args['group'];
+                    unset($args['group']);
+                }
+
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+
+                return $criteria->all();
+            });
+
+        $schema->addRawField('tagsConnection')
+            ->type(TagConnection::singleton($schema->getRequest()))
+            ->arguments(Tag::args($schema->getRequest()))
+            ->resolve(function ($root, $args, $context, $info) {
+                $criteria = \craft\elements\Tag::find();
+
+                if (isset($args['group'])) {
+                    $args['groupId'] = $args['group'];
+                    unset($args['group']);
+                }
+
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+
+                list($pageInfo, $tags) = \craft\helpers\Template::paginateCriteria($criteria);
+
+                return [
+                    'totalCount' => $pageInfo->total,
+                    'pageInfo' => $pageInfo,
+                    'edges' => $tags,
+                    'criteria' => $criteria,
+                    'args' => $args,
+                ];
             });
     }
 

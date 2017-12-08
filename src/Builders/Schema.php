@@ -7,7 +7,7 @@ use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Field as BaseField;
 
-class Schema {
+class Schema implements \ArrayAccess {
 
     private $fields;
     static $globals;
@@ -16,12 +16,12 @@ class Schema {
         $this->request = $request;
     }
 
-    static function addGlobal($request, $callback) {
+    static function addGlobalFields($request, $callback) {
         if (!static::$globals) {
             static::$globals = new static($request);
         }
 
-        $callback(static::$globals);
+        $callback->apply(static::$globals);
     }
 
     function addGlobalField($name) {
@@ -38,6 +38,18 @@ class Schema {
 
     function addRawStringField($name) {
         return $this->fields[] = (new BaseField($this->request, $name))->type(Type::string());
+    }
+
+    function addRawIntField($name) {
+        return $this->fields[] = (new BaseField($this->request, $name))->type(Type::int());
+    }
+
+    function addRawFloatField($name) {
+        return $this->fields[] = (new BaseField($this->request, $name))->type(Type::float());
+    }
+
+    function addRawBooleanField($name) {
+        return $this->fields[] = (new BaseField($this->request, $name))->type(Type::boolean());
     }
 
     function addField(CraftField $field): BaseField {
@@ -86,6 +98,22 @@ class Schema {
 
     function args() {
         return [];
+    }
+
+    function offsetExists($offset) {
+        return isset($this->fields[$offset]);
+    }
+
+    function offsetGet($offset) {
+        return $this->fields[$offset];
+    }
+
+    function offsetSet($offset , $value) {
+        $this->fields[$offset] = $value;
+    }
+
+    function offsetUnset($offset) {
+        unset($this->fields[$offset]);
     }
 
     // function addCraftArgument(\craft\base\Field $field, $type, callable $callback=null) {
