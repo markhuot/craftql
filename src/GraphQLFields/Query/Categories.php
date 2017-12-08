@@ -7,7 +7,6 @@ use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\GraphQLFields\Base as BaseField;
 use markhuot\CraftQL\Types\Category;
 use markhuot\CraftQL\Types\Entry;
-use markhuot\CraftQL\GraphQLFields\Query\Entries as EntriesField;
 
 class Categories extends BaseField {
 
@@ -37,7 +36,7 @@ class Categories extends BaseField {
             'positionedAfter' => Type::int(),
             'positionedBefore' => Type::int(),
             'prevSiblingOf' => Type::int(),
-            'relatedTo' => Type::listOf(EntriesField::relatedToInputObject()),
+            'relatedTo' => Type::listOf(Entry::relatedToInputObject()),
             'search' => Type::string(),
             'siblingOf' => Type::int(),
             'slug' => Type::string(),

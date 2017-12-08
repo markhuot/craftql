@@ -13,25 +13,14 @@ class GetDateFieldSchema
      * @param \markhuot\CraftQL\Events\GetFieldSchema $event
      * @return void
      */
-    static function handle($event) {
+    function handle($event) {
         $event->handled = true;
 
         $field = $event->sender;
-        $builder = $event->builder;
-        $request = $event->request;
+        $schema = $event->schema;
+        // $request = $event->request;
 
-        $type = (new DateField($request, !!$field->required))
-            ->setDescription($field->instructions)
-            ->toArray();
-
-        $builder
-            ->addField(
-                $field->handle,
-                $type
-            )
-            ->addCraftArgument(
-                $field,
-                Type::int()
-            );
+        $schema->addDateField($field);
+        // $schema->addCraftArgument($field, Type::int());
     }
 }

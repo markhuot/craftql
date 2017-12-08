@@ -8,7 +8,6 @@ use GraphQL\Type\Definition\Type;
 class GetFieldSchema extends Event {
 
     public $field;
-    public $builder;
-    public $request;
+    public $schema;
 
 }

@@ -13,14 +13,13 @@ class GetLightswitchFieldSchema
      * @param \markhuot\CraftQL\Events\GetFieldSchema $event
      * @return void
      */
-    static function handle($event) {
+    function handle($event) {
         $event->handled = true;
 
         $field = $event->sender;
-        $builder = $event->builder;
+        $schema = $event->schema;
 
-        $builder
-            ->addBooleanField($field)
-            ->addBooleanArgument($field);
+        $schema->addBooleanField($field);
+        // $schema->addBooleanArgument($field);
     }
 }

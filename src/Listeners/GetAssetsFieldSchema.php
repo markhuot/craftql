@@ -16,25 +16,24 @@ class GetAssetsFieldSchema
      * @param \markhuot\CraftQL\Events\GetFieldSchema $event
      * @return void
      */
-    static function handle($event) {
+    function handle($event) {
         $event->handled = true;
 
         $field = $event->sender;
-        $builder = $event->builder;
+        $schema = $event->schema;
 
-        $builder
-            ->addCraftField(
-                $field,
-                Type::listOf(Volume::interface()),
-                function ($root, $args) use ($field) {
-                    return $root->{$field->handle}->all();
-                }
-            )
-            ->addCraftArgument(
-                $field,
-                Type::listOf(static::getInputObject($field)),
-                [static::class, 'upload']
-            );
+        $schema->addField($field)
+            ->lists()
+            ->type(Volume::interface())
+            ->resolve(function ($root, $args) use ($field) {
+                return $root->{$field->handle}->all();
+            });
+
+        // $schema->addCraftArgument(
+        //     $field,
+        //     Type::listOf($this->getInputObject($field)),
+        //     [static::class, 'upload']
+        // );
     }
 
     /**
@@ -100,7 +99,7 @@ class GetAssetsFieldSchema
      * @param Field $field
      * @return InputObjectType
      */
-    static function getInputObject($field) {
+    function getInputObject($field) {
         return new InputObjectType([
             'name' => ucfirst($field->handle).'AssetInput',
             'fields' => [

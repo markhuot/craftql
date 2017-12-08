@@ -11,11 +11,10 @@ class GetDefaultFieldSchema
      * @param \markhuot\CraftQL\Events\GetFieldSchema $event
      * @return void
      */
-    static function handle($event) {
+    function handle($event) {
         $event->handled = true;
 
-        return $event->builder
-            ->addStringField($event->field)
-            ->addStringArgument($event->field);
+        $event->schema->addStringField($event->field);
+        // $event->schema->addStringArgument($event->field);
     }
 }

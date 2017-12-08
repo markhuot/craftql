@@ -76,7 +76,7 @@ class Request {
         return $this->sections;
     }
 
-    function entries($criteria, $args, $info) {
+    function entries($criteria, $root, $args, $context, $info) {
         if (empty($args['section'])) {
             $args['sectionId'] = array_map(function ($value) {
                 return $value->value;

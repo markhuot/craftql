@@ -2,10 +2,10 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType as BaseObjectType;
+use GraphQL\Type\Definition\ObjectType as GraphQLObjectType;
 use markhuot\CraftQL\Request;
 
-class ObjectType extends BaseObjectType {
+class ObjectType extends GraphQLObjectType {
 
     static $singletons = [];
 

@@ -22,10 +22,11 @@ class FieldService {
     if (!isset($this->fieldSchemas[$field->id])) {
       $event = new GetFieldSchemaEvent;
       $event->field = $field;
-      $event->builder = new \markhuot\CraftQL\Builders\ObjectType;
-      $event->request = $request;
+      $event->schema = new \markhuot\CraftQL\Builders\Schema($request);
       $field->trigger('craftQlGetFieldSchema', $event);
-      $this->fieldSchemas[$field->id] = $event->builder;
+      $this->fieldSchemas[$field->id]['schema'] = $event->schema;
+      $this->fieldSchemas[$field->id]['args'] = $event->schema->args();
+      $this->fieldSchemas[$field->id]['config'] = $event->schema->config();
     }
 
     return $this->fieldSchemas[$field->id];
@@ -37,7 +38,7 @@ class FieldService {
     if ($fieldLayoutId) {
       $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
       foreach ($fieldLayout->getFields() as $field) {
-        $graphQlArgs = array_merge($graphQlArgs, $this->getSchemaForField($field, $request)->getArgs());
+        $graphQlArgs = array_merge($graphQlArgs, $this->getSchemaForField($field, $request)['args']);
       }
     }
 
@@ -50,7 +51,7 @@ class FieldService {
     if ($fieldLayoutId) {
       $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
       foreach ($fieldLayout->getFields() as $field) {
-        $graphQlFields = array_merge($graphQlFields, $this->getSchemaForField($field, $request)->toArray());
+        $graphQlFields = array_merge($graphQlFields, $this->getSchemaForField($field, $request)['config']);
       }
     }
 
@@ -59,7 +60,7 @@ class FieldService {
   }
 
   function mutateValueForField($request, $field, $value, $entry) {
-    $value = $this->getSchemaForField($field, $request)->mutate($entry, $field, $value);
+    // $value = $this->getSchemaForField($field, $request)->mutate($entry, $field, $value);
 
     return $value;
   }

@@ -7,7 +7,6 @@ use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\GraphQLFields\Base as BaseField;
 use markhuot\CraftQL\Types\Entry;
 use markhuot\CraftQL\Types\Tag;
-use markhuot\CraftQL\GraphQLFields\Query\Entries as EntriesField;
 
 class Tags extends BaseField {
 
@@ -28,7 +27,7 @@ class Tags extends BaseField {
             'locale' => Type::string(),
             'offset' => Type::int(),
             'order' => Type::string(),
-            'relatedTo' => Type::listOf(EntriesField::relatedToInputObject()),
+            'relatedTo' => Type::listOf(Entry::relatedToInputObject()),
             'search' => Type::string(),
             'slug' => Type::string(),
             'title' => Type::string(),

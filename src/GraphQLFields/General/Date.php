@@ -28,9 +28,9 @@ class Date extends BaseField {
         if (isset($info->fieldNodes[0]->directives[0])) {
             $directive = $info->fieldNodes[0]->directives[0];
             if ($directive->arguments) {
-            foreach ($directive->arguments as $arg) {
-                $format = $arg->value->value;
-            }
+                foreach ($directive->arguments as $arg) {
+                    $format = $arg->value->value;
+                }
             }
         }
 

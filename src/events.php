@@ -3,27 +3,42 @@
 return [
     \craft\fields\Assets::class => [
         'craftQlGetFieldSchema' => [
-            \markhuot\CraftQL\Listeners\GetAssetsFieldSchema::class,
+            new \markhuot\CraftQL\Listeners\GetAssetsFieldSchema,
+        ],
+    ],
+    \craft\fields\Checkboxes::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetSelectMultipleFieldSchema,
         ],
     ],
     \craft\fields\Date::class => [
         'craftQlGetFieldSchema' => [
-            \markhuot\CraftQL\Listeners\GetDateFieldSchema::class,
+            new \markhuot\CraftQL\Listeners\GetDateFieldSchema,
         ],
     ],
     \craft\fields\Dropdown::class => [
         'craftQlGetFieldSchema' => [
-            \markhuot\CraftQL\Listeners\GetSelectOneSchema::class,
+            new \markhuot\CraftQL\Listeners\GetSelectOneFieldSchema,
+        ],
+    ],
+    \craft\fields\Entries::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetEntriesFieldSchema,
         ],
     ],
     \craft\fields\Lightswitch::class => [
         'craftQlGetFieldSchema' => [
-            \markhuot\CraftQL\Listeners\GetLightswitchFieldSchema::class,
+            new \markhuot\CraftQL\Listeners\GetLightswitchFieldSchema,
+        ],
+    ],
+    \craft\fields\MultiSelect::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetSelectMultipleFieldSchema,
         ],
     ],
     \craft\base\Field::class => [
         'craftQlGetFieldSchema' => [
-            \markhuot\CraftQL\Listeners\GetDefaultFieldSchema::class,
+            new \markhuot\CraftQL\Listeners\GetDefaultFieldSchema,
         ],
     ],
 ];
