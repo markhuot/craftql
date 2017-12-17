@@ -53,7 +53,9 @@ class EntryType extends ObjectType {
     function fields($craftEntryType, $request) {
         $fieldService = \Yii::$container->get('fieldService');
         $baseFields = \markhuot\CraftQL\Types\Entry::baseFields($request);
-        $entryTypeFields = $fieldService->getFields($craftEntryType->fieldLayoutId, $request);
+        $entryTypeFields = $fieldService->getFields($craftEntryType->fieldLayoutId, $request)['schema']->getFieldConfig();
+        // var_dump($entryTypeFields->getFieldConfig());
+        // die;
         return array_merge($baseFields, $entryTypeFields);
     }
 

@@ -76,6 +76,10 @@ class GraphQLService extends Component {
             // $request->tagGroups()->all(),
             $request->entryTypes()->all()
         );
+
+        // var_dump($request->entryTypes()->all()[0]);
+        // die;
+
         // $schema['directives'] = [
         //     \markhuot\CraftQL\Directives\Date::directive(),
         // ];

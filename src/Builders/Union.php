@@ -30,7 +30,7 @@ class Union extends ContentField {
         foreach ($this->types as $typeName => $typeSchema) {
             $types[] = new ObjectType([
                 'name' => $typeName,
-                'fields' => $typeSchema->config(),
+                'fields' => $typeSchema->getFieldConfig(),
             ]);
         }
 
