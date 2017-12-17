@@ -53,24 +53,6 @@ class EntryType extends ObjectType {
         return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
     }
 
-    static function make($request) {
-        if (!empty(static::$type)) {
-            return static::$type;
-        }
-
-        return static::$type = new ObjectType([
-            'name' => 'EntryType',
-            'fields' => [
-                'id' => ['type' => Type::nonNull(Type::int())],
-                'name' => ['type' => Type::nonNull(Type::string())],
-                'handle' => ['type' => Type::nonNull(Type::string())],
-                // 'fields' => ['type' => Type::listOf(Field::make($request)), 'resolve' => function ($root, $args) {
-                //     return Craft::$app->fields->getLayoutById($root->fieldLayoutId)->getFields();
-                // }],
-            ],
-        ]);
-    }
-
     function getGraphQLMutationArgs($request) {
         $fieldService = \Yii::$container->get('fieldService');
 

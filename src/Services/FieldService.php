@@ -55,7 +55,7 @@ class FieldService {
         if ($fieldLayoutId) {
             $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
             foreach ($fieldLayout->getFields() as $field) {
-                $graphQlFields = array_merge($graphQlFields, $this->getSchemaForField($field, $request)['config']);
+                $graphQlFields = array_merge($graphQlFields, $this->getSchemaForField($field, $request));
             }
         }
 

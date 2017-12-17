@@ -37,7 +37,15 @@ class Field {
     }
 
     function getType() {
-        return $this->type ?: Type::string();
+        return $this->type;
+    }
+    
+    function getRawType() {
+        if(is_($type=$this->getType(), Schema::class)) {
+            return ($type::singleton($this->request))->getGraphQLObject();
+        }
+        
+        return $type ?: Type::string();
     }
 
     function arguments($arguments): self {
@@ -50,7 +58,7 @@ class Field {
     }
 
     function getConfig() {
-        $type = $this->getType();
+        $type = $this->getRawType();
 
         if ($this->isList) {
             $type = Type::listOf($type);
@@ -97,7 +105,13 @@ class Field {
     }
 
     function getResolve() /* php 7.1: ?callable*/ {
-        return $this->resolve;
+        if (is_callable($this->resolve)) {
+            return $this->resolve;
+        }
+        
+        return function($root, $args) {
+            return $this->resolve;
+        }
     }
 
 }

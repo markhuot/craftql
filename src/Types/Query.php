@@ -15,17 +15,13 @@ class Query extends ObjectType {
 
         $config = [
             'name' => 'Query',
-            'fields' => [
-                'helloWorld' => [
-                    'type' => Type::string(),
-                    'resolve' => function ($root, $args) {
-                      return 'Welcome to GraphQL! You now have a fully functional GraphQL endpoint.';
-                    }
-                ],
-            ],
+            'fields' => [],
         ];
-
+        
         $schema = new Schema($request);
+        
+        $schema->addRawStringField('helloWorld')
+            ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
             if (!empty($request->entryTypes()->all())) {
@@ -33,39 +29,25 @@ class Query extends ObjectType {
             }
         }
 
-        // var_dump($request->globals()->all());
-        // die;
-
-        // foreach ($request->globals()->all() as $globalType) {
-            // var_dump($globalType);
-            // die;
-            $schema->addRawField('globals')
-                ->type(\markhuot\CraftQL\Types\GlobalsSet::singleton($request))
-                ->resolve(function ($root, $args) {
-                    $sets = [];
-                    foreach (\Craft::$app->globals->allSets as $set) {
-                        $sets[$set->handle] = $set;
-                    }
-                    return $sets;
-                });
-        // }
-
-        // foreach ($request->globals()->all() as $set) {
-        //     var_dump($set);
-        //     die;
-        // }
+        $schema->addRawField('globals')
+            ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
+            ->resolve(function ($root, $args) {
+                $sets = [];
+                foreach (\Craft::$app->globals->allSets as $set) {
+                    $sets[$set->handle] = $set;
+                }
+                return $sets;
+            });
 
         if ($token->can('query:tags')) {
             $this->addTagsSchema($schema);
         }
 
         if ($token->can('query:categories')) {
-            $config['fields']['categories'] = (new \markhuot\CraftQL\GraphQLFields\Query\Categories($request))->toArray();
-            $config['fields']['categoriesConnection'] = (new \markhuot\CraftQL\GraphQLFields\Query\CategoriesConnection($request))->toArray();
+        	$this->addCategoriesSchema($schema);
         }
 
         if ($token->can('query:users')) {
-            // $config['fields']['users'] = (new \markhuot\CraftQL\GraphQLFields\Query\Users($request))->toArray();
             $schema->addRawField('users')
                 ->lists()
                 ->type(User::type($request))
@@ -205,6 +187,58 @@ class Query extends ObjectType {
                     'totalCount' => $pageInfo->total,
                     'pageInfo' => $pageInfo,
                     'edges' => $tags,
+                    'criteria' => $criteria,
+                    'args' => $args,
+                ];
+            });
+    }
+    
+    /**
+     * The fields you can query that return categories
+     *
+     * @return Schema
+     */
+    function addCategoriesSchema($schema) {
+        $schema->addRawField('categories')
+            ->lists()
+            ->type(Category::interface($schema->request())
+            ->arguments(Category::args($schema->request())
+            ->resolve(function ($root, $args) {
+                $criteria = \craft\elements\Category::find();
+
+                if (isset($args['group'])) {
+                    $args['groupId'] = $args['group'];
+                    unset($args['group']);
+                }
+        
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+        
+                return $criteria->all();
+            });
+        
+        $schema->addRawField('categoriesConnection')
+            ->type(CategoryConnection::singleton($this->request))
+            ->arguments(Category::args($schema->request())
+            ->resolve(function ($root, $args) {
+                $criteria = \craft\elements\Category::find();
+
+                if (isset($args['group'])) {
+                    $args['groupId'] = $args['group'];
+                    unset($args['group']);
+                }
+        
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+
+                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($criteria);
+        
+                return [
+                    'totalCount' => $pageInfo->total,
+                    'pageInfo' => $pageInfo,
+                    'edges' => $categories,
                     'criteria' => $criteria,
                     'args' => $args,
                 ];

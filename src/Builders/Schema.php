@@ -9,12 +9,33 @@ use markhuot\CraftQL\Builders\Field as BaseField;
 
 class Schema implements \ArrayAccess {
 
+    private $name;
     private $fields = [];
     private $reallyRawFields = [];
+    protected $context;
     static $globals;
 
-    function __construct(Request $request) {
+    function __construct(Request $request, $context) {
         $this->request = $request;
+        $this->context = $context;
+        $this->boot();
+    }
+    
+    function boot() {
+    
+    }
+    
+    function name(string $bane) {
+        $this->name = $name;
+    }
+    
+    function getName(Request $request):string {
+        if ($this->name === null) {
+            $reflect = new \ReflectionClass(static::class);
+            return $this->name = $reflect->getShortName();
+        }
+
+        return $this->name;
     }
 
     static function addGlobalFields($request, $callback) {
@@ -94,6 +115,10 @@ class Schema implements \ArrayAccess {
     function getRequest() {
         return $this->request;
     }
+    
+    function getFields(): array {
+        return $this->fields;
+    }
 
     function getField($name) {
         foreach ($this->fields as $field) {
@@ -105,10 +130,10 @@ class Schema implements \ArrayAccess {
         return false;
     }
 
-    function config():array {
+    function getFieldConfig():array {
         $fields = [];
 
-        foreach ($this->fields as $field) {
+        foreach ($this->getFields() as $field) {
             $fields[$field->getName()] = $field->getConfig();
         }
 
@@ -116,9 +141,16 @@ class Schema implements \ArrayAccess {
 
         return $fields;
     }
-
-    function args() {
-        return [];
+    
+    function getGraphQLConfig() {
+        return [
+            'name' => $this->getName($request),
+            'fields' => $this->getFieldConfig($request),
+        ];
+    }
+    
+    function getGraphQLObject() {
+        return new ObjectType($this->getGraphQLConfig());
     }
 
     function offsetExists($offset) {
