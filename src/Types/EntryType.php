@@ -43,9 +43,9 @@ class EntryType extends ObjectType {
                 'id' => ['type' => Type::nonNull(Type::int())],
                 'name' => ['type' => Type::nonNull(Type::string())],
                 'handle' => ['type' => Type::nonNull(Type::string())],
-                // 'fields' => ['type' => Type::listOf(Field::make($request)), 'resolve' => function ($root, $args) {
-                //     return Craft::$app->fields->getLayoutById($root->fieldLayoutId)->getFields();
-                // }],
+                'fields' => ['type' => Type::listOf(Field::make($request)), 'resolve' => function ($root, $args) {
+                    return Craft::$app->fields->getLayoutById($root->fieldLayoutId)->getFields();
+                }],
             ],
         ]);
     }

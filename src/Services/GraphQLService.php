@@ -68,14 +68,14 @@ class GraphQLService extends Component {
 
         $schema = [];
         $schema['query'] = new \markhuot\CraftQL\Types\Query($request);
-        // $schema['types'] = array_merge(
-        //     $request->volumes()->all(),
-        //     $request->entryTypes()->all(),
-        //     $request->draftEntryTypes()->all(),
-        //     $request->categoryGroups()->all(),
-        //     $request->sections()->all(),
-        //     $request->tagGroups()->all()
-        // );
+        $schema['types'] = array_merge(
+            // $request->volumes()->all(),
+            // $request->draftEntryTypes()->all(),
+            // $request->categoryGroups()->all(),
+            // $request->sections()->all(),
+            // $request->tagGroups()->all(),
+            $request->entryTypes()->all()
+        );
         // $schema['directives'] = [
         //     \markhuot\CraftQL\Directives\Date::directive(),
         // ];
@@ -88,16 +88,16 @@ class GraphQLService extends Component {
         // var_dump(Schema::assertValid($schema));
         // die;
 
-        // try {
+        try {
             $schema = new Schema($schema);
-        //     $schema->assertValid();
+            $schema->assertValid();
         // } catch(\yii\base\ErrorException $e) {
         //     echo $e->getMessage();
         //     die('foo');
-        // } catch (\GraphQL\Error\InvariantViolation $e) {
-        //     echo $e->getMessage();
-        //     die('bar');
-        // }
+        } catch (\GraphQL\Error\InvariantViolation $e) {
+            echo $e->getMessage();
+            die('bar');
+        }
 
         return $schema;
     }

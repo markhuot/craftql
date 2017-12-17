@@ -23,11 +23,11 @@ class Query extends ObjectType {
         $schema->addRawStringField('helloWorld')
             ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
-        // if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
-        //     if (!empty($request->entryTypes()->all())) {
-        //         $this->addEntriesSchema($schema);
-        //     }
-        // }
+        if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
+            if (!empty($request->entryTypes()->all())) {
+                $this->addEntriesSchema($schema);
+            }
+        }
 
         $schema->addRawField('globals')
             ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
