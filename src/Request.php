@@ -11,6 +11,7 @@ class Request {
     private $categoryGroups;
     private $tagGroups;
     private $sections;
+    private $globals;
 
     function __construct($token) {
         $this->token = $token;
@@ -38,6 +39,10 @@ class Request {
 
     function addSections(\markhuot\CraftQL\Factories\Section $sections) {
         $this->sections = $sections;
+    }
+
+    function addGlobals(\markhuot\CraftQL\Factories\Globals $globals) {
+        $this->globals = $globals;
     }
 
     function token() {
@@ -74,6 +79,10 @@ class Request {
 
     function sections(): \markhuot\CraftQL\Factories\Section {
         return $this->sections;
+    }
+
+    function globals(): \markhuot\CraftQL\Factories\Globals {
+        return $this->globals;
     }
 
     function entries($criteria, $root, $args, $context, $info) {

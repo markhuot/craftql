@@ -18,7 +18,6 @@ class GetDateFieldSchema
 
         $field = $event->sender;
         $schema = $event->schema;
-        // $request = $event->request;
 
         $schema->addDateField($field);
         // $schema->addCraftArgument($field, Type::int());

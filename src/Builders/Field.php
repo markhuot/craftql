@@ -87,6 +87,10 @@ class Field {
         return $this;
     }
 
+    function isNonNull(): bool {
+        return $this->isNonNull;
+    }
+
     function resolve($resolve): self {
         $this->resolve = $resolve;
         return $this;

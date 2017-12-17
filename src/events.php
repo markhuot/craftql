@@ -31,6 +31,11 @@ return [
             new \markhuot\CraftQL\Listeners\GetLightswitchFieldSchema,
         ],
     ],
+    \craft\fields\Matrix::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetMatrixFieldSchema,
+        ],
+    ],
     \craft\fields\MultiSelect::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetSelectMultipleFieldSchema,

@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
 
 class Entry {
@@ -95,42 +96,38 @@ class Entry {
             return static::$baseFields;
         }
 
-        $fieldService = \Yii::$container->get('fieldService');
-
-        $fields = [];
-        $fields['elementType'] = ['type' => Type::nonNull(Type::string()), 'resolve' => function ($root, $args) {
-            return 'Entry';
-        }];
-        $fields['id'] = ['type' => Type::nonNull(Type::int())];
+        $schema = new Schema($request);
+        $schema->addRawStringField('elementType')->nonNull()->resolve('Entry');
+        $schema->addRawIntField('id')->nonNull();
 
         if ($request->token()->can('query:entry.author')) {
-            $fields['author'] = ['type' => Type::nonNull(\markhuot\CraftQL\Types\User::type($request))];
+            $schema->addRawField('author')->type(\markhuot\CraftQL\Types\User::type($request))->nonNull();
         }
 
-        $fields['title'] = ['type' => Type::nonNull(Type::string())];
-        $fields['slug'] = ['type' => Type::nonNull(Type::string())];
-        $fields['dateCreated'] = (new DateField($request))->toArray();
-        $fields['dateUpdated'] = (new DateField($request))->toArray();
-        $fields['expiryDate'] = (new DateField($request))->toArray();
-        $fields['enabled'] = ['type' => Type::nonNull(Type::boolean())];
-        $fields['status'] = ['type' => Type::nonNull(Type::string())];
-        $fields['uri'] = ['type' => Type::string()];
-        $fields['url'] = ['type' => Type::string()];
-        $fields['section'] = ['type' => \markhuot\CraftQL\Types\Section::type()];
-        $fields['type'] = ['type' => \markhuot\CraftQL\Types\EntryType::make($request)];
+        $schema->addRawStringField('title')->nonNull();
+        $schema->addRawStringField('slug')->nonNull();
+        $schema->addRawDateField('dateCreated');
+        $schema->addRawDateField('dateUpdated');
+        $schema->addRawDateField('expiryDate');
+        $schema->addRawBooleanField('enabled')->nonNull();
+        $schema->addRawStringField('status')->nonNull();
+        $schema->addRawStringField('uri');
+        $schema->addRawStringField('url');
+        $schema->addRawField('section')->type(\markhuot\CraftQL\Types\Section::type());
+        $schema->addRawField('type')->type(\markhuot\CraftQL\Types\EntryType::make($request));
+        $schema->addRawField('ancestors')->type(Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)));
+        $schema->addRawField('children')->type(Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)));
+        $schema->addRawField('descendants')->type(Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)));
+        $schema->addRawField('hasDescendants')->type(Type::nonNull(Type::boolean()));
+        $schema->addRawField('level')->type(Type::int());
+        $schema->addRawField('parent')->type(\markhuot\CraftQL\Types\Entry::interface($request));
+        $schema->addRawField('siblings')->type(Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)));
 
-        $fields['ancestors'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];
-        $fields['children'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];
-        $fields['descendants'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];
-        $fields['hasDescendants'] = ['type' => Type::nonNull(Type::boolean())];
-        $fields['level'] = ['type' => Type::int()];
-        $fields['parent'] = ['type' => \markhuot\CraftQL\Types\Entry::interface($request)];
-        $fields['siblings'] = ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request))];
         // $fields['json'] = ['type' => Type::string(), 'resolve' => function($root, $args) {
         //     return json_encode($root->toArray());
         // }];
 
-        return static::$baseFields = $fields;
+        return static::$baseFields = $schema->config();
     }
 
     static function resolveType($entry) {

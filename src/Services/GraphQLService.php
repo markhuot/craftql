@@ -22,19 +22,22 @@ class GraphQLService extends Component {
     private $tagGroups;
     private $entryTypes;
     private $sections;
+    private $globals;
 
     function __construct(
         \markhuot\CraftQL\Repositories\Volumes $volumes,
         \markhuot\CraftQL\Repositories\CategoryGroup $categoryGroups,
         \markhuot\CraftQL\Repositories\TagGroup $tagGroups,
         \markhuot\CraftQL\Repositories\EntryType $entryTypes,
-        \markhuot\CraftQL\Repositories\Section $sections
+        \markhuot\CraftQL\Repositories\Section $sections,
+        \markhuot\CraftQL\Repositories\Globals $globals
     ) {
         $this->volumes = $volumes;
         $this->categoryGroups = $categoryGroups;
         $this->tagGroups = $tagGroups;
         $this->entryTypes = $entryTypes;
         $this->sections = $sections;
+        $this->globals = $globals;
     }
 
     /**
@@ -48,6 +51,7 @@ class GraphQLService extends Component {
         $this->tagGroups->load();
         $this->entryTypes->load();
         $this->sections->load();
+        $this->globals->load();
     }
 
     function getSchema($token) {
@@ -58,6 +62,7 @@ class GraphQLService extends Component {
         $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
         $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
+        $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
 
         Builder::addGlobalFields($request, new RelatedToGlobal);
 

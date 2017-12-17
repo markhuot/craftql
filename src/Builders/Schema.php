@@ -9,7 +9,8 @@ use markhuot\CraftQL\Builders\Field as BaseField;
 
 class Schema implements \ArrayAccess {
 
-    private $fields;
+    private $fields = [];
+    private $reallyRawFields = [];
     static $globals;
 
     function __construct(Request $request) {
@@ -32,6 +33,11 @@ class Schema implements \ArrayAccess {
         return static::$globals;
     }
 
+    // @TODO remove this when it's no longer used
+    function addReallyRawField($name, $field) {
+        $this->reallyRawFields[$name] = $field;
+    }
+
     function addRawField($name) {
         return $this->fields[] = new BaseField($this->request, $name);
     }
@@ -52,6 +58,10 @@ class Schema implements \ArrayAccess {
         return $this->fields[] = (new BaseField($this->request, $name))->type(Type::boolean());
     }
 
+    function addRawDateField($name): BaseField {
+        return $this->fields[] = new Date($this->request, $name);
+    }
+
     function addField(CraftField $field): BaseField {
         return $this->fields[] = new ContentField($this->request, $field);
     }
@@ -69,7 +79,16 @@ class Schema implements \ArrayAccess {
     }
 
     function addDateField(CraftField $field): BaseField {
-        return $this->fields[] = new Date($this->request, $field);
+        return $this->fields[] = new Date($this->request, $field->handle);
+    }
+
+    function addUnionField(CraftField $field): BaseField {
+        return $this->fields[] = new Union($this->request, $field);
+    }
+
+    function addFieldsByLayoutId(int $fieldLayoutId) {
+        throw new \Exception('you need to do this');
+        $fields = $fieldService->getFields($fieldLayoutId, $this->request);
     }
 
     function getRequest() {
@@ -92,6 +111,8 @@ class Schema implements \ArrayAccess {
         foreach ($this->fields as $field) {
             $fields[$field->getName()] = $field->getConfig();
         }
+
+        $fields = array_merge($fields, $this->reallyRawFields);
 
         return $fields;
     }

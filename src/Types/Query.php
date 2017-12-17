@@ -33,14 +33,31 @@ class Query extends ObjectType {
             }
         }
 
+        // var_dump($request->globals()->all());
+        // die;
+
+        // foreach ($request->globals()->all() as $globalType) {
+            // var_dump($globalType);
+            // die;
+            $schema->addRawField('globals')
+                ->type(\markhuot\CraftQL\Types\GlobalsSet::singleton($request))
+                ->resolve(function ($root, $args) {
+                    $sets = [];
+                    foreach (\Craft::$app->globals->allSets as $set) {
+                        $sets[$set->handle] = $set;
+                    }
+                    return $sets;
+                });
+        // }
+
+        // foreach ($request->globals()->all() as $set) {
+        //     var_dump($set);
+        //     die;
+        // }
+
         if ($token->can('query:tags')) {
             $this->addTagsSchema($schema);
-
-            // $config['fields']['tags'] = (new \markhuot\CraftQL\GraphQLFields\Query\Tags($request))->toArray();
-            // $config['fields']['tagsConnection'] = (new \markhuot\CraftQL\GraphQLFields\Query\TagsConnection($request))->toArray();
         }
-
-        $config['fields'] = array_merge($config['fields'], $schema->config());
 
         if ($token->can('query:categories')) {
             $config['fields']['categories'] = (new \markhuot\CraftQL\GraphQLFields\Query\Categories($request))->toArray();
@@ -48,12 +65,44 @@ class Query extends ObjectType {
         }
 
         if ($token->can('query:users')) {
-            $config['fields']['users'] = (new \markhuot\CraftQL\GraphQLFields\Query\Users($request))->toArray();
+            // $config['fields']['users'] = (new \markhuot\CraftQL\GraphQLFields\Query\Users($request))->toArray();
+            $schema->addRawField('users')
+                ->lists()
+                ->type(User::type($request))
+                ->arguments([
+                    'admin' => Type::boolean(),
+                    'email' => Type::string(),
+                    'firstName' => Type::string(),
+                    'group' => Type::string(),
+                    'groupId' => Type::string(),
+                    'id' => Type::int(),
+                    'lastLoginDate' => Type::int(),
+                    'lastName' => Type::string(),
+                    'limit' => Type::int(),
+                    'offset' => Type::int(),
+                    'order' => Type::string(),
+                    'search' => Type::string(),
+                    // 'status' => static::statusEnum(),
+                    'username' => Type::string(),
+                ])
+                ->resolve(function ($root, $args, $context, $info) {
+                    $criteria = \craft\elements\User::find();
+
+                    foreach ($args as $key => $value) {
+                        $criteria = $criteria->{$key}($value);
+                    }
+
+                    return $criteria->all();
+                });
         }
 
         if ($token->can('query:sections')) {
-            $config['fields']['sections'] = (new \markhuot\CraftQL\GraphQLFields\Query\Sections($request))->toArray();
+            $schema->addRawField('sections')->lists()->type(Section::type())->resolve(function ($root, $args, $context, $info) {
+                return \Craft::$app->sections->allSections;
+            });
         }
+
+        $config['fields'] = array_merge($config['fields'], $schema->config());
 
         parent::__construct($config);
     }

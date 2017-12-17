@@ -21,6 +21,8 @@ class GetEntriesFieldSchema
 
         $schema->addField($field)
             ->type(Entry::interface($schema->getRequest()))
+            //->arguments()
+            //->resolve(request->entries)
             ->lists();
 
         $schema->addField($field)

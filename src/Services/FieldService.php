@@ -27,7 +27,11 @@ class FieldService {
             $this->fieldSchemas[$field->id]['schema'] = $event->schema;
             $this->fieldSchemas[$field->id]['args'] = $event->schema->args();
             $this->fieldSchemas[$field->id]['config'] = $event->schema->config();
+            // if ($field->id == 11) {
+            //     var_dump($this->fieldSchemas[$field->id]['config']);
+            // }
         }
+        // die;
 
         return $this->fieldSchemas[$field->id];
     }

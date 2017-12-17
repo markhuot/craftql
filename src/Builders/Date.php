@@ -5,11 +5,10 @@ namespace markhuot\CraftQL\Builders;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Builders\ContentField;
 
-class Date extends ContentField {
+class Date extends Field {
 
     function getType() {
-        $type = \markhuot\CraftQL\Types\Timestamp::type();
-        return $this->field->required ? Type::nonNull($type) : $type;
+        return \markhuot\CraftQL\Types\Timestamp::type();
     }
 
     function getResolve() {
@@ -27,7 +26,7 @@ class Date extends ContentField {
 
             $date = $root->{$info->fieldName};
 
-            if ($this->field->required && !$date) {
+            if ($this->isNonNull() && !$date) {
                 throw new Error("`{$info->fieldName}` is a required field but has no value");
             }
 

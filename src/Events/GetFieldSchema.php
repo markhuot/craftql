@@ -9,5 +9,6 @@ class GetFieldSchema extends Event {
 
     public $field;
     public $schema;
+    public $request;
 
 }
