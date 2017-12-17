@@ -9,7 +9,7 @@ use GraphQL\Type\Definition\Type;
 use Craft;
 use craft\elements\Entry;
 
-class EntryType extends ObjectType {
+class EntryTypeDerivitive extends ObjectType {
 
     public $craftType;
     static $rawCraftEntryTypes = [];

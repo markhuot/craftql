@@ -12,7 +12,7 @@ use markhuot\CraftQL\Builders\Schema;
 
 class Globals extends Schema {
 
-    protected function getName():string {
+    function getName():string {
         return ucfirst($this->context->handle);
     }
 

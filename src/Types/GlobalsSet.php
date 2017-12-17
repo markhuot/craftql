@@ -15,7 +15,7 @@ class GlobalsSet extends \markhuot\CraftQL\Builders\Schema {
 
     function boot() {
         foreach ($this->request->globals()->all() as $globalSet) {
-            $this->addRawField($globalSet->config['craftType']->handle)
+            $this->addRawField($globalSet->getContext()->handle)
                 ->type($globalSet);
         }
     }

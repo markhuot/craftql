@@ -39,12 +39,18 @@ class Field {
     function getType() {
         return $this->type;
     }
-    
+
     function getRawType() {
-        if(is_($type=$this->getType(), Schema::class)) {
+        $type = $this->getType();
+
+        if (is_string($type) && is_subclass_of($type, Schema::class)) {
             return ($type::singleton($this->request))->getGraphQLObject();
         }
-        
+
+        else if (is_subclass_of($type, Schema::class)) {
+            return $type->getGraphQLObject();
+        }
+
         return $type ?: Type::string();
     }
 
@@ -108,10 +114,14 @@ class Field {
         if (is_callable($this->resolve)) {
             return $this->resolve;
         }
-        
-        return function($root, $args) {
-            return $this->resolve;
+
+        if ($this->resolve !== null) {
+            return function($root, $args) {
+                return $this->resolve;
+            };
         }
+
+        return null;
     }
 
 }

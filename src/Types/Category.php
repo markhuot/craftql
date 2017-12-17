@@ -56,7 +56,7 @@ class Category extends ObjectType {
 
         return static::$interface;
     }
-    
+
     static function args($request) {
         return [
             'ancestorOf' => Type::int(),
@@ -65,7 +65,7 @@ class Category extends ObjectType {
             'descendantOf' => Type::int(),
             'descendantDist' => Type::int(),
             'fixedOrder' => Type::boolean(),
-            'group' => $this->request->categoryGroups()->enum(),
+            // 'group' => $this->request->categoryGroups()->enum(),
             'groupId' => Type::int(),
             'id' => Type::int(),
             'indexBy' => Type::string(),

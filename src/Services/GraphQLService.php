@@ -68,24 +68,38 @@ class GraphQLService extends Component {
 
         $schema = [];
         $schema['query'] = new \markhuot\CraftQL\Types\Query($request);
-        $schema['types'] = array_merge(
-            $request->volumes()->all(),
-            $request->entryTypes()->all(),
-            $request->draftEntryTypes()->all(),
-            $request->categoryGroups()->all(),
-            $request->sections()->all(),
-            $request->tagGroups()->all()
-        );
-        $schema['directives'] = [
-            \markhuot\CraftQL\Directives\Date::directive(),
-        ];
+        // $schema['types'] = array_merge(
+        //     $request->volumes()->all(),
+        //     $request->entryTypes()->all(),
+        //     $request->draftEntryTypes()->all(),
+        //     $request->categoryGroups()->all(),
+        //     $request->sections()->all(),
+        //     $request->tagGroups()->all()
+        // );
+        // $schema['directives'] = [
+        //     \markhuot\CraftQL\Directives\Date::directive(),
+        // ];
 
-        $mutation = new \markhuot\CraftQL\Types\Mutation($request);
-        if (count($mutation->getFields()) > 0) {
-            $schema['mutation'] = $mutation;
-        }
+        // $mutation = new \markhuot\CraftQL\Types\Mutation($request);
+        // if (count($mutation->getFields()) > 0) {
+        //     $schema['mutation'] = $mutation;
+        // }
 
-        return new Schema($schema);
+        // var_dump(Schema::assertValid($schema));
+        // die;
+
+        // try {
+            $schema = new Schema($schema);
+        //     $schema->assertValid();
+        // } catch(\yii\base\ErrorException $e) {
+        //     echo $e->getMessage();
+        //     die('foo');
+        // } catch (\GraphQL\Error\InvariantViolation $e) {
+        //     echo $e->getMessage();
+        //     die('bar');
+        // }
+
+        return $schema;
     }
 
     function execute($schema, $input, $variables = []) {

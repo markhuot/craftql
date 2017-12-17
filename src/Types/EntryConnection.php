@@ -45,7 +45,7 @@ class EntryConnection extends ObjectType {
                 return $root['edges'];
             });
 
-        return $schema->config();
+        return $schema->getFieldConfig();
     }
 
 }

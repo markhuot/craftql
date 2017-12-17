@@ -40,7 +40,7 @@ class TagConnection extends ObjectType {
                 return $root['edges'];
             });
 
-        return $schema->config();
+        return $schema->getFieldConfig();
     }
 
     // static $type;

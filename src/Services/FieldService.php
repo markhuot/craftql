@@ -25,8 +25,8 @@ class FieldService {
             $event->schema = new \markhuot\CraftQL\Builders\Schema($request);
             $field->trigger('craftQlGetFieldSchema', $event);
             $this->fieldSchemas[$field->id]['schema'] = $event->schema;
-            $this->fieldSchemas[$field->id]['args'] = $event->schema->args();
-            $this->fieldSchemas[$field->id]['config'] = $event->schema->config();
+            // $this->fieldSchemas[$field->id]['args'] = $event->schema->args();
+            // $this->fieldSchemas[$field->id]['config'] = $event->schema->config();
             // if ($field->id == 11) {
             //     var_dump($this->fieldSchemas[$field->id]['config']);
             // }
@@ -42,7 +42,7 @@ class FieldService {
         if ($fieldLayoutId) {
             $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
             foreach ($fieldLayout->getFields() as $field) {
-                $graphQlArgs = array_merge($graphQlArgs, $this->getSchemaForField($field, $request)['args']);
+                // $graphQlArgs = array_merge($graphQlArgs, $this->getSchemaForField($field, $request)['args']);
             }
         }
 

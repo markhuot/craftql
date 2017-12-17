@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Builders;
 
 use craft\base\Field as CraftField;
 use GraphQL\Type\Definition\Type;
+use GraphQL\Type\Definition\ObjectType;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Field as BaseField;
 
@@ -15,21 +16,29 @@ class Schema implements \ArrayAccess {
     protected $context;
     static $globals;
 
-    function __construct(Request $request, $context) {
+    function __construct(Request $request, $context=null) {
         $this->request = $request;
         $this->context = $context;
         $this->boot();
     }
-    
-    function boot() {
-    
+
+    protected function boot() {
+
     }
-    
+
+    static function singleton($request) {
+        return new static($request);
+    }
+
+    function getContext() {
+        return $this->context;
+    }
+
     function name(string $bane) {
         $this->name = $name;
     }
-    
-    function getName(Request $request):string {
+
+    function getName():string {
         if ($this->name === null) {
             $reflect = new \ReflectionClass(static::class);
             return $this->name = $reflect->getShortName();
@@ -108,14 +117,15 @@ class Schema implements \ArrayAccess {
     }
 
     function addFieldsByLayoutId(int $fieldLayoutId) {
-        throw new \Exception('you need to do this');
-        $fields = $fieldService->getFields($fieldLayoutId, $this->request);
+        $fieldService = \Yii::$container->get('fieldService');
+        $fields = $fieldService->getFields($fieldLayoutId, $this->request)['schema'];
+        return $this->fields = array_merge($this->fields, $fields->getFields());
     }
 
     function getRequest() {
         return $this->request;
     }
-    
+
     function getFields(): array {
         return $this->fields;
     }
@@ -141,14 +151,14 @@ class Schema implements \ArrayAccess {
 
         return $fields;
     }
-    
+
     function getGraphQLConfig() {
         return [
-            'name' => $this->getName($request),
-            'fields' => $this->getFieldConfig($request),
+            'name' => $this->getName(),
+            'fields' => $this->getFieldConfig(),
         ];
     }
-    
+
     function getGraphQLObject() {
         return new ObjectType($this->getGraphQLConfig());
     }

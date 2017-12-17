@@ -32,12 +32,12 @@ class User extends ObjectType {
         $schema->addRawBooleanField('admin')->nonNull();
         $schema->addRawBooleanField('isCurrent')->nonNull();
         $schema->addRawStringField('preferredLocale');
-        $schema->addRawField('status')->type(UsersField::statusEnum())->nonNull();
+        // $schema->addRawField('status')->type(UsersField::statusEnum())->nonNull();
         $schema->addRawDateField('dateCreated')->nonNull();
         $schema->addRawDateField('dateUpdated')->nonNull();
         $schema->addRawDateField('lastLoginDate')->nonNull();
 
-        return static::$baseFields = $schema->config();
+        return static::$baseFields = $schema->getFieldConfig();
     }
 
     static function type($request) {

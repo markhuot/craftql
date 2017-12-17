@@ -17,17 +17,17 @@ class Query extends ObjectType {
             'name' => 'Query',
             'fields' => [],
         ];
-        
+
         $schema = new Schema($request);
-        
+
         $schema->addRawStringField('helloWorld')
             ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
-        if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
-            if (!empty($request->entryTypes()->all())) {
-                $this->addEntriesSchema($schema);
-            }
-        }
+        // if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
+        //     if (!empty($request->entryTypes()->all())) {
+        //         $this->addEntriesSchema($schema);
+        //     }
+        // }
 
         $schema->addRawField('globals')
             ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
@@ -39,52 +39,55 @@ class Query extends ObjectType {
                 return $sets;
             });
 
-        if ($token->can('query:tags')) {
-            $this->addTagsSchema($schema);
-        }
+        // var_dump($schema->getFieldConfig()['globals']['type']->config['fields']['someSet']['type']);
+        // die;
 
-        if ($token->can('query:categories')) {
-        	$this->addCategoriesSchema($schema);
-        }
+        // if ($token->can('query:tags')) {
+        //     $this->addTagsSchema($schema);
+        // }
 
-        if ($token->can('query:users')) {
-            $schema->addRawField('users')
-                ->lists()
-                ->type(User::type($request))
-                ->arguments([
-                    'admin' => Type::boolean(),
-                    'email' => Type::string(),
-                    'firstName' => Type::string(),
-                    'group' => Type::string(),
-                    'groupId' => Type::string(),
-                    'id' => Type::int(),
-                    'lastLoginDate' => Type::int(),
-                    'lastName' => Type::string(),
-                    'limit' => Type::int(),
-                    'offset' => Type::int(),
-                    'order' => Type::string(),
-                    'search' => Type::string(),
-                    // 'status' => static::statusEnum(),
-                    'username' => Type::string(),
-                ])
-                ->resolve(function ($root, $args, $context, $info) {
-                    $criteria = \craft\elements\User::find();
+        // if ($token->can('query:categories')) {
+        // 	$this->addCategoriesSchema($schema);
+        // }
 
-                    foreach ($args as $key => $value) {
-                        $criteria = $criteria->{$key}($value);
-                    }
+        // if ($token->can('query:users')) {
+        //     $schema->addRawField('users')
+        //         ->lists()
+        //         ->type(User::type($request))
+        //         ->arguments([
+        //             'admin' => Type::boolean(),
+        //             'email' => Type::string(),
+        //             'firstName' => Type::string(),
+        //             'group' => Type::string(),
+        //             'groupId' => Type::string(),
+        //             'id' => Type::int(),
+        //             'lastLoginDate' => Type::int(),
+        //             'lastName' => Type::string(),
+        //             'limit' => Type::int(),
+        //             'offset' => Type::int(),
+        //             'order' => Type::string(),
+        //             'search' => Type::string(),
+        //             // 'status' => static::statusEnum(),
+        //             'username' => Type::string(),
+        //         ])
+        //         ->resolve(function ($root, $args, $context, $info) {
+        //             $criteria = \craft\elements\User::find();
 
-                    return $criteria->all();
-                });
-        }
+        //             foreach ($args as $key => $value) {
+        //                 $criteria = $criteria->{$key}($value);
+        //             }
 
-        if ($token->can('query:sections')) {
-            $schema->addRawField('sections')->lists()->type(Section::type())->resolve(function ($root, $args, $context, $info) {
-                return \Craft::$app->sections->allSections;
-            });
-        }
+        //             return $criteria->all();
+        //         });
+        // }
 
-        $config['fields'] = array_merge($config['fields'], $schema->config());
+        // if ($token->can('query:sections')) {
+        //     $schema->addRawField('sections')->lists()->type(Section::type())->resolve(function ($root, $args, $context, $info) {
+        //         return \Craft::$app->sections->allSections;
+        //     });
+        // }
+
+        $config['fields'] = array_merge($config['fields'], $schema->getFieldConfig());
 
         parent::__construct($config);
     }
@@ -192,7 +195,7 @@ class Query extends ObjectType {
                 ];
             });
     }
-    
+
     /**
      * The fields you can query that return categories
      *
@@ -201,8 +204,8 @@ class Query extends ObjectType {
     function addCategoriesSchema($schema) {
         $schema->addRawField('categories')
             ->lists()
-            ->type(Category::interface($schema->request())
-            ->arguments(Category::args($schema->request())
+            ->type(Category::interface($schema->getRequest()))
+            ->arguments(Category::args($schema->getRequest()))
             ->resolve(function ($root, $args) {
                 $criteria = \craft\elements\Category::find();
 
@@ -210,17 +213,17 @@ class Query extends ObjectType {
                     $args['groupId'] = $args['group'];
                     unset($args['group']);
                 }
-        
+
                 foreach ($args as $key => $value) {
                     $criteria = $criteria->{$key}($value);
                 }
-        
+
                 return $criteria->all();
             });
-        
+
         $schema->addRawField('categoriesConnection')
-            ->type(CategoryConnection::singleton($this->request))
-            ->arguments(Category::args($schema->request())
+            ->type(CategoryConnection::singleton($schema->getRequest()))
+            ->arguments(Category::args($schema->getRequest()))
             ->resolve(function ($root, $args) {
                 $criteria = \craft\elements\Category::find();
 
@@ -228,13 +231,13 @@ class Query extends ObjectType {
                     $args['groupId'] = $args['group'];
                     unset($args['group']);
                 }
-        
+
                 foreach ($args as $key => $value) {
                     $criteria = $criteria->{$key}($value);
                 }
 
                 list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($criteria);
-        
+
                 return [
                     'totalCount' => $pageInfo->total,
                     'pageInfo' => $pageInfo,

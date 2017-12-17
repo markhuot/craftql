@@ -127,7 +127,7 @@ class Entry {
         //     return json_encode($root->toArray());
         // }];
 
-        return static::$baseFields = $schema->config();
+        return static::$baseFields = $schema->getFieldConfig();
     }
 
     static function resolveType($entry) {

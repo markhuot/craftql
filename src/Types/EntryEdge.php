@@ -36,7 +36,7 @@ class EntryEdge extends ObjectType {
                         'edges' => $drafts,
                     ];
                 });
-            return $schema->config();
+            return $schema->getFieldConfig();
         };
     }
 
