@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Field as BaseField;
+use markhuot\CraftQL\Builders\Object as ObjectField;
 
 class Schema implements \ArrayAccess {
 
@@ -17,6 +18,7 @@ class Schema implements \ArrayAccess {
     static $globals;
     protected $interfaces = [];
     static $singletons = [];
+    protected $request;
 
     function __construct(Request $request, $context=null) {
         $this->request = $request;
@@ -25,7 +27,7 @@ class Schema implements \ArrayAccess {
     }
 
     protected function boot() {
-
+        /* intended to be overridden by subclassed schemas */
     }
 
     static function singleton(Request $request, $key=null) {
@@ -44,8 +46,9 @@ class Schema implements \ArrayAccess {
         return $this->context;
     }
 
-    function name(string $bane) {
+    function name(string $name): self {
         $this->name = $name;
+        return $this;
     }
 
     function getName():string {
@@ -57,6 +60,7 @@ class Schema implements \ArrayAccess {
         return $this->name;
     }
 
+    // @TODO remove globals for actual PHP traits at some point soon
     static function addGlobalFields($request, $callback) {
         if (!static::$globals) {
             static::$globals = new static($request);
@@ -64,42 +68,39 @@ class Schema implements \ArrayAccess {
 
         $callback->apply(static::$globals);
     }
-
     function addGlobalField($name) {
         return $this->fields[] = static::$globals->getField($name);
     }
-
     static function getGlobals() {
         return static::$globals;
     }
 
-    // @TODO remove this when it's no longer used
-    function addReallyRawField($name, $field) {
-        $this->reallyRawFields[$name] = $field;
-    }
-
-    function addRawField($name) {
+    function addRawField($name): BaseField {
         return $this->fields[] = new BaseField($this->request, $name);
     }
 
-    function addRawStringField($name) {
+    function addRawStringField($name): BaseField {
         return $this->fields[] = (new BaseField($this->request, $name))->type(Type::string());
     }
 
-    function addRawIntField($name) {
+    function addRawIntField($name): BaseField {
         return $this->fields[] = (new BaseField($this->request, $name))->type(Type::int());
     }
 
-    function addRawFloatField($name) {
+    function addRawFloatField($name): BaseField {
         return $this->fields[] = (new BaseField($this->request, $name))->type(Type::float());
     }
 
-    function addRawBooleanField($name) {
+    function addRawBooleanField($name): BaseField {
         return $this->fields[] = (new BaseField($this->request, $name))->type(Type::boolean());
     }
 
     function addRawDateField($name): BaseField {
         return $this->fields[] = new Date($this->request, $name);
+    }
+
+    function addRawObjectField(string $name): ObjectField {
+        return $this->fields[] = (new ObjectField($this->request, $name));
     }
 
     function addField(CraftField $field): BaseField {
@@ -136,16 +137,36 @@ class Schema implements \ArrayAccess {
         return $this->interfaces;
     }
 
+    function foo(): array {
+        $interfaces = [];
+
+        foreach ($this->getInterfaces() as $interface) {
+            if (is_string($interface) && is_subclass_of($interface, Schema::class)) {
+                $interfaces[] = ($interface::singleton($this->request));
+            }
+
+            else if (is_subclass_of($interface, Schema::class)) {
+                $interfaces[] = $interface;
+            }
+
+            else {
+                throw new \Exception('The interface is not a subclass of a known builder');
+            }
+        }
+
+        return $interfaces;
+    }
+
     function getRawInterfaces(): array {
         $interfaces = [];
 
         foreach ($this->getInterfaces() as $interface) {
             if (is_string($interface) && is_subclass_of($interface, Schema::class)) {
-                $interfaces[] = ($interface::singleton($this->request))->getGraphQLObject();
+                $interfaces[] = ($interface::singleton($this->request))->getRawGraphQLObject();
             }
 
             else if (is_subclass_of($interface, Schema::class)) {
-                $interfaces[] = $interface->getGraphQLObject();
+                $interfaces[] = $interface->getRawGraphQLObject();
             }
 
             else {
@@ -177,6 +198,12 @@ class Schema implements \ArrayAccess {
     function getFieldConfig():array {
         $fields = [];
 
+        foreach ($this->foo() as $interface) {
+            foreach ($interface->getFields() as $field) {
+                $fields[$field->getName()] = $field->getConfig();
+            }
+        }
+
         foreach ($this->getFields() as $field) {
             $fields[$field->getName()] = $field->getConfig();
         }
@@ -189,9 +216,33 @@ class Schema implements \ArrayAccess {
     function getGraphQLConfig() {
         return [
             'name' => $this->getName(),
-            'fields' => $this->getFieldConfig(),
+            'fields' => function () {
+                return $this->getFieldConfig();
+            },
             'interfaces' => $this->getRawInterfaces(),
+            'resolveType' => $this->getResolveType(),
         ];
+    }
+
+    /**
+     * Gets a function that will resolve an interface in to a valid type
+     *
+     * @return callable
+     */
+    function getResolveType() {
+        return null;
+    }
+
+    static $objects;
+
+    function getRawGraphQLObject() {
+        $key = static::class;
+
+        if (!empty(static::$objects[$key])) {
+            return static::$objects[$key];
+        }
+
+        return static::$objects[$key] = $this->getGraphQLObject();
     }
 
     function getGraphQLObject() {

@@ -6,57 +6,21 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Builders\Schema;
 
-class Section extends ObjectType {
+class Section extends Schema {
 
-    static $type;
-    static $baseFields;
-    static $baseArgs;
-
-    function __construct($section, $request) {
-        parent::__construct([
-            'name' => ucfirst($section->handle).'Section',
-            'description' => 'A section in Craft',
-            'fields' => [
-                'foo' => ['type' => Type::string()]
-            ],
-            'id' => $section->id,
-            'context' => $section
-        ]);
-    }
-
-    function getContext() {
-        return $this->config['context'];
-    }
-
-    static function baseFields() {
-        if (!empty(static::$baseFields)) {
-            return static::$baseFields;
-        }
-
-        return static::$baseFields = [
-            'id' => ['type' => Type::nonNull(Type::int())],
-            'structureId' => ['type' => Type::int()],
-            'name' => ['type' => Type::nonNull(Type::string())],
-            'handle' => ['type' => Type::nonNull(Type::string())],
-            'type' => ['type' => Type::nonNull(Type::string())],
-            'template' => ['type' => Type::string()],
-            'maxLevels' => ['type' => Type::int()],
-            'hasUrls' => ['type' => Type::boolean()],
-            'enableVersioning' => ['type' => Type::boolean()],
-        ];
-    }
-
-    static function type() {
-        if (!empty(static::$type)) {
-            return static::$type;
-        }
-
-        return static::$type = new ObjectType([
-            'name' => 'Section',
-            'description' => 'A section in Craft',
-            'fields' => static::baseFields(),
-        ]);
+    function boot() {
+        $this->addRawIntField('id')->nonNull();
+        $this->addRawIntField('structureId');
+        $this->addRawStringField('name')->nonNull();
+        $this->addRawStringField('handle')->nonNull();
+        $this->addRawStringField('type')->nonNull();
+        $this->addRawStringField('template');
+        $this->addRawIntField('maxLevels');
+        $this->addRawBooleanField('hasUrls');
+        $this->addRawBooleanField('enableVersioning');
+        $this->addRawField('entryTypes')->lists()->type(EntryType::class);
     }
 
 }

@@ -58,7 +58,6 @@ class GraphQLService extends Component {
         $request = new \markhuot\CraftQL\Request($token);
         $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
         $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
-        $request->addDraftEntryTypes(new \markhuot\CraftQL\Factories\DraftEntryType($this->entryTypes, $request));
         $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
         $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
@@ -70,25 +69,21 @@ class GraphQLService extends Component {
         $schema['query'] = new \markhuot\CraftQL\Types\Query($request);
         $schema['types'] = array_merge(
             // $request->volumes()->all(),
-            // $request->draftEntryTypes()->all(),
             // $request->categoryGroups()->all(),
             // $request->sections()->all(),
-            // $request->tagGroups()->all(),
-            // $request->entryTypes()->all()
-            [$request->entryTypes()->all()[0]->getGraphQLObject()]
+
+            array_map(function ($categoryGroup) {
+                return $categoryGroup->getGraphQLObject();
+            }, $request->categoryGroups()->all()),
+
+            array_map(function ($tagGroup) {
+                return $tagGroup->getGraphQLObject();
+            }, $request->tagGroups()->all()),
+
+            array_map(function ($entryType) {
+                return $entryType->getGraphQLObject();
+            }, $request->entryTypes()->all())
         );
-
-        var_dump($schema['query']->config['fields']);
-        die;
-
-        // var_dump([$request->entryTypes()->all()[0]->getGraphQLObject()]);
-        // die;
-
-        // var_dump($schema['types'][0]);
-        // die;
-
-        // var_dump($request->entryTypes()->all()[0]->getGraphQLObject());
-        // die;
 
         // $schema['directives'] = [
         //     \markhuot\CraftQL\Directives\Date::directive(),

@@ -5,56 +5,20 @@ namespace markhuot\CraftQL\Types;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Builders\Schema;
 
-class Category extends ObjectType {
+class Category extends Schema {
 
-    static $interface;
-    static $baseFields;
+    protected $interfaces = [
+        CategoryInterface::class,
+    ];
 
-    function __construct($group, $request) {
-        $fieldService = \Yii::$container->get('fieldService');
-        $fields = array_merge(\markhuot\CraftQL\Types\Category::baseFields($request), $fieldService->getFields($group->fieldLayoutId, $request));
-
-        parent::__construct([
-            'name' => ucfirst($group->handle).'Category',
-            'interfaces' => [
-                \markhuot\CraftQL\Types\Category::interface($request)
-            ],
-            'fields' => $fields,
-            'id' => $group->id,
-        ]);
+    function boot() {
+        $this->addFieldsByLayoutId($this->context->fieldLayoutId);
     }
 
-    static function baseFields($request) {
-        if (!empty(static::$baseFields)) {
-            return static::$baseFields;
-        }
-
-        $fields = [];
-        $fields['id'] = ['type' => Type::nonNull(Type::int())];
-        $fields['title'] = ['type' => Type::nonNull(Type::string())];
-        $fields['slug'] = ['type' => Type::string()];
-        $fields['uri'] = ['type' => Type::string()];
-        $fields['group'] = ['type' => \markhuot\CraftQL\Types\CategoryGroup::singleton($request)];
-
-        return static::$baseFields = $fields;
-    }
-
-    static function interface($request) {
-        if (!static::$interface) {
-            $fields = static::baseFields($request);
-
-            static::$interface = new InterfaceType([
-                'name' => 'CategoryInterface',
-                'description' => 'A category in Craft',
-                'fields' => $fields,
-                'resolveType' => function ($category) {
-                    return ucfirst($category->group->handle).'Category';
-                }
-            ]);
-        }
-
-        return static::$interface;
+    function getName(): string {
+        return ucfirst($this->context->handle).'Category';
     }
 
     static function args($request) {
@@ -77,7 +41,7 @@ class Category extends ObjectType {
             'positionedAfter' => Type::int(),
             'positionedBefore' => Type::int(),
             'prevSiblingOf' => Type::int(),
-            'relatedTo' => Type::listOf(Entry::relatedToInputObject()),
+            // 'relatedTo' => Type::listOf(Entry::relatedToInputObject()),
             'search' => Type::string(),
             'siblingOf' => Type::int(),
             'slug' => Type::string(),

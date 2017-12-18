@@ -2,42 +2,41 @@
 
 namespace markhuot\CraftQL\Types;
 
-// use GraphQL\Type\Definition\ObjectType;
+use Craft;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
 
-class EntryEdge extends ObjectType {
+class EntryEdge extends Schema {
 
-    protected function fields(Request $request) {
-        return function () use ($request) {
-            $schema = new Schema($request);
-            $schema->addRawStringField('cursor');
-            $schema->addRawField('node')
-                ->type(Entry::interface($request))
-                ->resolve(function ($root) {
-                    return $root['node'];
-                });
-            $schema->addGlobalField('relatedTo');
-            $schema->addRawField('drafts')
-                ->type(EntryDraftConnection::singleton($request))
-                ->resolve(function ($root, $args, $context, $info) use ($request) {
-                    $drafts = \Craft::$app->entryRevisions->getDraftsByEntryId($root['node']->id);
-                    return [
-                        'totalCount' => count($drafts),
-                        'pageInfo' => [
-                            'currentPage' => 1,
-                            'totalPages' => 1,
-                            'first' => 1,
-                            'last' => 1,
-                        ],
-                        'edges' => $drafts,
-                    ];
-                });
-            return $schema->getFieldConfig();
-        };
+    function boot() {
+        $this->addRawStringField('cursor');
+
+        $this->addRawField('node')
+            ->type(EntryInterface::class)
+            ->resolve(function ($root) {
+                return $root['node'];
+            });
+
+//        $this->addGlobalField('relatedTo');
+
+        $this->addRawField('drafts')
+            ->type(EntryDraftConnection::class)
+            ->resolve(function ($root, $args, $context, $info) {
+                $drafts = Craft::$app->entryRevisions->getDraftsByEntryId($root['node']->id);
+                return [
+                    'totalCount' => count($drafts),
+                    'pageInfo' => [
+                        'currentPage' => 1,
+                        'totalPages' => 1,
+                        'first' => 1,
+                        'last' => 1,
+                    ],
+                    'edges' => $drafts,
+                ];
+            });
     }
 
 }

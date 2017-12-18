@@ -4,15 +4,14 @@ namespace markhuot\CraftQL\Types;
 
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
+use markhuot\CraftQL\Builders\Schema;
 
-class CategoryGroup extends ObjectType {
+class CategoryGroup extends Schema {
 
-    protected function fields(Request $request) {
-        return [
-            'id' => ['type' => Type::int()],
-            'name' => ['type' => Type::string()],
-            'handle' => ['type' => Type::string()],
-        ];
+    function boot() {
+        $this->addRawIntField('id');
+        $this->addRawStringField('name');
+        $this->addRawStringField('handle');
     }
 
 }

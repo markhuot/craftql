@@ -7,10 +7,11 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Craft;
 use markhuot\CraftQL\Builders\Schema;
+use markhuot\CraftQL\Request;
 
 class Query extends ObjectType {
 
-    function __construct($request) {
+    function __construct(Request $request) {
         $token = $request->token();
 
         $config = [
@@ -29,26 +30,17 @@ class Query extends ObjectType {
             }
         }
 
-        $schema->addRawField('globals')
-            ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
-            ->resolve(function ($root, $args) {
-                $sets = [];
-                foreach (\Craft::$app->globals->allSets as $set) {
-                    $sets[$set->handle] = $set;
-                }
-                return $sets;
-            });
+        if ($token->can('query:globals')) {
+            $this->addGlobalsSchema($schema);
+        }
 
-        // var_dump($schema->getFieldConfig()['globals']['type']->config['fields']['someSet']['type']);
-        // die;
+        if ($token->can('query:tags')) {
+            $this->addTagsSchema($schema);
+        }
 
-        // if ($token->can('query:tags')) {
-        //     $this->addTagsSchema($schema);
-        // }
-
-        // if ($token->can('query:categories')) {
-        // 	$this->addCategoriesSchema($schema);
-        // }
+        if ($token->can('query:categories')) {
+            $this->addCategoriesSchema($schema);
+        }
 
         // if ($token->can('query:users')) {
         //     $schema->addRawField('users')
@@ -81,19 +73,16 @@ class Query extends ObjectType {
         //         });
         // }
 
-        // if ($token->can('query:sections')) {
-        //     $schema->addRawField('sections')->lists()->type(Section::type())->resolve(function ($root, $args, $context, $info) {
-        //         return \Craft::$app->sections->allSections;
-        //     });
-        // }
-
-        // var_dump($schema->getFieldConfig()['entries']['type']->ofType->config);
-        // die;
+        if ($token->can('query:sections')) {
+            $schema->addRawField('sections')
+                ->lists()
+                ->type(Section::class)
+                ->resolve(function ($root, $args, $context, $info) {
+                    return \Craft::$app->sections->allSections;
+                });
+        }
 
         $config['fields'] = array_merge($config['fields'], $schema->getFieldConfig());
-
-        // var_dump($schema->getFieldConfig()['entries']);
-        // die;
 
         parent::__construct($config);
     }
@@ -112,46 +101,62 @@ class Query extends ObjectType {
                 return $schema->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
             });
 
-        // var_dump($schema);
-        // var_dump($schema->getField('entries')->getConfig()['type']->ofType->config['fields']);
-        // die;
+         $schema->addRawField('entriesConnection')
+             ->name('entriesConnection')
+             ->type(EntryConnection::class)
+             ->arguments(Entry::args($schema->getRequest()))
+             ->resolve(function ($root, $args, $context, $info) use ($schema) {
+                 $criteria = $schema->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
+                 list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
 
-        // $schema->addRawField('entriesConnection')
-        //     ->name('entriesConnection')
-        //     ->type(EntryConnection::singleton($schema->getRequest()))
-        //     ->arguments(Entry::args($schema->getRequest()))
-        //     ->resolve(function ($root, $args, $context, $info) use ($schema) {
-        //         $criteria = $schema->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
-        //         list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
+                 return [
+                     'totalCount' => $pageInfo->total,
+                     'pageInfo' => $pageInfo,
+                     'edges' => $entries,
+                     'criteria' => $criteria,
+                     'args' => $args,
+                 ];
+             });
 
-        //         return [
-        //             'totalCount' => $pageInfo->total,
-        //             'pageInfo' => $pageInfo,
-        //             'edges' => $entries,
-        //             'criteria' => $criteria,
-        //             'args' => $args,
-        //         ];
-        //     });
+        $schema->addRawField('entry')
+            ->type(EntryInterface::class)
+            ->arguments(Entry::args($schema->getRequest()))
+            ->resolve(function ($root, $args, $context, $info) use ($schema) {
+                return $schema->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
+            });
+    }
 
-        // $schema->addRawField('entry')
-        //     ->type(Entry::interface($schema->getRequest()))
-        //     ->arguments(Entry::args($schema->getRequest()))
-        //     ->resolve(function ($root, $args, $context, $info) use ($schema) {
-        //         return $schema->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
-        //     });
-
-        // $schema->addRawField('drafts')
-        //     ->lists()
-        //     ->type(EntryDraft::interface($schema->getRequest()))
-        //     ->arguments([
-        //         'id' => [
-        //             'type' => Type::nonNull(Type::int()),
-        //             'description' => 'The entry id to query for drafts'
-        //         ],
-        //     ])
+    /**
+     * The fields you can query that return globals
+     *
+     * @return Schema
+     */
+    function addGlobalsSchema($schema) {
+        // $schema->addRawObjectField('globals')
+        //     ->config(function ($object) use ($request) {
+        //         $object->name('GlobalSet');
+        //         foreach ($request->globals()->all() as $globalSet) {
+        //             $object->addRawField($globalSet->getContext()->handle)
+        //                 ->type($globalSet);
+        //         }
+        //     })
         //     ->resolve(function ($root, $args) {
-        //         return \Craft::$app->entryRevisions->getDraftsByEntryId($args['id']);
+        //         $sets = [];
+        //         foreach (\Craft::$app->globals->allSets as $set) {
+        //             $sets[$set->handle] = $set;
+        //         }
+        //         return $sets;
         //     });
+
+        $schema->addRawField('globals')
+            ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
+            ->resolve(function ($root, $args) {
+                $sets = [];
+                foreach (\Craft::$app->globals->allSets as $set) {
+                    $sets[$set->handle] = $set;
+                }
+                return $sets;
+            });
     }
 
     /**
@@ -162,7 +167,7 @@ class Query extends ObjectType {
     function addTagsSchema($schema) {
         $schema->addRawField('tags')
             ->lists()
-            ->type(Tag::interface($schema->getRequest()))
+            ->type(TagInterface::class)
             ->arguments(Tag::args($schema->getRequest()))
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Tag::find();
@@ -180,7 +185,7 @@ class Query extends ObjectType {
             });
 
         $schema->addRawField('tagsConnection')
-            ->type(TagConnection::singleton($schema->getRequest()))
+            ->type(TagConnection::class)
             ->arguments(Tag::args($schema->getRequest()))
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Tag::find();
@@ -214,7 +219,7 @@ class Query extends ObjectType {
     function addCategoriesSchema($schema) {
         $schema->addRawField('categories')
             ->lists()
-            ->type(Category::interface($schema->getRequest()))
+            ->type(CategoryInterface::class)
             ->arguments(Category::args($schema->getRequest()))
             ->resolve(function ($root, $args) {
                 $criteria = \craft\elements\Category::find();
@@ -232,7 +237,7 @@ class Query extends ObjectType {
             });
 
         $schema->addRawField('categoriesConnection')
-            ->type(CategoryConnection::singleton($schema->getRequest()))
+            ->type(CategoryConnection::class)
             ->arguments(Category::args($schema->getRequest()))
             ->resolve(function ($root, $args) {
                 $criteria = \craft\elements\Category::find();

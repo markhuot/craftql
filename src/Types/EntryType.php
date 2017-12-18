@@ -5,18 +5,20 @@ namespace markhuot\CraftQL\Types;
 use Craft;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
+use markhuot\CraftQL\Builders\Schema;
 
-class EntryType extends ObjectType {
+class EntryType extends Schema {
 
-    protected function fields(Request $request) {
-        return [
-            'id' => ['type' => Type::nonNull(Type::int())],
-            'name' => ['type' => Type::nonNull(Type::string())],
-            'handle' => ['type' => Type::nonNull(Type::string())],
-            'fields' => ['type' => Type::listOf(Field::make($request)), 'resolve' => function ($root, $args) {
-                return Craft::$app->fields->getLayoutById($root->fieldLayoutId)->getFields();
-            }],
-        ];
+    function boot() {
+            $this->addRawIntField('id')->nonNull();
+            $this->addRawStringField('name')->nonNull();
+            $this->addRawStringField('handle')->nonNull();
+            $this->addRawField('fields')
+                ->nonNull()
+                ->lists()
+                ->type(Field::class)->resolve(function ($root, $args) {
+                    return Craft::$app->fields->getLayoutById($root->fieldLayoutId)->getFields();
+                });
     }
 
 }

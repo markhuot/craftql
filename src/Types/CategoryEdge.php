@@ -9,20 +9,18 @@ use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
 
-class CategoryEdge extends ObjectType {
+class CategoryEdge extends Schema {
 
-    protected function fields(Request $request) {
-        return function () use ($request) {
-            $schema = new Schema($request);
-            $schema->addRawStringField('cursor');
-            $schema->addRawField('node')
-                ->type(Category::interface($request))
-                ->resolve(function ($root) {
-                    return $root['node'];
-                });
-            $schema->addGlobalField('relatedTo');
-            return $schema->config();
-        };
+    function boot() {
+        $this->addRawStringField('cursor');
+
+        $this->addRawField('node')
+            ->type(CategoryInterface::class)
+            ->resolve(function ($root) {
+                return $root['node'];
+            });
+
+        // $this->addGlobalField('relatedTo');
     }
 
 }

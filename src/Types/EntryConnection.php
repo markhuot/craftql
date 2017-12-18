@@ -11,24 +11,18 @@ use markhuot\CraftQL\GraphQLFields\Query\Connection\Edges as EdgesField;
 use markhuot\CraftQL\Types\Entry;
 use markhuot\CraftQL\Builders\Schema;
 
-class EntryConnection extends ObjectType {
+class EntryConnection extends Schema {
 
-    static function edgesType($request) {
-        return EntryEdge::singleton($request);
-    }
-
-    protected function fields(Request $request) {
-        $schema = new Schema($request);
-
-        $schema->addRawIntField('totalCount')
+    function boot() {
+        $this->addRawIntField('totalCount')
             ->nonNull();
 
-        $schema->addRawField('pageInfo')
-            ->type(PageInfo::type($request));
+        $this->addRawField('pageInfo')
+            ->type(PageInfo::class);
 
-        $schema->addRawField('edges')
+        $this->addRawField('edges')
             ->lists()
-            ->type(static::edgesType($request))
+            ->type(EntryEdge::class)
             ->resolve(function ($root, $args, $context, $info) {
                 return array_map(function ($category) {
                     return [
@@ -38,14 +32,12 @@ class EntryConnection extends ObjectType {
                 }, $root['edges']);
             });
 
-        // $schema->addRawField('entries')
-        //     ->lists()
-        //     ->type(EntryInterface::singleton($request))
-        //     ->resolve(function ($root, $args) {
-        //         return $root['edges'];
-        //     });
-
-        return $schema->getFieldConfig();
+        $this->addRawField('entries')
+            ->lists()
+            ->type(EntryInterface::class)
+            ->resolve(function ($root, $args) {
+                return $root['edges'];
+            });
     }
 
 }

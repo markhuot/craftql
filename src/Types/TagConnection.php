@@ -10,20 +10,18 @@ use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Types\Category;
 use markhuot\CraftQL\Builders\Schema;
 
-class TagConnection extends ObjectType {
+class TagConnection extends Schema {
 
-    protected function fields(Request $request) {
-        $schema = new Schema($request);
-
-        $schema->addRawIntField('totalCount')
+    function boot() {
+        $this->addRawIntField('totalCount')
             ->nonNull();
 
-        $schema->addRawField('pageInfo')
-            ->type(PageInfo::type($request));
+        $this->addRawField('pageInfo')
+            ->type(PageInfo::class);
 
-        $schema->addRawField('edges')
+        $this->addRawField('edges')
             ->lists()
-            ->type(TagEdge::singleton($request))
+            ->type(TagEdge::class)
             ->resolve(function ($root, $args, $context, $info) {
                 return array_map(function ($category) {
                     return [
@@ -33,14 +31,12 @@ class TagConnection extends ObjectType {
                 }, $root['edges']);
             });
 
-        $schema->addRawField('categories')
-            ->lists()
-            ->type(Tag::interface($request))
-            ->resolve(function ($root, $args) {
-                return $root['edges'];
-            });
-
-        return $schema->getFieldConfig();
+        // $this->addRawField('categories')
+        //     ->lists()
+        //     ->type(Tag::interface($request))
+        //     ->resolve(function ($root, $args) {
+        //         return $root['edges'];
+        //     });
     }
 
     // static $type;

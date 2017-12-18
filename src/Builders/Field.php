@@ -20,6 +20,11 @@ class Field {
     function __construct(Request $request, string $name) {
         $this->request = $request;
         $this->name = $name;
+        $this->boot();
+    }
+
+    protected function boot() {
+
     }
 
     function name($name): self {
@@ -44,11 +49,11 @@ class Field {
         $type = $this->getType();
 
         if (is_string($type) && is_subclass_of($type, Schema::class)) {
-            return ($type::singleton($this->request))->getGraphQLObject();
+            return ($type::singleton($this->request))->getRawGraphQLObject();
         }
 
-        else if (is_subclass_of($type, Schema::class)) {
-            return $type->getGraphQLObject();
+        else if (is_a($type, Schema::class) || is_subclass_of($type, Schema::class)) {
+            return $type->getRawGraphQLObject();
         }
 
         return $type ?: Type::string();
