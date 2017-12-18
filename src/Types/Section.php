@@ -20,8 +20,13 @@ class Section extends ObjectType {
             'fields' => [
                 'foo' => ['type' => Type::string()]
             ],
-            'id' => $section->id
+            'id' => $section->id,
+            'context' => $section
         ]);
+    }
+
+    function getContext() {
+        return $this->config['context'];
     }
 
     static function baseFields() {

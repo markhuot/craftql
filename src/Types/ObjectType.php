@@ -32,6 +32,10 @@ class ObjectType extends GraphQLObjectType {
         parent::__construct($config);
     }
 
+    function getContext() {
+        return $this->craftType;
+    }
+
     protected function name(Request $request):string {
         if ($this->name == null) {
             $reflect = new \ReflectionClass(static::class);

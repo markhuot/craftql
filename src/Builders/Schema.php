@@ -15,6 +15,8 @@ class Schema implements \ArrayAccess {
     private $reallyRawFields = [];
     protected $context;
     static $globals;
+    protected $interfaces = [];
+    static $singletons = [];
 
     function __construct(Request $request, $context=null) {
         $this->request = $request;
@@ -26,8 +28,16 @@ class Schema implements \ArrayAccess {
 
     }
 
-    static function singleton($request) {
-        return new static($request);
+    static function singleton(Request $request, $key=null) {
+        if ($key === null) {
+            $key = static::class;
+        }
+
+        if (!empty(self::$singletons[$key])) {
+            return self::$singletons[$key];
+        }
+
+        return self::$singletons[$key] = new static($request);
     }
 
     function getContext() {
@@ -122,6 +132,30 @@ class Schema implements \ArrayAccess {
         return $this->fields = array_merge($this->fields, $fields->getFields());
     }
 
+    function getInterfaces(): array {
+        return $this->interfaces;
+    }
+
+    function getRawInterfaces(): array {
+        $interfaces = [];
+
+        foreach ($this->getInterfaces() as $interface) {
+            if (is_string($interface) && is_subclass_of($interface, Schema::class)) {
+                $interfaces[] = ($interface::singleton($this->request))->getGraphQLObject();
+            }
+
+            else if (is_subclass_of($interface, Schema::class)) {
+                $interfaces[] = $interface->getGraphQLObject();
+            }
+
+            else {
+                $interfaces[] = $interface;
+            }
+        }
+
+        return $interfaces;
+    }
+
     function getRequest() {
         return $this->request;
     }
@@ -156,6 +190,7 @@ class Schema implements \ArrayAccess {
         return [
             'name' => $this->getName(),
             'fields' => $this->getFieldConfig(),
+            'interfaces' => $this->getRawInterfaces(),
         ];
     }
 

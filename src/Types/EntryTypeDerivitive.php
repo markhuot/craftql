@@ -8,8 +8,9 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use Craft;
 use craft\elements\Entry;
+use markhuot\CraftQL\Builders\Schema;
 
-class EntryTypeDerivitive extends ObjectType {
+class EntryTypeDerivitive extends Schema {
 
     public $craftType;
     static $rawCraftEntryTypes = [];
@@ -18,114 +19,87 @@ class EntryTypeDerivitive extends ObjectType {
     static $typeArgEnum;
     static $sectionArgEnum;
 
-    public function __construct($craftEntryType, $request) {
-        $config = [
-            'name' => static::getName($craftEntryType),
-            'fields' => function () use ($craftEntryType, $request) {
-                return $this->fields($craftEntryType, $request);
-            },
-            'interfaces' => $this->interfaces($request),
-            'craftType' => $craftEntryType,
-            'id' => $craftEntryType->id,
-        ];
-
-        parent::__construct($config);
+    function getName(): string {
+        return static::entryTypeObjectName($this->context);
     }
 
-    static function make($request) {
-        if (!empty(static::$type)) {
-            return static::$type;
-        }
-
-        return static::$type = new ObjectType([
-            'name' => 'EntryType',
-            'fields' => [
-                'id' => ['type' => Type::nonNull(Type::int())],
-                'name' => ['type' => Type::nonNull(Type::string())],
-                'handle' => ['type' => Type::nonNull(Type::string())],
-                // 'fields' => ['type' => Type::listOf(Field::make($request)), 'resolve' => function ($root, $args) {
-                //     return Craft::$app->fields->getLayoutById($root->fieldLayoutId)->getFields();
-                // }],
-            ],
-        ]);
-    }
-
-    function fields($craftEntryType, $request) {
-        $fieldService = \Yii::$container->get('fieldService');
-        $baseFields = \markhuot\CraftQL\Types\Entry::baseFields($request);
-        $entryTypeFields = $fieldService->getFields($craftEntryType->fieldLayoutId, $request);
-        return array_merge($baseFields, $entryTypeFields);
-    }
-
-    function interfaces($request) {
+    function getInterfaces(): array {
         return [
-            \markhuot\CraftQL\Types\Entry::interface($request),
+            \markhuot\CraftQL\Types\EntryInterface::class,
             \markhuot\CraftQL\Types\Element::interface(),
         ];
     }
 
-    static function getName($entryType) {
+    static function entryTypeObjectName($entryType) {
         $typeHandle = ucfirst($entryType->handle);
         $sectionHandle = ucfirst($entryType->section->handle);
 
         return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
     }
 
-    function getGraphQLMutationArgs($request) {
+    function getFields(): array {
         $fieldService = \Yii::$container->get('fieldService');
-
-        return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getGraphQLMutationArgs($this->config['craftType']->fieldLayoutId, $request));
+        // $baseFields = \markhuot\CraftQL\Types\EntryInterface::baseFields($this->request);
+        $baseFields = [];
+        $entryTypeFields = $fieldService->getFields($this->context->fieldLayoutId, $this->request)['schema']->getFields();
+        return array_merge($baseFields, $entryTypeFields);
     }
 
-    function handle() {
-        return $this->config['craftType']->handle;
-    }
+    // function getGraphQLMutationArgs($request) {
+    //     $fieldService = \Yii::$container->get('fieldService');
 
-    function upsert($request) {
-        return function ($root, $args) use ($request) {
-            if (!empty($args['id'])) {
-                $criteria = Entry::find();
-                $criteria->id($args['id']);
-                $entry = $criteria->one();
-                if (!$entry) {
-                    throw new \Exception('Could not find an entry with id '.$args['id']);
-                }
-            }
-            else {
-                $entry = new Entry();
-                $entry->sectionId = $this->config['craftType']->section->id;
-                $entry->typeId = $this->config['craftType']->id;
-            }
+    //     return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getGraphQLMutationArgs($this->config['craftType']->fieldLayoutId, $request));
+    // }
 
-            if (isset($args['authorId'])) {
-                $entry->authorId = $args['authorId'];
-            }
+    // function handle() {
+    //     return $this->config['craftType']->handle;
+    // }
 
-            if (isset($args['title'])) {
-                $entry->title = $args['title'];
-            }
+    // function upsert($request) {
+    //     return function ($root, $args) use ($request) {
+    //         if (!empty($args['id'])) {
+    //             $criteria = Entry::find();
+    //             $criteria->id($args['id']);
+    //             $entry = $criteria->one();
+    //             if (!$entry) {
+    //                 throw new \Exception('Could not find an entry with id '.$args['id']);
+    //             }
+    //         }
+    //         else {
+    //             $entry = new Entry();
+    //             $entry->sectionId = $this->config['craftType']->section->id;
+    //             $entry->typeId = $this->config['craftType']->id;
+    //         }
 
-            $fields = $args;
-            unset($fields['id']);
-            unset($fields['title']);
-            unset($fields['sectionId']);
-            unset($fields['typeId']);
-            unset($fields['authorId']);
+    //         if (isset($args['authorId'])) {
+    //             $entry->authorId = $args['authorId'];
+    //         }
 
-            $fieldService = \Yii::$container->get('fieldService');
+    //         if (isset($args['title'])) {
+    //             $entry->title = $args['title'];
+    //         }
 
-            foreach ($fields as $handle => &$value) {
-                $field = Craft::$app->fields->getFieldByHandle($handle);
-                $value = $fieldService->mutateValueForField($request, $field, $value, $entry);
-                // $value = $field->upsert($value, $entry);
-            }
+    //         $fields = $args;
+    //         unset($fields['id']);
+    //         unset($fields['title']);
+    //         unset($fields['sectionId']);
+    //         unset($fields['typeId']);
+    //         unset($fields['authorId']);
 
-            $entry->setFieldValues($fields);
+    //         $fieldService = \Yii::$container->get('fieldService');
 
-            Craft::$app->elements->saveElement($entry);
+    //         foreach ($fields as $handle => &$value) {
+    //             $field = Craft::$app->fields->getFieldByHandle($handle);
+    //             $value = $fieldService->mutateValueForField($request, $field, $value, $entry);
+    //             // $value = $field->upsert($value, $entry);
+    //         }
 
-            return $entry;
-        };
-    }
+    //         $entry->setFieldValues($fields);
+
+    //         Craft::$app->elements->saveElement($entry);
+
+    //         return $entry;
+    //     };
+    // }
 
 }

@@ -15,7 +15,7 @@ class EntryType {
             }
         }
     }
-    
+
     function get($id) {
         return $this->entryTypes[$id];
     }

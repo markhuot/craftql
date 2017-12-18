@@ -31,10 +31,7 @@ class GetMatrixFieldSchema
 
         foreach ($field->getBlockTypes() as $blockType) {
             $type = $union->addType(ucfirst($field->handle).ucfirst($blockType->handle));
-
-            foreach ($fieldService->getFields($blockType->fieldLayoutId, $request) as $fieldName => $matrixField) {
-                $type->addReallyRawField($fieldName, $matrixField);
-            }
+            $type->addFieldsByLayoutId($blockType->fieldLayoutId);
         }
     }
 

@@ -38,12 +38,12 @@ class EntryConnection extends ObjectType {
                 }, $root['edges']);
             });
 
-        $schema->addRawField('entries')
-            ->lists()
-            ->type(Entry::interface($request))
-            ->resolve(function ($root, $args) {
-                return $root['edges'];
-            });
+        // $schema->addRawField('entries')
+        //     ->lists()
+        //     ->type(EntryInterface::singleton($request))
+        //     ->resolve(function ($root, $args) {
+        //         return $root['edges'];
+        //     });
 
         return $schema->getFieldConfig();
     }

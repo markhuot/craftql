@@ -74,10 +74,20 @@ class GraphQLService extends Component {
             // $request->categoryGroups()->all(),
             // $request->sections()->all(),
             // $request->tagGroups()->all(),
-            $request->entryTypes()->all()
+            // $request->entryTypes()->all()
+            [$request->entryTypes()->all()[0]->getGraphQLObject()]
         );
 
-        // var_dump($request->entryTypes()->all()[0]);
+        var_dump($schema['query']->config['fields']);
+        die;
+
+        // var_dump([$request->entryTypes()->all()[0]->getGraphQLObject()]);
+        // die;
+
+        // var_dump($schema['types'][0]);
+        // die;
+
+        // var_dump($request->entryTypes()->all()[0]->getGraphQLObject());
         // die;
 
         // $schema['directives'] = [
@@ -92,16 +102,16 @@ class GraphQLService extends Component {
         // var_dump(Schema::assertValid($schema));
         // die;
 
-        try {
+        // try {
             $schema = new Schema($schema);
             $schema->assertValid();
         // } catch(\yii\base\ErrorException $e) {
         //     echo $e->getMessage();
         //     die('foo');
-        } catch (\GraphQL\Error\InvariantViolation $e) {
-            echo $e->getMessage();
-            die('bar');
-        }
+        // } catch (\GraphQL\Error\InvariantViolation $e) {
+        //     echo $e->getMessage();
+        //     die;
+        // }
 
         return $schema;
     }
