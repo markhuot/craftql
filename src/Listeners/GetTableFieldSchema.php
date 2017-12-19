@@ -19,26 +19,27 @@ class GetTableFieldSchema
         $field = $event->sender;
         $schema = $event->schema;
 
+        $tableSchema = $schema->createObjectType(ucfirst($field->handle).'Table');
+
+        foreach ($field->columns as $key => $columnConfig) {
+            switch ($columnConfig['type']) {
+                case 'number':
+                    $tableSchema->addFloatField($columnConfig['handle'])
+                        ->description($columnConfig['heading']);
+                    break;
+                case 'checkbox':
+                case 'lightswitch':
+                    $tableSchema->addBooleanField($columnConfig['handle'])
+                        ->description($columnConfig['heading']);
+                    break;
+                default:
+                    $tableSchema->addStringField($columnConfig['handle'])
+                        ->description($columnConfig['heading']);
+            }
+        }
+
         $schema->addObjectField($field)
             ->lists()
-            ->config(function (Schema $object) use ($field) {
-                $object->name(ucfirst($field->handle).'Table');
-                foreach ($field->columns as $key => $columnConfig) {
-                    switch ($columnConfig['type']) {
-                        case 'number':
-                            $object->addRawFloatField($columnConfig['handle'])
-                                ->description($columnConfig['heading']);
-                            break;
-                        case 'checkbox':
-                        case 'lightswitch':
-                            $object->addRawBooleanField($columnConfig['handle'])
-                                ->description($columnConfig['heading']);
-                            break;
-                        default:
-                            $object->addRawStringField($columnConfig['handle'])
-                                ->description($columnConfig['heading']);
-                    }
-                }
-            });
+            ->config($tableSchema);
     }
 }

@@ -13,13 +13,13 @@ use markhuot\CraftQL\Builders\Schema;
 class TagConnection extends Schema {
 
     function boot() {
-        $this->addRawIntField('totalCount')
+        $this->addIntField('totalCount')
             ->nonNull();
 
-        $this->addRawField('pageInfo')
+        $this->addField('pageInfo')
             ->type(PageInfo::class);
 
-        $this->addRawField('edges')
+        $this->addField('edges')
             ->lists()
             ->type(TagEdge::class)
             ->resolve(function ($root, $args, $context, $info) {
@@ -31,7 +31,7 @@ class TagConnection extends Schema {
                 }, $root['edges']);
             });
 
-        // $this->addRawField('categories')
+        // $this->addField('categories')
         //     ->lists()
         //     ->type(Tag::interface($request))
         //     ->resolve(function ($root, $args) {

@@ -13,21 +13,21 @@ use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
 class User extends Schema {
 
     function boot() {
-        $this->addRawIntField('id')->nonNull();
-        $this->addRawStringField('name')->nonNull();
-        $this->addRawStringField('fullName');
-        $this->addRawStringField('friendlyName')->nonNull();
-        $this->addRawStringField('firstName');
-        $this->addRawStringField('lastName');
-        $this->addRawStringField('username')->nonNull();
-        $this->addRawStringField('email')->nonNull();
-        $this->addRawBooleanField('admin')->nonNull();
-        $this->addRawBooleanField('isCurrent')->nonNull();
-        $this->addRawStringField('preferredLocale');
-        // $this->addRawField('status')->type(UsersField::statusEnum())->nonNull();
-        $this->addRawDateField('dateCreated')->nonNull();
-        $this->addRawDateField('dateUpdated')->nonNull();
-        $this->addRawDateField('lastLoginDate')->nonNull();
+        $this->addIntField('id')->nonNull();
+        $this->addStringField('name')->nonNull();
+        $this->addStringField('fullName');
+        $this->addStringField('friendlyName')->nonNull();
+        $this->addStringField('firstName');
+        $this->addStringField('lastName');
+        $this->addStringField('username')->nonNull();
+        $this->addStringField('email')->nonNull();
+        $this->addBooleanField('admin')->nonNull();
+        $this->addBooleanField('isCurrent')->nonNull();
+        $this->addStringField('preferredLocale');
+        // $this->addField('status')->type(UsersField::statusEnum())->nonNull();
+        $this->addDateField('dateCreated')->nonNull();
+        $this->addDateField('dateUpdated')->nonNull();
+        $this->addDateField('lastLoginDate')->nonNull();
     }
 
 }

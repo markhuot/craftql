@@ -11,16 +11,16 @@ use markhuot\CraftQL\Builders\Schema;
 class Section extends Schema {
 
     function boot() {
-        $this->addRawIntField('id')->nonNull();
-        $this->addRawIntField('structureId');
-        $this->addRawStringField('name')->nonNull();
-        $this->addRawStringField('handle')->nonNull();
-        $this->addRawStringField('type')->nonNull();
-        $this->addRawStringField('template');
-        $this->addRawIntField('maxLevels');
-        $this->addRawBooleanField('hasUrls');
-        $this->addRawBooleanField('enableVersioning');
-        $this->addRawField('entryTypes')->lists()->type(EntryType::class);
+        $this->addIntField('id')->nonNull();
+        $this->addIntField('structureId');
+        $this->addStringField('name')->nonNull();
+        $this->addStringField('handle')->nonNull();
+        $this->addStringField('type')->nonNull();
+        $this->addStringField('template');
+        $this->addIntField('maxLevels');
+        $this->addBooleanField('hasUrls');
+        $this->addBooleanField('enableVersioning');
+        $this->addField('entryTypes')->lists()->type(EntryType::class);
     }
 
 }

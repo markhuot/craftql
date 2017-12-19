@@ -8,7 +8,7 @@ use markhuot\CraftQL\Types\EntryConnection;
 trait HasRelatedEntriesField {
 
     function bootHasRelatedEntriesField() {
-        $field = $this->addRawField('relatedEntries')
+        $field = $this->addField('relatedEntries')
             ->type(EntryConnection::class)
             ->arguments([
                 'source' => Type::boolean(),

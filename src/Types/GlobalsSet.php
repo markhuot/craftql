@@ -15,7 +15,7 @@ class GlobalsSet extends Schema {
 
     function boot() {
         foreach ($this->request->globals()->all() as $globalSet) {
-            $this->addRawField($globalSet->getContext()->handle)
+            $this->addField($globalSet->getContext()->handle)
                 ->type($globalSet);
         }
     }

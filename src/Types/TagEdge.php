@@ -13,9 +13,9 @@ class TagEdge extends Schema {
     use HasRelatedEntriesField;
 
     function boot() {
-        $this->addRawStringField('cursor');
+        $this->addStringField('cursor');
 
-        $this->addRawField('node')
+        $this->addField('node')
             ->type(TagInterface::class)
             ->resolve(function ($root) {
                 return $root['node'];

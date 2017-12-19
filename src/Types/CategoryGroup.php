@@ -9,9 +9,9 @@ use markhuot\CraftQL\Builders\Schema;
 class CategoryGroup extends Schema {
 
     function boot() {
-        $this->addRawIntField('id');
-        $this->addRawStringField('name');
-        $this->addRawStringField('handle');
+        $this->addIntField('id');
+        $this->addStringField('name');
+        $this->addStringField('handle');
     }
 
 }

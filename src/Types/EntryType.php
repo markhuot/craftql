@@ -11,10 +11,10 @@ use craft\models\EntryType as CraftEntryType;
 class EntryType extends Schema {
 
     function boot() {
-            $this->addRawIntField('id')->nonNull();
-            $this->addRawStringField('name')->nonNull();
-            $this->addRawStringField('handle')->nonNull();
-            $this->addRawField('fields')
+            $this->addIntField('id')->nonNull();
+            $this->addStringField('name')->nonNull();
+            $this->addStringField('handle')->nonNull();
+            $this->addField('fields')
                 ->nonNull()
                 ->lists()
                 ->type(Field::class)->resolve(function ($root, $args) {

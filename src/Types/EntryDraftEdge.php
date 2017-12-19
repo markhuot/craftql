@@ -12,15 +12,15 @@ use markhuot\CraftQL\Builders\Schema;
 class EntryDraftEdge extends Schema {
 
     function boot() {
-        $this->addRawStringField('cursor');
+        $this->addStringField('cursor');
 
-        $this->addRawField('node')
+        $this->addField('node')
             ->type(EntryInterface::class)
             ->resolve(function ($root, $args) {
                 return $root['node'];
             });
 
-        $this->addRawField('draftInfo')
+        $this->addField('draftInfo')
             ->type(EntryDraftInfo::class)
             ->resolve(function ($root, $args) {
                 return $root['node'];

@@ -13,11 +13,11 @@ use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
 class CategoryInterface extends Schema {
 
     function boot() {
-        $this->addRawIntField('id')->nonNull();
-        $this->addRawStringField('title')->nonNull();
-        $this->addRawStringField('slug');
-        $this->addRawStringField('uri');
-        $this->addRawStringField('group')->type(CategoryGroup::class);
+        $this->addIntField('id')->nonNull();
+        $this->addStringField('title')->nonNull();
+        $this->addStringField('slug');
+        $this->addStringField('uri');
+        $this->addStringField('group')->type(CategoryGroup::class);
     }
 
     function getGraphQLObject() {

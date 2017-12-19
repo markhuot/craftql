@@ -4,10 +4,9 @@ namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
-use markhuot\CraftQL\Builders\ContentField;
 use GraphQL\Type\Definition\UnionType;
 
-class Union extends ContentField {
+class Union extends Field {
 
     protected $types = [];
 
@@ -39,7 +38,7 @@ class Union extends ContentField {
 
     function getConfig() {
         $type = new UnionType([
-            'name' => ucfirst($this->field->handle).'Matrix',
+            'name' => ucfirst($this->getName()).'Matrix',
             'description' => 'A union of possible blocks for this matrix field',
             'types' => $this->getTypes(),
             'resolveType' => $this->getResolveType(),

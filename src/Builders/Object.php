@@ -3,7 +3,7 @@
 namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Builders\ContentField;
+use markhuot\CraftQL\Builders\Schema;
 
 class Object extends Field {
 
@@ -12,8 +12,12 @@ class Object extends Field {
     }
 
     function config($callback): self {
-        if ($callback) {
+        if (is_callable($callback)) {
             $callback($this->type);
+        }
+
+        if (is_a($callback, Schema::class)) {
+            $this->type = $callback;
         }
 
         return $this;

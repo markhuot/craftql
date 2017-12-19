@@ -15,9 +15,9 @@ class EntryEdge extends Schema {
     use HasRelatedEntriesField;
 
     function boot() {
-        $this->addRawStringField('cursor');
+        $this->addStringField('cursor');
 
-        $this->addRawField('node')
+        $this->addField('node')
             ->type(EntryInterface::class)
             ->resolve(function ($root) {
                 return $root['node'];
@@ -25,7 +25,7 @@ class EntryEdge extends Schema {
 
 //        $this->addGlobalField('relatedTo');
 
-        $this->addRawField('drafts')
+        $this->addField('drafts')
             ->type(EntryDraftConnection::class)
             ->resolve(function ($root, $args, $context, $info) {
                 $drafts = Craft::$app->entryRevisions->getDraftsByEntryId($root['node']->id);

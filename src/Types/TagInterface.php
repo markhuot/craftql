@@ -13,10 +13,10 @@ use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
 class TagInterface extends Schema {
 
     function boot() {
-        $this->addRawIntField('id')->nonNull();
-        $this->addRawStringField('title')->nonNull();
-        $this->addRawStringField('slug')->nonNull();
-        $this->addRawField('group')->nonNull()->type(TagGroup::class);
+        $this->addIntField('id')->nonNull();
+        $this->addStringField('title')->nonNull();
+        $this->addStringField('slug')->nonNull();
+        $this->addField('group')->nonNull()->type(TagGroup::class);
     }
 
     function getGraphQLObject() {

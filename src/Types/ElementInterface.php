@@ -13,7 +13,7 @@ use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
 class ElementInterface extends Schema {
 
     function boot() {
-        $this->addRawStringField('elementType');
+        $this->addStringField('elementType');
     }
 
     function getGraphQLObject() {

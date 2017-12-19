@@ -14,13 +14,13 @@ use markhuot\CraftQL\Builders\Schema;
 class EntryConnection extends Schema {
 
     function boot() {
-        $this->addRawIntField('totalCount')
+        $this->addIntField('totalCount')
             ->nonNull();
 
-        $this->addRawField('pageInfo')
+        $this->addField('pageInfo')
             ->type(PageInfo::class);
 
-        $this->addRawField('edges')
+        $this->addField('edges')
             ->lists()
             ->type(EntryEdge::class)
             ->resolve(function ($root, $args, $context, $info) {
@@ -32,7 +32,7 @@ class EntryConnection extends Schema {
                 }, $root['edges']);
             });
 
-        $this->addRawField('entries')
+        $this->addField('entries')
             ->lists()
             ->type(EntryInterface::class)
             ->resolve(function ($root, $args) {

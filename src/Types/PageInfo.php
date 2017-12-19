@@ -11,22 +11,22 @@ use markhuot\CraftQL\Builders\Schema;
 class PageInfo extends Schema {
 
     function boot() {
-        $this->addRawBooleanField('hasPreviousPage')
+        $this->addBooleanField('hasPreviousPage')
             ->nonNull()
             ->resolve(function ($root, $args) {
                 return $root->currentPage > 1;
             });
 
-        $this->addRawBooleanField('hasNextPage')
+        $this->addBooleanField('hasNextPage')
             ->nonNull()
             ->resolve( function ($root, $args) {
             return $root->currentPage < $root->totalPages;
         });
 
-        $this->addRawIntField('currentPage');
-        $this->addRawIntField('totalPages');
-        $this->addRawIntField('first');
-        $this->addRawIntField('last');
+        $this->addIntField('currentPage');
+        $this->addIntField('totalPages');
+        $this->addIntField('first');
+        $this->addIntField('last');
     }
 
 }

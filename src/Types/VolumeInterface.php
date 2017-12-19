@@ -92,9 +92,9 @@ class VolumeInterface extends Schema {
     }
 
     function boot() {
-        $this->addRawIntField('id');
-        $this->addRawStringField('uri');
-        $this->addRawStringField('url')
+        $this->addIntField('id');
+        $this->addStringField('uri');
+        $this->addStringField('url')
             ->arguments([
                 'transform' => static::getTransformsEnum(),
                 'crop' => static::cropInputObject(),
@@ -123,18 +123,18 @@ class VolumeInterface extends Schema {
                 return $root->getUrl($transform);
             });
 
-        $this->addRawStringField('width');
-        $this->addRawStringField('height');
-        $this->addRawIntField('size');
-        $this->addRawStringField('folder');
-        $this->addRawStringField('mimeType');
-        $this->addRawStringField('title');
-        $this->addRawStringField('extension');
-        $this->addRawStringField('filename');
-        $this->addRawDateField('dateCreatedTimestamp');
-        $this->addRawDateField('dateCreated');
-        $this->addRawDateField('dateUpdatedTimestamp');
-        $this->addRawDateField('dateUpdated');
+        $this->addStringField('width');
+        $this->addStringField('height');
+        $this->addIntField('size');
+        $this->addStringField('folder');
+        $this->addStringField('mimeType');
+        $this->addStringField('title');
+        $this->addStringField('extension');
+        $this->addStringField('filename');
+        $this->addDateField('dateCreatedTimestamp');
+        $this->addDateField('dateCreated');
+        $this->addDateField('dateUpdatedTimestamp');
+        $this->addDateField('dateUpdated');
     }
 
     function getGraphQLObject() {

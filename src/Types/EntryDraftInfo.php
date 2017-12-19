@@ -11,9 +11,9 @@ use markhuot\CraftQL\Builders\Schema;
 class EntryDraftInfo extends Schema {
 
     function boot() {
-        $this->addRawIntField('draftId');
-        $this->addRawStringField('name');
-        $this->addRawStringField('notes')
+        $this->addIntField('draftId');
+        $this->addStringField('name');
+        $this->addStringField('notes')
             ->resolve(function ($root, $args) {
                 return $root->revisionNotes;
             });

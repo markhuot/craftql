@@ -21,7 +21,7 @@ class Query extends ObjectType {
 
         $schema = new Schema($request);
 
-        $schema->addRawStringField('helloWorld')
+        $schema->addStringField('helloWorld')
             ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
@@ -43,7 +43,7 @@ class Query extends ObjectType {
         }
 
         if ($token->can('query:users')) {
-            $schema->addRawField('users')
+            $schema->addField('users')
                 ->lists()
                 ->type(User::class)
                 ->arguments([
@@ -74,7 +74,7 @@ class Query extends ObjectType {
         }
 
         if ($token->can('query:sections')) {
-            $schema->addRawField('sections')
+            $schema->addField('sections')
                 ->lists()
                 ->type(Section::class)
                 ->resolve(function ($root, $args, $context, $info) {
@@ -93,7 +93,7 @@ class Query extends ObjectType {
      * @return Schema
      */
     function addEntriesSchema($schema) {
-        $schema->addRawField('entries')
+        $schema->addField('entries')
             ->lists()
             ->type(EntryInterface::class)
             ->arguments(Entry::args($schema->getRequest()))
@@ -101,7 +101,7 @@ class Query extends ObjectType {
                 return $schema->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
             });
 
-         $schema->addRawField('entriesConnection')
+         $schema->addField('entriesConnection')
              ->name('entriesConnection')
              ->type(EntryConnection::class)
              ->arguments(Entry::args($schema->getRequest()))
@@ -118,7 +118,7 @@ class Query extends ObjectType {
                  ];
              });
 
-        $schema->addRawField('entry')
+        $schema->addField('entry')
             ->type(EntryInterface::class)
             ->arguments(Entry::args($schema->getRequest()))
             ->resolve(function ($root, $args, $context, $info) use ($schema) {
@@ -132,11 +132,12 @@ class Query extends ObjectType {
      * @return Schema
      */
     function addGlobalsSchema($schema) {
-        // $schema->addRawObjectField('globals')
+
+        // $schema->addObjectField('globals')
         //     ->config(function ($object) use ($request) {
         //         $object->name('GlobalSet');
         //         foreach ($request->globals()->all() as $globalSet) {
-        //             $object->addRawField($globalSet->getContext()->handle)
+        //             $object->addField($globalSet->getContext()->handle)
         //                 ->type($globalSet);
         //         }
         //     })
@@ -148,7 +149,7 @@ class Query extends ObjectType {
         //         return $sets;
         //     });
 
-        $schema->addRawField('globals')
+        $schema->addField('globals')
             ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
             ->resolve(function ($root, $args) {
                 $sets = [];
@@ -165,7 +166,7 @@ class Query extends ObjectType {
      * @return Schema
      */
     function addTagsSchema($schema) {
-        $schema->addRawField('tags')
+        $schema->addField('tags')
             ->lists()
             ->type(TagInterface::class)
             ->arguments(Tag::args($schema->getRequest()))
@@ -184,7 +185,7 @@ class Query extends ObjectType {
                 return $criteria->all();
             });
 
-        $schema->addRawField('tagsConnection')
+        $schema->addField('tagsConnection')
             ->type(TagConnection::class)
             ->arguments(Tag::args($schema->getRequest()))
             ->resolve(function ($root, $args, $context, $info) {
@@ -217,7 +218,7 @@ class Query extends ObjectType {
      * @return Schema
      */
     function addCategoriesSchema($schema) {
-        $schema->addRawField('categories')
+        $schema->addField('categories')
             ->lists()
             ->type(CategoryInterface::class)
             ->arguments(Category::args($schema->getRequest()))
@@ -236,7 +237,7 @@ class Query extends ObjectType {
                 return $criteria->all();
             });
 
-        $schema->addRawField('categoriesConnection')
+        $schema->addField('categoriesConnection')
             ->type(CategoryConnection::class)
             ->arguments(Category::args($schema->getRequest()))
             ->resolve(function ($root, $args) {

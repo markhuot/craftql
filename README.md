@@ -303,17 +303,44 @@ Scopes allow you to configure which GraphQL fields and entry types are included 
 To add CraftQL support to your third-party field plugin you will need to listen to the `craftQlGetFieldSchema` event. This event, triggered on your custom field, will pass a "schema builder" into the event handler, allowing you to specify the field schema your custom field provides. For example, in your plugin's `::init` method you could specify,
 
 ```php
-Event::on(\craft\base\Field::class, 'craftQlGetFieldSchema', function ($event) {
-  $event->builder->addStringField($event->sender);
+Event::on(\my\custom\Field::class, 'craftQlGetFieldSchema', function (\markhuot\CraftQL\Events\GetFieldSchema $event) {
+  // the custom field is passed as the event sender
+  $field = $event->sender;
+
+  // the schema exists on a public property of the event
+  $event->schema
+
+    // you can add as many fields as you need to for your field. Typically you'll
+    // pass your field in, which will automatically set the name and description
+    // based on the Craft config.
+    ->addStringField($field);
+
+  // the schema is a fluent builder and can be chained to set multiple properties
+  // of the custom field
+  $event->schema->addEnumField('customField')
+    ->lists()
+    ->description('This is a custom description for the field')
+    ->values(['KEY' => 'Label', 'KEY2' => 'Another label']);
 });
 ```
 
 The above, when called for a Post entry type on the `excerpt` field would generate a schema approximately equlilivant to,
 
 ```graphql
+type CustomFieldEnum {
+  # Label
+  KEY
+
+  # Another label
+  KEY2
+}
+
 type Post {
   # The field instructions are automatically included
   excerpt: String
+
+  # This is a custom description for the field
+  customField: [CustomFieldEnum]
 }
 ```
 
@@ -323,7 +350,7 @@ If your custom field resolves an object you can expose that to CraftQL as well. 
 Event::on(\craft\base\Field::class, 'craftQlGetFieldSchema', function ($event) {
   $field = $event->sender;
 
-  $object = $event->builder->newObjectType('MapPoint')
+  $object = $event->builder->createObjectType('MapPoint')
         ->addStringField('lat')
         ->addStringField('lng')
         ->addStringField('zoom');

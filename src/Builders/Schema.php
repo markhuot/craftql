@@ -13,7 +13,6 @@ class Schema implements \ArrayAccess {
 
     private $name;
     private $fields = [];
-    private $reallyRawFields = [];
     protected $context;
     static $globals;
     protected $interfaces = [];
@@ -85,78 +84,95 @@ class Schema implements \ArrayAccess {
         return $this->name;
     }
 
-    function addRawField($name): BaseField {
-        return $this->fields[] = new BaseField($this->request, $name);
-    }
-
-    function addRawStringField($name): BaseField {
-        return $this->fields[] = (new BaseField($this->request, $name))->type(Type::string());
-    }
-
-    function addRawIntField($name): BaseField {
-        return $this->fields[] = (new BaseField($this->request, $name))->type(Type::int());
-    }
-
-    function addRawFloatField($name): BaseField {
-        return $this->fields[] = (new BaseField($this->request, $name))->type(Type::float());
-    }
-
-    function addRawBooleanField($name): BaseField {
-        return $this->fields[] = (new BaseField($this->request, $name))->type(Type::boolean());
-    }
-
-    function addRawDateField($name): BaseField {
-        return $this->fields[] = new Date($this->request, $name);
-    }
-
-    function addRawEnumField($name): BaseField {
-        return $this->fields[] = new Enum($this->request, $name);
-    }
-
-    function addRawObjectField(string $name, callable $config=null): ObjectField {
-        return $this->fields[] = (new ObjectField($this->request, $name))
-            ->config($config);
+    function createObjectType($name): self {
+        return (new static($this->request))
+            ->name($name);
     }
 
     function addObjectField(CraftField $field, callable $config=null): ObjectField {
-        return $this->fields[] = (new ObjectField($this->request, $field->handle))
-            ->description($field->instructions)
+        if (is_a($field, CraftField::class)) {
+            return $this->fields[] = (new ObjectField($this->request, $field->handle))
+                ->description($field->instructions)
+                ->config($config);
+        }
+
+        return $this->fields[] = (new ObjectField($this->request, $field))
             ->config($config);
     }
 
-    function addField(CraftField $field): BaseField {
-        return $this->fields[] = new ContentField($this->request, $field);
+    function addField($field): BaseField {
+        if (is_a($field, CraftField::class)) {
+            return $this->fields[] = (new Field($this->request, $field->handle))
+                ->description($field->instructions);
+        }
+
+        return $this->fields[] = new Field($this->request, $field);
     }
 
-    function addStringField(CraftField $field): BaseField {
-        return $this->addField($field);
+    function addStringField($field): BaseField {
+        if (is_a($field, CraftField::class)) {
+            return $this->fields[] = (new Field($this->request, $field->handle))
+                ->description($field->instructions);
+        }
+
+        return $this->fields[] = new Field($this->request, $field);
     }
 
-    function addBooleanField(CraftField $field): BaseField {
-        return $this->fields[] = (new Boolean($this->request, $field->handle))
-            ->description($field->instructions);
+    function addBooleanField($field): BaseField {
+        if (is_a($field, CraftField::class)) {
+            return $this->fields[] = (new Boolean($this->request, $field->handle))
+                ->description($field->instructions);
+        }
+
+        return $this->fields[] = new Boolean($this->request, $field);
     }
 
-    function addEnumField(CraftField $field): BaseField {
-        return $this->fields[] = (new Enum($this->request, $field->handle))
-            ->description($field->instructions);
+    function addEnumField($field): BaseField {
+        if (is_a($field, CraftField::class)) {
+            return $this->fields[] = (new Enum($this->request, $field->handle))
+                ->description($field->instructions);
+        }
+
+        return $this->fields[] = new Enum($this->request, $field);
     }
 
-    function addIntField(CraftField $field): BaseField {
-        return $this->fields[] = (new ContentField($this->request, $field))
+    function addIntField($field): BaseField {
+        if (is_a($field, CraftField::class)) {
+            return $this->fields[] = (new Field($this->request, $field->handle))
+                ->type(Type::int())
+                ->description($field->instructions);
+        }
+
+        return $this->fields[] = (new Field($this->request, $field))
             ->type(Type::int());
     }
 
-    function addFloatField(CraftField $field): BaseField {
-        return $this->fields[] = (new ContentField($this->request, $field))
+    function addFloatField($field): BaseField {
+        if (is_a($field, CraftField::class)) {
+            return $this->fields[] = (new Field($this->request, $field->handle))
+                ->type(Type::float())
+                ->description($field->instructions);
+        }
+
+        return $this->fields[] = (new Field($this->request, $field))
             ->type(Type::float());
     }
 
-    function addDateField(CraftField $field): BaseField {
-        return $this->fields[] = new Date($this->request, $field->handle);
+    function addDateField($field): BaseField {
+        if (is_a($field, CraftField::class)) {
+            return $this->fields[] = (new Date($this->request, $field->handle))
+                ->description($field->instructions);
+        }
+
+        return $this->fields[] = new Date($this->request, $field);
     }
 
-    function addUnionField(CraftField $field): BaseField {
+    function addUnionField($field): BaseField {
+        if (is_a($field, CraftField::class)) {
+            return $this->fields[] = (new Union($this->request, $field->handle))
+                ->description($field->instructions);
+        }
+
         return $this->fields[] = new Union($this->request, $field);
     }
 
@@ -242,8 +258,6 @@ class Schema implements \ArrayAccess {
         foreach ($this->getFields() as $field) {
             $fields[$field->getName()] = $field->getConfig();
         }
-
-        $fields = array_merge($fields, $this->reallyRawFields);
 
         return $fields;
     }
