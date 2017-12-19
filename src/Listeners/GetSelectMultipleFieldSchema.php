@@ -18,7 +18,7 @@ class GetSelectMultipleFieldSchema
 
         $schema->addEnumField($field)
             ->lists()
-            ->values([GetSelectOneFieldSchema::class, 'valuesForField'])
+            ->values([GetSelectOneFieldSchema::class, 'valuesForField'], $field)
             ->resolve(function ($root, $args) use ($field) {
                 $values = [];
 

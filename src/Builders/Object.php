@@ -12,7 +12,10 @@ class Object extends Field {
     }
 
     function config($callback): self {
-        $callback($this->type);
+        if ($callback) {
+            $callback($this->type);
+        }
+
         return $this;
     }
 

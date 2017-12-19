@@ -17,17 +17,17 @@ class GetSelectOneFieldSchema
         $schema = $event->schema;
 
         $schema->addEnumField($field)
-            ->values([static::class, 'valuesForField'])
+            ->values([static::class, 'valuesForField'], $field)
             ->resolve(function ($root, $args) use ($field) {
                 return (string)$root->{$field->handle} ?: null;
             });
         // $schema->addEnumArgument($field, $enum);
     }
 
-    static function valuesForField($field) {
+    static function valuesForField($graphQLField, $craftField) {
         $values = [];
 
-        foreach ($field['settings']['options'] as $option) {
+        foreach ($craftField['settings']['options'] as $option) {
             $value = $option['value'];
             $value = preg_replace('/[^a-z0-9]+/i', ' ', $value);
             $value = \craft\helpers\StringHelper::toCamelCase($value);

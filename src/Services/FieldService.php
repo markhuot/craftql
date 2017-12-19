@@ -18,11 +18,15 @@ class FieldService {
 
   private $fieldSchemas = [];
 
-    function getSchemaForField(\craft\base\Field $field, \markhuot\CraftQL\Request $request) {
+    function getSchemaForField(\craft\base\Field $field, \markhuot\CraftQL\Request $request, $parent) {
         if (!isset($this->fieldSchemas[$field->id])) {
             $event = new GetFieldSchemaEvent;
-            $event->field = $field;
-            $event->schema = new \markhuot\CraftQL\Builders\Schema($request);
+            // if ($parent) {
+            //     $event->schema = $parent->clone();
+            // }
+            // else {
+                $event->schema = new \markhuot\CraftQL\Builders\Schema($request);
+            // }
             $field->trigger('craftQlGetFieldSchema', $event);
             $this->fieldSchemas[$field->id] = $event->schema;
         }
@@ -43,13 +47,13 @@ class FieldService {
         return $graphQlArgs;
     }
 
-    function getFields($fieldLayoutId, $request) {
+    function getFields($fieldLayoutId, $request, $parent=null) {
         $graphQlFields = [];
 
         if ($fieldLayoutId) {
             $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
             foreach ($fieldLayout->getFields() as $field) {
-                $schema = $this->getSchemaForField($field, $request);
+                $schema = $this->getSchemaForField($field, $request, $parent);
                 $graphQlFields = array_merge($graphQlFields, $schema->getFields());
             }
         }

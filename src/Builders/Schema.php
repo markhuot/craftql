@@ -19,12 +19,16 @@ class Schema implements \ArrayAccess {
     protected $interfaces = [];
     static $singletons = [];
     protected $request;
+    private $parent;
 
-    function __construct(Request $request, $context=null) {
+    function __construct(Request $request, $context=null, $parent=null) {
         $this->request = $request;
         $this->context = $context;
-        $this->boot();
-        $this->bootTraits();
+        $this->parent = $parent;
+        // CALLED LOWER, BEFORE GETTING FIELDS TO ACCOUNT FOR
+        // CIRCULAR REFERENCES
+        // $this->boot();
+        // $this->bootTraits();
     }
 
     /**
@@ -46,6 +50,10 @@ class Schema implements \ArrayAccess {
             }
         }
     }
+
+    // function clone() {
+    //     return new static($this->request, null, $this);
+    // }
 
     static function singleton(Request $request, $key=null) {
         if ($key === null) {
@@ -101,8 +109,19 @@ class Schema implements \ArrayAccess {
         return $this->fields[] = new Date($this->request, $name);
     }
 
-    function addRawObjectField(string $name): ObjectField {
-        return $this->fields[] = (new ObjectField($this->request, $name));
+    function addRawEnumField($name): BaseField {
+        return $this->fields[] = new Enum($this->request, $name);
+    }
+
+    function addRawObjectField(string $name, callable $config=null): ObjectField {
+        return $this->fields[] = (new ObjectField($this->request, $name))
+            ->config($config);
+    }
+
+    function addObjectField(CraftField $field, callable $config=null): ObjectField {
+        return $this->fields[] = (new ObjectField($this->request, $field->handle))
+            ->description($field->instructions)
+            ->config($config);
     }
 
     function addField(CraftField $field): BaseField {
@@ -114,11 +133,23 @@ class Schema implements \ArrayAccess {
     }
 
     function addBooleanField(CraftField $field): BaseField {
-        return $this->fields[] = new Boolean($this->request, $field);
+        return $this->fields[] = (new Boolean($this->request, $field->handle))
+            ->description($field->instructions);
     }
 
     function addEnumField(CraftField $field): BaseField {
-        return $this->fields[] = new Enum($this->request, $field);
+        return $this->fields[] = (new Enum($this->request, $field->handle))
+            ->description($field->instructions);
+    }
+
+    function addIntField(CraftField $field): BaseField {
+        return $this->fields[] = (new ContentField($this->request, $field))
+            ->type(Type::int());
+    }
+
+    function addFloatField(CraftField $field): BaseField {
+        return $this->fields[] = (new ContentField($this->request, $field))
+            ->type(Type::float());
     }
 
     function addDateField(CraftField $field): BaseField {
@@ -131,7 +162,7 @@ class Schema implements \ArrayAccess {
 
     function addFieldsByLayoutId(int $fieldLayoutId) {
         $fieldService = \Yii::$container->get('fieldService');
-        $fields = $fieldService->getFields($fieldLayoutId, $this->request);
+        $fields = $fieldService->getFields($fieldLayoutId, $this->request, $this);
         return $this->fields = array_merge($this->fields, $fields);
     }
 
@@ -179,11 +210,13 @@ class Schema implements \ArrayAccess {
         return $interfaces;
     }
 
-    function getRequest() {
+    function getRequest(): Request {
         return $this->request;
     }
 
     function getFields(): array {
+        $this->boot();
+        $this->bootTraits();
         return $this->fields;
     }
 

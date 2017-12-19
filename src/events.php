@@ -6,6 +6,11 @@ return [
             new \markhuot\CraftQL\Listeners\GetAssetsFieldSchema,
         ],
     ],
+    \craft\fields\Categories::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetCategoriesFieldSchema,
+        ],
+    ],
     \craft\fields\Checkboxes::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetSelectMultipleFieldSchema,
@@ -39,6 +44,21 @@ return [
     \craft\fields\MultiSelect::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetSelectMultipleFieldSchema,
+        ],
+    ],
+    \craft\fields\Number::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetNumberFieldSchema,
+        ],
+    ],
+    \craft\fields\Table::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetTableFieldSchema,
+        ],
+    ],
+    \craft\fields\Tags::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetTagsFieldSchema,
         ],
     ],
     \craft\base\Field::class => [

@@ -6,14 +6,14 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\EnumType;
 use markhuot\CraftQL\Builders\ContentField;
 
-class Enum extends ContentField {
+class Enum extends Field {
 
     private $values = [];
     static $count = 0;
 
-    function values($values) {
+    function values($values, $context=null) {
         if (is_callable($values)) {
-            $values = $values($this->field);
+            $values = $values($this, $context);
         }
 
         if (is_array($values)) {
@@ -34,7 +34,7 @@ class Enum extends ContentField {
 
     function getType() {
         return new EnumType([
-            'name' => ucfirst($this->field->handle).'Enum',
+            'name' => ucfirst($this->getName()).'Enum',
             'values' => $this->getValues(),
         ]);
     }

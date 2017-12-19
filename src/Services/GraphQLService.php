@@ -63,27 +63,32 @@ class GraphQLService extends Component {
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
         $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
 
+        // var_dump($request->categoryGroups()->all());
+        //     die;
+
         $schema = [];
         $schema['query'] = new \markhuot\CraftQL\Types\Query($request);
-        $schema['types'] = array_merge(
-            // $request->sections()->all(),
+        $schema['types'] = function () use ($request) {
+            return array_merge(
+                // $request->sections()->all(),
 
-            array_map(function ($volume) {
-                return $volume->getGraphQLObject();
-            }, $request->volumes()->all()),
+                array_map(function ($volume) {
+                    return $volume->getRawGraphQLObject();
+                }, $request->volumes()->all()),
 
-            array_map(function ($categoryGroup) {
-                return $categoryGroup->getGraphQLObject();
-            }, $request->categoryGroups()->all()),
+                array_map(function ($categoryGroup) {
+                    return $categoryGroup->getRawGraphQLObject();
+                }, $request->categoryGroups()->all()),
 
-            array_map(function ($tagGroup) {
-                return $tagGroup->getGraphQLObject();
-            }, $request->tagGroups()->all()),
+                array_map(function ($tagGroup) {
+                    return $tagGroup->getRawGraphQLObject();
+                }, $request->tagGroups()->all()),
 
-            array_map(function ($entryType) {
-                return $entryType->getGraphQLObject();
-            }, $request->entryTypes()->all())
-        );
+                array_map(function ($entryType) {
+                    return $entryType->getRawGraphQLObject();
+                }, $request->entryTypes()->all())
+            );
+        };
 
         // $schema['directives'] = [
         //     \markhuot\CraftQL\Directives\Date::directive(),
