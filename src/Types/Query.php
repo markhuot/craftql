@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\Type;
 use Craft;
 use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\Request;
+use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
 
 class Query extends Schema {
 
@@ -85,7 +86,7 @@ class Query extends Schema {
         $this->addField('entries')
             ->lists()
             ->type(EntryInterface::class)
-            ->arguments(Entry::args($this->getRequest()))
+            ->use(EntryQueryArguments::class)
             ->resolve(function ($root, $args, $context, $info) {
                 return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
             });
@@ -93,7 +94,7 @@ class Query extends Schema {
          $this->addField('entriesConnection')
              ->name('entriesConnection')
              ->type(EntryConnection::class)
-             ->arguments(Entry::args($this->getRequest()))
+             ->use(EntryQueryArguments::class)
              ->resolve(function ($root, $args, $context, $info) {
                  $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
                  list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
@@ -109,7 +110,7 @@ class Query extends Schema {
 
         $this->addField('entry')
             ->type(EntryInterface::class)
-            ->arguments(Entry::args($this->getRequest()))
+            ->use(EntryQueryArguments::class)
             ->resolve(function ($root, $args, $context, $info) {
                 return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
             });

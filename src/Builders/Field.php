@@ -5,8 +5,9 @@ namespace markhuot\CraftQL\Builders;
 use craft\base\Field as CraftField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
+use yii\base\Component;
 
-class Field {
+class Field extends Component {
 
     protected $request;
     protected $name;
@@ -25,6 +26,10 @@ class Field {
 
     protected function boot() {
 
+    }
+
+    function getRequest() {
+        return $this->request;
     }
 
     function name($name): self {
@@ -79,12 +84,25 @@ class Field {
             $type = Type::nonNull($type);
         }
 
+        // get behaviors
+        if ($behaviors=$this->getBehaviors()) {
+            foreach ($behaviors as $key => $behavior) {
+                $this->{"init{$key}"}();
+            }
+        }
+
         return [
             'type' => $type,
             'description' => $this->getDescription(),
             'args' => $this->getArguments(),
             'resolve' => $this->getResolve(),
         ];
+    }
+
+    function use(string $behavior): self {
+        $reflect = new \ReflectionClass($behavior);
+        $this->attachBehavior($reflect->getShortName(), $behavior);
+        return $this;
     }
 
     function description($description): self {

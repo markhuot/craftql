@@ -6,20 +6,25 @@ use yii\base\Component;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Craft;
-use craft\elements\Entry;
+use markhuot\CraftQL\Builders\Schema;
+use markhuot\CraftQL\Types\Entry;
+use markhuot\CraftQL\FieldBehaviors\EntryMutationArguments;
 
-class Mutation extends ObjectType {
+class Mutation extends Schema {
 
-    function __construct($request) {
-        $fields = [];
+    function boot() {
 
-        $entryTypes = $request->entryTypes()->all('mutate');
-        foreach ($entryTypes as $entryType) {
-            $fields['upsert'.ucfirst($entryType->name)] = [
-                'type' => $entryType,
-                'args' => $entryType->getGraphQLMutationArgs($request),
-                'resolve' => $entryType->upsert($request),
-            ];
+        foreach ($this->request->entryTypes()->all('mutate') as $entryType) {
+            $this->addField('upsert'.$entryType->getName())
+                ->type($entryType)
+                ->use(EntryMutationArguments::class)
+                // ->arguments([
+                //     'id' => Type::int(),
+                //     'title' => Type::string(),
+                // ])
+                // ->arguments($entryType->getArguments())
+                // ->resolve($entryType->upsert($request))
+                ;
         }
 
         // $fields['upsertField'] = [
@@ -53,11 +58,6 @@ class Mutation extends ObjectType {
         //         return $entry;
         //     },
         // ];
-
-        parent::__construct([
-            'name' => 'Mutation',
-            'fields' => $fields
-        ]);
     }
 
 }

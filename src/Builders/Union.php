@@ -9,6 +9,7 @@ use GraphQL\Type\Definition\UnionType;
 class Union extends Field {
 
     protected $types = [];
+    protected $resolveType;
 
     function resolveType(callable $resolveType): self {
         $this->resolveType = $resolveType;

@@ -67,7 +67,9 @@ class GraphQLService extends Component {
         $schemaConfig['query'] = (new \markhuot\CraftQL\Types\Query($request))->getRawGraphQLObject();
         $schemaConfig['types'] = function () use ($request) {
             return array_merge(
-                // $request->sections()->all(),
+                array_map(function ($section) {
+                    return $section->getRawGraphQLObject();
+                }, $request->sections()->all()),
 
                 array_map(function ($volume) {
                     return $volume->getRawGraphQLObject();
@@ -87,28 +89,18 @@ class GraphQLService extends Component {
             );
         };
 
-        // $schema['directives'] = [
-        //     \markhuot\CraftQL\Directives\Date::directive(),
-        // ];
+        $schemaConfig['directives'] = [
+            \markhuot\CraftQL\Directives\Date::directive(),
+        ];
 
-        // $mutation = new \markhuot\CraftQL\Types\Mutation($request);
-        // if (count($mutation->getFields()) > 0) {
-        //     $schema['mutation'] = $mutation;
-        // }
+        $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
+        $schemaConfig['mutation'] = $mutation;
 
-        // var_dump(Schema::assertValid($schema));
-        // die;
+        $schema = new Schema($schemaConfig);
 
-        // try {
-            $schema = new Schema($schemaConfig);
+        if (Craft::$app->config->general->devMode) {
             $schema->assertValid();
-        // } catch(\yii\base\ErrorException $e) {
-        //     echo $e->getMessage();
-        //     die('foo');
-        // } catch (\GraphQL\Error\InvariantViolation $e) {
-        //     echo $e->getMessage();
-        //     die;
-        // }
+        }
 
         return $schema;
     }
