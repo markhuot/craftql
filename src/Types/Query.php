@@ -9,41 +9,34 @@ use Craft;
 use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\Request;
 
-class Query extends ObjectType {
+class Query extends Schema {
 
-    function __construct(Request $request) {
-        $token = $request->token();
+    function boot() {
+        $token = $this->request->token();
 
-        $config = [
-            'name' => 'Query',
-            'fields' => [],
-        ];
-
-        $schema = new Schema($request);
-
-        $schema->addStringField('helloWorld')
+        $this->addStringField('helloWorld')
             ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
-            if (!empty($request->entryTypes()->all())) {
-                $this->addEntriesSchema($schema);
+            if (!empty($this->request->entryTypes()->all())) {
+                $this->addEntriesSchema();
             }
         }
 
         if ($token->can('query:globals')) {
-            $this->addGlobalsSchema($schema);
+            $this->addGlobalsSchema();
         }
 
         if ($token->can('query:tags')) {
-            $this->addTagsSchema($schema);
+            $this->addTagsSchema();
         }
 
         if ($token->can('query:categories')) {
-            $this->addCategoriesSchema($schema);
+            $this->addCategoriesSchema();
         }
 
         if ($token->can('query:users')) {
-            $schema->addField('users')
+            $this->addField('users')
                 ->lists()
                 ->type(User::class)
                 ->arguments([
@@ -74,17 +67,13 @@ class Query extends ObjectType {
         }
 
         if ($token->can('query:sections')) {
-            $schema->addField('sections')
+            $this->addField('sections')
                 ->lists()
                 ->type(Section::class)
                 ->resolve(function ($root, $args, $context, $info) {
                     return \Craft::$app->sections->allSections;
                 });
         }
-
-        $config['fields'] = array_merge($config['fields'], $schema->getFieldConfig());
-
-        parent::__construct($config);
     }
 
     /**
@@ -92,21 +81,21 @@ class Query extends ObjectType {
      *
      * @return Schema
      */
-    function addEntriesSchema($schema) {
-        $schema->addField('entries')
+    function addEntriesSchema() {
+        $this->addField('entries')
             ->lists()
             ->type(EntryInterface::class)
-            ->arguments(Entry::args($schema->getRequest()))
-            ->resolve(function ($root, $args, $context, $info) use ($schema) {
-                return $schema->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
+            ->arguments(Entry::args($this->getRequest()))
+            ->resolve(function ($root, $args, $context, $info) {
+                return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
             });
 
-         $schema->addField('entriesConnection')
+         $this->addField('entriesConnection')
              ->name('entriesConnection')
              ->type(EntryConnection::class)
-             ->arguments(Entry::args($schema->getRequest()))
-             ->resolve(function ($root, $args, $context, $info) use ($schema) {
-                 $criteria = $schema->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
+             ->arguments(Entry::args($this->getRequest()))
+             ->resolve(function ($root, $args, $context, $info) {
+                 $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
                  list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
 
                  return [
@@ -118,11 +107,11 @@ class Query extends ObjectType {
                  ];
              });
 
-        $schema->addField('entry')
+        $this->addField('entry')
             ->type(EntryInterface::class)
-            ->arguments(Entry::args($schema->getRequest()))
-            ->resolve(function ($root, $args, $context, $info) use ($schema) {
-                return $schema->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
+            ->arguments(Entry::args($this->getRequest()))
+            ->resolve(function ($root, $args, $context, $info) {
+                return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
             });
     }
 
@@ -131,12 +120,12 @@ class Query extends ObjectType {
      *
      * @return Schema
      */
-    function addGlobalsSchema($schema) {
+    function addGlobalsSchema() {
 
-        // $schema->addObjectField('globals')
-        //     ->config(function ($object) use ($request) {
+        // $this->addObjectField('globals')
+        //     ->config(function ($object) use ($this->request) {
         //         $object->name('GlobalSet');
-        //         foreach ($request->globals()->all() as $globalSet) {
+        //         foreach ($this->request->globals()->all() as $globalSet) {
         //             $object->addField($globalSet->getContext()->handle)
         //                 ->type($globalSet);
         //         }
@@ -149,7 +138,7 @@ class Query extends ObjectType {
         //         return $sets;
         //     });
 
-        $schema->addField('globals')
+        $this->addField('globals')
             ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
             ->resolve(function ($root, $args) {
                 $sets = [];
@@ -165,11 +154,11 @@ class Query extends ObjectType {
      *
      * @return Schema
      */
-    function addTagsSchema($schema) {
-        $schema->addField('tags')
+    function addTagsSchema() {
+        $this->addField('tags')
             ->lists()
             ->type(TagInterface::class)
-            ->arguments(Tag::args($schema->getRequest()))
+            ->arguments(Tag::args($this->getRequest()))
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Tag::find();
 
@@ -185,9 +174,9 @@ class Query extends ObjectType {
                 return $criteria->all();
             });
 
-        $schema->addField('tagsConnection')
+        $this->addField('tagsConnection')
             ->type(TagConnection::class)
-            ->arguments(Tag::args($schema->getRequest()))
+            ->arguments(Tag::args($this->getRequest()))
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Tag::find();
 
@@ -217,11 +206,11 @@ class Query extends ObjectType {
      *
      * @return Schema
      */
-    function addCategoriesSchema($schema) {
-        $schema->addField('categories')
+    function addCategoriesSchema() {
+        $this->addField('categories')
             ->lists()
             ->type(CategoryInterface::class)
-            ->arguments(Category::args($schema->getRequest()))
+            ->arguments(Category::args($this->getRequest()))
             ->resolve(function ($root, $args) {
                 $criteria = \craft\elements\Category::find();
 
@@ -237,9 +226,9 @@ class Query extends ObjectType {
                 return $criteria->all();
             });
 
-        $schema->addField('categoriesConnection')
+        $this->addField('categoriesConnection')
             ->type(CategoryConnection::class)
-            ->arguments(Category::args($schema->getRequest()))
+            ->arguments(Category::args($this->getRequest()))
             ->resolve(function ($root, $args) {
                 $criteria = \craft\elements\Category::find();
 

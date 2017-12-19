@@ -236,7 +236,7 @@ class Schema implements \ArrayAccess {
         return $this->fields;
     }
 
-    function getField($name) {
+    function getField($name): BaseField {
         foreach ($this->fields as $field) {
             if ($field->getName() == $name) {
                 return $field;
@@ -285,7 +285,7 @@ class Schema implements \ArrayAccess {
     static $objects;
 
     function getRawGraphQLObject() {
-        $key = static::class;
+        $key = $this->getName();
 
         if (!empty(static::$objects[$key])) {
             return static::$objects[$key];

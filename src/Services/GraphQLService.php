@@ -63,12 +63,9 @@ class GraphQLService extends Component {
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
         $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
 
-        // var_dump($request->categoryGroups()->all());
-        //     die;
-
-        $schema = [];
-        $schema['query'] = new \markhuot\CraftQL\Types\Query($request);
-        $schema['types'] = function () use ($request) {
+        $schemaConfig = [];
+        $schemaConfig['query'] = (new \markhuot\CraftQL\Types\Query($request))->getRawGraphQLObject();
+        $schemaConfig['types'] = function () use ($request) {
             return array_merge(
                 // $request->sections()->all(),
 
@@ -103,7 +100,7 @@ class GraphQLService extends Component {
         // die;
 
         // try {
-            $schema = new Schema($schema);
+            $schema = new Schema($schemaConfig);
             $schema->assertValid();
         // } catch(\yii\base\ErrorException $e) {
         //     echo $e->getMessage();
