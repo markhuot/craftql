@@ -68,9 +68,11 @@ class GraphQLService extends Component {
         $schema = [];
         $schema['query'] = new \markhuot\CraftQL\Types\Query($request);
         $schema['types'] = array_merge(
-            // $request->volumes()->all(),
-            // $request->categoryGroups()->all(),
             // $request->sections()->all(),
+
+            array_map(function ($volume) {
+                return $volume->getGraphQLObject();
+            }, $request->volumes()->all()),
 
             array_map(function ($categoryGroup) {
                 return $categoryGroup->getGraphQLObject();

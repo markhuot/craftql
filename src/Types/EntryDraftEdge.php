@@ -25,19 +25,6 @@ class EntryDraftEdge extends Schema {
             ->resolve(function ($root, $args) {
                 return $root['node'];
             });
-
-//        return [
-//            'cursor' => Type::string(),
-//            'node' => ['type' => Entry::interface($request), 'resolve' => function ($root, $args, $context, $info) {
-//                return $root['node'];
-//            }],
-//            'draftInfo' => [
-//                'type' => \markhuot\CraftQL\Types\EntryDraftInfo::type($request),
-//                'resolve' => function ($root, $args, $context, $info) {
-//                    return $root['node'];
-//                },
-//            ],
-//        ];
     }
 
 }

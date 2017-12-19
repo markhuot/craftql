@@ -129,8 +129,8 @@ class Schema implements \ArrayAccess {
 
     function addFieldsByLayoutId(int $fieldLayoutId) {
         $fieldService = \Yii::$container->get('fieldService');
-        $fields = $fieldService->getFields($fieldLayoutId, $this->request)['schema'];
-        return $this->fields = array_merge($this->fields, $fields->getFields());
+        $fields = $fieldService->getFields($fieldLayoutId, $this->request);
+        return $this->fields = array_merge($this->fields, $fields);
     }
 
     function getInterfaces(): array {

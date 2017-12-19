@@ -2,185 +2,155 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Builders\Schema;
 
-class Volume extends ObjectType {
+class Volume extends Schema {
 
-    static $baseFields;
-    static $interface;
-    static $transformEnum;
-    static $cropInputObject;
-    static $positionInputEnum;
-    static $formatInputEnum;
+    protected $interfaces = [
+        \markhuot\CraftQL\Types\VolumeInterface::class,
+    ];
 
-    function __construct($volume, $token) {
-        $fieldService = \Yii::$container->get('fieldService');
-        $fields = array_merge(static::baseFields(), $fieldService->getFields($volume->fieldLayoutId, $token));
-
-        parent::__construct([
-            'name' => ucfirst($volume->handle).'Assets',
-            'fields' => $fields,
-            'interfaces' => [
-                static::interface(),
-            ],
-            'id' => $volume->id,
-        ]);
+    function boot() {
+        $this->addFieldsByLayoutId($this->context->fieldLayoutId);
     }
 
-    static function getTransformsEnum() {
-        if (!empty(static::$transformEnum)) {
-            return static::$transformEnum;
-        }
-
-        $values = [];
-
-        foreach (\Craft::$app->getAssetTransforms()->getAllTransforms() as $transform) {
-            $values[$transform->handle] = $transform->name;
-        }
-
-        if (empty($values)) {
-            $values[] = 'Empty';
-        }
-
-        return static::$transformEnum = new EnumType([
-            'name' => 'NamedTransformsEnum',
-            'values' => $values,
-        ]);
+    function getName(): string {
+        return ucfirst($this->context->handle).'Volume';
     }
 
-    static function positionInputEnum() {
-        if (!empty(static::$positionInputEnum)) {
-            return static::$positionInputEnum;
-        }
+    // /**
+    //  * An input object (for argument lists) that controls how any
+    //  * related elements are searched.
+    //  *
+    //  * @var InputObjectType
+    //  */
+    // static $relatedToInputObject;
 
-        return static::$positionInputEnum = new EnumType([
-            'name' => 'PositionInputEnum',
-            'values' => [
-                'topLeft' => 'Top Left',
-                'topCenter' => 'Top Center',
-                'topRight' => 'Top Right',
-                'centerLeft' => 'Center Left',
-                'centerCenter' => 'Center Center',
-                'centerRight' => 'Center Right',
-                'bottomLeft' => 'Bottom Left',
-                'bottomCenter' => 'Bottom Center',
-                'bottomRight' => 'Bottom Right',
-            ],
-        ]);
-    }
+    // static function baseInputArgs() {
+    //     return [
+    //         'id' => ['type' => Type::int()],
+    //         'authorId' => ['type' => Type::int()],
+    //         'title' => ['type' => Type::string()],
+    //     ];
+    // }
 
-    static function formatInputEnum() {
-        if (!empty(static::$formatInputEnum)) {
-            return static::$formatInputEnum;
-        }
+    // /**
+    //  * An input object to query entries by relationship
+    //  *
+    //  * @return InputObjectType
+    //  */
+    // static function relatedToInputObject() {
+    //     if (static::$relatedToInputObject) {
+    //         return static::$relatedToInputObject;
+    //     }
 
-        return static::$formatInputEnum = new EnumType([
-            'name' => 'CropFormatInputEnum',
-            'values' => [
-                'jpg' => 'JPG',
-                'gif' => 'GIF',
-                'png' => 'PNG',
-                'Auto' => 'Auto',
-            ],
-        ]);
-    }
+    //     return static::$relatedToInputObject = new InputObjectType([
+    //         'name' => 'RelatedTo',
+    //         'fields' => [
+    //             'element' => Type::id(),
+    //             'sourceElement' => Type::id(),
+    //             'targetElement' => Type::id(),
+    //             'field' => Type::string(),
+    //             'sourceLocale' => Type::string(),
+    //         ],
+    //     ]);
+    // }
 
-    static function cropInputObject() {
-        if (!empty(static::$cropInputObject)) {
-            return static::$cropInputObject;
-        }
-
-        return static::$cropInputObject = new InputObjectType([
-            'name' => 'CropInputObject',
-            'fields' => [
-                'width' => ['type' => Type::int()],
-                'height' => ['type' => Type::int()],
-                'quality' => ['type' => Type::int()],
-                'position' => ['type' => static::positionInputEnum()],
-                'format' => ['type' => static::formatInputEnum()],
-            ],
-        ]);
-    }
-
-    static function baseFields() {
-        if (!empty(static::$baseFields)) {
-            return static::$baseFields;
-        }
-
-        $fields = [];
-        $fields['id'] = ['type' => Type::int()];
-        $fields['uri'] = ['type' => Type::string()];
-        $fields['url'] = [
-            'type' => Type::string(),
-            'args' => [
-                'transform' => static::getTransformsEnum(),
-                'crop' => static::cropInputObject(),
-                'fit' => static::cropInputObject(),
-                'stretch' => static::cropInputObject(),
-            ],
-            'resolve' => function ($root, $args) {
-                if (!empty($args['transform'])) {
-                    $transform = $args['transform'];
-                }
-                else if (!empty($args['crop'])) {
-                    $transform = $args['crop'];
-                    $transform['mode'] = 'crop';
-                }
-                else if (!empty($args['fit'])) {
-                    $transform = $args['fit'];
-                    $transform['mode'] = 'fit';
-                }
-                else if (!empty($args['stretch'])) {
-                    $transform = $args['stretch'];
-                    $transform['mode'] = 'stretch';
-                }
-                else {
-                    $transform = null;
-                }
-                return $root->getUrl($transform);
-            },
+    static function args($request) {
+        return [
+            'after' => Type::string(),
+            'ancestorOf' => Type::int(),
+            'ancestorDist' => Type::int(),
+            'archived' => Type::boolean(),
+            'authorGroup' => Type::string(),
+            'authorGroupId' => Type::int(),
+            'authorId' => Type::listOf(Type::int()),
+            'before' => Type::string(),
+            'level' => Type::int(),
+            'localeEnabled' => Type::boolean(),
+            'descendantOf' => Type::int(),
+            'descendantDist' => Type::int(),
+            'fixedOrder' => Type::boolean(),
+            'id' => Type::listOf(Type::int()),
+            'limit' => Type::int(),
+            'locale' => Type::string(),
+            'nextSiblingOf' => Type::int(),
+            'offset' => Type::int(),
+            'order' => Type::string(),
+            'positionedAfter' => Type::id(),
+            'positionedBefore' => Type::id(),
+            'postDate' => Type::string(),
+            'prevSiblingOf' => Type::id(),
+            // 'relatedTo' => Type::listOf(static::relatedToInputObject()),
+            // 'orRelatedTo' => Type::listOf(static::relatedToInputObject()),
+            'search' => Type::string(),
+            'section' => Type::listOf($request->sections()->enum()),
+            'siblingOf' => Type::int(),
+            'slug' => Type::string(),
+            'status' => Type::string(),
+            'title' => Type::string(),
+            // 'type' => Type::listOf($request->entryTypes()->enum()),
+            'uri' => Type::string(),
         ];
-        $fields['width'] = ['type' => Type::string()];
-        $fields['height'] = ['type' => Type::string()];
-        $fields['size'] = ['type' => Type::int()];
-        $fields['folder'] = ['type' => Type::string()];
-        $fields['mimeType'] = ['type' => Type::string()];
-        $fields['title'] = ['type' => Type::string()];
-        $fields['extension'] = ['type' => Type::string()];
-        $fields['filename'] = ['type' => Type::string()];
-        $fields['dateCreatedTimestamp'] = ['type' => Type::nonNull(Type::int()), 'resolve' => function ($root, $args) {
-            return $root->dateCreated->format('U');
-        }];
-        $fields['dateCreated'] = ['type' => Type::nonNull(Type::string()), 'args' => [
-            ['name' => 'format', 'type' => Type::string(), 'defaultValue' => 'r']
-        ], 'resolve' => function ($root, $args) {
-            return $root->dateCreated->format($args['format']);
-        }];
-        $fields['dateUpdatedTimestamp'] = ['type' => Type::nonNull(Type::int()), 'resolve' => function ($root, $args) {
-            return $root->dateUpdated->format('U');
-        }];
-        $fields['dateUpdated'] = ['type' => Type::nonNull(Type::int()), 'args' => [
-            ['name' => 'format', 'type' => Type::string(), 'defaultValue' => 'r']
-        ], 'resolve' => function ($root, $args) {
-            return $root->dateUpdated->format($args['format']);
-        }];
-
-        return static::$baseFields = $fields;
     }
 
-    static function interface() {
-        return static::$interface ?: static::$interface = new InterfaceType([
-            'name' => 'AssetInterface',
-            'description' => 'An asset in Craft',
-            'fields' => static::baseFields(),
-            'resolveType' => function ($asset) {
-                return ucfirst($asset->getVolume()->handle).'Assets';
-            }
-        ]);
-    }
+    // function getGraphQLMutationArgs($request) {
+    //     $fieldService = \Yii::$container->get('fieldService');
+
+    //     return array_merge(\markhuot\CraftQL\Types\Entry::baseInputArgs(), $fieldService->getGraphQLMutationArgs($this->config['craftType']->fieldLayoutId, $request));
+    // }
+
+    // function handle() {
+    //     return $this->config['craftType']->handle;
+    // }
+
+    // function upsert($request) {
+    //     return function ($root, $args) use ($request) {
+    //         if (!empty($args['id'])) {
+    //             $criteria = Entry::find();
+    //             $criteria->id($args['id']);
+    //             $entry = $criteria->one();
+    //             if (!$entry) {
+    //                 throw new \Exception('Could not find an entry with id '.$args['id']);
+    //             }
+    //         }
+    //         else {
+    //             $entry = new Entry();
+    //             $entry->sectionId = $this->config['craftType']->section->id;
+    //             $entry->typeId = $this->config['craftType']->id;
+    //         }
+
+    //         if (isset($args['authorId'])) {
+    //             $entry->authorId = $args['authorId'];
+    //         }
+
+    //         if (isset($args['title'])) {
+    //             $entry->title = $args['title'];
+    //         }
+
+    //         $fields = $args;
+    //         unset($fields['id']);
+    //         unset($fields['title']);
+    //         unset($fields['sectionId']);
+    //         unset($fields['typeId']);
+    //         unset($fields['authorId']);
+
+    //         $fieldService = \Yii::$container->get('fieldService');
+
+    //         foreach ($fields as $handle => &$value) {
+    //             $field = Craft::$app->fields->getFieldByHandle($handle);
+    //             $value = $fieldService->mutateValueForField($request, $field, $value, $entry);
+    //             // $value = $field->upsert($value, $entry);
+    //         }
+
+    //         $entry->setFieldValues($fields);
+
+    //         Craft::$app->elements->saveElement($entry);
+
+    //         return $entry;
+    //     };
+    // }
 
 }

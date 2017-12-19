@@ -42,36 +42,36 @@ class Query extends ObjectType {
             $this->addCategoriesSchema($schema);
         }
 
-        // if ($token->can('query:users')) {
-        //     $schema->addRawField('users')
-        //         ->lists()
-        //         ->type(User::type($request))
-        //         ->arguments([
-        //             'admin' => Type::boolean(),
-        //             'email' => Type::string(),
-        //             'firstName' => Type::string(),
-        //             'group' => Type::string(),
-        //             'groupId' => Type::string(),
-        //             'id' => Type::int(),
-        //             'lastLoginDate' => Type::int(),
-        //             'lastName' => Type::string(),
-        //             'limit' => Type::int(),
-        //             'offset' => Type::int(),
-        //             'order' => Type::string(),
-        //             'search' => Type::string(),
-        //             // 'status' => static::statusEnum(),
-        //             'username' => Type::string(),
-        //         ])
-        //         ->resolve(function ($root, $args, $context, $info) {
-        //             $criteria = \craft\elements\User::find();
+        if ($token->can('query:users')) {
+            $schema->addRawField('users')
+                ->lists()
+                ->type(User::class)
+                ->arguments([
+                    'admin' => Type::boolean(),
+                    'email' => Type::string(),
+                    'firstName' => Type::string(),
+                    'group' => Type::string(),
+                    'groupId' => Type::string(),
+                    'id' => Type::int(),
+                    'lastLoginDate' => Type::int(),
+                    'lastName' => Type::string(),
+                    'limit' => Type::int(),
+                    'offset' => Type::int(),
+                    'order' => Type::string(),
+                    'search' => Type::string(),
+                    // 'status' => static::statusEnum(),
+                    'username' => Type::string(),
+                ])
+                ->resolve(function ($root, $args, $context, $info) {
+                    $criteria = \craft\elements\User::find();
 
-        //             foreach ($args as $key => $value) {
-        //                 $criteria = $criteria->{$key}($value);
-        //             }
+                    foreach ($args as $key => $value) {
+                        $criteria = $criteria->{$key}($value);
+                    }
 
-        //             return $criteria->all();
-        //         });
-        // }
+                    return $criteria->all();
+                });
+        }
 
         if ($token->can('query:sections')) {
             $schema->addRawField('sections')

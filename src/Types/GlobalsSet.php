@@ -11,7 +11,7 @@ use craft\elements\Entry;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
 
-class GlobalsSet extends \markhuot\CraftQL\Builders\Schema {
+class GlobalsSet extends Schema {
 
     function boot() {
         foreach ($this->request->globals()->all() as $globalSet) {

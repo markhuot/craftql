@@ -16,7 +16,7 @@ class EntryInterface extends Schema {
         $this->addRawIntField('id')->nonNull();
 
         if ($this->request->token()->can('query:entry.author')) {
-            $this->addRawField('author')->type(\markhuot\CraftQL\Types\User::type($this->getRequest()))->nonNull();
+            $this->addRawField('author')->type(User::class)->nonNull();
         }
 
         $this->addRawStringField('title')->nonNull();
