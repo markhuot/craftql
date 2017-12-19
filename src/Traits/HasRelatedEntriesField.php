@@ -1,22 +1,22 @@
 <?php
 
-namespace markhuot\CraftQL\Schema;
+namespace markhuot\CraftQL\Traits;
 
-use markhuot\CraftQL\Builders\Schema;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Types\EntryConnection;
 
-class RelatedToGlobal {
+trait HasRelatedEntriesField {
 
-    function apply(Schema $schema) {
-        $schema->addRawField('relatedTo')
-            ->type(\markhuot\CraftQL\Types\EntryConnection::singleton($schema->getRequest()))
+    function bootHasRelatedEntriesField() {
+        $field = $this->addRawField('relatedEntries')
+            ->type(EntryConnection::class)
             ->arguments([
                 'source' => Type::boolean(),
                 'target' => Type::boolean(),
                 'field' => Type::string(),
                 'sourceLocale' => Type::string(),
             ])
-            ->resolve(function ($root, $args, $context, $info) use ($schema) {
+            ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Entry::find();
 
                 $criteria = $criteria->relatedTo([
@@ -32,7 +32,7 @@ class RelatedToGlobal {
                 unset($args['field']);
                 unset($args['sourceLocale']);
 
-                $criteria = $schema->getRequest()->entries($criteria, $root, $args, $context, $info);
+                $criteria = $this->getRequest()->entries($criteria, $root, $args, $context, $info);
                 list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
 
                 return [

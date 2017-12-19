@@ -45,7 +45,7 @@ class EntryInterface extends Schema {
 
     function getResolveType() {
         return function ($entry) {
-            return \markhuot\CraftQL\Types\Entry::entryTypeObjectName($entry->type);
+            return EntryType::graphQLName($entry->type);
         };
     }
 

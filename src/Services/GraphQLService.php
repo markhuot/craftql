@@ -63,8 +63,6 @@ class GraphQLService extends Component {
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
         $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
 
-        Builder::addGlobalFields($request, new RelatedToGlobal);
-
         $schema = [];
         $schema['query'] = new \markhuot\CraftQL\Types\Query($request);
         $schema['types'] = array_merge(

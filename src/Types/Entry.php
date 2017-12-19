@@ -22,14 +22,7 @@ class Entry extends Schema {
     }
 
     function getName(): string {
-        return static::entryTypeObjectName($this->context);
-    }
-
-    static function entryTypeObjectName($entryType) {
-        $typeHandle = ucfirst($entryType->handle);
-        $sectionHandle = ucfirst($entryType->section->handle);
-
-        return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
+        return EntryType::graphQLName($this->context);
     }
 
     // static $interfaces = [];

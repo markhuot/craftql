@@ -165,7 +165,7 @@ Similar to `craft.entries.relatedTo(entry)` you can use the `relatedTo` argument
 
 Note, the `relatedTo:` argument accepts an array of relations. By default `relatedTo:` looks for elements matching _all_ relations. If you would like to switch to elements relating to _any_ relation you can use `orRelatedTo:`.
 
-The above approach, typically, requires separate requests for the source content and the related content. That equates to extra HTTP requests and added latency. If you're using the "connection" approach to CraftQL you can fetch relationships in a single request using the `relatedTo` field of the `EntryEdge` type. The same request could be rewritten as follows to grab both the post and the comments in a single request.
+The above approach, typically, requires separate requests for the source content and the related content. That equates to extra HTTP requests and added latency. If you're using the "connection" approach to CraftQL you can fetch relationships in a single request using the `relatedEntries` field of the `EntryEdge` type. The same request could be rewritten as follows to grab both the post and the comments in a single request.
 
 ```graphql
 {
@@ -177,7 +177,7 @@ The above approach, typically, requires separate requests for the source content
           body
         }
       }
-      relatedTo(section:comments) {
+      relatedEntries(section:comments) {
         edges {
           node {
             ...on Comment {
@@ -280,7 +280,7 @@ For added functionality query categories and tags through their related `Connect
       node {
         title   # the category title
       }
-      relatedTo {
+      relatedEntries {
         entries {
           title # an entry title, that's related to this category
         }
@@ -343,7 +343,7 @@ No software is ever done. There's a lot still to do in order to make _CraftQL_ f
 - [x] Automated testing is not functional yet
 - [x] Automated testing doesn't actually _test_ anything yet
 - [x] Mutations need a lot more testing
-- [x] `relatedTo:` improvements to take source/target
+- [x] `relatedEntries:` improvements to take source/target
 - [ ] [Persisted queries](https://github.com/markhuot/craftql/issues/10)
 
 ## Requirements

@@ -24,10 +24,27 @@ class Schema implements \ArrayAccess {
         $this->request = $request;
         $this->context = $context;
         $this->boot();
+        $this->bootTraits();
     }
 
+    /**
+     * @TODO rename boot() to init() to better match Yii
+     *
+     * @return void
+     */
     protected function boot() {
         /* intended to be overridden by subclassed schemas */
+    }
+
+    function bootTraits() {
+        $traits = class_uses($this);
+        foreach ($traits as $trait) {
+            $reflect = new \ReflectionClass($trait);
+            $method = 'boot'.$reflect->getShortName();
+            if (method_exists($this, $method)) {
+                $this->$method();
+            }
+        }
     }
 
     static function singleton(Request $request, $key=null) {
@@ -58,21 +75,6 @@ class Schema implements \ArrayAccess {
         }
 
         return $this->name;
-    }
-
-    // @TODO remove globals for actual PHP traits at some point soon
-    static function addGlobalFields($request, $callback) {
-        if (!static::$globals) {
-            static::$globals = new static($request);
-        }
-
-        $callback->apply(static::$globals);
-    }
-    function addGlobalField($name) {
-        return $this->fields[] = static::$globals->getField($name);
-    }
-    static function getGlobals() {
-        return static::$globals;
     }
 
     function addRawField($name): BaseField {
