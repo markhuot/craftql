@@ -40,7 +40,7 @@ class EntryQueryArguments extends Behavior {
             'slug' => Type::string(),
             'status' => Type::string(),
             'title' => Type::string(),
-            // 'type' => Type::listOf($request->entryTypes()->enum()),
+            'type' => Type::listOf($this->owner->getRequest()->entryTypes()->enum()),
             'uri' => Type::string(),
         ]);
     }
