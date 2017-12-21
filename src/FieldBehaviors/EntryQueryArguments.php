@@ -8,41 +8,39 @@ use GraphQL\Type\Definition\Type;
 class EntryQueryArguments extends Behavior {
 
     function initEntryQueryArguments() {
-        $this->owner->arguments([
-            'after' => Type::string(),
-            'ancestorOf' => Type::int(),
-            'ancestorDist' => Type::int(),
-            'archived' => Type::boolean(),
-            'authorGroup' => Type::string(),
-            'authorGroupId' => Type::int(),
-            'authorId' => Type::listOf(Type::int()),
-            'before' => Type::string(),
-            'level' => Type::int(),
-            'localeEnabled' => Type::boolean(),
-            'descendantOf' => Type::int(),
-            'descendantDist' => Type::int(),
-            'fixedOrder' => Type::boolean(),
-            'id' => Type::listOf(Type::int()),
-            'limit' => Type::int(),
-            'locale' => Type::string(),
-            'nextSiblingOf' => Type::int(),
-            'offset' => Type::int(),
-            'order' => Type::string(),
-            'positionedAfter' => Type::id(),
-            'positionedBefore' => Type::id(),
-            'postDate' => Type::string(),
-            'prevSiblingOf' => Type::id(),
-            // 'relatedTo' => Type::listOf(static::relatedToInputObject()),
-            // 'orRelatedTo' => Type::listOf(static::relatedToInputObject()),
-            'search' => Type::string(),
-            'section' => Type::listOf($this->owner->getRequest()->sections()->enum()),
-            'siblingOf' => Type::int(),
-            'slug' => Type::string(),
-            'status' => Type::string(),
-            'title' => Type::string(),
-            'type' => Type::listOf($this->owner->getRequest()->entryTypes()->enum()),
-            'uri' => Type::string(),
-        ]);
+        $this->owner->addStringArgument('after');
+        $this->owner->addIntArgument('ancestorOf');
+        $this->owner->addIntArgument('ancestorDist');
+        $this->owner->addBooleanArgument('archived');
+        $this->owner->addStringArgument('authorGroup');
+        $this->owner->addIntArgument('authorGroupId');
+        $this->owner->addIntArgument('authorId')->lists();
+        $this->owner->addStringArgument('before');
+        $this->owner->addIntArgument('level');
+        $this->owner->addBooleanArgument('localeEnabled');
+        $this->owner->addIntArgument('descendantOf');
+        $this->owner->addIntArgument('descendantDist');
+        $this->owner->addBooleanArgument('fixedOrder');
+        $this->owner->addIntArgument('id')->lists();
+        $this->owner->addIntArgument('limit');
+        $this->owner->addStringArgument('locale');
+        $this->owner->addIntArgument('nextSiblingOf');
+        $this->owner->addIntArgument('offset');
+        $this->owner->addStringArgument('order');
+        $this->owner->addIntArgument('positionedAfter');
+        $this->owner->addIntArgument('positionedBefore');
+        $this->owner->addStringArgument('postDate');
+        $this->owner->addIntArgument('prevSiblingOf');
+        // $this->owner->addStringArgument('relatedTo' => Type::listOf(static::relatedToInputObject()),
+        // $this->owner->addStringArgument('orRelatedTo' => Type::listOf(static::relatedToInputObject()),
+        $this->owner->addStringArgument('search');
+        $this->owner->addStringArgument('section')->lists()->type($this->owner->getRequest()->sections()->enum());
+        $this->owner->addIntArgument('siblingOf');
+        $this->owner->addStringArgument('slug');
+        $this->owner->addStringArgument('status');
+        $this->owner->addStringArgument('title');
+        $this->owner->addStringArgument('type')->lists()->type($this->owner->getRequest()->entryTypes()->enum());
+        $this->owner->addStringArgument('uri');
     }
 
 }

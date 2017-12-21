@@ -9,6 +9,7 @@ use Craft;
 use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
+use markhuot\CraftQL\FieldBehaviors\UserQueryArguments;
 
 class Query extends Schema {
 
@@ -38,22 +39,7 @@ class Query extends Schema {
             $this->addField('users')
                 ->lists()
                 ->type(User::class)
-                ->arguments([
-                    'admin' => Type::boolean(),
-                    'email' => Type::string(),
-                    'firstName' => Type::string(),
-                    'group' => Type::string(),
-                    'groupId' => Type::string(),
-                    'id' => Type::int(),
-                    'lastLoginDate' => Type::int(),
-                    'lastName' => Type::string(),
-                    'limit' => Type::int(),
-                    'offset' => Type::int(),
-                    'order' => Type::string(),
-                    'search' => Type::string(),
-                    // 'status' => static::statusEnum(),
-                    'username' => Type::string(),
-                ])
+                ->use(UserQueryArguments::class)
                 ->resolve(function ($root, $args, $context, $info) {
                     $criteria = \craft\elements\User::find();
 

@@ -8,11 +8,9 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\Traits\HasRelatedEntriesField;
+use markhuot\CraftQL\FieldBehaviors\RelatedEntriesField;
 
 class EntryEdge extends Schema {
-
-    use HasRelatedEntriesField;
 
     function boot() {
         $this->addStringField('cursor');
@@ -23,7 +21,7 @@ class EntryEdge extends Schema {
                 return $root['node'];
             });
 
-//        $this->addGlobalField('relatedTo');
+       $this->use(RelatedEntriesField::class);
 
         $this->addField('drafts')
             ->type(EntryDraftConnection::class)

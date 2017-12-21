@@ -64,13 +64,44 @@ class Field extends Component {
         return $type ?: Type::string();
     }
 
-    function arguments($arguments): self {
-        $this->arguments = $arguments;
-        return $this;
+    // function arguments($arguments): self {
+    //     $this->arguments = $arguments;
+    //     return $this;
+    // }
+
+    function addStringArgument($name) {
+        return $this->arguments[] = (new Argument($name))
+            ->type(Type::string());
+    }
+
+    function addIdArgument($name) {
+        return $this->arguments[] = (new Argument($name))
+            ->type(Type::id());
+    }
+
+    function addIntArgument($name) {
+        return $this->arguments[] = (new Argument($name))
+            ->type(Type::int());
+    }
+
+    function addFloatArgument($name) {
+        return $this->arguments[] = (new Argument($name))
+            ->type(Type::float());
+    }
+
+    function addBooleanArgument($name) {
+        return $this->arguments[] = (new Argument($name))
+            ->type(Type::boolean());
     }
 
     function getArguments(): array {
-        return $this->arguments;
+        $arguments = [];
+
+        foreach ($this->arguments as $argument) {
+            $arguments[$argument->getName()] = $argument->getConfig();
+        }
+
+        return $arguments;
     }
 
     function getConfig() {

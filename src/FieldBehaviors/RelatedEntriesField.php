@@ -1,21 +1,22 @@
 <?php
 
-namespace markhuot\CraftQL\Traits;
+namespace markhuot\CraftQL\FieldBehaviors;
 
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Types\EntryConnection;
+use yii\base\Behavior;
 
-trait HasRelatedEntriesField {
+class RelatedEntriesField extends Behavior {
 
-    function bootHasRelatedEntriesField() {
-        $this->addField('relatedEntries')
+    function initRelatedEntriesField() {
+        $this->owner->addField('relatedEntries')
             ->type(EntryConnection::class)
-            ->arguments([
-                'source' => Type::boolean(),
-                'target' => Type::boolean(),
-                'field' => Type::string(),
-                'sourceLocale' => Type::string(),
-            ])
+            // ->arguments([
+            //     'source' => Type::boolean(),
+            //     'target' => Type::boolean(),
+            //     'field' => Type::string(),
+            //     'sourceLocale' => Type::string(),
+            // ])
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Entry::find();
 

@@ -8,8 +8,9 @@ use GraphQL\Type\Definition\ObjectType;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Field as BaseField;
 use markhuot\CraftQL\Builders\Object as ObjectField;
+use yii\base\Component;
 
-class Schema implements \ArrayAccess {
+class Schema extends Component implements \ArrayAccess {
 
     private $name;
     private $fields = [];
@@ -39,13 +40,16 @@ class Schema implements \ArrayAccess {
         /* intended to be overridden by subclassed schemas */
     }
 
-    function bootTraits() {
-        $traits = class_uses($this);
-        foreach ($traits as $trait) {
-            $reflect = new \ReflectionClass($trait);
-            $method = 'boot'.$reflect->getShortName();
-            if (method_exists($this, $method)) {
-                $this->$method();
+    function use(string $behavior): self {
+        $reflect = new \ReflectionClass($behavior);
+        $this->attachBehavior($reflect->getShortName(), $behavior);
+        return $this;
+    }
+
+    function bootBehaviors() {
+        if ($behaviors=$this->getBehaviors()) {
+            foreach ($behaviors as $key => $behavior) {
+                $this->{"init{$key}"}();
             }
         }
     }
@@ -232,7 +236,7 @@ class Schema implements \ArrayAccess {
 
     function getFields(): array {
         $this->boot();
-        $this->bootTraits();
+        $this->bootBehaviors();
         return $this->fields;
     }
 
