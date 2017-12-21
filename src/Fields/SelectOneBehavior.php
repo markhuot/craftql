@@ -31,8 +31,10 @@ class SelectOneBehavior extends Behavior
     }
 
     static function convertStringToGraphQLEnumValue($string) {
-        $string = preg_replace('/[^a-z0-9]+/i', ' ', $string);
-        $string = \craft\helpers\StringHelper::toCamelCase($string);
+        $string = preg_replace('/[^a-z0-9_]+/i', ' ', $string);
+        $string = preg_replace_callback('/\s+(.)/', function ($match) {
+            return ucfirst($match[1]);
+        }, $string);
         if ($string === '') {
             $string = 'empty';
         }
