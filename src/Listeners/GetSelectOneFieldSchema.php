@@ -2,6 +2,7 @@
 
 namespace markhuot\CraftQL\Listeners;
 
+use markhuot\CraftQL\Helpers\StringHelper;
 class GetSelectOneFieldSchema
 {
     /**
@@ -28,9 +29,7 @@ class GetSelectOneFieldSchema
         $values = [];
 
         foreach ($craftField['settings']['options'] as $option) {
-            $value = $option['value'];
-            $value = preg_replace('/[^a-z0-9]+/i', ' ', $value);
-            $value = \craft\helpers\StringHelper::toCamelCase($value);
+            $value = StringHelper::graphQLEnumValueForString($option['value']);
             $values[$value] = ['description' => $option['label']];
         }
 

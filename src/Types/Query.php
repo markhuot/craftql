@@ -19,9 +19,7 @@ class Query extends Schema {
             ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
-            if (!empty($this->request->entryTypes()->all())) {
-                $this->addEntriesSchema();
-            }
+            $this->addEntriesSchema();
         }
 
         if ($token->can('query:globals')) {
@@ -83,6 +81,10 @@ class Query extends Schema {
      * @return Schema
      */
     function addEntriesSchema() {
+        if ($this->request->entryTypes()->count() == 0) {
+            return;
+        }
+
         $this->addField('entries')
             ->lists()
             ->type(EntryInterface::class)
@@ -139,15 +141,17 @@ class Query extends Schema {
         //         return $sets;
         //     });
 
-        $this->addField('globals')
-            ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
-            ->resolve(function ($root, $args) {
-                $sets = [];
-                foreach (\Craft::$app->globals->allSets as $set) {
-                    $sets[$set->handle] = $set;
-                }
-                return $sets;
-            });
+        if ($this->request->globals()->count() > 0) {
+            $this->addField('globals')
+                ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
+                ->resolve(function ($root, $args) {
+                    $sets = [];
+                    foreach (\Craft::$app->globals->allSets as $set) {
+                        $sets[$set->handle] = $set;
+                    }
+                    return $sets;
+                });
+        }
     }
 
     /**
@@ -156,6 +160,10 @@ class Query extends Schema {
      * @return Schema
      */
     function addTagsSchema() {
+        if ($this->request->tagGroups()->count() == 0) {
+            return;
+        }
+
         $this->addField('tags')
             ->lists()
             ->type(TagInterface::class)
@@ -208,6 +216,10 @@ class Query extends Schema {
      * @return Schema
      */
     function addCategoriesSchema() {
+        if ($this->request->categoryGroups()->count() == 0) {
+            return;
+        }
+
         $this->addField('categories')
             ->lists()
             ->type(CategoryInterface::class)

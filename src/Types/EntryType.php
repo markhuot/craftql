@@ -22,17 +22,4 @@ class EntryType extends Schema {
                 });
     }
 
-    /**
-     * Convert a Craft Entry Type in to a valid GraphQL Name
-     *
-     * @param CraftEntryType $entryType
-     * @return string
-     */
-    static function graphQLName(CraftEntryType $entryType): string {
-        $typeHandle = ucfirst($entryType->handle);
-        $sectionHandle = ucfirst($entryType->section->handle);
-
-        return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
-    }
-
 }

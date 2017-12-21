@@ -2,6 +2,7 @@
 
 namespace markhuot\CraftQL\Listeners;
 
+use markhuot\CraftQL\Helpers\StringHelper;
 class GetSelectMultipleFieldSchema
 {
     /**
@@ -23,7 +24,7 @@ class GetSelectMultipleFieldSchema
                 $values = [];
 
                 foreach ($root->{$field->handle} as $option) {
-                    $values[] = $option->value;
+                    $values[] = StringHelper::graphQLEnumValueForString($option->value);
                 }
 
                 return $values;

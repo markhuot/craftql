@@ -9,6 +9,7 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
+use markhuot\CraftQL\Helpers\StringHelper;
 
 class Entry extends Schema {
 
@@ -22,7 +23,7 @@ class Entry extends Schema {
     }
 
     function getName(): string {
-        return EntryType::graphQLName($this->context);
+        return StringHelper::graphQLNameForEntryType($this->context);
     }
 
     // static $interfaces = [];

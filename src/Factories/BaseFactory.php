@@ -49,9 +49,11 @@ abstract class BaseFactory {
         return $objects;
     }
 
+    function count() {
+        return count($this->repository->all());
+    }
+
     function getEnumName($object) {
-        // var_dump('die');
-        // die;
         $rawObject = $this->repository->get($object->getContext()->id);
         return $rawObject->handle;
     }
