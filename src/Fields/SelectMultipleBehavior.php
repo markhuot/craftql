@@ -20,7 +20,7 @@ class SelectMultipleBehavior extends SelectOneBehavior
                 'resolve' => function ($root, $args) use ($field) {
                     $values = [];
                     foreach ($root->{$field->handle} as $option) {
-                        $values[] = $option->value;
+                        $values[] = SelectMultipleBehavior::convertStringToGraphQLEnumValue($option->value);
                     }
                     return $values;
                 }

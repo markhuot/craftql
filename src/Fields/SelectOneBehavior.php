@@ -18,12 +18,7 @@ class SelectOneBehavior extends Behavior
 
         $options = [];
         foreach ($field['settings']['options'] as $option) {
-            $value = $option['value'];
-            $value = preg_replace('/[^a-z0-9]+/i', ' ', $value);
-            $value = \craft\helpers\StringHelper::toCamelCase($value);
-            if ($value === '') {
-                $value = 'empty';
-            }
+            $value = static::convertStringToGraphQLEnumValue($option['value']);
             $options[$value] = [
                 'description' => $option['label'] ?: 'empty',
             ];
@@ -35,6 +30,15 @@ class SelectOneBehavior extends Behavior
         ]);
     }
 
+    static function convertStringToGraphQLEnumValue($string) {
+        $string = preg_replace('/[^a-z0-9]+/i', ' ', $string);
+        $string = \craft\helpers\StringHelper::toCamelCase($string);
+        if ($string === '') {
+            $string = 'empty';
+        }
+        return $string;
+    }
+
     function getGraphQLQueryFields($token) {
         $field = $this->owner;
 
@@ -43,7 +47,7 @@ class SelectOneBehavior extends Behavior
                 'type' => $this->getEnum($field),
                 'description' => $field->instructions,
                 'resolve' => function ($root, $args) use ($field) {
-                    return (string)$root->{$field->handle} ?: null;
+                    return SelectOneBehavior::convertStringToGraphQLEnumValue((string)$root->{$field->handle}) ?: null;
                 }
             ]
         ];
