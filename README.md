@@ -311,6 +311,7 @@ No software is ever done. There's a lot still to do in order to make _CraftQL_ f
 - [x] Mutations need a lot more testing
 - [x] `relatedTo:` improvements to take source/target
 - [ ] [Persisted queries](https://github.com/markhuot/craftql/issues/10)
+- [ ] [Subclassed enum fields](https://github.com/markhuot/craftql/issues/40) that are able to return the raw field value
 
 ## Requirements
 
