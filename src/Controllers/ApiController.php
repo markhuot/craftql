@@ -20,13 +20,10 @@ class ApiController extends Controller
         $id,
         $module,
         \markhuot\CraftQL\Services\GraphQLService $graphQl,
-        \markhuot\CraftQL\Services\RequestService $request,
         $config = []
     ) {
         parent::__construct($id, $module, $config);
-
         $this->graphQl = $graphQl;
-        $this->request = $request;
     }
 
     /**
@@ -85,6 +82,32 @@ class ApiController extends Controller
             ]);
         }
 
+        Craft::trace('CraftQL: Parsing request');
+        if (Craft::$app->request->isPost && $query=Craft::$app->request->post('query')) {
+            $input = $query;
+        }
+        else if (Craft::$app->request->isGet && $query=Craft::$app->request->get('query')) {
+            $input = $query;
+        }
+        else {
+            $data = Craft::$app->request->getRawBody();
+            $data = json_decode($data, true);
+            $input = @$data['query'];
+        }
+
+        if (Craft::$app->request->isPost && $query=Craft::$app->request->post('variables')) {
+            $variables = $query;
+        }
+        else if (Craft::$app->request->isGet && $query=Craft::$app->request->get('variables')) {
+            $variables = $query;
+        }
+        else {
+            $data = Craft::$app->request->getRawBody();
+            $data = json_decode($data, true);
+            $variables = @$data['variables'];
+        }
+        Craft::trace('CraftQL: Parsing request complete');
+
         Craft::trace('CraftQL: Bootstrapping');
         $this->graphQl->bootstrap();
         Craft::trace('CraftQL: Bootstrapping complete');
@@ -94,10 +117,10 @@ class ApiController extends Controller
         Craft::trace('CraftQL: Schema built');
 
         Craft::trace('CraftQL: Executing query');
-        $result = $this->graphQl->execute($schema, $this->request->input(), $this->request->variables());
+        $result = $this->graphQl->execute($schema, $input, $variables);
         Craft::trace('CraftQL: Execution complete');
 
-        if ($this->request->isDebugging() || false) {
+        if (!!Craft::$app->request->post('debug')) {
             $response = \Yii::$app->getResponse();
             $response->format = \craft\web\Response::FORMAT_HTML;
 
