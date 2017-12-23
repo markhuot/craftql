@@ -14,8 +14,8 @@ class Field extends BaseBuilder {
     use HasDescriptionAttribute;
     use HasIsListAttribute;
     use HasNonNullAttribute;
+    use HasResolveAttribute;
 
-    protected $resolve;
     protected $arguments = [];
 
     function __construct(Request $request, string $name) {
@@ -27,63 +27,6 @@ class Field extends BaseBuilder {
     protected function boot() {
 
     }
-
-    // function use(string $behavior): self {
-    //     $reflect = new \ReflectionClass($behavior);
-    //     $this->attachBehavior($reflect->getShortName(), $behavior);
-    //     return $this;
-    // }
-
-    // function getRequest() {
-    //     return $this->request;
-    // }
-
-    // function name($name): self {
-    //     $this->name = $name;
-    //     return $this;
-    // }
-
-    // function getName() {
-    //     return $this->name;
-    // }
-
-    // /**
-    //  * Set the type
-    //  *
-    //  * @param mixed $type
-    //  * @return self
-    //  */
-    // function type($type): self {
-    //     $this->type = $type;
-    //     return $this;
-    // }
-
-    // /**
-    //  * Get the defined type
-    //  *
-    //  * @return mixed
-    //  */
-    // function getType() {
-    //     return $this->type;
-    // }
-
-    // function getTypeConfig() {
-    //     $type = $this->getType();
-
-    //     if (is_string($type) && is_subclass_of($type, Schema::class)) {
-    //         $rawType = (new $type($this->request))->getRawGraphQLObject();
-    //     }
-
-    //     else if (is_a($type, Schema::class) || is_subclass_of($type, Schema::class)) {
-    //         $rawType = $type->getRawGraphQLObject();
-    //     }
-
-    //     else {
-    //         $rawType = $type ?: Type::string();
-    //     }
-
-    //     return $rawType;
-    // }
 
     function addArgumentsByLayoutId(int $fieldLayoutId) {
         $fieldService = \Yii::$container->get('fieldService');
@@ -118,6 +61,10 @@ class Field extends BaseBuilder {
 
     function addBooleanArgument($name): Argument {
         return $this->addArgument($name)->type(Type::boolean());
+    }
+
+    function addObjectArgument($name): Argument {
+        return $this->addArgument($name);
     }
 
     function addEnumArgument($name): Enum {
@@ -179,46 +126,12 @@ class Field extends BaseBuilder {
         ];
     }
 
-    // function description($description): self {
-    //     $this->description = $description;
-    //     return $this;
-    // }
-
-    // function getDescription() /* php 7.1: ?string*/ {
-    //     return $this->description;
-    // }
-
-    // function lists($isList=true): self {
-    //     $this->isList = $isList;
-    //     return $this;
-    // }
-
-    // function nonNull(): self {
-    //     $this->isNonNull = true;
-    //     return $this;
-    // }
-
-    // function isNonNull(): bool {
-    //     return $this->isNonNull;
-    // }
-
-    function resolve($resolve): self {
-        $this->resolve = $resolve;
-        return $this;
+    function onSave(callable $callback) {
+        $this->onSave = $callback;
     }
 
-    function getResolve() /* php 7.1: ?callable*/ {
-        if (is_callable($this->resolve)) {
-            return $this->resolve;
-        }
-
-        if ($this->resolve !== null) {
-            return function($root, $args) {
-                return $this->resolve;
-            };
-        }
-
-        return null;
+    function getOnSave() {
+        return $this->onSave;
     }
 
 }

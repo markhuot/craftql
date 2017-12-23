@@ -5,6 +5,7 @@ namespace markhuot\CraftQL\Builders;
 use craft\base\Field as CraftField;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
+use GraphQL\Type\Definition\InputObjectType;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Field as BaseField;
 use markhuot\CraftQL\Builders\Object as ObjectField;
@@ -47,12 +48,38 @@ class Schema extends BaseBuilder {
     }
 
     /**
+     * Add a new field to this schema
+     *
+     * @param mixed $field
+     * @return BaseField
+     */
+    function addField($field): BaseField {
+        if (is_a($field, CraftField::class)) {
+            return $this->fields[] = (new Field($this->request, $field->handle))
+                ->description($field->instructions);
+        }
+
+        return $this->fields[] = new Field($this->request, $field);
+    }
+
+    /**
      * Create a new builder
      *
      * @param [type] $name
      * @return self
      */
     function createObjectType($name): self {
+        return (new static($this->request))
+            ->name($name);
+    }
+
+    /**
+     * Create a new builder
+     *
+     * @param [type] $name
+     * @return self
+     */
+    function createInputObjectType($name): self {
         return (new static($this->request))
             ->name($name);
     }
@@ -66,21 +93,6 @@ class Schema extends BaseBuilder {
 
         return $this->fields[] = (new ObjectField($this->request, $field))
             ->config($config);
-    }
-
-    /**
-     * Add a new field to this schema
-     *
-     * @param mixed $field
-     * @return BaseField
-     */
-    function addField($field): BaseField {
-        if (is_a($field, CraftField::class)) {
-            return $this->fields[] = (new Field($this->request, $field->handle))
-                ->description($field->instructions);
-        }
-
-        return $this->fields[] = new Field($this->request, $field);
     }
 
     /**
@@ -139,13 +151,9 @@ class Schema extends BaseBuilder {
     }
 
     function getInterfaces(): array {
-        return $this->interfaces;
-    }
-
-    function foo(): array {
         $interfaces = [];
 
-        foreach ($this->getInterfaces() as $interface) {
+        foreach ($this->interfaces as $interface) {
             if (is_string($interface) && is_subclass_of($interface, Schema::class)) {
                 $interfaces[] = (new $interface($this->request));
             }
@@ -162,24 +170,10 @@ class Schema extends BaseBuilder {
         return $interfaces;
     }
 
-    function getRawInterfaces(): array {
-        $interfaces = [];
-
-        foreach ($this->getInterfaces() as $interface) {
-            if (is_string($interface) && is_subclass_of($interface, Schema::class)) {
-                $interfaces[] = (new $interface($this->request))->getRawGraphQLObject();
-            }
-
-            else if (is_subclass_of($interface, Schema::class)) {
-                $interfaces[] = $interface->getRawGraphQLObject();
-            }
-
-            else {
-                $interfaces[] = $interface;
-            }
-        }
-
-        return $interfaces;
+    function getInterfaceConfig(): array {
+        return array_map(function ($interface) {
+            return $interface->getRawGraphQLObject();
+        }, $this->getInterfaces());
     }
 
     function getFields(): array {
@@ -201,7 +195,7 @@ class Schema extends BaseBuilder {
     function getFieldConfig():array {
         $fields = [];
 
-        foreach ($this->foo() as $interface) {
+        foreach ($this->getInterfaces() as $interface) {
             foreach ($interface->getFields() as $field) {
                 $fields[$field->getName()] = $field->getConfig();
             }
@@ -214,13 +208,13 @@ class Schema extends BaseBuilder {
         return $fields;
     }
 
-    function getGraphQLConfig() {
+    function getConfig() {
         return [
             'name' => $this->getName(),
             'fields' => function () {
                 return $this->getFieldConfig();
             },
-            'interfaces' => $this->getRawInterfaces(),
+            'interfaces' => $this->getInterfaceConfig(),
             'resolveType' => $this->getResolveType(),
         ];
     }
@@ -234,8 +228,12 @@ class Schema extends BaseBuilder {
         return null;
     }
 
-    function getRawGraphQLObject() {
+    function getRawGraphQLObject($input=false): Type {
         $key = $this->getName();
+
+        if ($input) {
+            return new InputObjectType($this->getConfig());
+        }
 
         if (!empty(static::$objects[$key])) {
             return static::$objects[$key];
@@ -245,7 +243,7 @@ class Schema extends BaseBuilder {
     }
 
     function getGraphQLObject() {
-        return new ObjectType($this->getGraphQLConfig());
+        return new ObjectType($this->getConfig());
     }
 
 }

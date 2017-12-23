@@ -11,8 +11,7 @@ class Argument extends BaseBuilder {
     use HasDescriptionAttribute;
     use HasIsListAttribute;
     use HasNonNullAttribute;
-
-    protected $resolve;
+    use HasOnSaveAttribute;
 
     function __construct(Request $request, string $name) {
         $this->request = $request;
@@ -34,25 +33,6 @@ class Argument extends BaseBuilder {
             'type' => $type,
             'description' => $this->getDescription(),
         ];
-    }
-
-    function resolve($resolve): self {
-        $this->resolve = $resolve;
-        return $this;
-    }
-
-    function getResolve() /* php 7.1: ?callable*/ {
-        if (is_callable($this->resolve)) {
-            return $this->resolve;
-        }
-
-        if ($this->resolve !== null) {
-            return function($value) {
-                return $this->resolve;
-            };
-        }
-
-        return null;
     }
 
 }

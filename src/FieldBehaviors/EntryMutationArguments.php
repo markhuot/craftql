@@ -56,7 +56,7 @@ class EntryMutationArguments extends Behavior {
             $fieldService = \Yii::$container->get('fieldService');
 
             foreach ($fields as $handle => &$value) {
-                $callback = $this->owner->getArgument($handle)->getResolve();
+                $callback = $this->owner->getArgument($handle)->getOnSave();
                 if ($callback) {
                     $value = $callback($value);
                 }

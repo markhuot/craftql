@@ -33,6 +33,9 @@ class GetTagsFieldSchema
                 ->resolve(function ($root, $args) use ($field) {
                     return $root->{$field->handle}->all();
                 });
+
+            $event->mutation->addIntArgument($field)
+                ->lists();
         }
     }
 }

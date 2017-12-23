@@ -29,7 +29,7 @@ class EnumObject extends Schema {
         return $this->values;
     }
 
-    function getGraphQLConfig() {
+    function getConfig() {
         return [
             'name' => $this->getName(),
             'values' => $this->getValues(),
@@ -37,7 +37,7 @@ class EnumObject extends Schema {
     }
 
     function getGraphQLObject() {
-        return new EnumType($this->getGraphQLConfig());
+        return new EnumType($this->getConfig());
     }
 
 }

@@ -33,7 +33,8 @@ class GetCategoriesFieldSchema
                     return $root->{$field->handle}->all();
                 });
 
-            $event->mutation->addIntArgument($field)->lists();
+            $event->mutation->addIntArgument($field)
+                ->lists();
         }
 
     }

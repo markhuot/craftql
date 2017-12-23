@@ -21,7 +21,7 @@ class CategoryInterface extends Schema {
     }
 
     function getGraphQLObject() {
-        return new InterfaceType($this->getGraphQLConfig());
+        return new InterfaceType($this->getConfig());
     }
 
     function getResolveType() {

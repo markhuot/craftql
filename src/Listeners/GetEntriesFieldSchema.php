@@ -38,6 +38,7 @@ class GetEntriesFieldSchema
                 ];
             });
 
-        $event->mutation->addIntArgument($field)->lists();
+        $event->mutation->addIntArgument($field)
+            ->lists();
     }
 }

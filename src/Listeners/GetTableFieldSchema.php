@@ -19,27 +19,52 @@ class GetTableFieldSchema
         $field = $event->sender;
         $query = $event->query;
 
-        $tableSchema = $query->createObjectType(ucfirst($field->handle).'Table');
+        $outputSchema = $query->createObjectType(ucfirst($field->handle).'Table');
+        $inputSchema = $query->createInputObjectType(ucfirst($field->handle).'Input');
+        $handleMapping = [];
 
         foreach ($field->columns as $key => $columnConfig) {
+            $handleMapping[$columnConfig['handle']] = $key;
+
             switch ($columnConfig['type']) {
                 case 'number':
-                    $tableSchema->addFloatField($columnConfig['handle'])
+                    $outputSchema->addFloatField($columnConfig['handle'])
+                        ->description($columnConfig['heading']);
+                    $inputSchema->addFloatField($columnConfig['handle'])
                         ->description($columnConfig['heading']);
                     break;
                 case 'checkbox':
                 case 'lightswitch':
-                    $tableSchema->addBooleanField($columnConfig['handle'])
+                    $outputSchema->addBooleanField($columnConfig['handle'])
+                        ->description($columnConfig['heading']);
+                    $inputSchema->addBooleanField($columnConfig['handle'])
                         ->description($columnConfig['heading']);
                     break;
                 default:
-                    $tableSchema->addStringField($columnConfig['handle'])
+                    $outputSchema->addStringField($columnConfig['handle'])
+                        ->description($columnConfig['heading']);
+                    $inputSchema->addStringField($columnConfig['handle'])
                         ->description($columnConfig['heading']);
             }
         }
 
         $query->addObjectField($field)
             ->lists()
-            ->config($tableSchema);
+            ->config($outputSchema);
+
+        $event->mutation->addObjectArgument($field)
+            ->lists()
+            ->type($inputSchema->getRawGraphQLObject(true))
+            ->onSave(function($value) use ($handleMapping) {
+                $newValue = [];
+
+                foreach ($value as $index => $row) {
+                    foreach ($row as $oldKey => $value) {
+                        $newValue[$index][$handleMapping[$oldKey]] = $value;
+                    }
+                }
+
+                return $newValue;
+            });
     }
 }
