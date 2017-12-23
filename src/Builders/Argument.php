@@ -3,47 +3,24 @@
 namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Request;
 
-class Argument {
+class Argument extends BaseBuilder {
 
-    protected $name;
-    protected $type;
-    protected $isList = false;
-    protected $isNonNull = false;
+    use HasTypeAttribute;
+    use HasDescriptionAttribute;
+    use HasIsListAttribute;
+    use HasNonNullAttribute;
 
-    function __construct($name) {
+    protected $resolve;
+
+    function __construct(Request $request, string $name) {
+        $this->request = $request;
         $this->name = $name;
-    }
-
-    function name(string $name): self {
-        $this->name = $name;
-        return $this;
-    }
-
-    function getName(): string {
-        return $this->name;
-    }
-
-    function type(Type $type): self {
-        $this->type = $type;
-        return $this;
-    }
-
-    function getType(): Type {
-        return $this->type ?: Type::string();
-    }
-
-    function nonNull(bool $nonNull=true): self {
-        $this->isNonNull = $nonNull;
-        return $this;
-    }
-
-    function isNonNull(): bool {
-        return $this->isNonNull;
     }
 
     function getConfig() {
-        $type = $this->getType();
+        $type = $this->getTypeConfig();
 
         if ($this->isList) {
             $type = Type::listOf($type);
@@ -55,12 +32,27 @@ class Argument {
 
         return [
             'type' => $type,
+            'description' => $this->getDescription(),
         ];
     }
 
-    function lists(bool $isList=true): self {
-        $this->isList = $isList;
+    function resolve($resolve): self {
+        $this->resolve = $resolve;
         return $this;
+    }
+
+    function getResolve() /* php 7.1: ?callable*/ {
+        if (is_callable($this->resolve)) {
+            return $this->resolve;
+        }
+
+        if ($this->resolve !== null) {
+            return function($value) {
+                return $this->resolve;
+            };
+        }
+
+        return null;
     }
 
 }

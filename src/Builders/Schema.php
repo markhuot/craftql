@@ -8,18 +8,15 @@ use GraphQL\Type\Definition\ObjectType;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Field as BaseField;
 use markhuot\CraftQL\Builders\Object as ObjectField;
-use yii\base\Component;
+// use yii\base\Component;
 
-class Schema extends Component implements \ArrayAccess {
+class Schema extends BaseBuilder {
 
-    private $name;
-    private $fields = [];
+    protected static $objects;
+    protected $fields = [];
     protected $context;
-    static $globals;
     protected $interfaces = [];
-    static $singletons = [];
-    protected $request;
-    private $parent;
+    protected $parent;
 
     function __construct(Request $request, $context=null, $parent=null) {
         $this->request = $request;
@@ -40,54 +37,21 @@ class Schema extends Component implements \ArrayAccess {
         /* intended to be overridden by subclassed schemas */
     }
 
-    function use(string $behavior): self {
-        $reflect = new \ReflectionClass($behavior);
-        $this->attachBehavior($reflect->getShortName(), $behavior);
-        return $this;
-    }
-
-    function bootBehaviors() {
-        if ($behaviors=$this->getBehaviors()) {
-            foreach ($behaviors as $key => $behavior) {
-                $this->{"init{$key}"}();
-            }
-        }
-    }
-
-    // function clone() {
-    //     return new static($this->request, null, $this);
-    // }
-
-    static function singleton(Request $request, $key=null) {
-        if ($key === null) {
-            $key = static::class;
-        }
-
-        if (!empty(self::$singletons[$key])) {
-            return self::$singletons[$key];
-        }
-
-        return self::$singletons[$key] = new static($request);
-    }
-
+    /**
+     * Get any context used to create this schema
+     *
+     * @return void
+     */
     function getContext() {
         return $this->context;
     }
 
-    function name(string $name): self {
-        $this->name = $name;
-        return $this;
-    }
-
-    function getName():string {
-        if ($this->name === null) {
-            $reflect = new \ReflectionClass(static::class);
-            return $this->name = $reflect->getShortName();
-        }
-
-        return $this->name;
-    }
-
+    /**
+     * Create a new builder
+     *
+     * @param [type] $name
+     * @return self
+     */
     function createObjectType($name): self {
         return (new static($this->request))
             ->name($name);
@@ -104,6 +68,12 @@ class Schema extends Component implements \ArrayAccess {
             ->config($config);
     }
 
+    /**
+     * Add a new field to this schema
+     *
+     * @param mixed $field
+     * @return BaseField
+     */
     function addField($field): BaseField {
         if (is_a($field, CraftField::class)) {
             return $this->fields[] = (new Field($this->request, $field->handle))
@@ -113,53 +83,35 @@ class Schema extends Component implements \ArrayAccess {
         return $this->fields[] = new Field($this->request, $field);
     }
 
+    /**
+     * Sugar since `addField` defaults to a string anyway
+     *
+     * @param mixed $field
+     * @return BaseField
+     */
     function addStringField($field): BaseField {
-        if (is_a($field, CraftField::class)) {
-            return $this->fields[] = (new Field($this->request, $field->handle))
-                ->description($field->instructions);
-        }
-
-        return $this->fields[] = new Field($this->request, $field);
+        return $this->addField($field);
     }
 
     function addBooleanField($field): BaseField {
-        if (is_a($field, CraftField::class)) {
-            return $this->fields[] = (new Boolean($this->request, $field->handle))
-                ->description($field->instructions);
-        }
+        return $this->addField($field)->type(Type::boolean());
+    }
 
-        return $this->fields[] = new Boolean($this->request, $field);
+    function addIntField($field): BaseField {
+        return $this->addField($field)->type(Type::int());
+    }
+
+    function addFloatField($field): BaseField {
+        return $this->addField($field)->type(Type::float());
     }
 
     function addEnumField($field): BaseField {
         if (is_a($field, CraftField::class)) {
-            return $this->fields[] = (new Enum($this->request, $field->handle))
+            return $this->fields[] = (new EnumField($this->request, $field->handle))
                 ->description($field->instructions);
         }
 
-        return $this->fields[] = new Enum($this->request, $field);
-    }
-
-    function addIntField($field): BaseField {
-        if (is_a($field, CraftField::class)) {
-            return $this->fields[] = (new Field($this->request, $field->handle))
-                ->type(Type::int())
-                ->description($field->instructions);
-        }
-
-        return $this->fields[] = (new Field($this->request, $field))
-            ->type(Type::int());
-    }
-
-    function addFloatField($field): BaseField {
-        if (is_a($field, CraftField::class)) {
-            return $this->fields[] = (new Field($this->request, $field->handle))
-                ->type(Type::float())
-                ->description($field->instructions);
-        }
-
-        return $this->fields[] = (new Field($this->request, $field))
-            ->type(Type::float());
+        return $this->fields[] = new EnumField($this->request, $field);
     }
 
     function addDateField($field): BaseField {
@@ -195,7 +147,7 @@ class Schema extends Component implements \ArrayAccess {
 
         foreach ($this->getInterfaces() as $interface) {
             if (is_string($interface) && is_subclass_of($interface, Schema::class)) {
-                $interfaces[] = ($interface::singleton($this->request));
+                $interfaces[] = (new $interface($this->request));
             }
 
             else if (is_subclass_of($interface, Schema::class)) {
@@ -215,7 +167,7 @@ class Schema extends Component implements \ArrayAccess {
 
         foreach ($this->getInterfaces() as $interface) {
             if (is_string($interface) && is_subclass_of($interface, Schema::class)) {
-                $interfaces[] = ($interface::singleton($this->request))->getRawGraphQLObject();
+                $interfaces[] = (new $interface($this->request))->getRawGraphQLObject();
             }
 
             else if (is_subclass_of($interface, Schema::class)) {
@@ -228,10 +180,6 @@ class Schema extends Component implements \ArrayAccess {
         }
 
         return $interfaces;
-    }
-
-    function getRequest(): Request {
-        return $this->request;
     }
 
     function getFields(): array {
@@ -286,8 +234,6 @@ class Schema extends Component implements \ArrayAccess {
         return null;
     }
 
-    static $objects;
-
     function getRawGraphQLObject() {
         $key = $this->getName();
 
@@ -301,51 +247,5 @@ class Schema extends Component implements \ArrayAccess {
     function getGraphQLObject() {
         return new ObjectType($this->getGraphQLConfig());
     }
-
-    function offsetExists($offset) {
-        return isset($this->fields[$offset]);
-    }
-
-    function offsetGet($offset) {
-        return $this->fields[$offset];
-    }
-
-    function offsetSet($offset , $value) {
-        $this->fields[$offset] = $value;
-    }
-
-    function offsetUnset($offset) {
-        unset($this->fields[$offset]);
-    }
-
-    // function addCraftArgument(\craft\base\Field $field, $type, callable $callback=null) {
-    //     $this->args[$field->handle] = $type;
-
-    //     if ($callback) {
-    //         $this->mutationCallbacks[$field->handle] = $callback;
-    //     }
-
-    //     return $this;
-    // }
-
-    // function addStringArgument(\craft\base\Field $field, callable $callback=null) {
-    //     return $this->addCraftArgument($field, Type::string(), $callback);
-    // }
-
-    // function addEnumArgument(\craft\base\Field $field, \markhuot\CraftQL\Builders\Enum $enum, callable $callback=null) {
-    //     return $this->addCraftArgument($field, $enum->toArray(), $callback);
-    // }
-
-    // function addBooleanArgument(\craft\base\Field $field, callable $callback=null) {
-    //     return $this->addCraftArgument($field, Type::boolean(), $callback);
-    // }
-
-    // function mutate($entry, \craft\base\Field $field, $value) {
-    //     if (!empty($this->mutationCallbacks[$field->handle])) {
-    //         $value = $this->mutationCallbacks[$field->handle]($entry, $field, $value);
-    //     }
-
-    //     return $value;
-    // }
 
 }

@@ -4,7 +4,8 @@ namespace markhuot\CraftQL\Events;
 
 use yii\base\Event;
 use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Builders\Schema;
+use markhuot\CraftQL\Builders\Schema as SchemaBuilder;
+use markhuot\CraftQL\Builders\Field as FieldBuilder;
 use craft\base\Field;
 
 class GetFieldSchema extends Event {
@@ -19,8 +20,15 @@ class GetFieldSchema extends Event {
     /**
      * The schema to build
      *
-     * @var Schema
+     * @var SchemaBuilder
      */
-    public $schema;
+    public $query;
+
+    /**
+     * The mutation arguments
+     *
+     * @var FieldBuilder
+     */
+    public $mutation;
 
 }

@@ -17,9 +17,8 @@ class GetDateFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $schema = $event->schema;
 
-        $schema->addDateField($field);
-        // $schema->addCraftArgument($field, Type::int());
+        $event->query->addDateField($field);
+        $event->mutation->addIntArgument($field);
     }
 }

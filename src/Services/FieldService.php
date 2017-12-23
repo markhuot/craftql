@@ -16,31 +16,31 @@ use GraphQL\Error\Error;
 
 class FieldService {
 
-  private $fieldSchemas = [];
+    private $fieldSchemas = [];
 
     function getSchemaForField(\craft\base\Field $field, \markhuot\CraftQL\Request $request, $parent) {
         if (!isset($this->fieldSchemas[$field->id])) {
             $event = new GetFieldSchemaEvent;
-            // if ($parent) {
-            //     $event->schema = $parent->clone();
-            // }
-            // else {
-                $event->schema = new \markhuot\CraftQL\Builders\Schema($request);
-            // }
+            $event->query = new \markhuot\CraftQL\Builders\Schema($request);
+            $event->mutation = new \markhuot\CraftQL\Builders\Field($request, 'MUTATION');
             $field->trigger('craftQlGetFieldSchema', $event);
-            $this->fieldSchemas[$field->id] = $event->schema;
+            $this->fieldSchemas[$field->id] = [
+                'query' => $event->query,
+                'mutation' => $event->mutation,
+            ];
         }
 
         return $this->fieldSchemas[$field->id];
     }
 
-    function getGraphQLMutationArgs($fieldLayoutId, $request) {
+    function getMutationArguments($fieldLayoutId, $request) {
         $graphQlArgs = [];
 
         if ($fieldLayoutId) {
             $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
             foreach ($fieldLayout->getFields() as $field) {
-                // $graphQlArgs = array_merge($graphQlArgs, $this->getSchemaForField($field, $request)['args']);
+                $schema = $this->getSchemaForField($field, $request, null)['mutation'];
+                $graphQlArgs = array_merge($graphQlArgs, $schema->getArguments());
             }
         }
 
@@ -53,18 +53,12 @@ class FieldService {
         if ($fieldLayoutId) {
             $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
             foreach ($fieldLayout->getFields() as $field) {
-                $schema = $this->getSchemaForField($field, $request, $parent);
+                $schema = $this->getSchemaForField($field, $request, $parent)['query'];
                 $graphQlFields = array_merge($graphQlFields, $schema->getFields());
             }
         }
 
         return $graphQlFields;
-    }
-
-    function mutateValueForField($request, $field, $value, $entry) {
-        // $value = $this->getSchemaForField($field, $request)->mutate($entry, $field, $value);
-
-        return $value;
     }
 
 }

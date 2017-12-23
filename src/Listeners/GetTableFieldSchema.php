@@ -17,9 +17,9 @@ class GetTableFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $schema = $event->schema;
+        $query = $event->query;
 
-        $tableSchema = $schema->createObjectType(ucfirst($field->handle).'Table');
+        $tableSchema = $query->createObjectType(ucfirst($field->handle).'Table');
 
         foreach ($field->columns as $key => $columnConfig) {
             switch ($columnConfig['type']) {
@@ -38,7 +38,7 @@ class GetTableFieldSchema
             }
         }
 
-        $schema->addObjectField($field)
+        $query->addObjectField($field)
             ->lists()
             ->config($tableSchema);
     }

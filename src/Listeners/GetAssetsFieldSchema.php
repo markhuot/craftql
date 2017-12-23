@@ -21,16 +21,16 @@ class GetAssetsFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $schema = $event->schema;
+        $query = $event->query;
 
-        $schema->addField($field)
+        $query->addField($field)
             ->lists()
             ->type(VolumeInterface::class)
             ->resolve(function ($root, $args) use ($field) {
                 return $root->{$field->handle}->all();
             });
 
-        // $schema->addCraftArgument(
+        // $query->addCraftArgument(
         //     $field,
         //     Type::listOf($this->getInputObject($field)),
         //     [static::class, 'upload']

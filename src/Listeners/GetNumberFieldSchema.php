@@ -16,13 +16,14 @@ class GetNumberFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $schema = $event->schema;
 
         if ($field->decimals == 0) {
-            $schema->addIntField($field);
+            $event->query->addIntField($field);
+            $event->mutation->addIntArgument($field);
         }
         else {
-            $schema->addFloatField($field);
+            $event->query->addFloatField($field);
+            $event->mutation->addFloatArgument($field);
         }
     }
 }

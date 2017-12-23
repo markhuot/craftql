@@ -6,16 +6,16 @@ use craft\base\Field as CraftField;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
 use yii\base\Component;
+use GraphQL\Type\Definition\EnumType;
 
-class Field extends Component {
+class Field extends BaseBuilder {
 
-    protected $request;
-    protected $name;
-    protected $type;
-    protected $description;
+    use HasTypeAttribute;
+    use HasDescriptionAttribute;
+    use HasIsListAttribute;
+    use HasNonNullAttribute;
+
     protected $resolve;
-    protected $isList = false;
-    protected $isNonNull = false;
     protected $arguments = [];
 
     function __construct(Request $request, string $name) {
@@ -28,73 +28,122 @@ class Field extends Component {
 
     }
 
-    function getRequest() {
-        return $this->request;
-    }
-
-    function name($name): self {
-        $this->name = $name;
-        return $this;
-    }
-
-    function getName() {
-        return $this->name;
-    }
-
-    function type($type): self {
-        $this->type = $type;
-        return $this;
-    }
-
-    function getType() {
-        return $this->type;
-    }
-
-    function getRawType() {
-        $type = $this->getType();
-
-        if (is_string($type) && is_subclass_of($type, Schema::class)) {
-            return ($type::singleton($this->request))->getRawGraphQLObject();
-        }
-
-        else if (is_a($type, Schema::class) || is_subclass_of($type, Schema::class)) {
-            return $type->getRawGraphQLObject();
-        }
-
-        return $type ?: Type::string();
-    }
-
-    // function arguments($arguments): self {
-    //     $this->arguments = $arguments;
+    // function use(string $behavior): self {
+    //     $reflect = new \ReflectionClass($behavior);
+    //     $this->attachBehavior($reflect->getShortName(), $behavior);
     //     return $this;
     // }
 
-    function addStringArgument($name) {
-        return $this->arguments[] = (new Argument($name))
-            ->type(Type::string());
+    // function getRequest() {
+    //     return $this->request;
+    // }
+
+    // function name($name): self {
+    //     $this->name = $name;
+    //     return $this;
+    // }
+
+    // function getName() {
+    //     return $this->name;
+    // }
+
+    // /**
+    //  * Set the type
+    //  *
+    //  * @param mixed $type
+    //  * @return self
+    //  */
+    // function type($type): self {
+    //     $this->type = $type;
+    //     return $this;
+    // }
+
+    // /**
+    //  * Get the defined type
+    //  *
+    //  * @return mixed
+    //  */
+    // function getType() {
+    //     return $this->type;
+    // }
+
+    // function getTypeConfig() {
+    //     $type = $this->getType();
+
+    //     if (is_string($type) && is_subclass_of($type, Schema::class)) {
+    //         $rawType = (new $type($this->request))->getRawGraphQLObject();
+    //     }
+
+    //     else if (is_a($type, Schema::class) || is_subclass_of($type, Schema::class)) {
+    //         $rawType = $type->getRawGraphQLObject();
+    //     }
+
+    //     else {
+    //         $rawType = $type ?: Type::string();
+    //     }
+
+    //     return $rawType;
+    // }
+
+    function addArgumentsByLayoutId(int $fieldLayoutId) {
+        $fieldService = \Yii::$container->get('fieldService');
+        $arguments = $fieldService->getMutationArguments($fieldLayoutId, $this->request, $this);
+        return $this->arguments = array_merge($this->arguments, $arguments);
     }
 
-    function addIdArgument($name) {
-        return $this->arguments[] = (new Argument($name))
-            ->type(Type::id());
+    function addArgument($name): Argument {
+        if (is_a($name, CraftField::class)) {
+            return $this->arguments[] = (new Argument($this->request, $name->handle))
+                ->description($name->instructions);
+        }
+
+        return $this->arguments[] = new Argument($this->request, $name);
     }
 
-    function addIntArgument($name) {
-        return $this->arguments[] = (new Argument($name))
-            ->type(Type::int());
+    function addStringArgument($name): Argument {
+        return $this->addArgument($name)->type(Type::string());
     }
 
-    function addFloatArgument($name) {
-        return $this->arguments[] = (new Argument($name))
-            ->type(Type::float());
+    function addIdArgument($name): Argument {
+        return $this->addArgument($name)->type(Type::id());
     }
 
-    function addBooleanArgument($name) {
-        return $this->arguments[] = (new Argument($name))
-            ->type(Type::boolean());
+    function addIntArgument($name): Argument {
+        return $this->addArgument($name)->type(Type::int());
+    }
+
+    function addFloatArgument($name): Argument {
+        return $this->addArgument($name)->type(Type::float());
+    }
+
+    function addBooleanArgument($name): Argument {
+        return $this->addArgument($name)->type(Type::boolean());
+    }
+
+    function addEnumArgument($name): Enum {
+        if (is_a($name, CraftField::class)) {
+            return $this->arguments[] = (new EnumField($this->request, $name->handle))
+                ->description($name->instructions);
+        }
+
+        return $this->arguments[] = (new EnumField($this->request, $name));
     }
 
     function getArguments(): array {
+        return $this->arguments;
+    }
+
+    function getArgument(string $name)/* @TODO PHP 7.1 nullable return types :?Argument*/ {
+        foreach ($this->arguments as $argument) {
+            if ($argument->getName() == $name) {
+                return $argument;
+            }
+        }
+
+        return null;
+    }
+
+    function getArgumentConfig(): array {
         $arguments = [];
 
         foreach ($this->arguments as $argument) {
@@ -105,7 +154,7 @@ class Field extends Component {
     }
 
     function getConfig() {
-        $type = $this->getRawType();
+        $type = $this->getTypeConfig();
 
         if ($this->isList) {
             $type = Type::listOf($type);
@@ -115,7 +164,7 @@ class Field extends Component {
             $type = Type::nonNull($type);
         }
 
-        // get behaviors
+        // init behaviors
         if ($behaviors=$this->getBehaviors()) {
             foreach ($behaviors as $key => $behavior) {
                 $this->{"init{$key}"}();
@@ -125,39 +174,33 @@ class Field extends Component {
         return [
             'type' => $type,
             'description' => $this->getDescription(),
-            'args' => $this->getArguments(),
+            'args' => $this->getArgumentConfig(),
             'resolve' => $this->getResolve(),
         ];
     }
 
-    function use(string $behavior): self {
-        $reflect = new \ReflectionClass($behavior);
-        $this->attachBehavior($reflect->getShortName(), $behavior);
-        return $this;
-    }
+    // function description($description): self {
+    //     $this->description = $description;
+    //     return $this;
+    // }
 
-    function description($description): self {
-        $this->description = $description;
-        return $this;
-    }
+    // function getDescription() /* php 7.1: ?string*/ {
+    //     return $this->description;
+    // }
 
-    function getDescription() /* php 7.1: ?string*/ {
-        return $this->description;
-    }
+    // function lists($isList=true): self {
+    //     $this->isList = $isList;
+    //     return $this;
+    // }
 
-    function lists($isList=true): self {
-        $this->isList = $isList;
-        return $this;
-    }
+    // function nonNull(): self {
+    //     $this->isNonNull = true;
+    //     return $this;
+    // }
 
-    function nonNull(): self {
-        $this->isNonNull = true;
-        return $this;
-    }
-
-    function isNonNull(): bool {
-        return $this->isNonNull;
-    }
+    // function isNonNull(): bool {
+    //     return $this->isNonNull;
+    // }
 
     function resolve($resolve): self {
         $this->resolve = $resolve;

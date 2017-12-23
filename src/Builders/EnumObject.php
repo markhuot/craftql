@@ -2,14 +2,11 @@
 
 namespace markhuot\CraftQL\Builders;
 
-use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\EnumType;
-use markhuot\CraftQL\Builders\ContentField;
 
-class Enum extends Field {
+class EnumObject extends Schema {
 
     private $values = [];
-    static $count = 0;
 
     function values($values, $context=null) {
         if (is_callable($values)) {
@@ -32,11 +29,15 @@ class Enum extends Field {
         return $this->values;
     }
 
-    function getType() {
-        return new EnumType([
-            'name' => ucfirst($this->getName()).'Enum',
+    function getGraphQLConfig() {
+        return [
+            'name' => $this->getName(),
             'values' => $this->getValues(),
-        ]);
+        ];
+    }
+
+    function getGraphQLObject() {
+        return new EnumType($this->getGraphQLConfig());
     }
 
 }

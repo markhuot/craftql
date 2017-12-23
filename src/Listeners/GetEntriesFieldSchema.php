@@ -17,13 +17,12 @@ class GetEntriesFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $schema = $event->schema;
 
-        $schema->addField($field)
+        $event->query->addField($field)
             ->type(EntryInterface::class)
             ->lists();
 
-        $schema->addField($field)
+        $event->query->addField($field)
             ->type(EntryConnection::class)
             ->name("{$field->handle}Connection")
             ->resolve(function ($root, $args) use ($field) {
@@ -38,5 +37,7 @@ class GetEntriesFieldSchema
                     'args' => $args,
                 ];
             });
+
+        $event->mutation->addIntArgument($field)->lists();
     }
 }

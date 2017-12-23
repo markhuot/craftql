@@ -17,21 +17,24 @@ class GetCategoriesFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $schema = $event->schema;
+        $query = $event->query;
 
-        if (!$schema->getRequest()->token()->can('query:categories')) {
+        if (!$query->getRequest()->token()->can('query:categories')) {
             return;
         }
 
         if (preg_match('/^group:(\d+)$/', $field->source, $matches)) {
             $groupId = $matches[1];
 
-            $schema->addField($field)
+            $query->addField($field)
                 ->lists()
-                ->type($schema->getRequest()->categoryGroups()->get($groupId))
+                ->type($query->getRequest()->categoryGroups()->get($groupId))
                 ->resolve(function ($root, $args) use ($field) {
                     return $root->{$field->handle}->all();
                 });
+
+            $event->mutation->addIntArgument($field)->lists();
         }
+
     }
 }

@@ -17,10 +17,10 @@ class GetMatrixFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $schema = $event->schema;
-        $request = $schema->getRequest();
+        $query = $event->query;
+        $request = $query->getRequest();
 
-        $union = $schema->addUnionField($field)
+        $union = $query->addUnionField($field)
             ->lists()
             ->resolveType(function ($root, $args) use ($field) {
                 $block = $root->getType();

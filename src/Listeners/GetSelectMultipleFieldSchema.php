@@ -14,21 +14,23 @@ class GetSelectMultipleFieldSchema
     function handle($event) {
         $event->handled = true;
 
-        $field = $event->sender;
-        $schema = $event->schema;
+        $craftField = $event->sender;
 
-        $schema->addEnumField($field)
+        $graphqlField = $event->query->addEnumField($craftField)
             ->lists()
-            ->values([GetSelectOneFieldSchema::class, 'valuesForField'], $field)
-            ->resolve(function ($root, $args) use ($field) {
+            ->values([GetSelectOneFieldSchema::class, 'valuesForField'], $craftField)
+            ->resolve(function ($root, $args) use ($craftField) {
                 $values = [];
 
-                foreach ($root->{$field->handle} as $option) {
+                foreach ($root->{$craftField->handle} as $option) {
                     $values[] = StringHelper::graphQLEnumValueForString($option->value);
                 }
 
                 return $values;
             });
-        // $schema->addEnumArgument($field, $enum);
+
+        $event->mutation->addArgument($craftField)
+            ->lists()
+            ->type($graphqlField);
     }
 }

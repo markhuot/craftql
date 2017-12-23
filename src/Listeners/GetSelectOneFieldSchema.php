@@ -15,14 +15,15 @@ class GetSelectOneFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $schema = $event->schema;
+        $query = $event->query;
 
-        $schema->addEnumField($field)
+        $query->addEnumField($field)
             ->values([static::class, 'valuesForField'], $field)
             ->resolve(function ($root, $args) use ($field) {
                 return (string)$root->{$field->handle} ?: null;
             });
-        // $schema->addEnumArgument($field, $enum);
+
+        // $query->addEnumArgument($field, $enum);
     }
 
     static function valuesForField($graphQLField, $craftField) {

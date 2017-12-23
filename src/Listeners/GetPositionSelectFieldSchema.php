@@ -16,7 +16,7 @@ class GetPositionSelectFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $schema = $event->schema;
+        $query = $event->query;
 
         $values = [];
         if (in_array('left', $field->options)) { $values['left'] = 'Left'; }
@@ -26,7 +26,7 @@ class GetPositionSelectFieldSchema
         if (in_array('drop-left', $field->options)) { $values['dropLeft'] = 'Drop Left'; }
         if (in_array('drop-right', $field->options)) { $values['dropRight'] = 'Drop Right'; }
 
-        $schema->addEnumField($field)
+        $query->addEnumField($field)
             ->values($values);
     }
 }

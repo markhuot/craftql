@@ -21,22 +21,4 @@ class Tag extends Schema {
         return ucfirst($this->context->handle).'Tags';
     }
 
-    static function args($request) {
-        return [
-            'fixedOrder' => Type::boolean(),
-            'group' => $request->tagGroups()->enum(),
-            'groupId' => Type::int(),
-            'id' => Type::int(),
-            'indexBy' => Type::string(),
-            'limit' => Type::int(),
-            'locale' => Type::string(),
-            'offset' => Type::int(),
-            'order' => Type::string(),
-            // 'relatedTo' => Type::listOf(Entry::relatedToInputObject()),
-            'search' => Type::string(),
-            'slug' => Type::string(),
-            'title' => Type::string(),
-        ];
-    }
-
 }

@@ -10,6 +10,8 @@ use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\UserQueryArguments;
+use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
+use markhuot\CraftQL\FieldBehaviors\TagQueryArguments;
 
 class Query extends Schema {
 
@@ -153,7 +155,7 @@ class Query extends Schema {
         $this->addField('tags')
             ->lists()
             ->type(TagInterface::class)
-            ->arguments(Tag::args($this->getRequest()))
+            ->use(TagQueryArguments::class)
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Tag::find();
 
@@ -171,7 +173,7 @@ class Query extends Schema {
 
         $this->addField('tagsConnection')
             ->type(TagConnection::class)
-            ->arguments(Tag::args($this->getRequest()))
+            ->use(TagQueryArguments::class)
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Tag::find();
 
@@ -209,7 +211,7 @@ class Query extends Schema {
         $this->addField('categories')
             ->lists()
             ->type(CategoryInterface::class)
-            ->arguments(Category::args($this->getRequest()))
+            ->use(CategoryQueryArguments::class)
             ->resolve(function ($root, $args) {
                 $criteria = \craft\elements\Category::find();
 
@@ -227,7 +229,7 @@ class Query extends Schema {
 
         $this->addField('categoriesConnection')
             ->type(CategoryConnection::class)
-            ->arguments(Category::args($this->getRequest()))
+            ->use(CategoryQueryArguments::class)
             ->resolve(function ($root, $args) {
                 $criteria = \craft\elements\Category::find();
 

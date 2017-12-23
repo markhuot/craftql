@@ -93,36 +93,9 @@ class ApiController extends Controller
         $schema = $this->graphQl->getSchema($token);
         Craft::trace('CraftQL: Schema built');
 
-        try {
-            Craft::trace('CraftQL: Executing query');
-            $result = $this->graphQl->execute($schema, $this->request->input(), $this->request->variables());
-            Craft::trace('CraftQL: Execution complete');
-        } catch (\Exception $e) {
-            // $backtrace = [];
-
-            ob_start();
-            debug_print_backtrace();
-            $backtrace = ob_get_contents(); ob_end_clean();
-
-            // foreach ($e->getTrace() as $index => $trace) {
-            //     if ($index > 10) { break; }
-
-            //     $backtrace[] = [
-            //         'function' => $trace['function'],
-            //         'file' => @$trace['file'],
-            //         'line' => @$trace['line'],
-            //     ];
-            // }
-
-            $result = [
-                'errors' => [
-                    'message' => $e->getMessage(),
-                    'line' => $e->getLine(),
-                    'file' => $e->getFile(),
-                    'backtrace' => $backtrace,
-                ]
-            ];
-        }
+        Craft::trace('CraftQL: Executing query');
+        $result = $this->graphQl->execute($schema, $this->request->input(), $this->request->variables());
+        Craft::trace('CraftQL: Execution complete');
 
         if ($this->request->isDebugging() || false) {
             $response = \Yii::$app->getResponse();
