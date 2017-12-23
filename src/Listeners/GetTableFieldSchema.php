@@ -52,7 +52,7 @@ class GetTableFieldSchema
             ->lists()
             ->config($outputSchema);
 
-        $event->mutation->addObjectArgument($field)
+        $event->mutation->addArgument($field)
             ->lists()
             ->type($inputSchema->getRawGraphQLObject(true))
             ->onSave(function($value) use ($handleMapping) {

@@ -30,11 +30,15 @@ class GetAssetsFieldSchema
                 return $root->{$field->handle}->all();
             });
 
-        // $query->addCraftArgument(
-        //     $field,
-        //     Type::listOf($this->getInputObject($field)),
-        //     [static::class, 'upload']
-        // );
+        $inputObject = $event->mutation->createInputObjectType(ucfirst($field->handle).'AssetInput')
+            ->addIntField('id')
+            ->addStringField('url');
+
+        $event->mutation->addArgument($field)
+            ->type($inputObject)
+            ->onSave(function ($value) {
+                var_dump($value);
+            });
     }
 
     /**

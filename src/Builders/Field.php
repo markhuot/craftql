@@ -63,9 +63,20 @@ class Field extends BaseBuilder {
         return $this->addArgument($name)->type(Type::boolean());
     }
 
-    function addObjectArgument($name): Argument {
-        return $this->addArgument($name);
+    /**
+     * Create a new builder
+     *
+     * @param [type] $name
+     * @return self
+     */
+    function createInputObjectType($name): Schema {
+        return (new Schema($this->request))
+            ->name($name);
     }
+
+    // function addObjectArgument($name): Argument {
+    //     return $this->addArgument($name);
+    // }
 
     function addEnumArgument($name): Enum {
         if (is_a($name, CraftField::class)) {
