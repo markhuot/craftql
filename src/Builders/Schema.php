@@ -80,7 +80,7 @@ class Schema extends BaseBuilder {
      * @return self
      */
     function createInputObjectType($name): self {
-        return (new static($this->request))
+        return (new InputSchema($this->request))
             ->name($name);
     }
 
@@ -228,12 +228,12 @@ class Schema extends BaseBuilder {
         return null;
     }
 
-    function getRawGraphQLObject($input=false): Type {
+    function getRawGraphQLObject(): Type {
         $key = $this->getName();
 
-        if ($input) {
-            return new InputObjectType($this->getConfig());
-        }
+        // if ($input) {
+        //     return new InputObjectType($this->getConfig());
+        // }
 
         if (!empty(static::$objects[$key])) {
             return static::$objects[$key];

@@ -70,7 +70,7 @@ class Field extends BaseBuilder {
      * @return self
      */
     function createInputObjectType($name): Schema {
-        return (new Schema($this->request))
+        return (new InputSchema($this->request))
             ->name($name);
     }
 
