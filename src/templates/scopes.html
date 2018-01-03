@@ -4,9 +4,9 @@
 {% set fullPageForm = true %}
 {% set title = "Token Scopes"|t %}
 {% set crumbs = [
-    {'label': 'Settings', 'url': '/admin/settings'},
-    {'label': 'Plugins', 'url': '/admin/settings/plugins'},
-    {'label': 'CraftQL', 'url': '/admin/settings/plugins/craftql'},
+    {'label': 'Settings', 'url': url('settings')},
+    {'label': 'Plugins', 'url': url('settings/plugins')},
+    {'label': 'CraftQL', 'url': url('settings/plugins/craftql')},
 ] %}
 
 {% set content %}
@@ -23,7 +23,7 @@
 </style>
 <div class="fieldlayoutform">
     <h2>Try it out</h2>
-    <p>You can explore your API with the permissions of this token by navigating to <a href="/admin/craftql/browse/{{ token.token }}">/admin/craftql/browse/{token}</a>.
+    <p>You can explore your API with the permissions of this token in <a href="{{ url('craftql/browse/' ~ token.token ) }}">GraphiQL</a>.
 </div>
 
 <hr>
