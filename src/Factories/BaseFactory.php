@@ -11,7 +11,6 @@ abstract class BaseFactory {
     protected $repository;
     protected $request;
     private $objects = [];
-    private $enum;
 
     function __construct($repository, $request) {
         $this->repository = $repository;
@@ -69,8 +68,6 @@ abstract class BaseFactory {
         $values = [];
 
         foreach ($this->all() as $index => $object) {
-            // var_dump('die');
-            // die;
             $values[$this->getEnumName($object)] = $object->getContext()->id;
         }
 

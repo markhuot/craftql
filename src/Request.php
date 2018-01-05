@@ -107,6 +107,9 @@ class Request {
             unset($args['orRelatedTo']);
         }
 
+        // var_dump($args);
+        // die;
+
         foreach ($args as $key => $value) {
             $criteria = $criteria->{$key}($value);
         }

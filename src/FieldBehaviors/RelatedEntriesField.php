@@ -33,7 +33,7 @@ class RelatedEntriesField extends Behavior {
                 unset($args['field']);
                 unset($args['sourceLocale']);
 
-                $criteria = $this->getRequest()->entries($criteria, $root, $args, $context, $info);
+                $criteria = $this->owner->getRequest()->entries($criteria, $root, $args, $context, $info);
                 list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
 
                 return [

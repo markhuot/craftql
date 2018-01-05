@@ -6,11 +6,9 @@ use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Types\Tag;
 use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\Traits\HasRelatedEntriesField;
+use markhuot\CraftQL\FieldBehaviors\RelatedEntriesField;
 
 class TagEdge extends Schema {
-
-    use HasRelatedEntriesField;
 
     function boot() {
         $this->addStringField('cursor');
@@ -20,6 +18,8 @@ class TagEdge extends Schema {
             ->resolve(function ($root) {
                 return $root['node'];
             });
+
+        // $this->use(RelatedEntriesField::class);
 
         // $this->addGlobalField('relatedTo');
     }
