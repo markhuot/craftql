@@ -17,10 +17,10 @@ class GetTableFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $query = $event->query;
+        $schema = $event->schema;
 
-        $outputSchema = $query->createObjectType(ucfirst($field->handle).'Table');
-        $inputSchema = $query->createInputObjectType(ucfirst($field->handle).'Input');
+        $outputSchema = $schema->createObjectType(ucfirst($field->handle).'Table');
+        $inputSchema = $schema->createInputObjectType(ucfirst($field->handle).'Input');
         $handleMapping = [];
 
         foreach ($field->columns as $key => $columnConfig) {
@@ -48,9 +48,11 @@ class GetTableFieldSchema
             }
         }
 
-        $query->addObjectField($field)
+        $schema->addObjectField($field)
             ->lists()
             ->config($outputSchema);
+
+        $event->query->addStringArgument($field);
 
         $event->mutation->addArgument($field)
             ->lists()

@@ -16,7 +16,7 @@ class GetSelectMultipleFieldSchema
 
         $craftField = $event->sender;
 
-        $graphqlField = $event->query->addEnumField($craftField)
+        $graphqlField = $event->schema->addEnumField($craftField)
             ->lists()
             ->values([GetSelectOneFieldSchema::class, 'valuesForField'], $craftField)
             ->resolve(function ($root, $args) use ($craftField) {
@@ -28,6 +28,8 @@ class GetSelectMultipleFieldSchema
 
                 return $values;
             });
+
+        $event->query->addStringArgument($craftField);
 
         $event->mutation->addArgument($craftField)
             ->lists()

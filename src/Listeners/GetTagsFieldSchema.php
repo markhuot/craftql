@@ -17,9 +17,9 @@ class GetTagsFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $query = $event->query;
+        $schema = $event->schema;
 
-        if (!$query->getRequest()->token()->can('query:tags')) {
+        if (!$schema->getRequest()->token()->can('query:tags')) {
             return;
         }
 
@@ -27,12 +27,14 @@ class GetTagsFieldSchema
         if (preg_match('/taggroup:(\d+)/', $source, $matches)) {
             $groupId = $matches[1];
 
-            $query->addField($field)
+            $schema->addField($field)
                 ->lists()
-                ->type($query->getRequest()->tagGroups()->get($groupId))
+                ->type($schema->getRequest()->tagGroups()->get($groupId))
                 ->resolve(function ($root, $args) use ($field) {
                     return $root->{$field->handle}->all();
                 });
+
+            $event->query->addIntArgument($field);
 
             $event->mutation->addIntArgument($field)
                 ->lists();

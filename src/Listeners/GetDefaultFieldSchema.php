@@ -14,7 +14,8 @@ class GetDefaultFieldSchema
     function handle($event) {
         $event->handled = true;
 
-        $event->query->addStringField($event->sender);
+        $event->schema->addStringField($event->sender);
+        $event->query->addStringArgument($event->sender);
         $event->mutation->addStringArgument($event->sender);
     }
 }

@@ -15,13 +15,14 @@ class GetSelectOneFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $query = $event->query;
 
-        $graphqlField = $query->addEnumField($field)
+        $graphqlField = $event->schema->addEnumField($field)
             ->values([static::class, 'valuesForField'], $field)
             ->resolve(function ($root, $args) use ($field) {
                 return StringHelper::graphQLEnumValueForString((string)$root->{$field->handle}) ?: null;
             });
+
+        $event->query->addStringArgument($field);
 
         $event->mutation->addArgument($field)
             ->type($graphqlField);

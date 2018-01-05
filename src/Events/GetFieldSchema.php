@@ -22,6 +22,13 @@ class GetFieldSchema extends Event {
      *
      * @var SchemaBuilder
      */
+    public $schema;
+
+    /**
+     * The schema to build
+     *
+     * @var FieldBuilder
+     */
     public $query;
 
     /**

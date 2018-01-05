@@ -34,13 +34,27 @@ class Field extends BaseBuilder {
         return $this->arguments = array_merge($this->arguments, $arguments);
     }
 
+    function addArguments(array $arguments, bool $throwsException = true): self {
+        foreach ($arguments as $argument) {
+            if ($throwsException && !empty($this->arguments[$argument->getName()])) {
+                throw new \Exception('Argument `'.$argument->getName().'` is already in use');
+            }
+
+            if (empty($this->arguments[$argument->getName()])) {
+                $this->arguments[$argument->getName()] = $argument;
+            }
+        }
+
+        return $this;
+    }
+
     function addArgument($name): Argument {
         if (is_a($name, CraftField::class)) {
-            return $this->arguments[] = (new Argument($this->request, $name->handle))
+            return $this->arguments[$name->handle] = (new Argument($this->request, $name->handle))
                 ->description($name->instructions);
         }
 
-        return $this->arguments[] = new Argument($this->request, $name);
+        return $this->arguments[$name] = new Argument($this->request, $name);
     }
 
     function addStringArgument($name): Argument {

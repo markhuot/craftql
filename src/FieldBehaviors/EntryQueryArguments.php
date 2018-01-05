@@ -41,6 +41,10 @@ class EntryQueryArguments extends Behavior {
         $this->owner->addStringArgument('title');
         $this->owner->addStringArgument('type')->lists()->type($this->owner->getRequest()->entryTypes()->enum());
         $this->owner->addStringArgument('uri');
+
+        $fieldService = \Yii::$container->get('fieldService');
+        $arguments = $fieldService->getQueryArguments($this->owner->getRequest());
+        $this->owner->addArguments($arguments, false);
     }
 
 }

@@ -18,11 +18,11 @@ class GetEntriesFieldSchema
 
         $field = $event->sender;
 
-        $event->query->addField($field)
+        $event->schema->addField($field)
             ->type(EntryInterface::class)
             ->lists();
 
-        $event->query->addField($field)
+        $event->schema->addField($field)
             ->type(EntryConnection::class)
             ->name("{$field->handle}Connection")
             ->resolve(function ($root, $args) use ($field) {

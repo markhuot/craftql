@@ -21,9 +21,9 @@ class GetAssetsFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $query = $event->query;
+        $schema = $event->schema;
 
-        $query->addField($field)
+        $schema->addField($field)
             ->lists()
             ->type(VolumeInterface::class)
             ->resolve(function ($root, $args) use ($field) {

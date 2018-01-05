@@ -20,11 +20,15 @@ class Union extends Field {
         return $this->resolveType;
     }
 
-    function addType($typeName) {
-        return $this->types[$typeName] = new Schema($this->request);
+    function addType($typeName, $context=null) {
+        return $this->types[$typeName] = new Schema($this->request, $context);
     }
 
     function getTypes(): array {
+        return $this->types;
+    }
+
+    function getRawTypes(): array {
         $types = [];
 
         foreach ($this->types as $typeName => $typeSchema) {
@@ -41,7 +45,7 @@ class Union extends Field {
         $type = new UnionType([
             'name' => ucfirst($this->getName()).'Matrix',
             'description' => 'A union of possible blocks for this matrix field',
-            'types' => $this->getTypes(),
+            'types' => $this->getRawTypes(),
             'resolveType' => $this->getResolveType(),
         ]);
 

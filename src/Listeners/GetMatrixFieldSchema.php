@@ -17,10 +17,10 @@ class GetMatrixFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
-        $query = $event->query;
-        $request = $query->getRequest();
+        $schema = $event->schema;
+        $request = $schema->getRequest();
 
-        $union = $query->addUnionField($field)
+        $union = $schema->addUnionField($field)
             ->lists()
             ->resolveType(function ($root, $args) use ($field) {
                 $block = $root->getType();
@@ -29,44 +29,31 @@ class GetMatrixFieldSchema
 
         $fieldService = \Yii::$container->get('fieldService');
 
-        foreach ($field->getBlockTypes() as $blockType) {
-            $type = $union->addType(ucfirst($field->handle).ucfirst($blockType->handle));
+        $blockTypes = $field->getBlockTypes();
+
+        foreach ($blockTypes as $blockType) {
+            $type = $union->addType(ucfirst($field->handle).ucfirst($blockType->handle), $blockType);
             $type->addFieldsByLayoutId($blockType->fieldLayoutId);
         }
-    }
 
-    function getEmptyMatrixObject($field) {
-        $msg = 'This matrix has no blocks defined, which GraphQL does not support. A placeholder block was added on the GraphQL side automatically.';
+        if (empty($blockTypes)) {
+            $warning = 'The matrix field, `'.$field->name.'`, has no block types. This would violate the GraphQL spec so we filled it in with this placeholder.';
 
-        return new ObjectType([
-            'name' => ucfirst($field->handle).'Empty',
-            'description' => 'This matrix block is empty',
-            'fields' => [
-                'empty' => [
-                    'type' => Type::string(),
-                    'description' => $msg,
-                    'resolve' => function ($root, $args) use ($msg) {
-                        return $msg;
-                    }
-                ],
-            ],
-        ]);
-    }
+            $type = $union->addType(ucfirst($field->handle).'Empty');
+            $type->addStringField('empty')
+                ->description($warning)
+                ->resolve($warning);
+        }
 
-    function getBlockObject($request, $field, $blockType) {
-        $fieldService = \Yii::$container->get('fieldService');
+        foreach ($union->getTypes() as $typeName => $typeSchema) {
+            if (empty($typeSchema->getFields())) {
+                $warning = 'The block type, `'.$typeName.'`, has no fields. This would violate the GraphQL spec so we filled it in with this placeholder.';
 
-        return new ObjectType([
-            'name' => ucfirst($field->handle).ucfirst($blockType->handle),
-            'fields' => $fieldService->getFields($blockType->fieldLayoutId, $request) ?: [
-                'EMPTY' => [
-                    'type' => Type::string(),
-                    'description' => 'This block has no fields defined, which GraphQL does not support. A placeholder field was added on the GraphQL side automatically.',
-                    'resolve' => function ($root, $args) {
-                        return 'This block has no fields defined, which GraphQL does not support. A placeholder field was added on the GraphQL side automatically.';
-                    }
-            ],
-            ],
-        ]);
+                $type->addStringField('empty')
+                    ->description($warning)
+                    ->resolve($warning);
+            }
+        }
+
     }
 }
