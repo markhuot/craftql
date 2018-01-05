@@ -11,15 +11,16 @@ class CategoryGroup extends ObjectType {
     static $type;
 
     function __construct($group, $token) {
-        $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
-        $fields = array_merge(\markhuot\CraftQL\Types\Category::baseFields(), $fieldService->getFields($group->fieldLayoutId, $token));
-
         parent::__construct([
             'name' => ucfirst($group->handle).'Category',
             'interfaces' => [
                 \markhuot\CraftQL\Types\Category::interface()
             ],
-            'fields' => $fields,
+            'fields' => function () use ($group, $token) {
+                $fieldService = \Yii::$container->get(\markhuot\CraftQL\Services\FieldService::class);
+                $fields = array_merge(\markhuot\CraftQL\Types\Category::baseFields(), $fieldService->getFields($group->fieldLayoutId, $token));
+                return $fields;
+            },
             'id' => $group->id,
         ]);
     }
