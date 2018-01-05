@@ -14,7 +14,8 @@ class TagQueryArguments extends Behavior {
         $this->owner->addIntArgument('id');
         $this->owner->addStringArgument('indexBy');
         $this->owner->addIntArgument('limit');
-        $this->owner->addStringArgument('locale');
+        $this->owner->addStringArgument('site');
+        $this->owner->addIntArgument('siteId');
         $this->owner->addIntArgument('offset');
         $this->owner->addStringArgument('order');
         // $this->owner->addStringArgument('relatedTo')->lists()->type(Entry::relatedToInputObject());
