@@ -10,6 +10,7 @@ class Union extends Field {
 
     protected $types = [];
     protected $resolveType;
+    protected static $rawTypes = [];
 
     function resolveType(callable $resolveType): self {
         $this->resolveType = $resolveType;
@@ -41,13 +42,21 @@ class Union extends Field {
         return $types;
     }
 
-    function getConfig() {
-        $type = new UnionType([
-            'name' => ucfirst($this->getName()).'Matrix',
-            'description' => 'A union of possible blocks for this matrix field',
+    function getRawType() {
+        if (!empty(static::$rawTypes[$this->getName()])) {
+            return static::$rawTypes[$this->getName()];
+        }
+
+        return static::$rawTypes[$this->getName()] = new UnionType([
+            'name' => ucfirst($this->getName()).'Union',
+            'description' => 'A union of possible blocks types',
             'types' => $this->getRawTypes(),
             'resolveType' => $this->getResolveType(),
         ]);
+    }
+
+    function getConfig() {
+        $type = $this->getRawType();
 
         if ($this->isList) {
             $type = Type::listOf($type);
