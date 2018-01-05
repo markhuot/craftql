@@ -2,6 +2,8 @@
 
 namespace markhuot\CraftQL\Listeners;
 
+use Craft;
+use craft\helpers\ElementHelper;
 use markhuot\CraftQL\Events\GetFieldSchema;
 use markhuot\CraftQL\Types\CategoryInterface;
 
@@ -34,8 +36,38 @@ class GetCategoriesFieldSchema
 
             $event->query->addStringArgument($field);
 
-            $event->mutation->addIntArgument($field)
-                ->lists();
+            $inputObject = $event->mutation->createInputObjectType(ucfirst($field->handle).'AssetInput');
+            $inputObject->addIntField('id');
+            $inputObject->addStringField('title');
+            $inputObject->addStringField('slug');
+
+            $event->mutation->addArgument($field)
+                ->type($inputObject)
+                ->lists()
+                ->onSave(function ($values) use ($groupId) {
+                    $group = Craft::$app->getCategories()->getGroupById($groupId);
+
+                    foreach ($values as &$value) {
+                        if (is_numeric($value)) {
+                            continue;
+                        }
+
+                        if (empty($value['slug'])) {
+                            $value['slug'] = ElementHelper::createSlug($value['title']);
+                        }
+
+                        $category = new \craft\elements\Category();
+                        $category->groupId = $group->id;
+                        $category->fieldLayoutId = $group->fieldLayoutId;
+                        $category->title = @$value['title'];
+                        $category->slug = @$value['slug'];
+                        Craft::$app->getElements()->saveElement($category);
+
+                        $value = $category->id;
+                    }
+
+                    return $values;
+                });
         }
 
     }

@@ -11,7 +11,7 @@ trait HasNonNullAttribute {
      *
      * @var boolean
      */
-    protected $isNonNull;
+    protected $isNonNull = false;
 
     /**
      * Set if required
@@ -29,7 +29,7 @@ trait HasNonNullAttribute {
      *
      * @return boolean
      */
-    function isNonNull(): boolean {
+    function isNonNull(): bool {
         return $this->isNonNull;
     }
 

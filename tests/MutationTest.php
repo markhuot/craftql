@@ -21,7 +21,8 @@ final class MutationTest extends TestCase
             new \markhuot\CraftQL\Repositories\CategoryGroup,
             new \markhuot\CraftQL\Repositories\TagGroup,
             new \markhuot\CraftQL\Repositories\EntryType,
-            new \markhuot\CraftQL\Repositories\Section
+            new \markhuot\CraftQL\Repositories\Section,
+            new \markhuot\CraftQL\Repositories\Globals
         );
         self::$service->bootstrap();
         self::$schema = self::$service->getSchema(Token::admin());
@@ -125,6 +126,15 @@ final class MutationTest extends TestCase
         $result = $this->execute($input);
 
         $this->assertEquals('["fb","tw"]', json_encode(@$result['data']['story']['socialLinksTwo']));
+    }
+
+    public function testCategoriesMutation(): void
+    {
+        $input = 'mutation { story: upsertStories(title:"Category Test'.date('U').'", storyTypes:[{"title":"foo bar"}]) { id, storyTypes { id, title, slug } } }';
+
+        $result = $this->execute($input);
+
+        $this->assertEquals('foo-bar', json_encode(@$result['data']['story']['storyTypes'][0]['slug']));
     }
 
     // public function testPositionSelectMutation(): void
