@@ -238,8 +238,8 @@ class ToolsController extends Controller
 
         $matrixField = new \craft\fields\Matrix();
         $matrixField->groupId = $groupModel->id;
-        $matrixField->name = 'Body Enhanced';
-        $matrixField->handle = 'bodyEnhanced';
+        $matrixField->name = 'Rich Content';
+        $matrixField->handle = 'richContent';
         $matrixField->required = false;
         $matrixField->sortOrder = 0;
         $matrixField->setBlockTypes([
@@ -247,7 +247,7 @@ class ToolsController extends Controller
                 'name' => 'Text',
                 'handle' => 'text',
                 'fields' => [
-                    [
+                    'new1' => [
                         'type' => \craft\fields\PlainText::class,
                         'name' => 'Content',
                         'handle' => 'textContent',
@@ -260,14 +260,14 @@ class ToolsController extends Controller
                 'name' => 'Related Cotnent',
                 'handle' => 'relatedContent',
                 'fields' => [
-                    [
+                    'new1' => [
                         'type' => \craft\fields\PlainText::class,
                         'name' => 'Heading',
                         'handle' => 'heading',
                         'instructions' => null,
                         'required' => false,
                     ],
-                    [
+                    'new2' => [
                         'type' => \craft\fields\Entries::class,
                         'name' => 'Related Entry',
                         'handle' => 'matrixRelatedEntry',
@@ -327,12 +327,12 @@ class ToolsController extends Controller
         $categoryGroup->name = 'Story Types';
         $categoryGroup->handle = 'storyTypes';
         $categoryGroup->maxLevels = null;
-        $siteSettings = new \craft\models\CategoryGroup_SiteSettings();
-        $siteSettings->siteId = 1;
-        $siteSettings->hasUrls = true;
-        $siteSettings->uriFormat = 'type/{slug}';
-        $siteSettings->template = 'type/_story';
-        $categoryGroup->setSiteSettings([1 => $siteSettings]);
+        $groupSiteSettings = new \craft\models\CategoryGroup_SiteSettings();
+        $groupSiteSettings->siteId = 1;
+        $groupSiteSettings->hasUrls = true;
+        $groupSiteSettings->uriFormat = 'type/{slug}';
+        $groupSiteSettings->template = 'type/_story';
+        $categoryGroup->setSiteSettings([1 => $groupSiteSettings]);
         Craft::$app->getCategories()->saveGroup($categoryGroup);
 
         $categoryField = new \craft\fields\Categories();
@@ -359,7 +359,7 @@ class ToolsController extends Controller
             $entriesField,
             $multiSelectField,
             $assetsField,
-            // $matrixField,
+            $matrixField,
             $emptyMatrixField,
             $emptyMatrixBlockField,
             $categoryField,

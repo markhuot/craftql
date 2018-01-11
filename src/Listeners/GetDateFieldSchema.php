@@ -17,7 +17,15 @@ class GetDateFieldSchema
         $event->handled = true;
 
         $event->schema->addDateField($event->sender);
+
         $event->query->addStringArgument($event->sender);
-        $event->mutation->addIntArgument($event->sender);
+
+        // @TODO make this timezone aware. if you send a unixtime stamp it should be for GMT
+        $event->mutation->addIntArgument($event->sender)
+//            ->onSave(function($value) {
+//                var_dump($value);
+//                die;
+//            })
+        ;
     }
 }

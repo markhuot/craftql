@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\InputObjectType;
 use markhuot\CraftQL\Types\Volume;
 use markhuot\CraftQL\Types\VolumeInterface;
+use markhuot\CraftQL\Events\GetFieldSchema;
 
 class GetAssetsFieldSchema
 {
@@ -17,7 +18,7 @@ class GetAssetsFieldSchema
      * @param \markhuot\CraftQL\Events\GetFieldSchema $event
      * @return void
      */
-    function handle($event) {
+    function handle(GetFieldSchema $event) {
         $event->handled = true;
 
         $field = $event->sender;

@@ -34,7 +34,7 @@ class Plugin extends BasePlugin
         }
 
         // make sure there's only one instance of our field service
-        Craft::$container->setSingleton('fieldService', \markhuot\CraftQL\Services\FieldService::class);
+        Craft::$container->setSingleton('craftQLFieldService', \markhuot\CraftQL\Services\FieldService::class);
 
         $headers = !empty($this->getSettings()->headers) && is_array($this->getSettings()->headers) ? $this->getSettings()->headers : [];
 

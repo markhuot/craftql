@@ -2,10 +2,13 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
+use markhuot\CraftQL\Builders\Field;
 use yii\base\Behavior;
 use GraphQL\Type\Definition\Type;
 
 class EntryQueryArguments extends Behavior {
+
+    static $inputObjectType;
 
     function initEntryQueryArguments() {
         $this->owner->addStringArgument('after');
@@ -32,8 +35,8 @@ class EntryQueryArguments extends Behavior {
         $this->owner->addIntArgument('positionedBefore');
         $this->owner->addStringArgument('postDate');
         $this->owner->addIntArgument('prevSiblingOf');
-        // $this->owner->addStringArgument('relatedTo' => Type::listOf(static::relatedToInputObject()),
-        // $this->owner->addStringArgument('orRelatedTo' => Type::listOf(static::relatedToInputObject()),
+        $this->owner->addStringArgument('relatedTo')->lists()->type($this->relatedToInputObject());
+        $this->owner->addStringArgument('orRelatedTo')->lists()->type($this->relatedToInputObject());
         $this->owner->addStringArgument('search');
         $this->owner->addStringArgument('section')->lists()->type($this->owner->getRequest()->sections()->enum());
         $this->owner->addIntArgument('siblingOf');
@@ -43,9 +46,23 @@ class EntryQueryArguments extends Behavior {
         $this->owner->addStringArgument('type')->lists()->type($this->owner->getRequest()->entryTypes()->enum());
         $this->owner->addStringArgument('uri');
 
-        $fieldService = \Yii::$container->get('fieldService');
+        $fieldService = \Yii::$container->get('craftQLFieldService');
         $arguments = $fieldService->getQueryArguments($this->owner->getRequest());
         $this->owner->addArguments($arguments, false);
+    }
+
+    function relatedToInputObject() {
+        if (!empty(static::$inputObjectType)) {
+            return static::$inputObjectType;
+        }
+
+        $type = $this->owner->createInputObjectType('RelatedToInputType');
+        $type->addIntField('element');
+        $type->addIntField('sourceElement');
+        $type->addIntField('targetElement');
+        $type->addStringField('field');
+        $type->addStringField('sourceLocale');
+        return static::$inputObjectType = $type;
     }
 
 }

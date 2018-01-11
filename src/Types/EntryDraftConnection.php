@@ -11,7 +11,9 @@ class EntryDraftConnection extends EntryConnection {
 
     function boot() {
         parent::boot();
-        $this->getField('edges')->type(EntryDraftEdge::class);
+
+        $this->getField('edges')
+            ->type(EntryDraftEdge::class);
     }
 
 }

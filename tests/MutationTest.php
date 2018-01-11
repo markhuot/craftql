@@ -50,24 +50,23 @@ final class MutationTest extends TestCase
         $this->assertEquals('text in the body', @$result['data']['story']['body']);
     }
 
-    // public function testRichTextMutation(): void
-    // {
-    //     $input = 'mutation { story: upsertStories(title:"Text Test'.date('U').'", body:"page one<!--pagebreak-->page two") { id, title, body, pageOne:body(page:1) } }';
-
-    //     $result = $this->execute($input);
-
-    //     $this->assertEquals('page one<!--pagebreak-->page two', @$result['data']['story']['body']);
-    //     $this->assertEquals('page one', @$result['data']['story']['pageOne']);
-    // }
-
     public function testDateMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Date Test'.date('U').'", releaseDate:'.date('U', strtotime('2017-02-04 03:12:18')).') { id, releaseDateTimestamp: releaseDate, releaseDateFormatted: releaseDate @date(as:"Y-m-d H:i:s") } }';
+        $originalDate = new DateTime('2017-02-04 03:12:18', new DateTimeZone('UTC'));
+        $input = 'mutation { story: upsertStories(title:"Date Test'.date('U').'", releaseDate:'.$originalDate->getTimestamp().') { id, releaseDateTimestamp: releaseDate, releaseDateFormatted: releaseDate @date(as:"Y-m-d H:i:s"), releaseDateLa: releaseDate @date(as:"Y-m-d H:i:s", timezone: "America/Los_Angeles") } }';
 
         $result = $this->execute($input);
 
-        $this->assertEquals(date('U', strtotime('2017-02-04 03:12:18')), @$result['data']['story']['releaseDateTimestamp']);
+        $utcDateTime = new DateTime('2017-02-04 03:12:18', new DateTimeZone('UTC'));
+        $this->assertEquals($utcDateTime->format('U'), @$result['data']['story']['releaseDateTimestamp']);
+
         $this->assertEquals('2017-02-04 03:12:18', @$result['data']['story']['releaseDateFormatted']);
+
+        $laTimestamp = (clone $utcDateTime)
+            ->setTimezone(new DateTimeZone('America/Los_Angeles'))
+            ->format('Y-m-d H:i:s');
+
+        $this->assertEquals($laTimestamp, @$result['data']['story']['releaseDateLa']);
     }
 
     public function testLightswitchMutation(): void
@@ -114,9 +113,9 @@ final class MutationTest extends TestCase
         $third = $this->execute($input);
         $this->assertEquals($secondId, @$third['data']['entry']['id']);
 
-        $input = 'query { entriesConnection(id:'.$firstId.') { edges { relatedTo { entries { id } } } } }';
+        $input = 'query { entriesConnection(id:'.$firstId.') { edges { relatedEntries { entries { id } } } } }';
         $fourth = $this->execute($input);
-        $this->assertEquals($secondId, @$fourth['data']['entriesConnection']['edges'][0]['relatedTo']['entries'][0]['id']);
+        $this->assertEquals($secondId, @$fourth['data']['entriesConnection']['edges'][0]['relatedEntries']['entries'][0]['id']);
     }
 
     public function testMultiSelectMutation(): void
@@ -130,11 +129,12 @@ final class MutationTest extends TestCase
 
     public function testCategoriesMutation(): void
     {
-        $input = 'mutation { story: upsertStories(title:"Category Test'.date('U').'", storyTypes:[{"title":"foo bar"}]) { id, storyTypes { id, title, slug } } }';
+        $hash = date('U');
+        $input = 'mutation { story: upsertStories(title:"Category Test'.date('U').'", storyTypes:[{title:"foo bar", slug:"foo-bar'.$hash.'"}]) { id, storyTypes { id, title, slug } } }';
 
         $result = $this->execute($input);
 
-        $this->assertEquals('foo-bar', json_encode(@$result['data']['story']['storyTypes'][0]['slug']));
+        $this->assertEquals('foo-bar'.$hash, @$result['data']['story']['storyTypes'][0]['slug']);
     }
 
     // public function testPositionSelectMutation(): void

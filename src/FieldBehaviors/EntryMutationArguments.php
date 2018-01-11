@@ -53,7 +53,7 @@ class EntryMutationArguments extends Behavior {
             unset($fields['typeId']);
             unset($fields['authorId']);
 
-            $fieldService = \Yii::$container->get('fieldService');
+            $fieldService = \Yii::$container->get('craftQLFieldService');
 
             foreach ($fields as $handle => &$value) {
                 $callback = $this->owner->getArgument($handle)->getOnSave();

@@ -29,7 +29,7 @@ class Field extends BaseBuilder {
     }
 
     function addArgumentsByLayoutId(int $fieldLayoutId) {
-        $fieldService = \Yii::$container->get('fieldService');
+        $fieldService = \Yii::$container->get('craftQLFieldService');
         $arguments = $fieldService->getMutationArguments($fieldLayoutId, $this->request, $this);
         return $this->arguments = array_merge($this->arguments, $arguments);
     }

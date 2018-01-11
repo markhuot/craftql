@@ -27,7 +27,7 @@ class GetMatrixFieldSchema
                 return ucfirst($field->handle).ucfirst($block->handle);
             });
 
-        $fieldService = \Yii::$container->get('fieldService');
+        $fieldService = \Yii::$container->get('craftQLFieldService');
 
         $blockTypes = $field->getBlockTypes();
 

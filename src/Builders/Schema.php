@@ -145,7 +145,7 @@ class Schema extends BaseBuilder {
     }
 
     function addFieldsByLayoutId(int $fieldLayoutId) {
-        $fieldService = \Yii::$container->get('fieldService');
+        $fieldService = \Yii::$container->get('craftQLFieldService');
         $fields = $fieldService->getFields($fieldLayoutId, $this->request, $this);
         return $this->fields = array_merge($this->fields, $fields);
     }
