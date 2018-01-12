@@ -3,14 +3,9 @@
 namespace markhuot\CraftQL\Services;
 
 use Craft;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
-use markhuot\CraftQL\Builders\Schema as Builder;
-use markhuot\CraftQL\Schema\RelatedToGlobal;
-use markhuot\CraftQL\Plugin;
 use yii\base\Component;
 use Yii;
 

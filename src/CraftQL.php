@@ -4,7 +4,7 @@ namespace markhuot\CraftQL;
 
 use Craft;
 
-use craft\base\Plugin as BasePlugin;
+use craft\base\Plugin;
 use craft\console\Application as ConsoleApplication;
 use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
@@ -13,7 +13,7 @@ use yii\base\Event;
 
 use markhuot\CraftQL\Models\Token;
 
-class Plugin extends BasePlugin
+class CraftQL extends Plugin
 {
     // const EVENT_GET_FIELD_SCHEMA = 'getFieldSchema';
 

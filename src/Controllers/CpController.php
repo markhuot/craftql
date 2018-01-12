@@ -5,7 +5,7 @@ namespace markhuot\CraftQL\Controllers;
 use Craft;
 use Yii;
 use craft\web\Controller;
-use markhuot\CraftQL\Plugin;
+use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Models\Token;
 
 class CpController extends Controller
@@ -55,7 +55,7 @@ class CpController extends Controller
     function actionGraphiql()
     {
         $url = \craft\helpers\UrlHelper::siteUrl();
-        $instance = \markhuot\CraftQL\Plugin::getInstance();
+        $instance = \markhuot\CraftQL\CraftQL::getInstance();
         $uri = $instance->settings->uri;
 
         $this->renderTemplate('craftql/graphiql', [
@@ -67,7 +67,7 @@ class CpController extends Controller
     function actionGraphiqlas($token)
     {
         $url = \craft\helpers\UrlHelper::siteUrl();
-        $instance = \markhuot\CraftQL\Plugin::getInstance();
+        $instance = \markhuot\CraftQL\CraftQL::getInstance();
         $uri = $instance->settings->uri;
 
         $this->renderTemplate('craftql/graphiql', [

@@ -9,7 +9,6 @@ use craft\fields\Tags as TagsField;
 use craft\fields\Table as TableField;
 use craft\helpers\Assets;
 use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Plugin;
 use markhuot\CraftQL\Events\GetFieldSchema as GetFieldSchemaEvent;
 use GraphQL\Error\Error;
 

@@ -28,6 +28,6 @@
         "handle": "craftql",
         "developer": "Mark Huot",
         "developerUrl": "https://www.github.com/markhuot",
-        "class": "markhuot\\CraftQL\\Plugin"
+        "class": "markhuot\\CraftQL\\CraftQL"
     }
 }
