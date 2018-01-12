@@ -373,5 +373,35 @@ class ToolsController extends Controller
             ]);
             Craft::$app->fields->saveLayout($layout);
         }
+
+
+        // ----------
+
+
+        $globalMetaDescriptionField = new \craft\fields\PlainText();
+        $globalMetaDescriptionField->groupId = $groupModel->id;
+        $globalMetaDescriptionField->name = 'Meta Description';
+        $globalMetaDescriptionField->handle = 'metaDescription';
+        $globalMetaDescriptionField->required = false;
+        $globalMetaDescriptionField->sortOrder = 0;
+        Craft::$app->fields->saveField($globalMetaDescriptionField);
+
+        $globalFieldLayout = new \craft\models\FieldLayout();
+        $globalFieldLayout->type = \craft\elements\GlobalSet::class;
+
+        $globalLayoutTab = new \craft\models\FieldLayoutTab();
+        $globalLayoutTab->setLayout($globalFieldLayout);
+        $globalLayoutTab->name = 'Content';
+        $globalLayoutTab->setFields([
+            $globalMetaDescriptionField,
+        ]);
+        $globalFieldLayout->setTabs([$globalLayoutTab]);
+        Craft::$app->fields->saveLayout($globalFieldLayout);
+
+        $globalSet = new \craft\elements\GlobalSet();
+        $globalSet->name = "SEO";
+        $globalSet->handle = 'seo';
+        $globalSet->setFieldLayout($globalFieldLayout);
+        Craft::$app->getGlobals()->saveSet($globalSet);
     }
 }

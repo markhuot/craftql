@@ -17,7 +17,7 @@ class BaseBuilder extends Component {
     /**
      * The request used to generate the schema
      *
-     * @var [type]
+     * @var \markhuot\CraftQL\Request
      */
     protected $request;
 

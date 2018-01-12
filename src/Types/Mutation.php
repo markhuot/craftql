@@ -20,6 +20,21 @@ class Mutation extends Schema {
                 ->use(EntryMutationArguments::class);
         }
 
+        if ($this->request->globals()->count()) {
+            /** @var \markhuot\CraftQL\Types\Globals $globalSet */
+            foreach ($this->request->globals()->all() as $globalSet) {
+                $this->addField('upsert'.$globalSet->getName().'Globals')
+                    ->type($globalSet)
+                    ->addArgumentsByLayoutId($globalSet->getContext()->fieldLayoutId)
+                    ->resolve(function ($root, $args) use ($globalSet) {
+                        $globalSetElement = $globalSet->getContext();
+                        $globalSetElement->setFieldValues($args);
+                        Craft::$app->getElements()->saveElement($globalSetElement);
+                        return $globalSetElement;
+                    });
+            }
+        }
+
         // $fields['upsertField'] = [
         //     'type' => \markhuot\CraftQL\Types\Entry::interface($request),
         //     'args' => [

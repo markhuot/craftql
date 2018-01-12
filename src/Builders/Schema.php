@@ -40,8 +40,6 @@ class Schema extends BaseBuilder {
 
     /**
      * Get any context used to create this schema
-     *
-     * @return void
      */
     function getContext() {
         return $this->context;

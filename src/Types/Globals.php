@@ -2,12 +2,6 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use Craft;
-use craft\elements\Entry;
-use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
 
 class Globals extends Schema {
@@ -18,6 +12,15 @@ class Globals extends Schema {
 
     protected function boot() {
         $this->addFieldsByLayoutId($this->context->fieldLayoutId);
+    }
+
+    /**
+     * Get the context used to create this schema
+     *
+     * return \craft\elements\GlobalSet
+     */
+    function getContext(): \craft\elements\GlobalSet {
+        return parent::getContext();
     }
 
 }
