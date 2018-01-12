@@ -48,13 +48,13 @@ For example, if you had a section named `news` you could ask _CraftQL_ for five 
 
 You can access your GraphQL endpoint in two ways,
 
-1. **[GraphiQL](/admin/craftql/browse)** <p>will show you a graphical interface to GraphQL. Use it to explore your schema and test requests. Click _Docs_ in the upper right hand corner to see all the fields you can query against.</p>
+1. **[GraphiQL]({{ url('craftql/browse') }})** <p>will show you a graphical interface to GraphQL. Use it to explore your schema and test requests. Click _Docs_ in the upper right hand corner to see all the fields you can query against.</p>
 
 2. **Curl**
 {% if settings.tokens|length %}<p>You can query your schema directly by passing a GraphQL statement throuh a `query` variable. The following Curl statement should get you started,</p>
 <p><pre style="background: whiteSmoke; padding: 15px;"><code class="shell">$ curl -H "Authorization: bearer {{ settings.tokens[0].token|default('{TOKEN}') }}" -H "Content-type: application/json" -d '{"query":"{ helloWorld }"}' {{ siteUrl }}{{ settings.uri }}</code></pre></p>
 {% else %}
-<p>Before you can use Curl you need to [add a token](/admin/craftql/token-gen) for authenticated access in to Craft.</p>
+<p>Before you can use Curl you need to [add a token]({{ url('craftql/token-gen') }}) for authenticated access in to Craft.</p>
 {% endif %}
 {% endset %}
 
@@ -77,7 +77,7 @@ You can access your GraphQL endpoint in two ways,
     <h2>Tokens</h2>
     <p>Tokens control access in to your API. Instead of authenticating with a username and password, API access is granted via a token. Treat this token like a password because it provides privileged access in to your Craft website.</p>
 
-    <p><a href="/admin/craftql/token-gen">Generate a new token</a> (for my user)</p>
+    <p><a href="{{ url('craftql/token-gen') }}">Generate a new token</a> (for my user)</p>
 
     {% if settings.tokens|length > 0 %}
     <table class="data fullwidth collapsible">
@@ -93,8 +93,8 @@ You can access your GraphQL endpoint in two ways,
             <tr>
                 <td><input type="text" name="token[{{ token.id }}][name]" class="text" placeholder="Name..." value="{{ token.name }}" /></td>
                 <td>{{ token.token }}</td>
-                <td><a href="/admin/craftql/token/{{ token.id }}/scopes">Scopes&hellip;</a></td>
-                <td><a class="delete icon" title="Delete" role="button" href="/admin/craftql/token-del/{{ token.id }}"></a></td>
+                <td><a href="{{ url('craftql/token/' ~ token.id ~ '/scopes') }}">Scopes&hellip;</a></td>
+                <td><a class="delete icon" title="Delete" role="button" href="{{ url('craftql/token-del/' ~ token.id) }}"></a></td>
             </tr>
         {% endfor %}
     </table>

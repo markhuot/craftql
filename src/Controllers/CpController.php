@@ -17,7 +17,7 @@ class CpController extends Controller
         $token->token = Yii::$app->security->generateRandomString(64);
         $token->save();
 
-        $this->redirect('/admin/settings/plugins/craftql');
+        $this->redirect('settings/plugins/craftql');
     }
 
     function actionTokendelete($tokenId)
@@ -25,7 +25,7 @@ class CpController extends Controller
         $token = Token::find()->where(['id' => $tokenId])->one();
         $token->delete();
 
-        $this->redirect('/admin/settings/plugins/craftql');
+        $this->redirect('settings/plugins/craftql');
     }
 
     function actionTokenscopes($tokenId)
@@ -44,7 +44,7 @@ class CpController extends Controller
 
         Craft::$app->getSession()->setNotice(Craft::t('app', 'Scopes saved.'));
 
-        $this->redirect('/admin/craftql/token/'.$tokenId.'/scopes');
+        $this->redirect('craftql/token/'.$tokenId.'/scopes');
     }
 
     function actionIndex()
