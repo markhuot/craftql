@@ -23,11 +23,22 @@ class Mutation extends Schema {
         if ($this->request->globals()->count()) {
             /** @var \markhuot\CraftQL\Types\Globals $globalSet */
             foreach ($this->request->globals()->all() as $globalSet) {
-                $this->addField('upsert'.$globalSet->getName().'Globals')
+                $upsertField = $this->addField('upsert'.$globalSet->getName().'Globals')
                     ->type($globalSet)
-                    ->addArgumentsByLayoutId($globalSet->getContext()->fieldLayoutId)
-                    ->resolve(function ($root, $args) use ($globalSet) {
+                    ->addArgumentsByLayoutId($globalSet->getContext()->fieldLayoutId);
+
+                $upsertField->resolve(function ($root, $args) use ($globalSet, $upsertField) {
                         $globalSetElement = $globalSet->getContext();
+
+                        $fieldService = \Yii::$container->get('craftQLFieldService');
+
+                        foreach ($args as $handle => &$value) {
+                            $callback = $upsertField->getArgument($handle)->getOnSave();
+                            if ($callback) {
+                                $value = $callback($value);
+                            }
+                        }
+
                         $globalSetElement->setFieldValues($args);
                         Craft::$app->getElements()->saveElement($globalSetElement);
                         return $globalSetElement;
