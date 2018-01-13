@@ -3,12 +3,12 @@
 namespace markhuot\CraftQL\Factories;
 
 use markhuot\CraftQL\Factories\BaseFactory;
-use markhuot\CraftQL\Types\CategoryGroup as CategoryGroupObjectType;
+use markhuot\CraftQL\Types\Category as CategoryObjectType;
 
 class CategoryGroup extends BaseFactory {
 
     function make($raw, $request) {
-        return new CategoryGroupObjectType($raw, $request);
+        return new CategoryObjectType($request, $raw);
     }
 
     function can($id, $mode='query') {

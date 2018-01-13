@@ -2,23 +2,31 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
+use Craft;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Request;
+use markhuot\CraftQL\Builders\Schema;
+use markhuot\CraftQL\FieldBehaviors\RelatedEntriesField;
 
-class EntryEdge extends Edge {
+class EntryEdge extends Schema {
 
-    static function baseFields($request) {
-        $fields = parent::baseFields($request);
+    function boot() {
+        $this->addStringField('cursor');
 
-        $fields['relatedTo'] = (new \markhuot\CraftQL\GraphQLFields\Edge\RelatedTo($request))->toArray();
+        $this->addField('node')
+            ->type(EntryInterface::class)
+            ->resolve(function ($root) {
+                return $root['node'];
+            });
 
-        $fields['drafts'] = [
-            'type' => \markhuot\CraftQL\Types\EntryDraftConnection::make($request),
-            'resolve' => function ($root, $args, $context, $info) use ($request) {
-                $drafts = \Craft::$app->entryRevisions->getDraftsByEntryId($root['node']->id);
+       $this->use(RelatedEntriesField::class);
 
+        $this->addField('drafts')
+            ->type(EntryDraftConnection::class)
+            ->resolve(function ($root, $args, $context, $info) {
+                $drafts = Craft::$app->entryRevisions->getDraftsByEntryId($root['node']->id);
                 return [
                     'totalCount' => count($drafts),
                     'pageInfo' => [
@@ -29,17 +37,7 @@ class EntryEdge extends Edge {
                     ],
                     'edges' => $drafts,
                 ];
-            },
-        ];
-
-        // @optional could expose each entry type next to the generic node
-        // foreach ($request->entryTypes()->all() as $entryType) {
-        //     $fields[$entryType->config['craftType']->handle] = ['type' => $entryType, 'resolve' => function ($root, $args) {
-        //         return $root['node'];
-        //     }];
-        // }
-
-        return $fields;
+            });
     }
 
 }

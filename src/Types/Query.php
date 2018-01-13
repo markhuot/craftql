@@ -6,53 +6,252 @@ use yii\base\Component;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Craft;
-use craft\elements\Entry;
+use markhuot\CraftQL\Builders\Schema;
+use markhuot\CraftQL\Request;
+use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
+use markhuot\CraftQL\FieldBehaviors\UserQueryArguments;
+use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
+use markhuot\CraftQL\FieldBehaviors\TagQueryArguments;
 
-class Query extends ObjectType {
+class Query extends Schema {
 
-    function __construct($request) {
-        $token = $request->token();
+    function boot() {
+        $token = $this->request->token();
 
-        $config = [
-            'name' => 'Query',
-            'fields' => [
-                'helloWorld' => [
-                    'type' => Type::string(),
-                    'resolve' => function ($root, $args) {
-                      return 'Welcome to GraphQL! You now have a fully functional GraphQL endpoint.';
-                    }
-                ],
-            ],
-        ];
+        $this->addStringField('helloWorld')
+            ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
-            if (!empty($request->entryTypes()->all())) {
-                $config['fields']['entries'] = (new \markhuot\CraftQL\GraphQLFields\Entries($request))->toArray();
-                $config['fields']['entriesConnection'] = (new \markhuot\CraftQL\GraphQLFields\EntriesConnection($request))->toArray();
-                $config['fields']['entry'] = (new \markhuot\CraftQL\GraphQLFields\Entry($request))->toArray();
-                $config['fields']['drafts'] = (new \markhuot\CraftQL\GraphQLFields\Drafts($request))->toArray();
-            }
+            $this->addEntriesSchema();
+        }
+
+        if ($token->can('query:globals')) {
+            $this->addGlobalsSchema();
         }
 
         if ($token->can('query:tags')) {
-            $config['fields']['tags'] = (new \markhuot\CraftQL\GraphQLFields\Tags($request))->toArray();
-            $config['fields']['tagsConnection'] = (new \markhuot\CraftQL\GraphQLFields\TagsConnection($request))->toArray();
+            $this->addTagsSchema();
         }
 
         if ($token->can('query:categories')) {
-            $config['fields']['categories'] = (new \markhuot\CraftQL\GraphQLFields\Categories($request))->toArray();
-            $config['fields']['categoriesConnection'] = (new \markhuot\CraftQL\GraphQLFields\CategoriesConnection($request))->toArray();
+            $this->addCategoriesSchema();
         }
 
         if ($token->can('query:users')) {
-            $config['fields']['users'] = (new \markhuot\CraftQL\GraphQLFields\Users($request))->toArray();
+            $this->addField('users')
+                ->lists()
+                ->type(User::class)
+                ->use(UserQueryArguments::class)
+                ->resolve(function ($root, $args, $context, $info) {
+                    $criteria = \craft\elements\User::find();
+
+                    foreach ($args as $key => $value) {
+                        $criteria = $criteria->{$key}($value);
+                    }
+
+                    return $criteria->all();
+                });
         }
 
         if ($token->can('query:sections')) {
-            $config['fields']['sections'] = (new \markhuot\CraftQL\GraphQLFields\Sections($request))->toArray();
+            $this->addField('sections')
+                ->lists()
+                ->type(Section::class)
+                ->resolve(function ($root, $args, $context, $info) {
+                    return \Craft::$app->sections->allSections;
+                });
+        }
+    }
+
+    /**
+     * The fields you can query that return entries
+     *
+     * @return Schema
+     */
+    function addEntriesSchema() {
+        if ($this->request->entryTypes()->count() == 0) {
+            return;
         }
 
-        parent::__construct($config);
+        $this->addField('entries')
+            ->lists()
+            ->type(EntryInterface::class)
+            ->use(EntryQueryArguments::class)
+            ->resolve(function ($root, $args, $context, $info) {
+                return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
+            });
+
+         $this->addField('entriesConnection')
+             ->name('entriesConnection')
+             ->type(EntryConnection::class)
+             ->use(EntryQueryArguments::class)
+             ->resolve(function ($root, $args, $context, $info) {
+                 $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
+                 list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
+
+                 return [
+                     'totalCount' => $pageInfo->total,
+                     'pageInfo' => $pageInfo,
+                     'edges' => $entries,
+                     'criteria' => $criteria,
+                     'args' => $args,
+                 ];
+             });
+
+        $this->addField('entry')
+            ->type(EntryInterface::class)
+            ->use(EntryQueryArguments::class)
+            ->resolve(function ($root, $args, $context, $info) {
+                return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
+            });
+    }
+
+    /**
+     * The fields you can query that return globals
+     *
+     * @return Schema
+     */
+    function addGlobalsSchema() {
+
+        // $this->addObjectField('globals')
+        //     ->config(function ($object) use ($this->request) {
+        //         $object->name('GlobalSet');
+        //         foreach ($this->request->globals()->all() as $globalSet) {
+        //             $object->addField($globalSet->getContext()->handle)
+        //                 ->type($globalSet);
+        //         }
+        //     })
+        //     ->resolve(function ($root, $args) {
+        //         $sets = [];
+        //         foreach (\Craft::$app->globals->allSets as $set) {
+        //             $sets[$set->handle] = $set;
+        //         }
+        //         return $sets;
+        //     });
+
+        if ($this->request->globals()->count() > 0) {
+            $this->addField('globals')
+                ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
+                ->resolve(function ($root, $args) {
+                    $sets = [];
+                    foreach (\Craft::$app->globals->allSets as $set) {
+                        $sets[$set->handle] = $set;
+                    }
+                    return $sets;
+                });
+        }
+    }
+
+    /**
+     * The fields you can query that return tags
+     *
+     * @return Schema
+     */
+    function addTagsSchema() {
+        if ($this->request->tagGroups()->count() == 0) {
+            return;
+        }
+
+        $this->addField('tags')
+            ->lists()
+            ->type(TagInterface::class)
+            ->use(TagQueryArguments::class)
+            ->resolve(function ($root, $args, $context, $info) {
+                $criteria = \craft\elements\Tag::find();
+
+                if (isset($args['group'])) {
+                    $args['groupId'] = $args['group'];
+                    unset($args['group']);
+                }
+
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+
+                return $criteria->all();
+            });
+
+        $this->addField('tagsConnection')
+            ->type(TagConnection::class)
+            ->use(TagQueryArguments::class)
+            ->resolve(function ($root, $args, $context, $info) {
+                $criteria = \craft\elements\Tag::find();
+
+                if (isset($args['group'])) {
+                    $args['groupId'] = $args['group'];
+                    unset($args['group']);
+                }
+
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+
+                list($pageInfo, $tags) = \craft\helpers\Template::paginateCriteria($criteria);
+
+                return [
+                    'totalCount' => $pageInfo->total,
+                    'pageInfo' => $pageInfo,
+                    'edges' => $tags,
+                    'criteria' => $criteria,
+                    'args' => $args,
+                ];
+            });
+    }
+
+    /**
+     * The fields you can query that return categories
+     *
+     * @return Schema
+     */
+    function addCategoriesSchema() {
+        if ($this->request->categoryGroups()->count() == 0) {
+            return;
+        }
+
+        $this->addField('categories')
+            ->lists()
+            ->type(CategoryInterface::class)
+            ->use(CategoryQueryArguments::class)
+            ->resolve(function ($root, $args) {
+                $criteria = \craft\elements\Category::find();
+
+                if (isset($args['group'])) {
+                    $args['groupId'] = $args['group'];
+                    unset($args['group']);
+                }
+
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+
+                return $criteria->all();
+            });
+
+        $this->addField('categoriesConnection')
+            ->type(CategoryConnection::class)
+            ->use(CategoryQueryArguments::class)
+            ->resolve(function ($root, $args) {
+                $criteria = \craft\elements\Category::find();
+
+                if (isset($args['group'])) {
+                    $args['groupId'] = $args['group'];
+                    unset($args['group']);
+                }
+
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+
+                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($criteria);
+
+                return [
+                    'totalCount' => $pageInfo->total,
+                    'pageInfo' => $pageInfo,
+                    'edges' => $categories,
+                    'criteria' => $criteria,
+                    'args' => $args,
+                ];
+            });
     }
 
 }

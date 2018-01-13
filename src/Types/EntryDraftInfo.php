@@ -6,27 +6,17 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Builders\Schema;
 
-class EntryDraftInfo extends ObjectType {
+class EntryDraftInfo extends Schema {
 
-    static $type;
-
-    static function type($request) {
-        if (static::$type) {
-            return static::$type;
-        }
-
-        return static::$type = new static([
-            'name' => 'EntryDraftInfo',
-            'fields' => [
-                'draftId' => Type::int(),
-                'name' => Type::string(),
-                'notes' => [
-                    'type' => Type::string(),
-                    'resolve' => function ($root, $args) { return $root->revisionNotes; }
-                ],
-            ],
-        ]);
+    function boot() {
+        $this->addIntField('draftId');
+        $this->addStringField('name');
+        $this->addStringField('notes')
+            ->resolve(function ($root, $args) {
+                return $root->revisionNotes;
+            });
     }
 
 }

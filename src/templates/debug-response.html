@@ -9,21 +9,20 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/addon/comment/comment.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.29.0/mode/javascript/javascript.min.js"></script>
         <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
             .CodeMirror-wrap {
-                position: fixed;
-                top: 0;
-                left: 0;
                 width: 100vw;
                 height: 100vh;
             }
         </style>
     </head>
     <body>
-        <pre>
 <textarea id="code">
 
 </textarea>
-        </pre>
         <script>
             var el = document.getElementById('code');
             el.innerHTML = JSON.stringify(JSON.parse('{{ json|replace({"\\": "\\\\", "\'": "\\\'"})|raw }}'), null, 2);

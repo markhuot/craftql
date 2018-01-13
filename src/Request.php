@@ -6,11 +6,11 @@ class Request {
 
     private $token;
     private $entryTypes;
-    private $draftEntryTypes;
     private $volumes;
     private $categoryGroups;
     private $tagGroups;
     private $sections;
+    private $globals;
 
     function __construct($token) {
         $this->token = $token;
@@ -28,16 +28,16 @@ class Request {
         $this->entryTypes = $entryTypes;
     }
 
-    function addDraftEntryTypes(\markhuot\CraftQL\Factories\DraftEntryType $draftEntryTypes) {
-        $this->draftEntryTypes = $draftEntryTypes;
-    }
-
     function addVolumes(\markhuot\CraftQL\Factories\Volume $volumes) {
         $this->volumes = $volumes;
     }
 
     function addSections(\markhuot\CraftQL\Factories\Section $sections) {
         $this->sections = $sections;
+    }
+
+    function addGlobals(\markhuot\CraftQL\Factories\Globals $globals) {
+        $this->globals = $globals;
     }
 
     function token() {
@@ -64,10 +64,6 @@ class Request {
         return $this->entryTypes;
     }
 
-    function draftEntryTypes(): \markhuot\CraftQL\Factories\DraftEntryType {
-        return $this->draftEntryTypes;
-    }
-
     function volumes(): \markhuot\CraftQL\Factories\Volume {
         return $this->volumes;
     }
@@ -76,7 +72,11 @@ class Request {
         return $this->sections;
     }
 
-    function entries($criteria, $args, $info) {
+    function globals(): \markhuot\CraftQL\Factories\Globals {
+        return $this->globals;
+    }
+
+    function entries($criteria, $root, $args, $context, $info) {
         if (empty($args['section'])) {
             $args['sectionId'] = array_map(function ($value) {
                 return $value->value;
@@ -106,6 +106,9 @@ class Request {
             $criteria->relatedTo(array_merge(['or'], $args['orRelatedTo']));
             unset($args['orRelatedTo']);
         }
+
+        // var_dump($args);
+        // die;
 
         foreach ($args as $key => $value) {
             $criteria = $criteria->{$key}($value);

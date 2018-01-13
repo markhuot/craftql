@@ -25,9 +25,15 @@ class Date {
             'args' => [
                 new FieldArgument([
                     'name' => 'as',
-                    'type' => Type::string(),
+                    'type' => Type::nonNull(Type::string()),
                     'description' => 'Date formatting',
                     'defaultValue' => 'r'
+                ]),
+                new FieldArgument([
+                    'name' => 'timezone',
+                    'type' => Type::string(),
+                    'description' => 'The full name of the timezone, defaults to GMT. (E.g., America/New_York)',
+                    'defaultValue' => 'GMT'
                 ])
             ]
         ]);

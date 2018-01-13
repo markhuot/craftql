@@ -2,48 +2,38 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
-use markhuot\CraftQL\Types\Category;
+use markhuot\CraftQL\GraphQLFields\Query\Connection\Edges as EdgesField;
+use markhuot\CraftQL\Builders\Schema;
 
-class CategoryConnection extends ObjectType {
+class CategoryConnection extends Schema {
 
-    static $type;
+    function boot() {
+        $this->addIntField('totalCount')
+            ->nonNull();
 
-    static function make(Request $request) {
-        if (!empty(static::$type)) {
-            return static::$type;
-        }
+        $this->addField('pageInfo')
+            ->type(PageInfo::class);
 
-        $reflect = new \ReflectionClass(static::class);
+        $this->addField('edges')
+            ->lists()
+            ->type(CategoryEdge::class)
+            ->resolve(function ($root, $args, $context, $info) {
+                return array_map(function ($category) {
+                    return [
+                        'cursor' => '',
+                        'node' => $category
+                    ];
+                }, $root['edges']);
+            });
 
-        return static::$type = new static([
-            'name' => $reflect->getShortName(),
-            'fields' => [
-                'totalCount' => Type::nonNull(Type::int()),
-                'pageInfo' => PageInfo::type($request),
-                'edges' => [
-                    'type' => Type::listOf(CategoryEdge::make($request)),
-                    'resolve' => function ($root, $args) {
-                        return array_map(function ($category) {
-                            return [
-                                'cursor' => '',
-                                'node' => $category
-                            ];
-                        }, $root['edges']);
-                    }
-                ],
-                'categories' => [
-                    'type' => Type::listOf(Category::interface($request)),
-                    'resolve' => function ($root, $args) {
-                        return $root['edges'];
-                    }
-                ],
-            ],
-        ]);
+        $this->addField('categories')
+            ->lists()
+            ->type(CategoryInterface::class)
+            ->resolve(function ($root, $args) {
+                return $root['edges'];
+            });
     }
 
 }
