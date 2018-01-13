@@ -5,42 +5,25 @@ namespace markhuot\CraftQL\Types;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Builders\Schema;
+use markhuot\CraftQL\Request;
 
-class Category extends ObjectType {
+class Category extends Schema {
 
-    static $interface;
-    static $baseFields;
+    protected $interfaces = [
+        CategoryInterface::class,
+    ];
 
-    static function baseFields() {
-        if (!empty(static::$baseFields)) {
-            return static::$baseFields;
-        }
-
-        $fields = [];
-        $fields['id'] = ['type' => Type::nonNull(Type::int())];
-        $fields['title'] = ['type' => Type::nonNull(Type::string())];
-        $fields['slug'] = ['type' => Type::string()];
-        $fields['uri'] = ['type' => Type::string()];
-        $fields['group'] = ['type' => \markhuot\CraftQL\Types\CategoryGroup::type()];
-
-        return static::$baseFields = $fields;
+    function __construct(Request $request, $context=null) {
+        parent::__construct($request, $context);
     }
 
-    static function interface() {
-        if (!static::$interface) {
-            $fields = static::baseFields();
+    function boot() {
+        $this->addFieldsByLayoutId($this->context->fieldLayoutId);
+    }
 
-            static::$interface = new InterfaceType([
-                'name' => 'CategoryInterface',
-                'description' => 'A category in Craft',
-                'fields' => $fields,
-                'resolveType' => function ($category) {
-                    return ucfirst($category->group->handle).'Category';
-                }
-            ]);
-        }
-
-        return static::$interface;
+    function getName(): string {
+        return ucfirst($this->context->handle).'Category';
     }
 
 }

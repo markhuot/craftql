@@ -8,7 +8,7 @@ use markhuot\CraftQL\Types\Volume as VolumeObjectType;
 class Volume extends BaseFactory {
 
     function make($raw, $request) {
-        return new VolumeObjectType($raw, $request);
+        return new VolumeObjectType($request, $raw);
     }
 
     function can($id, $mode='query') {

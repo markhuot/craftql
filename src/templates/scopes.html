@@ -62,6 +62,11 @@
                 <td>{{ forms.lightswitch({"name": "scope[query:entry.author]", "value": 1, "on": token.can('query:entry.author'), "small": true}) }}</td>
             </tr>
             <tr data-id="default">
+                <th>globals</th>
+                <td>Query any globals.</td>
+                <td>{{ forms.lightswitch({"name": "scope[query:globals]", "value": 1, "on": token.can('query:globals'), "small": true}) }}</td>
+            </tr>
+            <tr data-id="default">
                 <th>categories</th>
                 <td>Query any category.</td>
                 <td>{{ forms.lightswitch({"name": "scope[query:categories]", "value": 1, "on": token.can('query:categories'), "small": true}) }}</td>
@@ -106,7 +111,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for section in craft.sections.getAllSections() %}
+            {% for section in craft.sections.allSections %}
                 {% for entryType in section.entryTypes %}
                     <tr data-id="default">
                         <th>{{ section.type|ucfirst }}</th>
@@ -136,7 +141,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for section in craft.sections.getAllSections() %}
+            {% for section in craft.sections.allSections %}
                 {% for entryType in section.entryTypes %}
                     <tr data-id="default">
                         <th>{{ section.type|ucfirst }}</th>

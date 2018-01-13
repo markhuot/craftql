@@ -107,19 +107,11 @@ class ToolsController extends Controller
                         $variables = @$body['variables'] ?: [];
                     }
 
-                    try {
-                        if ($this->debug) { echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n"; }
-                        $schema = $graphQl->getSchema($token);
-                        $result = $graphQl->execute($schema, $query, $variables);
-                    } catch (\Exception $e) {
-                        $result = [
-                            'error' => [
-                                'message' => $e->getMessage()
-                            ]
-                        ];
-                    }
+                    if ($this->debug) { echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n"; }
+                    $schema = $graphQl->getSchema($token);
+                    $result = $graphQl->execute($schema, $query, $variables);
 
-                    $resolve(new Response(200, $headers, json_encode($result)));
+                    $resolve(new Response(200, $headers, json_encode($result->toArray())));
                 });
             });
         });
@@ -221,6 +213,72 @@ class ToolsController extends Controller
         $entriesField->sortOrder = 0;
         Craft::$app->fields->saveField($entriesField);
 
+        $emptyMatrixField = new \craft\fields\Matrix();
+        $emptyMatrixField->groupId = $groupModel->id;
+        $emptyMatrixField->name = 'Empty Matrix Field';
+        $emptyMatrixField->handle = 'emptyMatrixField';
+        $emptyMatrixField->required = false;
+        $emptyMatrixField->sortOrder = 0;
+        Craft::$app->fields->saveField($emptyMatrixField);
+
+        $emptyMatrixBlockField = new \craft\fields\Matrix();
+        $emptyMatrixBlockField->groupId = $groupModel->id;
+        $emptyMatrixBlockField->name = 'Empty Matrix Fields';
+        $emptyMatrixBlockField->handle = 'emptyMatrixBlockFields';
+        $emptyMatrixBlockField->required = false;
+        $emptyMatrixBlockField->sortOrder = 0;
+        $emptyMatrixBlockField->setBlockTypes([
+            'new1' => [
+                'name' => 'Empty Block',
+                'handle' => 'emptyBlock',
+                'fields' => []
+            ],
+        ]);
+        Craft::$app->fields->saveField($emptyMatrixBlockField);
+
+        $matrixField = new \craft\fields\Matrix();
+        $matrixField->groupId = $groupModel->id;
+        $matrixField->name = 'Rich Content';
+        $matrixField->handle = 'richContent';
+        $matrixField->required = false;
+        $matrixField->sortOrder = 0;
+        $matrixField->setBlockTypes([
+            'new1' => [
+                'name' => 'Text',
+                'handle' => 'text',
+                'fields' => [
+                    'new1' => [
+                        'type' => \craft\fields\PlainText::class,
+                        'name' => 'Content',
+                        'handle' => 'textContent',
+                        'instructions' => null,
+                        'required' => false,
+                    ]
+                ]
+            ],
+            'new2' => [
+                'name' => 'Related Cotnent',
+                'handle' => 'relatedContent',
+                'fields' => [
+                    'new1' => [
+                        'type' => \craft\fields\PlainText::class,
+                        'name' => 'Heading',
+                        'handle' => 'heading',
+                        'instructions' => null,
+                        'required' => false,
+                    ],
+                    'new2' => [
+                        'type' => \craft\fields\Entries::class,
+                        'name' => 'Related Entry',
+                        'handle' => 'matrixRelatedEntry',
+                        'instructions' => null,
+                        'required' => false,
+                    ],
+                ]
+            ],
+        ]);
+        Craft::$app->fields->saveField($matrixField);
+
         $multiSelectField = new \craft\fields\MultiSelect();
         $multiSelectField->groupId = $groupModel->id;
         $multiSelectField->name = 'Social Links';
@@ -234,18 +292,6 @@ class ToolsController extends Controller
             ['label' => 'Instagram', 'value' => 'in', 'default' => false],
         ];
         Craft::$app->fields->saveField($multiSelectField);
-
-        // $heroImagePosition = new \craft\fields\PositionSelect();
-        // $heroImagePosition->groupId = $groupModel->id;
-        // $heroImagePosition->name = 'Hero Image Position';
-        // $heroImagePosition->handle = 'heroImagePosition';
-        // $heroImagePosition->required = false;
-        // $heroImagePosition->sortOrder = 0;
-        // $heroImagePosition->options = [
-        //     'right',
-        //     'drop-right',
-        // ];
-        // Craft::$app->fields->saveField($heroImagePosition);
 
         if (!file_exists('./web/uploads')) {
             mkdir('./web/uploads');
@@ -277,6 +323,27 @@ class ToolsController extends Controller
         $assetsField->allowedKinds = null;
         Craft::$app->fields->saveField($assetsField);
 
+        $categoryGroup = new \craft\models\CategoryGroup();
+        $categoryGroup->name = 'Story Types';
+        $categoryGroup->handle = 'storyTypes';
+        $categoryGroup->maxLevels = null;
+        $groupSiteSettings = new \craft\models\CategoryGroup_SiteSettings();
+        $groupSiteSettings->siteId = 1;
+        $groupSiteSettings->hasUrls = true;
+        $groupSiteSettings->uriFormat = 'type/{slug}';
+        $groupSiteSettings->template = 'type/_story';
+        $categoryGroup->setSiteSettings([1 => $groupSiteSettings]);
+        Craft::$app->getCategories()->saveGroup($categoryGroup);
+
+        $categoryField = new \craft\fields\Categories();
+        $categoryField->groupId = $groupModel->id;
+        $categoryField->name = 'Story Types';
+        $categoryField->handle = 'storyTypes';
+        $categoryField->required = false;
+        $categoryField->sortOrder = 0;
+        $categoryField->source = 'group:'.$categoryGroup->id;
+        Craft::$app->fields->saveField($categoryField);
+
         $layout = new \craft\models\FieldLayout();
         $layout->type = \craft\elements\Entry::class;
 
@@ -291,8 +358,11 @@ class ToolsController extends Controller
             $dropdownField,
             $entriesField,
             $multiSelectField,
-            // $heroImagePosition,
             $assetsField,
+            $matrixField,
+            $emptyMatrixField,
+            $emptyMatrixBlockField,
+            $categoryField,
         ]);
 
         if (!empty($section->getEntryTypes())) {
@@ -303,5 +373,35 @@ class ToolsController extends Controller
             ]);
             Craft::$app->fields->saveLayout($layout);
         }
+
+
+        // ----------
+
+
+        $globalMetaDescriptionField = new \craft\fields\PlainText();
+        $globalMetaDescriptionField->groupId = $groupModel->id;
+        $globalMetaDescriptionField->name = 'Meta Description';
+        $globalMetaDescriptionField->handle = 'metaDescription';
+        $globalMetaDescriptionField->required = false;
+        $globalMetaDescriptionField->sortOrder = 0;
+        Craft::$app->fields->saveField($globalMetaDescriptionField);
+
+        $globalFieldLayout = new \craft\models\FieldLayout();
+        $globalFieldLayout->type = \craft\elements\GlobalSet::class;
+
+        $globalLayoutTab = new \craft\models\FieldLayoutTab();
+        $globalLayoutTab->setLayout($globalFieldLayout);
+        $globalLayoutTab->name = 'Content';
+        $globalLayoutTab->setFields([
+            $globalMetaDescriptionField,
+        ]);
+        $globalFieldLayout->setTabs([$globalLayoutTab]);
+        Craft::$app->fields->saveLayout($globalFieldLayout);
+
+        $globalSet = new \craft\elements\GlobalSet();
+        $globalSet->name = "SEO";
+        $globalSet->handle = 'seo';
+        $globalSet->setFieldLayout($globalFieldLayout);
+        Craft::$app->getGlobals()->saveSet($globalSet);
     }
 }

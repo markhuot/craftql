@@ -9,10 +9,11 @@ use GraphQL\Type\Definition\Type;
 
 class EntryDraftConnection extends EntryConnection {
 
-    static $type;
+    function boot() {
+        parent::boot();
 
-    static function edgesType($request) {
-        return EntryDraftEdge::make($request);
+        $this->getField('edges')
+            ->type(EntryDraftEdge::class);
     }
 
 }

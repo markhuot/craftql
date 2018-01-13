@@ -4,12 +4,13 @@ namespace markhuot\CraftQL\Factories;
 
 use markhuot\CraftQL\Factories\BaseFactory;
 use GraphQL\Type\Definition\EnumType;
-use markhuot\CraftQL\Types\EntryType as EntryTypeObjectType;
+use markhuot\CraftQL\Types\Entry as EntryObjectType;
+use markhuot\CraftQL\Helpers\StringHelper;
 
 class EntryType extends BaseFactory {
 
     function make($raw, $request) {
-        return new EntryTypeObjectType($raw, $request);
+        return new EntryObjectType($request, $raw);
     }
 
     function can($id, $mode='query') {
@@ -17,8 +18,7 @@ class EntryType extends BaseFactory {
     }
 
     function getEnumName($object) {
-        $rawObject = $this->repository->get($object->config['id']);
-        return \markhuot\CraftQL\Types\EntryType::getName($rawObject);
+        return StringHelper::graphQLNameForEntryType($object->getContext());
     }
 
 }

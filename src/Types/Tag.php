@@ -5,41 +5,20 @@ namespace markhuot\CraftQL\Types;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Builders\Schema;
 
-class Tag extends ObjectType {
+class Tag extends Schema {
 
-    static $interface;
-    static $baseFields;
+    protected $interfaces = [
+        TagInterface::class,
+    ];
 
-    static function baseFields() {
-        if (!empty(static::$baseFields)) {
-            return static::$baseFields;
-        }
-
-        $fields = [];
-        $fields['id'] = ['type' => Type::nonNull(Type::int())];
-        $fields['title'] = ['type' => Type::nonNull(Type::string())];
-        $fields['slug'] = ['type' => Type::string()];
-        $fields['group'] = ['type' => \markhuot\CraftQL\Types\TagGroup::type()];
-
-        return static::$baseFields = $fields;
+    function boot() {
+        $this->addFieldsByLayoutId($this->context->fieldLayoutId);
     }
 
-    static function interface() {
-        if (!static::$interface) {
-            $fields = static::baseFields();
-
-            static::$interface = new InterfaceType([
-                'name' => 'TagInterface',
-                'description' => 'A tag in Craft',
-                'fields' => $fields,
-                'resolveType' => function ($category) {
-                    return ucfirst($category->group->handle).'Tags';
-                }
-            ]);
-        }
-
-        return static::$interface;
+    function getName(): string {
+        return ucfirst($this->context->handle).'Tags';
     }
 
 }

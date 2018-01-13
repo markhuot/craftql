@@ -2,45 +2,39 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
+use markhuot\CraftQL\GraphQLFields\Query\Connection\Edges as EdgesField;
+use markhuot\CraftQL\Types\Entry;
+use markhuot\CraftQL\Builders\Schema;
 
-class EntryConnection extends ObjectType {
+class EntryConnection extends Schema {
 
-    static $type;
+    function boot() {
+        $this->addIntField('totalCount')
+            ->nonNull();
 
-    static function edgesType($request) {
-        return EntryEdge::make($request);
-    }
+        $this->addField('pageInfo')
+            ->type(PageInfo::class);
 
-    static function make(Request $request) {
-        if (!empty(static::$type)) {
-            return static::$type;
-        }
+        $this->addField('edges')
+            ->lists()
+            ->type(EntryEdge::class)
+            ->resolve(function ($root, $args, $context, $info) {
+                return array_map(function ($category) {
+                    return [
+                        'cursor' => '',
+                        'node' => $category
+                    ];
+                }, $root['edges']);
+            });
 
-        $reflect = new \ReflectionClass(static::class);
-
-        return static::$type = new static([
-            'name' => $reflect->getShortName(),
-            'fields' => [
-                'totalCount' => Type::nonNull(Type::int()),
-                'pageInfo' => PageInfo::type($request),
-                'edges' => ['type' => Type::listOf(static::edgesType($request)), 'resolve' => function ($root, $args) {
-                    return array_map(function ($entry) {
-                        return [
-                            'cursor' => '',
-                            'node' => $entry
-                        ];
-                    }, $root['edges']);
-                }],
-                'entries' => ['type' => Type::listOf(\markhuot\CraftQL\Types\Entry::interface($request)), 'resolve' => function ($root, $args) {
-                    return $root['edges'];
-                }],
-            ],
-        ]);
+        $this->addField('entries')
+            ->lists()
+            ->type(EntryInterface::class)
+            ->resolve(function ($root, $args) {
+                return $root['edges'];
+            });
     }
 
 }

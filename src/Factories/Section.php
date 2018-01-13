@@ -8,7 +8,7 @@ use markhuot\CraftQL\Types\Section as SectionObjectType;
 class Section extends BaseFactory {
 
     function make($raw, $request) {
-        return new SectionObjectType($raw, $request);
+        return new SectionObjectType($request, $raw);
     }
 
     function can($id, $mode='query') {

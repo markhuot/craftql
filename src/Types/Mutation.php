@@ -6,20 +6,44 @@ use yii\base\Component;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Craft;
-use craft\elements\Entry;
+use markhuot\CraftQL\Builders\Schema;
+use markhuot\CraftQL\Types\Entry;
+use markhuot\CraftQL\FieldBehaviors\EntryMutationArguments;
 
-class Mutation extends ObjectType {
+class Mutation extends Schema {
 
-    function __construct($request) {
-        $fields = [];
+    function boot() {
 
-        $entryTypes = $request->entryTypes()->all('mutate');
-        foreach ($entryTypes as $entryType) {
-            $fields['upsert'.ucfirst($entryType->name)] = [
-                'type' => $entryType,
-                'args' => $entryType->args($request),
-                'resolve' => $entryType->upsert($request),
-            ];
+        foreach ($this->request->entryTypes()->all('mutate') as $entryType) {
+            $this->addField('upsert'.$entryType->getName())
+                ->type($entryType)
+                ->use(EntryMutationArguments::class);
+        }
+
+        if ($this->request->globals()->count()) {
+            /** @var \markhuot\CraftQL\Types\Globals $globalSet */
+            foreach ($this->request->globals()->all() as $globalSet) {
+                $upsertField = $this->addField('upsert'.$globalSet->getName().'Globals')
+                    ->type($globalSet)
+                    ->addArgumentsByLayoutId($globalSet->getContext()->fieldLayoutId);
+
+                $upsertField->resolve(function ($root, $args) use ($globalSet, $upsertField) {
+                        $globalSetElement = $globalSet->getContext();
+
+                        $fieldService = \Yii::$container->get('craftQLFieldService');
+
+                        foreach ($args as $handle => &$value) {
+                            $callback = $upsertField->getArgument($handle)->getOnSave();
+                            if ($callback) {
+                                $value = $callback($value);
+                            }
+                        }
+
+                        $globalSetElement->setFieldValues($args);
+                        Craft::$app->getElements()->saveElement($globalSetElement);
+                        return $globalSetElement;
+                    });
+            }
         }
 
         // $fields['upsertField'] = [
@@ -53,11 +77,6 @@ class Mutation extends ObjectType {
         //         return $entry;
         //     },
         // ];
-
-        parent::__construct([
-            'name' => 'Mutation',
-            'fields' => $fields
-        ]);
     }
 
 }

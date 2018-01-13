@@ -6,31 +6,27 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Builders\Schema;
 
-class PageInfo extends ObjectType {
+class PageInfo extends Schema {
 
-    static $type;
+    function boot() {
+        $this->addBooleanField('hasPreviousPage')
+            ->nonNull()
+            ->resolve(function ($root, $args) {
+                return $root->currentPage > 1;
+            });
 
-    static function type($request) {
-        if (static::$type) {
-            return static::$type;
-        }
+        $this->addBooleanField('hasNextPage')
+            ->nonNull()
+            ->resolve( function ($root, $args) {
+            return $root->currentPage < $root->totalPages;
+        });
 
-        return static::$type = new static([
-            'name' => 'PageInfo',
-            'fields' => [
-                'hasPreviousPage' => ['type' => Type::nonNull(Type::boolean()), 'resolve' => function ($root, $args) {
-                    return $root->currentPage > 1;
-                }],
-                'hasNextPage' => ['type' => Type::nonNull(Type::boolean()), 'resolve' => function ($root, $args) {
-                    return $root->currentPage < $root->totalPages;
-                }],
-                'currentPage' => Type::int(),
-                'totalPages' => Type::int(),
-                'first' => Type::int(),
-                'last' => Type::int(),
-            ],
-        ]);
+        $this->addIntField('currentPage');
+        $this->addIntField('totalPages');
+        $this->addIntField('first');
+        $this->addIntField('last');
     }
 
 }

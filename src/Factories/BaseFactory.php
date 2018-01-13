@@ -11,7 +11,6 @@ abstract class BaseFactory {
     protected $repository;
     protected $request;
     private $objects = [];
-    private $enum;
 
     function __construct($repository, $request) {
         $this->repository = $repository;
@@ -49,8 +48,12 @@ abstract class BaseFactory {
         return $objects;
     }
 
+    function count() {
+        return count($this->repository->all());
+    }
+
     function getEnumName($object) {
-        $rawObject = $this->repository->get($object->config['id']);
+        $rawObject = $this->repository->get($object->getContext()->id);
         return $rawObject->handle;
     }
 
@@ -65,7 +68,7 @@ abstract class BaseFactory {
         $values = [];
 
         foreach ($this->all() as $index => $object) {
-            $values[$this->getEnumName($object)] = $object->config['id'];
+            $values[$this->getEnumName($object)] = $object->getContext()->id;
         }
 
         // Enums can't be emtpy so fake it. Craft can expose the Category or
