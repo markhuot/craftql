@@ -55,5 +55,37 @@ class GetMatrixFieldSchema
             }
         }
 
+        if (!empty($blockTypes)) {
+            $inputType = $event->mutation->createInputObjectType(ucfirst($event->sender->handle) . 'Input');
+
+            foreach ($blockTypes as $blockType) {
+                $blockInputType = $event->mutation->createInputObjectType(ucfirst($event->sender->handle) . ucfirst($blockType->handle) . 'Input');
+                $blockInputType->addArgumentsByLayoutId($blockType->fieldLayoutId);
+                $blockInputType->addStringArgument('foo');
+
+                $inputType->addArgument($blockType->handle)
+                    ->type($blockInputType);
+            }
+
+            $event->mutation->addArgument($event->sender)
+                ->lists()
+                ->type($inputType)
+                ->onSave(function ($values) {
+                    $newValues = [];
+
+                    foreach ($values as $key => $value) {
+                        $type = array_keys($value)[0];
+
+                        $newValues["new{$key}"] = [
+                            'type' => $type,
+                            'enabled' => 1,
+                            'fields' => $value[$type],
+                        ];
+                    }
+
+                    return $newValues;
+                });
+        }
+
     }
 }

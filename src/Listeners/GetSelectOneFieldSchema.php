@@ -22,10 +22,11 @@ class GetSelectOneFieldSchema
                 return StringHelper::graphQLEnumValueForString((string)$root->{$field->handle}) ?: null;
             });
 
-        $event->query->addStringArgument($field);
+        $event->query->addStringArgument($field)
+            ->type($graphqlField->getType());
 
         $event->mutation->addArgument($field)
-            ->type($graphqlField);
+            ->type($graphqlField->getType());
     }
 
     static function valuesForField($graphQLField, $craftField) {

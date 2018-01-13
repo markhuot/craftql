@@ -20,7 +20,7 @@ class GetTableFieldSchema
         $schema = $event->schema;
 
         $outputSchema = $schema->createObjectType(ucfirst($field->handle).'Table');
-        $inputSchema = $schema->createInputObjectType(ucfirst($field->handle).'Input');
+        $inputSchema = $event->mutation->createInputObjectType(ucfirst($field->handle).'Input');
         $handleMapping = [];
 
         foreach ($field->columns as $key => $columnConfig) {
@@ -30,20 +30,20 @@ class GetTableFieldSchema
                 case 'number':
                     $outputSchema->addFloatField($columnConfig['handle'])
                         ->description($columnConfig['heading']);
-                    $inputSchema->addFloatField($columnConfig['handle'])
+                    $inputSchema->addFloatArgument($columnConfig['handle'])
                         ->description($columnConfig['heading']);
                     break;
                 case 'checkbox':
                 case 'lightswitch':
                     $outputSchema->addBooleanField($columnConfig['handle'])
                         ->description($columnConfig['heading']);
-                    $inputSchema->addBooleanField($columnConfig['handle'])
+                    $inputSchema->addBooleanArgument($columnConfig['handle'])
                         ->description($columnConfig['heading']);
                     break;
                 default:
                     $outputSchema->addStringField($columnConfig['handle'])
                         ->description($columnConfig['heading']);
-                    $inputSchema->addStringField($columnConfig['handle'])
+                    $inputSchema->addStringArgument($columnConfig['handle'])
                         ->description($columnConfig['heading']);
             }
         }
@@ -56,7 +56,7 @@ class GetTableFieldSchema
 
         $event->mutation->addArgument($field)
             ->lists()
-            ->type($inputSchema->getRawGraphQLObject(true))
+            ->type($inputSchema)
             ->onSave(function($value) use ($handleMapping) {
                 $newValue = [];
 

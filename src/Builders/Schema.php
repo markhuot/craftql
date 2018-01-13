@@ -63,11 +63,11 @@ class Schema extends BaseBuilder {
     /**
      * Create a new builder
      *
-     * @param [type] $name
+     * @param string $name
      * @return self
      */
     function createObjectType($name): self {
-        return (new static($this->request))
+        return (new Schema($this->request))
             ->name($name);
     }
 
@@ -77,9 +77,8 @@ class Schema extends BaseBuilder {
      * @param [type] $name
      * @return self
      */
-    function createInputObjectType($name): self {
-        return (new InputSchema($this->request))
-            ->name($name);
+    function createInputObjectType($name): InputSchema {
+        return new InputSchema($this->request, $name);
     }
 
     function addObjectField(CraftField $field, callable $config=null): ObjectField {
@@ -228,10 +227,6 @@ class Schema extends BaseBuilder {
 
     function getRawGraphQLObject(): Type {
         $key = $this->getName();
-
-        // if ($input) {
-        //     return new InputObjectType($this->getConfig());
-        // }
 
         if (!empty(static::$objects[$key])) {
             return static::$objects[$key];

@@ -32,9 +32,9 @@ class GetAssetsFieldSchema
             });
 
         $inputObject = $event->mutation->createInputObjectType(ucfirst($field->handle).'AssetInput');
-        $inputObject->addIntField('id');
-        $inputObject->addStringField('url');
-        $inputObject->addStringField('title');
+        $inputObject->addIntArgument('id');
+        $inputObject->addStringArgument('url');
+        $inputObject->addStringArgument('title');
         // $inputObject->addFieldsByLayoutId();
 
         $event->mutation->addArgument($field)

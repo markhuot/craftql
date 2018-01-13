@@ -29,10 +29,12 @@ class GetSelectMultipleFieldSchema
                 return $values;
             });
 
-        $event->query->addStringArgument($craftField);
+        // @TODO this search isn't working correctly
+        $event->query->addStringArgument($craftField)
+            ->type($graphqlField->getType());
 
         $event->mutation->addArgument($craftField)
             ->lists()
-            ->type($graphqlField);
+            ->type($graphqlField->getType());
     }
 }

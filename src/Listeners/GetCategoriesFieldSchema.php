@@ -37,9 +37,9 @@ class GetCategoriesFieldSchema
             $event->query->addStringArgument($field);
 
             $inputObject = $event->mutation->createInputObjectType(ucfirst($field->handle).'AssetInput');
-            $inputObject->addIntField('id');
-            $inputObject->addStringField('title');
-            $inputObject->addStringField('slug');
+            $inputObject->addIntArgument('id');
+            $inputObject->addStringArgument('title');
+            $inputObject->addStringArgument('slug');
 
             $event->mutation->addArgument($field)
                 ->type($inputObject)

@@ -49,8 +49,8 @@ trait HasTypeAttribute {
             $rawType = $type->getRawGraphQLObject();
         }
 
-        else if (is_a($type, Field::class) || is_subclass_of($type, Field::class)) {
-            $rawType = $type->getTypeConfig();
+        else if (is_a($type, InputSchema::class) || is_subclass_of($type, InputSchema::class)) {
+            $rawType = $type->getRawGraphQLType();
         }
 
         else {

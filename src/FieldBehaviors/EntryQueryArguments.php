@@ -57,11 +57,11 @@ class EntryQueryArguments extends Behavior {
         }
 
         $type = $this->owner->createInputObjectType('RelatedToInputType');
-        $type->addIntField('element');
-        $type->addIntField('sourceElement');
-        $type->addIntField('targetElement');
-        $type->addStringField('field');
-        $type->addStringField('sourceLocale');
+        $type->addIntArgument('element');
+        $type->addIntArgument('sourceElement');
+        $type->addIntArgument('targetElement');
+        $type->addStringArgument('field');
+        $type->addStringArgument('sourceLocale');
         return static::$inputObjectType = $type;
     }
 
