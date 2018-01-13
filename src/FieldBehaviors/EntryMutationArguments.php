@@ -3,7 +3,6 @@
 namespace markhuot\CraftQL\FieldBehaviors;
 
 use yii\base\Behavior;
-use GraphQL\Type\Definition\Type;
 use craft\elements\Entry;
 use markhuot\CraftQL\Builders\Field;
 use Craft;
@@ -11,7 +10,7 @@ use Craft;
 class EntryMutationArguments extends Behavior {
 
     /**
-     * @var Field|null the owner of this behavior
+     * @var Field the owner of this behavior
      */
     public $owner;
 
