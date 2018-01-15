@@ -5,11 +5,8 @@ namespace markhuot\CraftQL\Builders;
 use craft\base\Field as CraftField;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InputObjectType;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Field as BaseField;
-use markhuot\CraftQL\Builders\Object as ObjectField;
-// use yii\base\Component;
 
 class Schema extends BaseBuilder {
 
@@ -79,17 +76,6 @@ class Schema extends BaseBuilder {
      */
     function createInputObjectType($name): InputSchema {
         return new InputSchema($this->request, $name);
-    }
-
-    function addObjectField(CraftField $field, callable $config=null): ObjectField {
-        if (is_a($field, CraftField::class)) {
-            return $this->fields[] = (new ObjectField($this->request, $field->handle))
-                ->description($field->instructions)
-                ->config($config);
-        }
-
-        return $this->fields[] = (new ObjectField($this->request, $field))
-            ->config($config);
     }
 
     /**

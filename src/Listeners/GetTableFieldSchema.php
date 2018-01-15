@@ -48,9 +48,9 @@ class GetTableFieldSchema
             }
         }
 
-        $schema->addObjectField($field)
+        $schema->addField($field)
             ->lists()
-            ->config($outputSchema);
+            ->type($outputSchema);
 
         $event->query->addStringArgument($field);
 
