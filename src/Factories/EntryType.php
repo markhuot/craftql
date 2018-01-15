@@ -17,7 +17,7 @@ class EntryType extends BaseFactory {
         return $this->request->token()->can("{$mode}:entryType:{$id}");
     }
 
-    function getEnumName($object) {
+    function getEnumKey($object) {
         return StringHelper::graphQLNameForEntryType($object->getContext());
     }
 
