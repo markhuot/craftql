@@ -2,16 +2,10 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
+use markhuot\CraftQL\Builders\InterfaceBuilder;
 use markhuot\CraftQL\Helpers\StringHelper;
 
-class EntryInterface extends Schema {
+class EntryInterface extends InterfaceBuilder {
 
     function boot() {
         $this->addIntField('id')->nonNull();
@@ -34,14 +28,10 @@ class EntryInterface extends Schema {
         $this->addField('ancestors')->lists()->type(EntryInterface::class);
         $this->addField('children')->lists()->type(EntryInterface::class);
         $this->addField('descendants')->lists()->type(EntryInterface::class);
-        $this->addField('hasDescendants')->type(Type::nonNull(Type::boolean()));
-        $this->addField('level')->type(Type::int());
+        $this->addBooleanField('hasDescendants')->nonNull();
+        $this->addIntField('level');
         $this->addField('parent')->type(EntryInterface::class);
         $this->addField('siblings')->lists()->type(EntryInterface::class);
-    }
-
-    function getGraphQLObject() {
-        return new InterfaceType($this->getConfig());
     }
 
     function getResolveType() {

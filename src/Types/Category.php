@@ -14,10 +14,6 @@ class Category extends Schema {
         CategoryInterface::class,
     ];
 
-    function __construct(Request $request, $context=null) {
-        parent::__construct($request, $context);
-    }
-
     function boot() {
         $this->addFieldsByLayoutId($this->context->fieldLayoutId);
     }

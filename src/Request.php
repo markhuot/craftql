@@ -16,6 +16,10 @@ class Request {
         $this->token = $token;
     }
 
+    function resolve($className, $params=[]) {
+        return new $className($this, ...$params);
+    }
+
     function addCategoryGroups(\markhuot\CraftQL\Factories\CategoryGroup $categoryGroups) {
         $this->categoryGroups = $categoryGroups;
     }

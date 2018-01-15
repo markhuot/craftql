@@ -2,15 +2,10 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Builders\Schema;
+use markhuot\CraftQL\Builders\InterfaceBuilder;
 use markhuot\CraftQL\FieldBehaviors\AssetTransformArguments;
 
-class VolumeInterface extends Schema {
+class VolumeInterface extends InterfaceBuilder {
 
     function boot() {
         $this->addIntField('id');
@@ -30,10 +25,6 @@ class VolumeInterface extends Schema {
         $this->addDateField('dateCreated');
         $this->addDateField('dateUpdatedTimestamp');
         $this->addDateField('dateUpdated');
-    }
-
-    function getGraphQLObject() {
-        return new InterfaceType($this->getConfig());
     }
 
     function getResolveType() {

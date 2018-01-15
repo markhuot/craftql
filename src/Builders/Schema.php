@@ -159,6 +159,10 @@ class Schema extends BaseBuilder {
         }, $this->getInterfaces());
     }
 
+    /**
+     * @TODO rename `boot` to some sort of WillFields method to better reflect what's happening
+     * @return array
+     */
     function getFields(): array {
         $this->boot();
         $this->bootBehaviors();

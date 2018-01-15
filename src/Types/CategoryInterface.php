@@ -2,15 +2,10 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
+use markhuot\CraftQL\Builders\InterfaceBuilder;
 
-class CategoryInterface extends Schema {
+class CategoryInterface extends InterfaceBuilder {
 
     function boot() {
         $this->addIntField('id')->nonNull();
@@ -18,10 +13,6 @@ class CategoryInterface extends Schema {
         $this->addStringField('slug');
         $this->addStringField('uri');
         $this->addStringField('group')->type(CategoryGroup::class);
-    }
-
-    function getGraphQLObject() {
-        return new InterfaceType($this->getConfig());
     }
 
     function getResolveType() {
