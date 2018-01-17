@@ -9,7 +9,7 @@ class TagQueryArguments extends Behavior {
 
     function initTagQueryArguments() {
         $this->owner->addBooleanArgument('fixedOrder');
-        $this->owner->addArgument('group')->type($request->tagGroups()->enum());
+        $this->owner->addArgument('group')->type($this->owner->getRequest()->tagGroups()->enum());
         $this->owner->addIntArgument('groupId');
         $this->owner->addIntArgument('id');
         $this->owner->addStringArgument('indexBy');
