@@ -5,7 +5,6 @@ namespace markhuot\CraftQL\Listeners;
 use Craft;
 use craft\helpers\ElementHelper;
 use markhuot\CraftQL\Events\GetFieldSchema;
-use markhuot\CraftQL\Types\CategoryInterface;
 
 class GetCategoriesFieldSchema
 {
@@ -36,7 +35,7 @@ class GetCategoriesFieldSchema
 
             $event->query->addStringArgument($field);
 
-            $inputObject = $event->mutation->createInputObjectType(ucfirst($field->handle).'AssetInput');
+            $inputObject = $event->mutation->createInputObjectType(ucfirst($field->handle).'CategoryInput');
             $inputObject->addIntArgument('id');
             $inputObject->addStringArgument('title');
             $inputObject->addStringArgument('slug');

@@ -137,23 +137,15 @@ final class MutationTest extends TestCase
         $this->assertEquals('foo-bar'.$hash, @$result['data']['story']['storyTypes'][0]['slug']);
     }
 
-    // public function testPositionSelectMutation(): void
-    // {
-    //     $input = 'mutation { story: upsertStories(title:"Position Select Test'.date('U').'", heroImagePosition:right) { id, heroImagePosition } }';
+    public function testTagsMutation(): void
+    {
+        $hash = date('U');
+        $input = 'mutation { story: upsertStories(title:"Tag Test'.date('U').'", storyTags:[{title:"foo'.$hash.'"}]) { id, storyTags { id, title, slug } } }';
 
-    //     $result = $this->execute($input);
+        $result = $this->execute($input);
 
-    //     $this->assertEquals('right', @$result['data']['story']['heroImagePosition']);
-    // }
-
-    // public function testPositionSelectFailureMutation(): void
-    // {
-    //     $input = 'mutation { story: upsertStories(title:"Position Select Failure Test'.date('U').'", heroImagePosition:left) { id, heroImagePosition } }';
-
-    //     $result = $this->execute($input);
-
-    //     $this->assertEquals("Argument \"heroImagePosition\" has invalid value left.\nExpected type \"HeroImagePositionEnum\", found left.", @$result['errors'][0]['message']);
-    // }
+        $this->assertEquals('foo'.$hash, @$result['data']['story']['storyTags'][0]['slug']);
+    }
 
     public function testAssetsMutation(): void
     {

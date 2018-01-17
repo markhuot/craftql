@@ -344,6 +344,20 @@ class ToolsController extends Controller
         $categoryField->source = 'group:'.$categoryGroup->id;
         Craft::$app->fields->saveField($categoryField);
 
+        $tagGroup = new \craft\models\TagGroup();
+        $tagGroup->name = 'Story Tags';
+        $tagGroup->handle = 'storyTags';
+        Craft::$app->getTags()->saveTagGroup($tagGroup);
+
+        $tagField = new \craft\fields\Tags();
+        $tagField->groupId = $groupModel->id;
+        $tagField->name = 'Story Tags';
+        $tagField->handle = 'storyTags';
+        $tagField->required = false;
+        $tagField->sortOrder = 0;
+        $tagField->source = 'group:'.$tagGroup->id;
+        Craft::$app->fields->saveField($tagField);
+
         $layout = new \craft\models\FieldLayout();
         $layout->type = \craft\elements\Entry::class;
 
@@ -363,6 +377,7 @@ class ToolsController extends Controller
             $emptyMatrixField,
             $emptyMatrixBlockField,
             $categoryField,
+            $tagField,
         ]);
 
         if (!empty($section->getEntryTypes())) {
