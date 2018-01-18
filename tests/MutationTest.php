@@ -145,6 +145,12 @@ final class MutationTest extends TestCase
         $result = $this->execute($input);
 
         $this->assertEquals('foo'.$hash, @$result['data']['story']['storyTags'][0]['slug']);
+
+        $input = '{ story: entriesConnection(id:'.$result['data']['story']['id'].') { edges { node { ...on Stories { storyTags { id, title, slug } } } } } }';
+
+        $result2 = $this->execute($input);
+
+        $this->assertEquals('foo'.$hash, @$result2['data']['story']['edges'][0]['node']['storyTags'][0]['slug']);
     }
 
     public function testAssetsMutation(): void

@@ -30,8 +30,6 @@ class Mutation extends Schema {
                 $upsertField->resolve(function ($root, $args) use ($globalSet, $upsertField) {
                         $globalSetElement = $globalSet->getContext();
 
-                        $fieldService = \Yii::$container->get('craftQLFieldService');
-
                         foreach ($args as $handle => &$value) {
                             $callback = $upsertField->getArgument($handle)->getOnSave();
                             if ($callback) {

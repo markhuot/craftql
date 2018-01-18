@@ -2,9 +2,6 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Request;
-use markhuot\CraftQL\Types\Tag;
 use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\FieldBehaviors\RelatedEntriesField;
 
@@ -19,9 +16,7 @@ class TagEdge extends Schema {
                 return $root['node'];
             });
 
-        // $this->use(RelatedEntriesField::class);
-
-        // $this->addGlobalField('relatedTo');
+        $this->use(new RelatedEntriesField);
     }
 
 }
