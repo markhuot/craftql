@@ -51,6 +51,11 @@ return [
             new \markhuot\CraftQL\Listeners\GetNumberFieldSchema,
         ],
     ],
+    \craft\redactor\Field::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetRedactorFieldSchema,
+        ],
+    ],
     \craft\fields\Table::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetTableFieldSchema,
