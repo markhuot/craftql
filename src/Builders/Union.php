@@ -22,7 +22,9 @@ class Union extends Field {
     }
 
     function addType($typeName, $context=null) {
-        return $this->types[$typeName] = new Schema($this->request, $context);
+        $this->types[$typeName] = new Schema($this->request, $context);
+        $this->types[$typeName]->name($typeName);
+        return $this->types[$typeName];
     }
 
     function getTypes(): array {

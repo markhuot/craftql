@@ -18,7 +18,6 @@ class GetMatrixFieldSchema
 
         $field = $event->sender;
         $schema = $event->schema;
-        $request = $schema->getRequest();
 
         $union = $schema->addUnionField($field)
             ->lists()
@@ -27,13 +26,19 @@ class GetMatrixFieldSchema
                 return ucfirst($field->handle).ucfirst($block->handle);
             });
 
-        $fieldService = \Yii::$container->get('craftQLFieldService');
-
         $blockTypes = $field->getBlockTypes();
 
         foreach ($blockTypes as $blockType) {
             $type = $union->addType(ucfirst($field->handle).ucfirst($blockType->handle), $blockType);
             $type->addFieldsByLayoutId($blockType->fieldLayoutId);
+
+            if (empty($type->getFields())) {
+                $warning = 'The block type, `'.$blockType->handle.'` on `'.$field->handle.'`, has no fields. This would violate the GraphQL spec so we filled it in with this placeholder.';
+
+                $type->addStringField('empty')
+                    ->description($warning)
+                    ->resolve($warning);
+            }
         }
 
         if (empty($blockTypes)) {
@@ -43,16 +48,6 @@ class GetMatrixFieldSchema
             $type->addStringField('empty')
                 ->description($warning)
                 ->resolve($warning);
-        }
-
-        foreach ($union->getTypes() as $typeName => $typeSchema) {
-            if (empty($typeSchema->getFields())) {
-                $warning = 'The block type, `'.$typeName.'`, has no fields. This would violate the GraphQL spec so we filled it in with this placeholder.';
-
-                $type->addStringField('empty')
-                    ->description($warning)
-                    ->resolve($warning);
-            }
         }
 
         if (!empty($blockTypes)) {
