@@ -355,7 +355,7 @@ class ToolsController extends Controller
         $tagField->handle = 'storyTags';
         $tagField->required = false;
         $tagField->sortOrder = 0;
-        $tagField->source = 'group:'.$tagGroup->id;
+        $tagField->source = 'taggroup:'.$tagGroup->id;
         Craft::$app->fields->saveField($tagField);
 
         $layout = new \craft\models\FieldLayout();
