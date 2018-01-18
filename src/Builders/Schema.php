@@ -140,10 +140,16 @@ class Schema extends BaseBuilder {
         return $this->fields[] = new Union($this->request, $field);
     }
 
-    function addFieldsByLayoutId(int $fieldLayoutId) {
+    function addFieldsByLayoutId($fieldLayoutId): self {
+        // some places in craft lave a null field layout, so account for that
+        if (!$fieldLayoutId) {
+            return;
+        }
+
         $fieldService = \Yii::$container->get('craftQLFieldService');
         $fields = $fieldService->getFields($fieldLayoutId, $this->request, $this);
-        return $this->fields = array_merge($this->fields, $fields);
+        $this->fields = array_merge($this->fields, $fields);
+        return $this;
     }
 
     function getInterfaces(): array {

@@ -14,7 +14,12 @@ trait HasArgumentsAttribute {
         return $this;
     }
 
-    function addArgumentsByLayoutId(int $fieldLayoutId): self {
+    function addArgumentsByLayoutId($fieldLayoutId): self {
+        // some places in craft lave a null field layout, so account for that
+        if (!$fieldLayoutId) {
+            return $this;
+        }
+
         $fieldService = \Yii::$container->get('craftQLFieldService');
         $arguments = $fieldService->getMutationArguments($fieldLayoutId, $this->request, $this);
         $this->arguments = array_merge($this->arguments, $arguments);
