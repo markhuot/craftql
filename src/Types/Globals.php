@@ -12,6 +12,11 @@ class Globals extends Schema {
 
     protected function boot() {
         $this->addFieldsByLayoutId($this->context->fieldLayoutId);
+
+        if (empty($this->fields)) {
+            $warning = 'The global set, `'.$this->getName().'`, has no fields. This would violate the GraphQL spec so we filled it in with this placeholder.';
+            $this->addStringField('empty')->description($warning)->resolve($warning);
+        }
     }
 
     /**
