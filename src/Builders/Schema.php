@@ -143,7 +143,7 @@ class Schema extends BaseBuilder {
     function addFieldsByLayoutId($fieldLayoutId): self {
         // some places in craft lave a null field layout, so account for that
         if (!$fieldLayoutId) {
-            return;
+            return $this;
         }
 
         $fieldService = \Yii::$container->get('craftQLFieldService');
