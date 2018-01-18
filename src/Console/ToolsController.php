@@ -109,7 +109,11 @@ class ToolsController extends Controller
 
                     if ($this->debug) { echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n"; }
                     $schema = $graphQl->getSchema($token);
-                    $result = $graphQl->execute($schema, $query, $variables);
+                    try {
+                        $result = $graphQl->execute($schema, $query, $variables);
+                    } catch (\Exception $e) {
+                        if ($this->debug) { echo $e; }
+                    }
 
                     $resolve(new Response(200, $headers, json_encode($result)));
                 });
