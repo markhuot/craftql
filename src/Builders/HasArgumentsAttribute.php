@@ -9,6 +9,11 @@ trait HasArgumentsAttribute {
 
     protected $arguments = [];
 
+    function arguments(callable $closure): self {
+        $closure($this);
+        return $this;
+    }
+
     function addArgumentsByLayoutId(int $fieldLayoutId): self {
         $fieldService = \Yii::$container->get('craftQLFieldService');
         $arguments = $fieldService->getMutationArguments($fieldLayoutId, $this->request, $this);

@@ -10,12 +10,12 @@ class RelatedEntriesField extends SchemaBehavior {
     function initRelatedEntriesField() {
         $this->owner->addField('relatedEntries')
             ->type(EntryConnection::class)
-            // ->arguments([
-            //     'source' => Type::boolean(),
-            //     'target' => Type::boolean(),
-            //     'field' => Type::string(),
-            //     'sourceLocale' => Type::string(),
-            // ])
+            ->arguments(function($field) {
+                $field->addBooleanArgument('source');
+                $field->addBooleanArgument('target');
+                $field->addStringArgument('field');
+                $field->addStringArgument('sourceLocale');
+            })
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Entry::find();
 
