@@ -2,11 +2,10 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
-use markhuot\CraftQL\Builders\Field;
-use yii\base\Behavior;
-use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Behaviors\FieldBehavior;
+use markhuot\CraftQL\Builders\InputSchema;
 
-class EntryQueryArguments extends Behavior {
+class EntryQueryArguments extends FieldBehavior {
 
     static $inputObjectType;
 

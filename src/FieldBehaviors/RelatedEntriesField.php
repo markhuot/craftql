@@ -2,11 +2,10 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
-use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Behaviors\SchemaBehavior;
 use markhuot\CraftQL\Types\EntryConnection;
-use yii\base\Behavior;
 
-class RelatedEntriesField extends Behavior {
+class RelatedEntriesField extends SchemaBehavior {
 
     function initRelatedEntriesField() {
         $this->owner->addField('relatedEntries')

@@ -2,10 +2,9 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
-use yii\base\Behavior;
-use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Behaviors\FieldBehavior;
 
-class UserQueryArguments extends Behavior {
+class UserQueryArguments extends FieldBehavior {
 
     function initUserQueryArguments() {
         $this->owner->addBooleanArgument('admin');

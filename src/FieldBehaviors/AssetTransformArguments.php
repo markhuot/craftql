@@ -2,12 +2,12 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
-use yii\base\Behavior;
+use markhuot\CraftQL\Behaviors\FieldBehavior;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\Type;
 
-class AssetTransformArguments extends Behavior {
+class AssetTransformArguments extends FieldBehavior {
 
     static $transformEnum;
     static $positionInputEnum;

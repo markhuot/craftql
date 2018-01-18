@@ -41,7 +41,7 @@ class Query extends Schema {
             $this->addField('users')
                 ->lists()
                 ->type(User::class)
-                ->use(UserQueryArguments::class)
+                ->use(new UserQueryArguments)
                 ->resolve(function ($root, $args, $context, $info) {
                     $criteria = \craft\elements\User::find();
 
@@ -76,7 +76,7 @@ class Query extends Schema {
         $this->addField('entries')
             ->lists()
             ->type(EntryInterface::class)
-            ->use(EntryQueryArguments::class)
+            ->use(new EntryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
                 return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
             });
@@ -84,7 +84,7 @@ class Query extends Schema {
          $this->addField('entriesConnection')
              ->name('entriesConnection')
              ->type(EntryConnection::class)
-             ->use(EntryQueryArguments::class)
+             ->use(new EntryQueryArguments)
              ->resolve(function ($root, $args, $context, $info) {
                  $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
                  list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
@@ -100,7 +100,7 @@ class Query extends Schema {
 
         $this->addField('entry')
             ->type(EntryInterface::class)
-            ->use(EntryQueryArguments::class)
+            ->use(new EntryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
                 return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
             });
@@ -155,7 +155,7 @@ class Query extends Schema {
         $this->addField('tags')
             ->lists()
             ->type(TagInterface::class)
-            ->use(TagQueryArguments::class)
+            ->use(new TagQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Tag::find();
 
@@ -173,7 +173,7 @@ class Query extends Schema {
 
         $this->addField('tagsConnection')
             ->type(TagConnection::class)
-            ->use(TagQueryArguments::class)
+            ->use(new TagQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Tag::find();
 
@@ -211,7 +211,7 @@ class Query extends Schema {
         $this->addField('categories')
             ->lists()
             ->type(CategoryInterface::class)
-            ->use(CategoryQueryArguments::class)
+            ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args) {
                 $criteria = \craft\elements\Category::find();
 
@@ -229,7 +229,7 @@ class Query extends Schema {
 
         $this->addField('categoriesConnection')
             ->type(CategoryConnection::class)
-            ->use(CategoryQueryArguments::class)
+            ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args) {
                 $criteria = \craft\elements\Category::find();
 

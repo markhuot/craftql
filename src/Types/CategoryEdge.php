@@ -21,7 +21,7 @@ class CategoryEdge extends Schema {
                 return $root['node'];
             });
 
-        $this->use(RelatedEntriesField::class);
+        $this->use(new RelatedEntriesField);
     }
 
 }

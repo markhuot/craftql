@@ -5,6 +5,7 @@ namespace markhuot\CraftQL\Builders;
 use craft\base\Field as CraftField;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
+use markhuot\CraftQL\Behaviors\SchemaBehavior;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Field as BaseField;
 
@@ -33,6 +34,18 @@ class Schema extends BaseBuilder {
      */
     protected function boot() {
         /* intended to be overridden by subclassed schemas */
+    }
+
+    /**
+     * Add behaviors to our builder
+     *
+     * @param string $behavior
+     * @return self
+     */
+    function use(SchemaBehavior $behavior): self {
+        $reflect = new \ReflectionClass($behavior);
+        $this->attachBehavior($reflect->getShortName(), $behavior);
+        return $this;
     }
 
     /**

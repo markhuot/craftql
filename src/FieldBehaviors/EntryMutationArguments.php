@@ -2,12 +2,12 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
-use yii\base\Behavior;
 use craft\elements\Entry;
+use markhuot\CraftQL\Behaviors\FieldBehavior;
 use markhuot\CraftQL\Builders\Field;
 use Craft;
 
-class EntryMutationArguments extends Behavior {
+class EntryMutationArguments extends FieldBehavior {
 
     /**
      * @var Field the owner of this behavior

@@ -22,18 +22,6 @@ class BaseBuilder extends Component {
     protected $request;
 
     /**
-     * Add behaviors to our builder
-     *
-     * @param string $behavior
-     * @return self
-     */
-    function use(string $behavior): self {
-        $reflect = new \ReflectionClass($behavior);
-        $this->attachBehavior($reflect->getShortName(), $behavior);
-        return $this;
-    }
-
-    /**
      * Run the behavior's init methods
      *
      * @return void

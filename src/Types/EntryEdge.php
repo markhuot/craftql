@@ -21,7 +21,7 @@ class EntryEdge extends Schema {
                 return $root['node'];
             });
 
-       $this->use(RelatedEntriesField::class);
+       $this->use(new RelatedEntriesField);
 
         $this->addField('drafts')
             ->type(EntryDraftConnection::class)

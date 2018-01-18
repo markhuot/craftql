@@ -2,10 +2,9 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
-use yii\base\Behavior;
-use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Behaviors\FieldBehavior;
 
-class TagQueryArguments extends Behavior {
+class TagQueryArguments extends FieldBehavior {
 
     function initTagQueryArguments() {
         $this->owner->addBooleanArgument('fixedOrder');

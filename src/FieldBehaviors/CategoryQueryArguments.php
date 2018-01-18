@@ -2,10 +2,9 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
-use yii\base\Behavior;
-use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Behaviors\FieldBehavior;
 
-class CategoryQueryArguments extends Behavior {
+class CategoryQueryArguments extends FieldBehavior {
 
     function initCategoryQueryArguments() {
         $this->owner->addIntArgument('ancestorOf');

@@ -17,7 +17,7 @@ class Mutation extends Schema {
         foreach ($this->request->entryTypes()->all('mutate') as $entryType) {
             $this->addField('upsert'.$entryType->getName())
                 ->type($entryType)
-                ->use(EntryMutationArguments::class);
+                ->use(new EntryMutationArguments);
         }
 
         if ($this->request->globals()->count()) {

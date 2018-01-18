@@ -11,7 +11,7 @@ class VolumeInterface extends InterfaceBuilder {
         $this->addIntField('id');
         $this->addStringField('uri');
         $this->addStringField('url')
-            ->use(AssetTransformArguments::class);
+            ->use(new AssetTransformArguments);
 
         $this->addStringField('width');
         $this->addStringField('height');
