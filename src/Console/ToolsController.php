@@ -107,9 +107,19 @@ class ToolsController extends Controller
                         $variables = @$body['variables'] ?: [];
                     }
 
+                    var_dump('1');
+//                    (new \NunoMaduro\Collision\Provider(new \Whoops\Run, new \NunoMaduro\Collision\Handler))->register();
+
+                    $whoops = new \Whoops\Run;
+                    $whoops->pushHandler(new \Whoops\Handler\PlainTextHandler);
+                    $whoops->register();
+
+                    var_dump('2');
+
                     if ($this->debug) { echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n"; }
                     $schema = $graphQl->getSchema($token);
                     $result = $graphQl->execute($schema, $query, $variables);
+                    var_dump('3');
 
                     $resolve(new Response(200, $headers, json_encode($result)));
                 });

@@ -18,6 +18,8 @@ class Query extends Schema {
     function boot() {
         $token = $this->request->token();
 
+        throw new \Exception('oh no!');
+
         $this->addStringField('helloWorld')
             ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
