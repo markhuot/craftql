@@ -14,9 +14,14 @@ class Mutation extends Schema {
 
     function boot() {
 
+        $this->addField('helloWorld')
+            ->description('A sample mutation. Doesn\'t actually save anything.')
+            ->resolve('If this were a real mutation it would have saved to the database.');
+
         foreach ($this->request->entryTypes()->all('mutate') as $entryType) {
             $this->addField('upsert'.$entryType->getName())
                 ->type($entryType)
+                ->description('Create or update existing '.$entryType->getName().'.')
                 ->use(new EntryMutationArguments);
         }
 
