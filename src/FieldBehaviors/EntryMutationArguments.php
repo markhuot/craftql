@@ -35,6 +35,10 @@ class EntryMutationArguments extends FieldBehavior {
                 $entry = new Entry();
                 $entry->sectionId = $this->owner->getType()->getContext()->section->id;
                 $entry->typeId = $this->owner->getType()->getContext()->id;
+
+                if (empty($args['title'])) {
+                    throw new \GraphQL\Error\UserError('You must set a title when upserting a new entry.');
+                }
             }
 
             if (isset($args['authorId'])) {
