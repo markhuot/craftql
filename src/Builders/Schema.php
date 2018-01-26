@@ -131,7 +131,7 @@ class Schema extends BaseBuilder {
         return $this->fields[] = new Date($this->request, $field);
     }
 
-    function addUnionField($field): BaseField {
+    function addUnionField($field): Union{
         if (is_a($field, CraftField::class)) {
             return $this->fields[] = (new Union($this->request, $field->handle))
                 ->description($field->instructions);

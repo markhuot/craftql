@@ -24,6 +24,9 @@ class GetMatrixFieldSchema
             ->resolveType(function ($root, $args) use ($field) {
                 $block = $root->getType();
                 return ucfirst($field->handle).ucfirst($block->handle);
+            })
+            ->resolve(function ($root, $args, $context, $info) use ($field) {
+                return $root->{$field->handle}->all();
             });
 
         $blockTypes = $field->getBlockTypes();
