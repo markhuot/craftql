@@ -2,6 +2,7 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
+use craft\base\Element;
 use craft\elements\Entry;
 use markhuot\CraftQL\Behaviors\FieldBehavior;
 use markhuot\CraftQL\Builders\Field;
@@ -35,6 +36,7 @@ class EntryMutationArguments extends FieldBehavior {
                 $entry = new Entry();
                 $entry->sectionId = $this->owner->getType()->getContext()->section->id;
                 $entry->typeId = $this->owner->getType()->getContext()->id;
+                $entry->fieldLayoutId = $this->owner->getType()->getContext()->fieldLayoutId;
 
                 if (empty($args['title'])) {
                     throw new \GraphQL\Error\UserError('You must set a title when upserting a new entry.');
@@ -67,7 +69,16 @@ class EntryMutationArguments extends FieldBehavior {
 
             $entry->setFieldValues($fields);
 
-            Craft::$app->elements->saveElement($entry);
+            $entry->setScenario(Element::SCENARIO_LIVE);
+
+            if (!Craft::$app->elements->saveElement($entry)) {
+                $errorStrings = [];
+
+                foreach ($entry->errors as $fieldName => $errors) {
+                    $errorStrings = array_merge($errorStrings, $errors);
+                }
+                throw new \GraphQL\Error\UserError('Validation failed.'."\n\n- ".implode("\n-", $errorStrings));
+            }
 
             return $entry;
         });
