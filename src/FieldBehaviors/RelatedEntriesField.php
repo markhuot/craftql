@@ -10,6 +10,7 @@ class RelatedEntriesField extends SchemaBehavior {
     function initRelatedEntriesField() {
         $this->owner->addField('relatedEntries')
             ->type(EntryConnection::class)
+            ->use(new EntryQueryArguments)
             ->arguments(function($field) {
                 $field->addBooleanArgument('source');
                 $field->addBooleanArgument('target');
