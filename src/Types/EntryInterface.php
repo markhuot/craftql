@@ -16,9 +16,10 @@ class EntryInterface extends InterfaceBuilder {
 
         $this->addStringField('title')->nonNull();
         $this->addStringField('slug')->nonNull();
-        $this->addDateField('dateCreated');
-        $this->addDateField('dateUpdated');
+        $this->addDateField('dateCreated')->nonNull();
+        $this->addDateField('dateUpdated')->nonNull();
         $this->addDateField('expiryDate');
+        $this->addDateField('postDate');
         $this->addBooleanField('enabled')->nonNull();
         $this->addStringField('status')->nonNull();
         $this->addStringField('uri');
