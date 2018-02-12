@@ -104,6 +104,15 @@ class Query extends Schema {
             ->resolve(function ($root, $args, $context, $info) {
                 return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
             });
+
+        $draftField = $this->addField('draft')
+            ->type(EntryInterface::class)
+            ->use(new EntryQueryArguments)
+            ->resolve(function ($root, $args, $context, $info) {
+                return Craft::$app->entryRevisions->getDraftById($args['draftId']);
+            });
+
+        $draftField->addIntArgument('draftId')->nonNull();
     }
 
     /**
