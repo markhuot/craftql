@@ -9,14 +9,13 @@ class VolumeInterface extends InterfaceBuilder {
 
     function boot() {
         $this->addIntField('id');
-        $this->addStringField('uri');
         $this->addStringField('url')
             ->use(new AssetTransformArguments);
 
         $this->addStringField('width');
         $this->addStringField('height');
         $this->addIntField('size');
-        $this->addStringField('folder');
+        $this->addField('folder')->type(VolumeFolder::class);
         $this->addStringField('mimeType');
         $this->addStringField('title');
         $this->addStringField('extension');
