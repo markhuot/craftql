@@ -2,13 +2,9 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
+use Craft;
 use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\GraphQLFields\Query\Users as UsersField;
-use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
+use craft\elements\User as CraftUserElement;
 
 class User extends Schema {
 
@@ -25,9 +21,19 @@ class User extends Schema {
         $this->addBooleanField('isCurrent')->nonNull();
         $this->addStringField('preferredLocale');
         // $this->addField('status')->type(UsersField::statusEnum())->nonNull();
+
+        $volumeId = Craft::$app->getSystemSettings()->getSetting('users', 'photoVolumeId');
+        if ($volumeId) {
+            $this->addField('photo')
+                ->type($this->request->volumes()->get($volumeId));
+        }
+
         $this->addDateField('dateCreated')->nonNull();
         $this->addDateField('dateUpdated')->nonNull();
         $this->addDateField('lastLoginDate')->nonNull();
+
+        $fieldLayoutId = Craft::$app->getFields()->getLayoutByType(CraftUserElement::class)->id;
+        $this->addFieldsByLayoutId($fieldLayoutId);
     }
 
 }
