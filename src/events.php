@@ -56,6 +56,11 @@ return [
             new \markhuot\CraftQL\Listeners\GetRedactorFieldSchema,
         ],
     ],
+    \verbb\supertable\fields\SuperTableField::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetSuperTableFieldSchema,
+        ],
+    ],
     \craft\fields\Table::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetTableFieldSchema,

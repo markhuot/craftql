@@ -33,6 +33,7 @@ class GetMatrixFieldSchema
 
         foreach ($blockTypes as $blockType) {
             $type = $union->addType(ucfirst($field->handle).ucfirst($blockType->handle), $blockType);
+            $type->addIntField('id');
             $type->addFieldsByLayoutId($blockType->fieldLayoutId);
 
             if (empty($type->getFields())) {
