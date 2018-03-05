@@ -14,8 +14,11 @@ class GetUsersFieldSchema
      */
     function handle($event) {
         $event->handled = true;
-
         $field = $event->sender;
+
+        if (!$event->query->getRequest()->token()->can('query:users')) {
+            return;
+        }
 
         $event->schema->addField($field)
             ->type(User::class)
