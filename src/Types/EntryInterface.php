@@ -24,8 +24,12 @@ class EntryInterface extends InterfaceBuilder {
         $this->addStringField('status')->nonNull();
         $this->addStringField('uri');
         $this->addStringField('url');
-        $this->addField('section')->type(Section::class);
-        $this->addField('type')->type(EntryType::class);
+
+        if ($this->request->token()->can('query:sections')) {
+            $this->addField('section')->type(Section::class);
+            $this->addField('type')->type(EntryType::class);
+        }
+
         $this->addField('ancestors')->lists()->type(EntryInterface::class);
         $this->addField('children')->lists()->type(EntryInterface::class);
         $this->addField('descendants')->lists()->type(EntryInterface::class);
