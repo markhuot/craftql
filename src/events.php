@@ -71,6 +71,11 @@ return [
             new \markhuot\CraftQL\Listeners\GetTagsFieldSchema,
         ],
     ],
+    \craft\fields\Users::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetUsersFieldSchema,
+        ],
+    ],
     \craft\base\Field::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetDefaultFieldSchema,
