@@ -33,7 +33,7 @@ class GetMatrixFieldSchema
 
         foreach ($blockTypes as $blockType) {
             $type = $union->addType(ucfirst($field->handle).ucfirst($blockType->handle), $blockType);
-            $type->addIntField('id');
+            $type->addStringField('id'); // ideally this would be an `int`, but draft matrix blocks have an id of `new1`
             $type->addFieldsByLayoutId($blockType->fieldLayoutId);
 
             if (empty($type->getFields())) {
