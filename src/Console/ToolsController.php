@@ -129,6 +129,42 @@ class ToolsController extends Controller
 
     public function actionSeed()
     {
+        $homeSection = new \craft\models\Section;
+        $homeSection->name = 'Homepage';
+        $homeSection->handle = 'homepage';
+        $homeSection->type = 'single';
+        $homeSection->enableVersioning = true;
+
+        $homeSectionSiteSettings = new \craft\models\Section_SiteSettings();
+        $homeSectionSiteSettings->siteId = 1;
+        $homeSectionSiteSettings->hasUrls = true;
+        $homeSectionSiteSettings->uriFormat = '/';
+        $homeSectionSiteSettings->template = 'homepage/_entry';
+        $homeSectionSiteSettings->enabledByDefault = true;
+        $homeSection->setSiteSettings([1 => $homeSectionSiteSettings]);
+
+        Craft::$app->getSections()->saveSection($homeSection);
+
+        // ----------
+
+        $destinationSection = new \craft\models\Section;
+        $destinationSection->name = 'Destinations';
+        $destinationSection->handle = 'destinations';
+        $destinationSection->type = 'channel';
+        $destinationSection->enableVersioning = true;
+
+        $destinationSectionSiteSettings = new \craft\models\Section_SiteSettings();
+        $destinationSectionSiteSettings->siteId = 1;
+        $destinationSectionSiteSettings->hasUrls = true;
+        $destinationSectionSiteSettings->uriFormat = 'destinations/{slug}';
+        $destinationSectionSiteSettings->template = 'destination/_entry';
+        $destinationSectionSiteSettings->enabledByDefault = true;
+        $destinationSection->setSiteSettings([1 => $destinationSectionSiteSettings]);
+
+        Craft::$app->getSections()->saveSection($destinationSection);
+
+        // ----------
+
         $section = new \craft\models\Section;
         $section->name = 'Stories';
         $section->handle = 'stories';
@@ -144,6 +180,25 @@ class ToolsController extends Controller
         $section->setSiteSettings([1 => $siteSettings]);
 
         Craft::$app->getSections()->saveSection($section);
+
+        // ----------
+
+        if (!file_exists('./web/uploads')) {
+            mkdir('./web/uploads');
+        }
+
+        $volume = Craft::$app->volumes->createVolume([
+            'type' => 'craft\volumes\Local',
+            'name' => 'Default Volume',
+            'handle' => 'defaultVolume',
+            'hasUrls' => true,
+            'url' => '/uploads',
+            'settings' => json_encode(['path' => realpath('./web/uploads')]),
+        ]);
+
+        Craft::$app->volumes->saveVolume($volume);
+
+        // ----------
 
         $groupModel = new \craft\models\FieldGroup();
         $groupModel->name = 'Default';
@@ -164,6 +219,22 @@ class ToolsController extends Controller
         $bodyField->required = false;
         $bodyField->sortOrder = 0;
         Craft::$app->fields->saveField($bodyField);
+
+        $headingField = new \craft\fields\PlainText();
+        $headingField->groupId = $groupModel->id;
+        $headingField->name = 'Heading';
+        $headingField->handle = 'heading';
+        $headingField->required = false;
+        $headingField->sortOrder = 0;
+        Craft::$app->fields->saveField($headingField);
+
+        $subheadingField = new \craft\fields\PlainText();
+        $subheadingField->groupId = $groupModel->id;
+        $subheadingField->name = 'Subheading';
+        $subheadingField->handle = 'subheading';
+        $subheadingField->required = false;
+        $subheadingField->sortOrder = 0;
+        Craft::$app->fields->saveField($subheadingField);
 
         $dateField = new \craft\fields\Date();
         $dateField->groupId = $groupModel->id;
@@ -297,35 +368,20 @@ class ToolsController extends Controller
         ];
         Craft::$app->fields->saveField($multiSelectField);
 
-        if (!file_exists('./web/uploads')) {
-            mkdir('./web/uploads');
-        }
-
-        $volume = Craft::$app->volumes->createVolume([
-            'type' => 'craft\volumes\Local',
-            'name' => 'Default Volume',
-            'handle' => 'defaultVolume',
-            'hasUrls' => true,
-            'url' => '/uploads',
-            'settings' => json_encode(['path' => realpath('./web/uploads')]),
-        ]);
-
-        Craft::$app->volumes->saveVolume($volume);
-
-        $assetsField = new \craft\fields\Assets();
-        $assetsField->groupId = $groupModel->id;
-        $assetsField->name = 'Hero Image';
-        $assetsField->handle = 'heroImage';
-        $assetsField->required = false;
-        $assetsField->sortOrder = 0;
-        $assetsField->useSingleFolder = false;
-        $assetsField->defaultUploadLocationSource = "folder:1";
-        $assetsField->defaultUploadLocationSubpath = "";
-        $assetsField->singleUploadLocationSource = "folder:1";
-        $assetsField->singleUploadLocationSubpath = "";
-        $assetsField->restrictFiles = "";
-        $assetsField->allowedKinds = null;
-        Craft::$app->fields->saveField($assetsField);
+        $heroImageField = new \craft\fields\Assets();
+        $heroImageField->groupId = $groupModel->id;
+        $heroImageField->name = 'Hero Image';
+        $heroImageField->handle = 'heroImage';
+        $heroImageField->required = false;
+        $heroImageField->sortOrder = 0;
+        $heroImageField->useSingleFolder = false;
+        $heroImageField->defaultUploadLocationSource = "folder:1";
+        $heroImageField->defaultUploadLocationSubpath = "";
+        $heroImageField->singleUploadLocationSource = "folder:1";
+        $heroImageField->singleUploadLocationSubpath = "";
+        $heroImageField->restrictFiles = "";
+        $heroImageField->allowedKinds = null;
+        Craft::$app->fields->saveField($heroImageField);
 
         $categoryGroup = new \craft\models\CategoryGroup();
         $categoryGroup->name = 'Story Types';
@@ -362,11 +418,57 @@ class ToolsController extends Controller
         $tagField->source = 'taggroup:'.$tagGroup->id;
         Craft::$app->fields->saveField($tagField);
 
-        $layout = new \craft\models\FieldLayout();
-        $layout->type = \craft\elements\Entry::class;
+        // ----------
+
+        $homepageLayout = new \craft\models\FieldLayout();
+        $homepageLayout->type = \craft\elements\Entry::class;
 
         $contentTab = new \craft\models\FieldLayoutTab();
-        $contentTab->setLayout($layout);
+        $contentTab->setLayout($homepageLayout);
+        $contentTab->name = 'Content';
+        $contentTab->setFields([
+            $heroImageField,
+            $headingField,
+            $subheadingField,
+        ]);
+
+        if (!empty($homeSection->getEntryTypes())) {
+            $entryType = $homeSection->getEntryTypes()[0];
+            $homepageLayout = Craft::$app->fields->getLayoutById($entryType->fieldLayoutId);
+            $homepageLayout->setTabs([
+                $contentTab,
+            ]);
+            Craft::$app->fields->saveLayout($homepageLayout);
+        }
+
+        // ----------
+
+        $destinationLayout = new \craft\models\FieldLayout();
+        $destinationLayout->type = \craft\elements\Entry::class;
+
+        $destinationTab = new \craft\models\FieldLayoutTab();
+        $destinationTab->setLayout($destinationLayout);
+        $destinationTab->name = 'Content';
+        $destinationTab->setFields([
+            $matrixField,
+        ]);
+
+        if (!empty($destinationSection->getEntryTypes())) {
+            $entryType = $destinationSection->getEntryTypes()[0];
+            $destinationLayout = Craft::$app->fields->getLayoutById($entryType->fieldLayoutId);
+            $destinationLayout->setTabs([
+                $destinationTab,
+            ]);
+            Craft::$app->fields->saveLayout($destinationLayout);
+        }
+
+        // ----------
+
+        $storiesLayout = new \craft\models\FieldLayout();
+        $storiesLayout->type = \craft\elements\Entry::class;
+
+        $contentTab = new \craft\models\FieldLayoutTab();
+        $contentTab->setLayout($storiesLayout);
         $contentTab->name = 'Content';
         $contentTab->setFields([
             $bodyField,
@@ -376,7 +478,7 @@ class ToolsController extends Controller
             $dropdownField,
             $entriesField,
             $multiSelectField,
-            $assetsField,
+            $heroImageField,
             $matrixField,
             $emptyMatrixField,
             $emptyMatrixBlockField,
@@ -386,16 +488,14 @@ class ToolsController extends Controller
 
         if (!empty($section->getEntryTypes())) {
             $entryType = $section->getEntryTypes()[0];
-            $layout = Craft::$app->fields->getLayoutById($entryType->fieldLayoutId);
-            $layout->setTabs([
+            $storiesLayout = Craft::$app->fields->getLayoutById($entryType->fieldLayoutId);
+            $storiesLayout->setTabs([
                 $contentTab,
             ]);
-            Craft::$app->fields->saveLayout($layout);
+            Craft::$app->fields->saveLayout($storiesLayout);
         }
 
-
         // ----------
-
 
         $globalMetaDescriptionField = new \craft\fields\PlainText();
         $globalMetaDescriptionField->groupId = $groupModel->id;
