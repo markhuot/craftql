@@ -120,6 +120,15 @@ class ApiController extends Controller
         $result = $this->graphQl->execute($schema, $input, $variables);
         Craft::trace('CraftQL: Execution complete');
 
+        $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];
+        foreach ($customHeaders as $key => $value) {
+            if (is_callable($value)) {
+                $value = $value($schema, $input, $variables, $result);
+            }
+            $response = \Craft::$app->getResponse();
+            $response->headers->add($key, $value);
+        }
+
         if (!!Craft::$app->request->post('debug')) {
             $response = \Yii::$app->getResponse();
             $response->format = \craft\web\Response::FORMAT_HTML;
