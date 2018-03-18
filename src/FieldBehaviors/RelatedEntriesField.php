@@ -11,29 +11,13 @@ class RelatedEntriesField extends SchemaBehavior {
         $this->owner->addField('relatedEntries')
             ->type(EntryConnection::class)
             ->use(new EntryQueryArguments)
-            ->arguments(function($field) {
-                $field->addBooleanArgument('source');
-                $field->addBooleanArgument('target');
-                $field->addStringArgument('field');
-                $field->addStringArgument('sourceLocale');
-            })
             ->resolve(function ($root, $args, $context, $info) {
-                $criteria = \craft\elements\Entry::find();
+                $criteria = $this->owner->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
 
-                $criteria = $criteria->relatedTo([
-                    'element' => !@$args['source'] && !@$args['target'] ? $root['node']->id : null,
-                    'sourceElement' => @$args['source'] == true ? $root['node']->id : null,
-                    'targetElement' => @$args['target'] == true ? $root['node']->id : null,
-                    'field' => @$args['field'] ?: null,
-                    'sourceLocale' => @$args['sourceLocale'] ?: null,
-                ]);
+                if (empty($criteria->relatedTo)) {
+                    $criteria->relatedTo(@$root['node']->id);
+                }
 
-                unset($args['source']);
-                unset($args['target']);
-                unset($args['field']);
-                unset($args['sourceLocale']);
-
-                $criteria = $this->owner->getRequest()->entries($criteria, $root, $args, $context, $info);
                 list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
 
                 return [

@@ -80,6 +80,19 @@ class Request {
         return $this->globals;
     }
 
+    private function parseRelatedTo($relations, $id) {
+        foreach ($relations as $index => &$relatedTo) {
+            foreach (['element', 'sourceElement', 'targetElement'] as $key) {
+                if (!empty($relatedTo["{$key}IsEdge"])) {
+                    $relatedTo[$key] = $id;
+                    unset($relatedTo["{$key}IsEdge"]);
+                }
+            }
+        }
+
+        return $relations;
+    }
+
     function entries($criteria, $root, $args, $context, $info) {
         if (empty($args['section'])) {
             $args['sectionId'] = array_map(function ($value) {
@@ -102,12 +115,12 @@ class Request {
         }
 
         if (!empty($args['relatedTo'])) {
-            $criteria->relatedTo(array_merge(['and'], $args['relatedTo']));
+            $criteria->relatedTo(array_merge(['and'], $this->parseRelatedTo($args['relatedTo'], @$root['node']->id)));
             unset($args['relatedTo']);
         }
 
         if (!empty($args['orRelatedTo'])) {
-            $criteria->relatedTo(array_merge(['or'], $args['orRelatedTo']));
+            $criteria->relatedTo(array_merge(['or'], $this->parseRelatedTo($args['orRelatedTo'], @$root['node']->id)));
             unset($args['orRelatedTo']);
         }
 

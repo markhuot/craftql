@@ -57,8 +57,11 @@ class EntryQueryArguments extends FieldBehavior {
 
         $type = $this->owner->createInputObjectType('RelatedToInputType');
         $type->addIntArgument('element');
+        $type->addBooleanArgument('elementIsEdge');
         $type->addIntArgument('sourceElement');
+        $type->addBooleanArgument('sourceElementIsEdge');
         $type->addIntArgument('targetElement');
+        $type->addBooleanArgument('targetElementIsEdge');
         $type->addStringArgument('field');
         $type->addStringArgument('sourceLocale');
         return static::$inputObjectType = $type;
