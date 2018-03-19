@@ -141,11 +141,29 @@ class Query extends Schema {
         if ($this->request->globals()->count() > 0) {
             $this->addField('globals')
                 ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
+                ->arguments(function ($field) {
+                    $field->addStringArgument('site');
+                    $field->addIntArgument('siteId');
+                })
                 ->resolve(function ($root, $args) {
+                    if (!empty($args['site'])) {
+                        $siteId = Craft::$app->getSites()->getSiteByHandle($args['site'])->id;
+                    }
+                    else if (!empty($args['siteId'])) {
+                        $siteId = $args['siteId'];
+                    }
+                    else {
+                        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+                    }
+
                     $sets = [];
-                    foreach (\Craft::$app->globals->allSets as $set) {
+                    $setIds = \Craft::$app->globals->getAllSetIds();
+
+                    foreach ($setIds as $id) {
+                        $set = \Craft::$app->globals->getSetById($id, $siteId);
                         $sets[$set->handle] = $set;
                     }
+
                     return $sets;
                 });
         }
