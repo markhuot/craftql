@@ -38,18 +38,29 @@ class Query extends Schema {
         }
 
         if ($token->can('query:users')) {
+            $userResolver = function ($root, $args) {
+                $criteria = \craft\elements\User::find();
+
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+
+                return $criteria;
+            };
+
             $this->addField('users')
                 ->lists()
                 ->type(User::class)
                 ->use(new UserQueryArguments)
-                ->resolve(function ($root, $args, $context, $info) {
-                    $criteria = \craft\elements\User::find();
+                ->resolve(function ($root, $args) use ($userResolver) {
+                    return $userResolver($root, $args)->all();
+                });
 
-                    foreach ($args as $key => $value) {
-                        $criteria = $criteria->{$key}($value);
-                    }
-
-                    return $criteria->all();
+            $this->addField('user')
+                ->type(User::class)
+                ->use(new UserQueryArguments)
+                ->resolve(function ($root, $args) use ($userResolver) {
+                    return $userResolver($root, $args)->first();
                 });
         }
 
