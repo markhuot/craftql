@@ -32,6 +32,10 @@ class CategoryQueryArguments extends FieldBehavior {
         $this->owner->addStringArgument('slug');
         $this->owner->addStringArgument('title');
         $this->owner->addStringArgument('uri');
+
+        $fieldService = \Yii::$container->get('craftQLFieldService');
+        $arguments = $fieldService->getQueryArguments($this->owner->getRequest());
+        $this->owner->addArguments($arguments, false);
     }
 
 }

@@ -21,6 +21,10 @@ class UserQueryArguments extends FieldBehavior {
         $this->owner->addStringArgument('search');
         // $this->owner->addStringArgument('status' => static::statusEnum(),
         $this->owner->addStringArgument('username');
+
+        $fieldService = \Yii::$container->get('craftQLFieldService');
+        $arguments = $fieldService->getQueryArguments($this->owner->getRequest());
+        $this->owner->addArguments($arguments, false);
     }
 
 }
