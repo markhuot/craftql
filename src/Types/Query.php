@@ -235,48 +235,46 @@ class Query extends Schema {
             return;
         }
 
+        $categoryResolver = function ($root, $args) {
+            $criteria = \craft\elements\Category::find();
+
+            if (isset($args['group'])) {
+                $args['groupId'] = $args['group'];
+                unset($args['group']);
+            }
+
+            foreach ($args as $key => $value) {
+                $criteria = $criteria->{$key}($value);
+            }
+
+            return $criteria;
+        };
+
         $this->addField('categories')
             ->lists()
             ->type(CategoryInterface::class)
             ->use(new CategoryQueryArguments)
-            ->resolve(function ($root, $args) {
-                $criteria = \craft\elements\Category::find();
+            ->resolve(function ($root, $args) use ($categoryResolver) {
+                return $categoryResolver($root, $args)->all();
+            });
 
-                if (isset($args['group'])) {
-                    $args['groupId'] = $args['group'];
-                    unset($args['group']);
-                }
-
-                foreach ($args as $key => $value) {
-                    $criteria = $criteria->{$key}($value);
-                }
-
-                return $criteria->all();
+        $this->addField('category')
+            ->type(CategoryInterface::class)
+            ->use(new CategoryQueryArguments)
+            ->resolve(function ($root, $args) use ($categoryResolver) {
+                return $categoryResolver($root, $args)->first();
             });
 
         $this->addField('categoriesConnection')
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
-            ->resolve(function ($root, $args) {
-                $criteria = \craft\elements\Category::find();
-
-                if (isset($args['group'])) {
-                    $args['groupId'] = $args['group'];
-                    unset($args['group']);
-                }
-
-                foreach ($args as $key => $value) {
-                    $criteria = $criteria->{$key}($value);
-                }
-
-                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($criteria);
+            ->resolve(function ($root, $args) use ($categoryResolver) {
+                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($categoryResolver($root, $args));
 
                 return [
                     'totalCount' => $pageInfo->total,
                     'pageInfo' => $pageInfo,
                     'edges' => $categories,
-                    'criteria' => $criteria,
-                    'args' => $args,
                 ];
             });
     }
