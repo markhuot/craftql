@@ -390,7 +390,7 @@ $ composer create-project craftcms/craft my-awesome-site -s beta
 Once you have a running version of Craft 3 you can install _CraftQL_ with Composer:
 
 ```shell
-$ composer require markhuot/craftql
+$ composer require markhuot/craftql:^1.0.0-beta.29
 ```
 
 ## Running the CLI server
