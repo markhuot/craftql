@@ -80,7 +80,9 @@ class GraphQLService extends Component {
 
                 array_map(function ($entryType) {
                     return $entryType->getRawGraphQLObject();
-                }, $request->entryTypes()->all())
+                }, $request->entryTypes()->all()),
+
+                [\markhuot\CraftQL\Directives\Date::dateFormatTypesEnum()]
             );
         };
 

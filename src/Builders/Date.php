@@ -2,8 +2,7 @@
 
 namespace markhuot\CraftQL\Builders;
 
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Builders\ContentField;
+use DateTime;
 use DateTimeZone;
 
 class Date extends Field {
@@ -29,6 +28,10 @@ class Date extends Field {
 
                             case 'timezone':
                                 $timezone = $arg->value->value;
+                                break;
+
+                            case 'format':
+                                $format = constant('DateTime::' . strtoupper($arg->value->value));
                                 break;
                         }
                     }
