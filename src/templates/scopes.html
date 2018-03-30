@@ -45,9 +45,9 @@
     <table id="sites" class="shadow-box editable">
         <thead>
             <tr>
-                <th scope="col" class="header thin">Field Name</th>
-                <th scope="col" class="header">Description</th>
-                <th scope="col" class="header thin"></th>
+                <th scope="col" class="thin">Field Name</th>
+                <th scope="col">Description</th>
+                <th scope="col" class="thin"></th>
             </tr>
         </thead>
         <tbody>
@@ -98,16 +98,16 @@
 <hr>
 
 <div class="field">
-    <h2>Query Entry Types</h2>
+    <h2>Queries</h2>
     <div class="field first last"><div class="heading"><div class="instructions"><p>Only the enabled entry types will be visible in the GraphQL schema.</p></div></div></div>
 
     <table id="sites" class="shadow-box editable">
         <thead>
             <tr>
-                <th scope="col" class="header thin">Type</th>
-                <th scope="col" class="header">Section</th>
-                <th scope="col" class="header">Entry Type</th>
-                <th scope="col" class="header thin"></th>
+                <th scope="col" class="thin">Type</th>
+                <th scope="col">Section</th>
+                <th scope="col">Entry Type</th>
+                <th scope="col" class="thin"></th>
             </tr>
         </thead>
         <tbody>
@@ -128,16 +128,16 @@
 <hr>
 
 <div class="field">
-    <h2>Mutation Entry Types</h2>
+    <h2>Mutations</h2>
     <div class="field first last"><div class="heading"><div class="instructions"><p>Enable the entry types that should be editable through GraphQL.</p></div></div></div>
 
     <table id="sites" class="shadow-box editable">
         <thead>
             <tr>
-                <th scope="col" class="header thin">Type</th>
-                <th scope="col" class="header">Section</th>
-                <th scope="col" class="header">Entry Type</th>
-                <th scope="col" class="header thin"></th>
+                <th scope="col" class="thin">Type</th>
+                <th scope="col">Section</th>
+                <th scope="col">Entry Type</th>
+                <th scope="col" class="thin"></th>
             </tr>
         </thead>
         <tbody>
@@ -154,6 +154,22 @@
         </tbody>
     </table>
 </div>
+
+{#
+<hr>
+
+<div class="field">
+    <h2>Throttling</h2>
+    <div class="field first last"><div class="heading"><div class="instructions"><p>Throttling is handled by calculating the "cost" of a GraphQL query. The cost is determined by the total <em>possible</em> elements returned by a query. For example a call to <code>{ entries { ... } }</code> will cost 100 points because, unbounded, the entries field is limited to 100 results. If you pass <code>{ entries(limit:5) { ... } }</code> then the cost will only be 5 points.</em>. Throttling limits are per hour.</p></div></div></div>
+
+    {{ forms.textField({
+        first: true,
+        name: 'token[throttling]',
+        value: 50000,
+    }) }}
+</div>
+#}
+
 {% endset %}
 
 {% set extraPageHeaderHtml %}

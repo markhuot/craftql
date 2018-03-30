@@ -7,6 +7,9 @@
     background: none;
     padding: 0;
 }
+.breakall {
+    word-break: break-all;
+}
 </style>
 
 {% set welcome %}
@@ -80,7 +83,7 @@ You can access your GraphQL endpoint in two ways,
     <p><a href="{{ url('craftql/token-gen') }}">Generate a new token</a> (for my user)</p>
 
     {% if settings.tokens|length > 0 %}
-    <table class="data fullwidth collapsible">
+    <table class="data fullwidth">
         <thead>
             <tr>
                 <th scope="col">Name</th>
@@ -92,8 +95,8 @@ You can access your GraphQL endpoint in two ways,
         {% for token in settings.tokens %}
             <tr>
                 <td><input type="text" name="token[{{ token.id }}][name]" class="text" placeholder="Name..." value="{{ token.name }}" /></td>
-                <td>{{ token.token }}</td>
-                <td><a href="{{ url('craftql/token/' ~ token.id ~ '/scopes') }}">Scopes&hellip;</a></td>
+                <td class="breakall">{{ token.token }}</td>
+                <td><a href="{{ url('craftql/token/' ~ token.id ~ '/scopes') }}">Settings&hellip;</a></td>
                 <td><a class="delete icon" title="Delete" role="button" href="{{ url('craftql/token-del/' ~ token.id) }}"></a></td>
             </tr>
         {% endfor %}
