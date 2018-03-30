@@ -3,6 +3,7 @@
 namespace markhuot\CraftQL\Controllers;
 
 use Craft;
+use markhuot\CraftQL\GraphiQLAssetBundle;
 use Yii;
 use craft\web\Controller;
 use markhuot\CraftQL\CraftQL;
@@ -57,6 +58,8 @@ class CpController extends Controller
         $url = \craft\helpers\UrlHelper::siteUrl();
         $instance = \markhuot\CraftQL\CraftQL::getInstance();
         $uri = $instance->settings->uri;
+
+        $this->view->registerAssetBundle(GraphiQLAssetBundle::class);
 
         $this->renderTemplate('craftql/graphiql', [
             'url' => "{$url}{$uri}",
