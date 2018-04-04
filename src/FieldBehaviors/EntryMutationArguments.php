@@ -46,6 +46,9 @@ class EntryMutationArguments extends FieldBehavior {
             if (isset($args['authorId'])) {
                 $entry->authorId = $args['authorId'];
             }
+            else if (empty($args['authorId'])) {
+                $entry->authorId = $this->owner->getRequest()->token()->user->id;
+            }
 
             if (isset($args['title'])) {
                 $entry->title = $args['title'];
