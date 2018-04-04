@@ -1,3 +1,7 @@
+## 1.0.0 - 2018-04-04
+
+- Initial public release!
+
 ## 1.0.0-beta.8 - 2017-08-24
 
 ### Fixed
