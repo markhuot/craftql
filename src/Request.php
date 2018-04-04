@@ -124,6 +124,11 @@ class Request {
             unset($args['orRelatedTo']);
         }
 
+        if (!empty($args['idNot'])) {
+            $criteria->id('not '.implode(', ', $args['idNot']));
+            unset($args['idNot']);
+        }
+
         // var_dump($args);
         // die;
 
