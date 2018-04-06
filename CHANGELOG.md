@@ -1,6 +1,7 @@
-## 1.0.1 - 2018-04-04
+## dev-master
 
 - Upsert mutations now set the `authorId` based on the token's user, where applicable.
+- Allows the top level `categories` field to accept an array of `id:` integers now.
 
 ## 1.0.0 - 2018-04-04
 
