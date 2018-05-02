@@ -73,6 +73,8 @@ class CpController extends Controller
         $instance = \markhuot\CraftQL\CraftQL::getInstance();
         $uri = $instance->settings->uri;
 
+        $this->view->registerAssetBundle(GraphiQLAssetBundle::class);
+
         $this->renderTemplate('craftql/graphiql', [
             'url' => "{$url}{$uri}",
             'token' => $token,
