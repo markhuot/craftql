@@ -42,6 +42,7 @@ class ToolsController extends Controller
         switch ($action->actionMethod) {
             case 'actionServe': return 'An event-driven, non-blocking web server.';
             case 'actionSeed': return 'Create sample sections to test out CraftQL.';
+            case 'actionDownloadFragmentTypes': return 'Downloads a JSON file of fragment types to be passed to Apollo Client';
         }
     }
 
@@ -522,5 +523,42 @@ class ToolsController extends Controller
         $globalSet->handle = 'seo';
         $globalSet->setFieldLayout($globalFieldLayout);
         Craft::$app->getGlobals()->saveSet($globalSet);
+    }
+
+    public function actionFetchFragmentTypes() {
+        $graphQl = Yii::$container->get(GraphQLService::class);
+        $graphQl->bootstrap();
+
+        $token = Token::admin();
+
+        $query = '{
+            __schema {
+                types {
+                    kind
+                    name
+                    possibleTypes {
+                        name
+                    }
+                }
+            }
+        }';
+        $variables = [];
+
+        $schema = $graphQl->getSchema($token);
+        $result = $graphQl->execute($schema, $query, $variables);
+
+        foreach ($result['data']['__schema']['types'] as $index => $type) {
+            if (empty($type['possibleTypes'])) {
+                unset($result['data']['__schema']['types'][$index]);
+            }
+        }
+
+        // because we removed some types our index isn't incremental any more which
+        // will cause PHP to json_encode types in to an object, not an array, we'll
+        // merge down the array back to itself to reset the keys so
+        // they're incremental
+        $result['data']['__schema']['types'] = array_merge($result['data']['__schema']['types']);
+
+        echo json_encode($result['data']);
     }
 }
