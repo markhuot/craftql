@@ -350,12 +350,12 @@ If your custom field resolves an object you can expose that to CraftQL as well. 
 Event::on(\craft\base\Field::class, 'craftQlGetFieldSchema', function ($event) {
   $field = $event->sender;
 
-  $object = $event->schema->createObjectType('MapPoint')
+  $object = $event->schema->createObjectType(ucfirst($field->handle) . 'MapPoint')
         ->addStringField('lat')
         ->addStringField('lng')
         ->addStringField('zoom');
 
-  $event->schema->addObjectField($field, $object);
+  $event->schema->addField($field)->type($object);
 });
 ```
 
