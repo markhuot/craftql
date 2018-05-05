@@ -15,7 +15,7 @@ class SectionSiteSettings extends Schema {
         $this->addIntField('siteId')->nonNull();
         $this->addBooleanField('enabledByDefault')->nonNull();
         $this->addBooleanField('hasUrls')->nonNull();
-        $this->addStringField('uriFormat')->nonNull();
+        $this->addStringField('uriFormat');
         $this->addStringField('template')->nonNull();
     }
 
