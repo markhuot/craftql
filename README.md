@@ -355,7 +355,7 @@ Event::on(\craft\base\Field::class, 'craftQlGetFieldSchema', function ($event) {
         ->addStringField('lng')
         ->addStringField('zoom');
 
-  $event->schema->addObjectField($field, $object);
+  $event->schema->addField($field)->type($object);
 });
 ```
 
