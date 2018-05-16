@@ -76,6 +76,11 @@ return [
             new \markhuot\CraftQL\Listeners\GetUsersFieldSchema,
         ],
     ],
+    \dukt\videos\fields\Video::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetVideosFieldSchema,
+        ],
+    ],
     \craft\base\Field::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetDefaultFieldSchema,
