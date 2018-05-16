@@ -71,6 +71,7 @@ class Union extends Field {
         return [
             'type' => $type,
             'description' => $this->getDescription(),
+            'args' => $this->getArgumentConfig(),
             'resolve' => $this->getResolve(),
         ];
     }

@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Listeners;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\UnionType;
+use markhuot\CraftQL\Builders\Field;
 
 class GetMatrixFieldSchema
 {
@@ -21,12 +22,27 @@ class GetMatrixFieldSchema
 
         $union = $schema->addUnionField($field)
             ->lists()
+            ->arguments(function ($field) {
+                $field->addStringArgument('type');
+                $field->addIntArgument('limit');
+            })
             ->resolveType(function ($root, $args) use ($field) {
                 $block = $root->getType();
                 return ucfirst($field->handle).ucfirst($block->handle);
             })
             ->resolve(function ($root, $args, $context, $info) use ($field) {
-                return $root->{$field->handle}->all();
+                if (!empty($args['type'])) {
+                    $query = $root->{$field->handle}->type($args['type']);
+                }
+                else {
+                    $query = $root->{$field->handle};
+                }
+
+                if (!empty($args['limit'])) {
+                    $query = $query->limit($args['limit']);
+                }
+
+                return $query->all();
             });
 
         $blockTypes = $field->getBlockTypes();
