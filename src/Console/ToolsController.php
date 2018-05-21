@@ -3,6 +3,7 @@
 namespace markhuot\CraftQL\Console;
 
 use Craft;
+use GraphQL\Utils\SchemaPrinter;
 use React\EventLoop\Factory;
 use React\Socket\Server;
 use React\Http\Response;
@@ -43,6 +44,7 @@ class ToolsController extends Controller
             case 'actionServe': return 'An event-driven, non-blocking web server.';
             case 'actionSeed': return 'Create sample sections to test out CraftQL.';
             case 'actionDownloadFragmentTypes': return 'Downloads a JSON file of fragment types to be passed to Apollo Client';
+            case 'actionPrintSchema': return 'Prints a .graphql type file to std out';
         }
     }
 
@@ -560,5 +562,13 @@ class ToolsController extends Controller
         $result['data']['__schema']['types'] = array_merge($result['data']['__schema']['types']);
 
         echo json_encode($result['data']);
+    }
+
+    public function actionPrintSchema() {
+        $graphQl = Yii::$container->get(GraphQLService::class);
+        $graphQl->bootstrap();
+        $token = Token::admin();
+        $schema = $graphQl->getSchema($token);
+        echo SchemaPrinter::doPrint($schema);
     }
 }
