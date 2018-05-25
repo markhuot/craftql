@@ -18,6 +18,7 @@ class UserQueryArguments extends FieldBehavior {
         $this->owner->addIntArgument('limit');
         $this->owner->addIntArgument('offset');
         $this->owner->addStringArgument('order');
+        $this->owner->addStringArgument('orderBy');
         $this->owner->addStringArgument('search');
         // $this->owner->addStringArgument('status' => static::statusEnum(),
         $this->owner->addStringArgument('username');

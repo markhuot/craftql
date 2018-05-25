@@ -89,7 +89,7 @@ class Query extends Schema {
             ->type(EntryInterface::class)
             ->use(new EntryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
-                return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
+                return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->all();
             });
 
          $this->addField('entriesConnection')

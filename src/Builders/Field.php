@@ -14,6 +14,7 @@ class Field extends BaseBuilder {
     use HasNonNullAttribute;
     use HasResolveAttribute;
     use HasArgumentsAttribute;
+    use HasDeprecationReasonAttribute;
 
 //    protected $arguments = [];
 
@@ -72,6 +73,7 @@ class Field extends BaseBuilder {
             'description' => $this->getDescription(),
             'args' => $this->getArgumentConfig(),
             'resolve' => $this->getResolve(),
+            'deprecationReason' => $this->getDeprecationReason(),
         ];
     }
 

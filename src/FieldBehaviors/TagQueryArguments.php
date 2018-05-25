@@ -17,6 +17,7 @@ class TagQueryArguments extends FieldBehavior {
         $this->owner->addIntArgument('siteId');
         $this->owner->addIntArgument('offset');
         $this->owner->addStringArgument('order');
+        $this->owner->addStringArgument('orderBy');
         // $this->owner->addStringArgument('relatedTo')->lists()->type(Entry::relatedToInputObject());
         $this->owner->addStringArgument('search');
         $this->owner->addStringArgument('slug');

@@ -23,6 +23,7 @@ class CategoryQueryArguments extends FieldBehavior {
         $this->owner->addIntArgument('nextSiblingOf');
         $this->owner->addIntArgument('offset');
         $this->owner->addStringArgument('order');
+        $this->owner->addStringArgument('orderBy');
         $this->owner->addIntArgument('positionedAfter');
         $this->owner->addIntArgument('positionedBefore');
         $this->owner->addIntArgument('prevSiblingOf');
