@@ -196,7 +196,9 @@ The above approach, typically, requires separate requests for the source content
 
 ## Transforms
 
-You can ask CraftQL for image transforms by specifying an argument to any asset field. If you have defined named transforms within the Craft UI you can reference the transform by its handle,
+You can ask CraftQL for image transforms by specifying an argument to any asset field. Note: for this to work the volume storing the image must have "public URLs" enabled in the volume settings otherwise CraftQL will return `null` values.
+
+If you have defined named transforms within the Craft UI you can reference the transform by its handle,
 
 ```graphql
 {
