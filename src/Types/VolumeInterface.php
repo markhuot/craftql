@@ -12,8 +12,12 @@ class VolumeInterface extends InterfaceBuilder {
         $this->addStringField('url')
             ->use(new AssetTransformArguments);
 
-        $this->addStringField('width');
-        $this->addStringField('height');
+        $this->addStringField('width')
+            ->use(new AssetTransformArguments);
+
+        $this->addStringField('height')
+            ->use(new AssetTransformArguments);
+
         $this->addIntField('size');
         $this->addField('folder')->type(VolumeFolder::class);
         $this->addStringField('mimeType');

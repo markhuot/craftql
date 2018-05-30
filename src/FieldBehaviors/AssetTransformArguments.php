@@ -2,6 +2,7 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
+use GraphQL\Type\Definition\ResolveInfo;
 use markhuot\CraftQL\Behaviors\FieldBehavior;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
@@ -98,7 +99,7 @@ class AssetTransformArguments extends FieldBehavior {
         $this->owner->addStringArgument('fit')->type(static::cropInputObject());
         $this->owner->addStringArgument('stretch')->type(static::cropInputObject());
 
-        $this->owner->resolve(function ($root, $args) {
+        $this->owner->resolve(function ($root, $args, $context, ResolveInfo $info) {
             if (!empty($args['transform'])) {
                 $transform = $args['transform'];
             }
@@ -117,7 +118,12 @@ class AssetTransformArguments extends FieldBehavior {
             else {
                 $transform = null;
             }
-            return $root->getUrl($transform);
+
+            switch ($info->fieldName) {
+                case 'url': return $root->getUrl($transform);
+                case 'width': return $root->getWidth($transform);
+                case 'height': return $root->getHeight($transform);
+            }
         });
     }
 
