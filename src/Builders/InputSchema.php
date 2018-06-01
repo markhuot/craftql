@@ -3,6 +3,7 @@
 namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\InputObjectType;
+use markhuot\CraftQL\Behaviors\FieldBehavior;
 
 class InputSchema extends BaseBuilder {
 
@@ -15,11 +16,28 @@ class InputSchema extends BaseBuilder {
         $this->name = $name;
     }
 
+    /**
+     * Add behaviors to our builder
+     *
+     * @param string $behavior
+     * @return self
+     */
+    function use(FieldBehavior $behavior): self {
+        $reflect = new \ReflectionClass($behavior);
+        $this->attachBehavior($reflect->getShortName(), $behavior);
+        return $this;
+    }
+
+    function getArguments() {
+        $this->bootBehaviors();
+        return $this->getArgumentConfig();
+    }
+
     function getGraphQLConfig() {
         return [
             'name' => $this->getName(),
             'fields' => function () {
-                return $this->getArgumentConfig();
+                return $this->getArguments();
             },
         ];
     }

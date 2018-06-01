@@ -3,6 +3,7 @@
 namespace markhuot\CraftQL\FieldBehaviors;
 
 use craft\base\Element;
+use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
 use markhuot\CraftQL\Behaviors\FieldBehavior;
 use markhuot\CraftQL\Builders\Field;
@@ -19,11 +20,16 @@ class EntryMutationArguments extends FieldBehavior {
         $this->owner->addIntArgument('id');
         $this->owner->addIntArgument('authorId');
         $this->owner->addStringArgument('title');
+        $this->owner->addBooleanArgument('enabled');
+
+        $mutationQueryObject = $this->owner->createInputObjectType('MutationQuery');
+        $mutationQueryObject->use(new EntryQueryArguments);
+        $this->owner->addArgument('query')->type($mutationQueryObject);
 
         $fieldLayoutId = $this->owner->getType()->getContext()->fieldLayoutId;
         $this->owner->addArgumentsByLayoutId($fieldLayoutId);
 
-        $this->owner->resolve(function ($root, $args) {
+        $this->owner->resolve(function ($root, $args, $context, $info) {
             if (!empty($args['id'])) {
                 $criteria = Entry::find();
                 $criteria->id($args['id']);
@@ -32,7 +38,12 @@ class EntryMutationArguments extends FieldBehavior {
                     throw new \GraphQL\Error\UserError('Could not find an entry with id '.$args['id']);
                 }
             }
-            else {
+            else if (!empty($args['query'])) {
+                $criteria = $this->owner->getRequest()->entries(Entry::find(), $root, $args['query'], $context, $info);
+                $entry = $criteria->one();
+            }
+
+            if (!$entry) {
                 $entry = new Entry();
                 $entry->sectionId = $this->owner->getType()->getContext()->section->id;
                 $entry->typeId = $this->owner->getType()->getContext()->id;
@@ -46,12 +57,16 @@ class EntryMutationArguments extends FieldBehavior {
             if (isset($args['authorId'])) {
                 $entry->authorId = $args['authorId'];
             }
-            else if (empty($args['authorId'])) {
+            else if (empty($args['authorId']) && empty($entry->authorId) && !empty($this->owner->getRequest()->token()->user)) {
                 $entry->authorId = $this->owner->getRequest()->token()->user->id;
             }
 
             if (isset($args['title'])) {
                 $entry->title = $args['title'];
+            }
+
+            if (isset($args['enabled'])) {
+                $entry->enabled = $args['enabled'];
             }
 
             $fields = $args;
@@ -60,6 +75,8 @@ class EntryMutationArguments extends FieldBehavior {
             unset($fields['sectionId']);
             unset($fields['typeId']);
             unset($fields['authorId']);
+            unset($fields['enabled']);
+            unset($fields['query']);
 
             $fieldService = \Yii::$container->get('craftQLFieldService');
 
