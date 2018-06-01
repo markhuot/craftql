@@ -21,6 +21,8 @@ class Query extends Schema {
         $this->addStringField('helloWorld')
             ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
+        $this->addAuthSchema();
+
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
             $this->addEntriesSchema();
         }
@@ -288,6 +290,16 @@ class Query extends Schema {
                     'edges' => $categories,
                 ];
             });
+    }
+
+    function addAuthSchema() {
+        $field = $this->addField('authorize');
+        $field->addStringArgument('username')->nonNull();
+        $field->addStringArgument('password')->nonNull();
+        $field->resolve(function ($root, $args) {
+            $args['username'];
+            $args['password'];
+        });
     }
 
 }

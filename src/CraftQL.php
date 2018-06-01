@@ -13,6 +13,9 @@ use yii\base\Event;
 
 use markhuot\CraftQL\Models\Token;
 
+use craft\events\RegisterUserPermissionsEvent;
+use craft\services\UserPermissions;
+
 class CraftQL extends Plugin
 {
     // const EVENT_GET_FIELD_SCHEMA = 'getFieldSchema';
@@ -79,6 +82,25 @@ class CraftQL extends Plugin
                 }
             }
         }
+
+        // register our permissions
+        Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS, function(RegisterUserPermissionsEvent $event) {
+            $event->permissions[\Craft::t('craftql', 'CraftQL Queries')] = [
+                'queryEntries' => ['label' => \Craft::t('craftql', 'Query Entries'), 'nested' => [
+                    'stories' => ['label' => \Craft::t('craftql', 'Stories')],
+                ]],
+                'queryEntryAuthors' => ['label' => \Craft::t('craftql', 'Query Entry Authors')],
+                'queryGlobals' => ['label' => \Craft::t('craftql', 'Query Globals')],
+                'queryCategories' => ['label' => \Craft::t('craftql', 'Query Categories')],
+                'queryTags' => ['label' => \Craft::t('craftql', 'Query Tags')],
+                'queryUsers' => ['label' => \Craft::t('craftql', 'Query Users')],
+                'querySections' => ['label' => \Craft::t('craftql', 'Query Sections')],
+                'queryFields' => ['label' => \Craft::t('craftql', 'Query Fields')],
+                'mutateEntries' => ['label' => \Craft::t('craftql', 'Mutate Entries'), 'nested' => [
+                    'stories' => ['label' => \Craft::t('craftql', 'Stories')],
+                ]],
+            ];
+        });
     }
 
     /**
