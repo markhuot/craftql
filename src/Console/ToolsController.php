@@ -71,6 +71,10 @@ class ToolsController extends Controller
                     preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
                     $token = Token::findId(@$matches['tokenId']);
 
+                    if (!$token) {
+                        $token = Token::anonymous();
+                    }
+
                     // @todo, check user permissions when PRO license
 
                     $headers = [
@@ -91,17 +95,6 @@ class ToolsController extends Controller
 
                     if ($request->getMethod() == 'OPTIONS') {
                         return $resolve(new Response(200, $headers, ''));
-                    }
-
-                    if (!$token) {
-                        $response = new Response(403, $headers,
-                            json_encode([
-                                'errors' => [
-                                    ['message' => 'Not authorized']
-                                ]
-                            ])
-                        );
-                        return $resolve($response);
                     }
 
                     if ($postBody) {

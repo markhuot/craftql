@@ -20,8 +20,13 @@ class Token extends ActiveRecord
 
     public static function findId($tokenId=false)
     {
+        var_dump(preg_match('/[^.]+\.[^.]+\.[^.]+/', $tokenId));
+        die;
         if ($tokenId) {
             return Token::find()->where(['token' => $tokenId])->one();
+        }
+        else if (preg_match('/[^.]+\.[^.]+\.[^.]+/', $tokenId)) {
+            var_dump($tokenId);
         }
         else {
             $user = Craft::$app->getUser()->getIdentity();
@@ -38,6 +43,12 @@ class Token extends ActiveRecord
         $token = new static;
         $token->scopes = json_encode([]);
         $token->makeAdmin();
+        return $token;
+    }
+
+    public static function anonymous(): Token {
+        $token = new static;
+        $token->scopes = json_encode([]);
         return $token;
     }
 
@@ -74,60 +85,7 @@ class Token extends ActiveRecord
         return !$this->can($do);
     }
 
-    // function mutableEntryTypeIds(): array {
-    //     $ids = [];
-
-    //     foreach ($this->scopeArray as $scope => $enabled) {
-    //         if ($enabled && preg_match('/mutation:entryType:(\d+)/', $scope, $matches)) {
-    //             $ids[] = $matches[1];
-    //         }
-    //     }
-
-    //     return $ids;
-    // }
-
-    // function queryableEntryTypeIds(): array {
-    //     $ids = [];
-
-    //     foreach ($this->scopeArray as $scope => $enabled) {
-    //         if ($enabled && preg_match('/query:entryType:(\d+)/', $scope, $matches)) {
-    //             $ids[] = $matches[1];
-    //         }
-    //     }
-
-    //     return $ids;
-    // }
-
-    // private $entryTypeEnum;
-
-    // function entryTypeEnum() {
-    //     if ($this->entryTypeEnum) {
-    //         return $this->entryTypeEnum;
-    //     }
-
-    //     $entryTypeEnumValues = [];
-    //     // $sectionEnumValues = [];
-
-    //     foreach (\markhuot\CraftQL\Repositories\EntryType::all() as $entryType) {
-    //         if (in_array($entryType->id, $this->queryableEntryTypeIds())) {
-    //             $name = \markhuot\CraftQL\Types\EntryType::getName($entryType);
-    //             $entryTypeEnumValues[$name] = $entryType->id;
-    //             // $sectionEnumValues[$entryType->section->handle] = $entryType->section->id;
-    //         }
-    //     }
-
-    //     return $this->entryTypeEnum = new EnumType([
-    //         'name' => 'EntryTypeEnum',
-    //         'values' => $entryTypeEnumValues,
-    //     ]);
-
-    //     // $this->sectionArgEnum = new EnumType([
-    //     //     'name' => 'SectionEnum',
-    //     //     'values' => $sectionEnumValues,
-    //     // ]);
-    // }
-
-    function allowsMatch($regex): bool {
+    function canMatch($regex): bool {
         if ($this->admin) {
             return true;
         }

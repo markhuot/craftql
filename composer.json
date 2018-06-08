@@ -10,7 +10,8 @@
     ],
     "require": {
         "webonyx/graphql-php": "^0.11.0",
-        "react/http": "^0.7"
+        "react/http": "^0.7",
+        "firebase/php-jwt": "^5.0.0"
     },
     "authors": [
         {

@@ -74,12 +74,7 @@ class ApiController extends Controller
         }
 
         if (!$token) {
-            http_response_code(403);
-            return $this->asJson([
-                'errors' => [
-                    ['message' => 'Not authorized']
-                ]
-            ]);
+            $token = Token::anonymous();
         }
 
         Craft::trace('CraftQL: Parsing request');
