@@ -72,11 +72,15 @@ class GetMatrixFieldSchema
 
         if (!empty($blockTypes)) {
             $inputType = $event->mutation->createInputObjectType(ucfirst($event->sender->handle) . 'Input');
+            $inputType->addStringArgument('id');
 
             foreach ($blockTypes as $blockType) {
                 $blockInputType = $event->mutation->createInputObjectType(ucfirst($event->sender->handle) . ucfirst($blockType->handle) . 'Input');
                 $blockInputType->addArgumentsByLayoutId($blockType->fieldLayoutId);
-                $blockInputType->addStringArgument('foo');
+
+                if (count($blockInputType->getArguments()) == 0) {
+                    $blockInputType->addStringArgument('emptyEntrytType')->description('The entry type, '.$event->sender->handle.', has no fields. This would violate the GraphQL spec so we filled it in with this placeholder.');
+                }
 
                 $inputType->addArgument($blockType->handle)
                     ->type($blockInputType);
@@ -88,13 +92,22 @@ class GetMatrixFieldSchema
                 ->onSave(function ($values) {
                     $newValues = [];
 
-                    foreach ($values as $key => $value) {
-                        $type = array_keys($value)[0];
+                    foreach ($values as $index => $value) {
+                        $id = @$value['id'] ? $value['id'] : "new{$index}";
+                        unset($value['id']);
+                        if (isset($value['type'])) {
+                            $type = $value['type'];
+                            $fields = $value['fields'];
+                        }
+                        else {
+                            $type = array_keys($value)[0];
+                            $fields = $value[$type];
+                        }
 
-                        $newValues["new{$key}"] = [
+                        $newValues[$id] = [
                             'type' => $type,
                             'enabled' => 1,
-                            'fields' => $value[$type],
+                            'fields' => $fields,
                         ];
                     }
 
