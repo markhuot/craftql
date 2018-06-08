@@ -114,6 +114,11 @@ class Request {
             unset($args['type']);
         }
 
+        // @TODO check permission and allow other users if checked!
+        if (empty($args['authorId']) && $this->token->user) {
+            $args['authorId'] = $this->token->user->id;
+        }
+
         if (!empty($args['relatedTo'])) {
             $criteria->relatedTo(array_merge(['and'], $this->parseRelatedTo($args['relatedTo'], @$root['node']->id)));
             unset($args['relatedTo']);
@@ -129,8 +134,8 @@ class Request {
             unset($args['idNot']);
         }
 
-        // var_dump($args);
-        // die;
+//         var_dump($args);
+//         die;
 
         foreach ($args as $key => $value) {
             $criteria = $criteria->{$key}($value);

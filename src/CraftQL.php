@@ -6,6 +6,7 @@ use Craft;
 
 use craft\base\Plugin;
 use craft\console\Application as ConsoleApplication;
+use craft\models\Section;
 use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
 
@@ -85,20 +86,31 @@ class CraftQL extends Plugin
 
         // register our permissions
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS, function(RegisterUserPermissionsEvent $event) {
+            $queryTypes = [];
+            $mutationTypes = [];
+            $sections = Craft::$app->sections->getAllSections();
+            foreach ($sections as $section) {
+                $entryTypes = $section->getEntryTypes();
+                foreach ($entryTypes as $entryType) {
+                    $id = $entryType->id;
+                    $queryTypes["craftql:query:entrytype:{$id}"] = ['label' => \Craft::t('craftql', 'Query their own entries of the '.$entryType->name.' type'), 'nested' => [
+                        "craftql:query:entrytype:{$id}:others" => ['label' => \Craft::t('craftql', 'Query others entries of the '.$entryType->name.' type')],
+                    ]];
+                    $mutationTypes["craftql:mutate:entrytype:{$id}"] = ['label' => \Craft::t('craftql', 'Mutate their own entries of the '.$entryType->name.' type')];
+                }
+            }
+
             $event->permissions[\Craft::t('craftql', 'CraftQL Queries')] = [
-                'queryEntries' => ['label' => \Craft::t('craftql', 'Query Entries'), 'nested' => [
-                    'stories' => ['label' => \Craft::t('craftql', 'Stories')],
-                ]],
-                'queryEntryAuthors' => ['label' => \Craft::t('craftql', 'Query Entry Authors')],
-                'queryGlobals' => ['label' => \Craft::t('craftql', 'Query Globals')],
-                'queryCategories' => ['label' => \Craft::t('craftql', 'Query Categories')],
-                'queryTags' => ['label' => \Craft::t('craftql', 'Query Tags')],
-                'queryUsers' => ['label' => \Craft::t('craftql', 'Query Users')],
-                'querySections' => ['label' => \Craft::t('craftql', 'Query Sections')],
-                'queryFields' => ['label' => \Craft::t('craftql', 'Query Fields')],
-                'mutateEntries' => ['label' => \Craft::t('craftql', 'Mutate Entries'), 'nested' => [
-                    'stories' => ['label' => \Craft::t('craftql', 'Stories')],
-                ]],
+                'craftql:query:entries' => ['label' => \Craft::t('craftql', 'Query Entries'), 'nested' => $queryTypes],
+                'craftql:query:entry.author' => ['label' => \Craft::t('craftql', 'Query Entry Authors')],
+                'craftql:query:globals' => ['label' => \Craft::t('craftql', 'Query Globals')],
+                'craftql:query:categories' => ['label' => \Craft::t('craftql', 'Query Categories')],
+                'craftql:query:tags' => ['label' => \Craft::t('craftql', 'Query Tags')],
+                'craftql:query:users' => ['label' => \Craft::t('craftql', 'Query Users')],
+                'craftql:query:sections' => ['label' => \Craft::t('craftql', 'Query Sections')],
+                'craftql:query:fields' => ['label' => \Craft::t('craftql', 'Query Fields')],
+                'craftql:mutate:entries' => ['label' => \Craft::t('craftql', 'Mutate Entries'), 'nested' => $mutationTypes],
+                'craftql:mutate:globals' => ['label' => \Craft::t('craftql', 'Mutate Entries')],
             ];
         });
     }

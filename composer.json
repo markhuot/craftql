@@ -29,6 +29,9 @@
         "handle": "craftql",
         "developer": "Mark Huot",
         "developerUrl": "https://www.github.com/markhuot",
-        "class": "markhuot\\CraftQL\\CraftQL"
+        "class": "markhuot\\CraftQL\\CraftQL",
+        "components": {
+            "jwt": "markhuot\\CraftQL\\Services\\JWTService"
+        }
     }
 }

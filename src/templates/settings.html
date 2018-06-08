@@ -96,7 +96,7 @@ You can access your GraphQL endpoint in two ways,
             <tr>
                 <td><input type="text" name="token[{{ token.id }}][name]" class="text" placeholder="Name..." value="{{ token.name }}" /></td>
                 <td class="breakall">{{ token.token }}</td>
-                <td><a href="{{ url('craftql/token/' ~ token.id ~ '/scopes') }}">Settings&hellip;</a></td>
+                <td><a href="{{ url('craftql/token/' ~ token.id ~ '/scopes') }}">Scopes&hellip;</a></td>
                 <td><a class="delete icon" title="Delete" role="button" href="{{ url('craftql/token-del/' ~ token.id) }}"></a></td>
             </tr>
         {% endfor %}

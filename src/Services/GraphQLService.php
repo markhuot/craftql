@@ -5,6 +5,7 @@ namespace markhuot\CraftQL\Services;
 use Craft;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Schema;
 use yii\base\Component;
 use Yii;
@@ -90,8 +91,11 @@ class GraphQLService extends Component {
             \markhuot\CraftQL\Directives\Date::directive(),
         ];
 
+        /** @var ObjectType $mutation */
         $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
-        $schemaConfig['mutation'] = $mutation;
+        if (!empty($mutation->getFields())) {
+            $schemaConfig['mutation'] = $mutation;
+        }
 
         $schema = new Schema($schemaConfig);
 

@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Types;
 
 use Firebase\JWT\JWT;
 use markhuot\CraftQL\Builders\Schema;
+use markhuot\CraftQL\CraftQL;
 
 class Authorize extends Schema {
 
@@ -20,23 +21,16 @@ class Authorize extends Schema {
                 /** @var \craft\elements\User $user */
                 $user = $root['user'];
 
-                $key = \Craft::$app->config->general->securityKey;
-                if (!empty(\Craft::$app->config->craftql->securityKey)) {
-                    $key = \Craft::$app->config->craftql->securityKey;
-                }
-
                 $userRow = (new \craft\db\Query())
                     ->from('users')
                     ->where(['id' => $user->id])
                     ->limit(1)
                     ->one();
 
-                $token = [
+                return CraftQL::getInstance()->jwt->encode([
                     'uid' => $userRow['uid'],
                     // @TODO add expiration in to this
-                ];
-
-                return JWT::encode($token, $key);
+                ]);
             });
 
     }

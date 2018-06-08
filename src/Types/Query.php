@@ -26,7 +26,7 @@ class Query extends Schema {
         // @TODO add plugin setting to control authorize visibility
         $this->addAuthSchema();
 
-        if ($token->can('query:entries') && $token->canMatch('/^query:entryType/')) {
+        if ($token->canMatch('/^query:entrytype/')) {
             $this->addEntriesSchema();
         }
 

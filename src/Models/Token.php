@@ -5,34 +5,49 @@ namespace markhuot\CraftQL\Models;
 use Craft;
 use craft\db\ActiveRecord;
 use craft\records\User;
+use Firebase\JWT\JWT;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\CraftQL;
 
 class Token extends ActiveRecord
 {
     private $admin = false;
 
-    public function getUser() {
-        return $this->hasOne(User::class, ['id' => 'userId']);
+    /**
+     * @var \craft\elements\User
+     */
+    private $user = false;
+
+    /**
+     * @return \craft\elements\User
+     */
+    function getUser() {
+        return $this->user;
     }
 
-    public static function findId($tokenId=false)
+    function setUser (\craft\elements\User $user) {
+        $this->user = $user;
+    }
+
+    public static function findId($token=false)
     {
-        var_dump(preg_match('/[^.]+\.[^.]+\.[^.]+/', $tokenId));
-        die;
-        if ($tokenId) {
-            return Token::find()->where(['token' => $tokenId])->one();
+        if ($token && preg_match('/[^.]+\.[^.]+\.[^.]+/', $token)) {
+            $tokenData = CraftQL::getInstance()->jwt->decode($token);
+            $userRow = (new \craft\db\Query())
+                ->from('users')
+                ->where(['uid' => $tokenData->uid])
+                ->limit(1)
+                ->one();
+            return Token::forUser(\craft\elements\User::find()->id($userRow['id'])->one());
         }
-        else if (preg_match('/[^.]+\.[^.]+\.[^.]+/', $tokenId)) {
-            var_dump($tokenId);
+        else if ($token && $token=Token::find()->where(['token' => $token])->one()) {
+            return $token;
         }
-        else {
-            $user = Craft::$app->getUser()->getIdentity();
-            if ($user) {
-                return Token::forUser($user);
-            }
+        else if ($user = Craft::$app->getUser()->getIdentity()) {
+            return Token::forUser($user);
         }
 
         return false;
@@ -52,11 +67,24 @@ class Token extends ActiveRecord
         return $token;
     }
 
-    public static function forUser(): Token
+    public static function forUser(\craft\elements\User $user): Token
     {
         $token = new static;
-        $token->scopes = json_encode([]);
-        $token->makeAdmin();
+        $token->setUser($user);
+
+        $scopes = [];
+        $permissions = Craft::$app->getUserPermissions()->getPermissionsByUserId($user->id);
+        foreach ($permissions as $permission) {
+            if (substr($permission, 0, 8) == 'craftql:') {
+                $scopes[substr($permission, 8)] = 1;
+            }
+        }
+        $token->scopes = json_encode($scopes);
+
+        if ($user->admin) {
+            $token->makeAdmin();
+        }
+
         return $token;
     }
 
@@ -74,7 +102,14 @@ class Token extends ActiveRecord
 
     function getScopeArray(): array
     {
-        return json_decode($this->scopes ?: '[]', true);
+        $scopes = [];
+
+        $rawScopes = json_decode($this->scopes ?: '[]', true);
+        foreach ($rawScopes as $key => $value) {
+            $scopes[strtolower($key)] = $value;
+        }
+
+        return $scopes;
     }
 
     function can($do): bool {
