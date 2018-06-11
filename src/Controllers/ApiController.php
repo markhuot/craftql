@@ -53,6 +53,10 @@ class ApiController extends Controller
         preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
         $token = Token::findByToken(@$matches['tokenId']);
 
+        if (!$token) {
+            $token = Token::anonymous();
+        }
+
         $response = \Craft::$app->getResponse();
         if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
             if (is_string($allowedOrigins)) {
@@ -69,10 +73,6 @@ class ApiController extends Controller
 
         if (\Craft::$app->getRequest()->isOptions) {
             return '';
-        }
-
-        if (!$token) {
-            $token = Token::anonymous();
         }
 
         Craft::trace('CraftQL: Parsing request');

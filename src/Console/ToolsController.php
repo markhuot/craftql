@@ -75,8 +75,6 @@ class ToolsController extends Controller
                         $token = Token::anonymous();
                     }
 
-                    // @todo, check user permissions when PRO license
-
                     $headers = [
                         'Content-Type' => 'application/json; charset=UTF-8',
                     ];
