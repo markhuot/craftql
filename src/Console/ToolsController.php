@@ -69,7 +69,7 @@ class ToolsController extends Controller
 
                     $authorization = @$request->getHeaders()['authorization'][0];
                     preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
-                    $token = Token::findId(@$matches['tokenId']);
+                    $token = Token::findByToken(@$matches['tokenId']);
 
                     if (!$token) {
                         $token = Token::anonymous();

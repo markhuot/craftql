@@ -2,9 +2,15 @@
 
 namespace markhuot\CraftQL;
 
+use markhuot\CraftQL\Models\Token;
+
 class Request {
 
+    /**
+     * @var Token
+     */
     private $token;
+
     private $entryTypes;
     private $volumes;
     private $categoryGroups;
@@ -114,9 +120,12 @@ class Request {
             unset($args['type']);
         }
 
-        // @TODO check permission and allow other users if checked!
-        if (empty($args['authorId']) && $this->token->user) {
-            $args['authorId'] = $this->token->user->id;
+        // check if we're a user token, and if so if the user has access to
+        // all entries or just their own
+        if ($this->token->user) {
+            if (!$this->token->can('query:otheruserentries')) {
+                $args['authorId'] = $this->token->user->id;
+            }
         }
 
         if (!empty($args['relatedTo'])) {

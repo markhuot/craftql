@@ -93,12 +93,11 @@ class CraftQL extends Plugin
                 $entryTypes = $section->getEntryTypes();
                 foreach ($entryTypes as $entryType) {
                     $id = $entryType->id;
-                    $queryTypes["craftql:query:entrytype:{$id}"] = ['label' => \Craft::t('craftql', 'Query their own entries of the '.$entryType->name.' type'), 'nested' => [
-                        "craftql:query:entrytype:{$id}:others" => ['label' => \Craft::t('craftql', 'Query others entries of the '.$entryType->name.' type')],
-                    ]];
-                    $mutationTypes["craftql:mutate:entrytype:{$id}"] = ['label' => \Craft::t('craftql', 'Mutate their own entries of the '.$entryType->name.' type')];
+                    $queryTypes["craftql:query:entrytype:{$id}"] = ['label' => \Craft::t('craftql', 'Query their own entries of the '.$entryType->name.' entry type')];
+                    $mutationTypes["craftql:mutate:entrytype:{$id}"] = ['label' => \Craft::t('craftql', 'Mutate their own entries of the '.$entryType->name.' entry type')];
                 }
             }
+            $queryTypes['craftql:query:otheruserentries'] = ['label' => \Craft::t('craftql', 'Query other authors’ entries')];
 
             $event->permissions[\Craft::t('craftql', 'CraftQL Queries')] = [
                 'craftql:query:entries' => ['label' => \Craft::t('craftql', 'Query Entries'), 'nested' => $queryTypes],

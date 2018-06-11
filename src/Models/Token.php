@@ -14,6 +14,11 @@ use markhuot\CraftQL\CraftQL;
 
 class Token extends ActiveRecord
 {
+    /**
+     * Whether the token represents an admin role
+     *
+     * @var bool
+     */
     private $admin = false;
 
     /**
@@ -28,12 +33,24 @@ class Token extends ActiveRecord
         return $this->user;
     }
 
+    /**
+     * Sets the user
+     *
+     * @param \craft\elements\User $user
+     */
     function setUser (\craft\elements\User $user) {
         $this->user = $user;
     }
 
-    public static function findId($token=false)
+    /**
+     * Gets a token by the token id
+     *
+     * @param bool $token
+     * @return Token|null
+     */
+    public static function findByToken($token=false)
     {
+        // If the token matches a JWT format
         if ($token && preg_match('/[^.]+\.[^.]+\.[^.]+/', $token)) {
             $tokenData = CraftQL::getInstance()->jwt->decode($token);
             $userRow = (new \craft\db\Query())
@@ -41,11 +58,18 @@ class Token extends ActiveRecord
                 ->where(['uid' => $tokenData->uid])
                 ->limit(1)
                 ->one();
-            return Token::forUser(\craft\elements\User::find()->id($userRow['id'])->one());
+            $user = \craft\elements\User::find()->id($userRow['id'])->one();
+            $token = Token::forUser($user);
+            $token->setUser($user);
+            return $token;
         }
+
+        // If the token is in the database
         else if ($token && $token=Token::find()->where(['token' => $token])->one()) {
             return $token;
         }
+
+        // If the user has an active Craft session
         else if ($user = Craft::$app->getUser()->getIdentity()) {
             return Token::forUser($user);
         }
@@ -70,7 +94,6 @@ class Token extends ActiveRecord
     public static function forUser(\craft\elements\User $user): Token
     {
         $token = new static;
-        $token->setUser($user);
 
         $scopes = [];
         $permissions = Craft::$app->getUserPermissions()->getPermissionsByUserId($user->id);
