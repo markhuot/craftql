@@ -18,6 +18,7 @@ class EntryMutationArguments extends FieldBehavior {
 
     function initEntryMutationArguments() {
         $this->owner->addIntArgument('id');
+        $this->owner->addIntArgument('siteId');
         $this->owner->addIntArgument('authorId');
         $this->owner->addStringArgument('title');
         $this->owner->addBooleanArgument('enabled');
@@ -33,6 +34,9 @@ class EntryMutationArguments extends FieldBehavior {
             if (!empty($args['id'])) {
                 $criteria = Entry::find();
                 $criteria->id($args['id']);
+                if (!empty($args['siteId']))  {
+                    $criteria->siteId($args['siteId']);
+                }
                 $entry = $criteria->one();
                 if (!$entry) {
                     throw new \GraphQL\Error\UserError('Could not find an entry with id '.$args['id']);
@@ -43,15 +47,15 @@ class EntryMutationArguments extends FieldBehavior {
                 $entry = $criteria->one();
             }
 
-            if (!$entry) {
+            if (empty($entry)) {
                 $entry = new Entry();
                 $entry->sectionId = $this->owner->getType()->getContext()->section->id;
                 $entry->typeId = $this->owner->getType()->getContext()->id;
                 $entry->fieldLayoutId = $this->owner->getType()->getContext()->fieldLayoutId;
+            }
 
-                if (empty($args['title'])) {
-                    throw new \GraphQL\Error\UserError('You must set a title when upserting a new entry.');
-                }
+            if (isset($args['siteId'])) {
+                $entry->siteId = $args['siteId'];
             }
 
             if (isset($args['authorId'])) {
@@ -71,6 +75,7 @@ class EntryMutationArguments extends FieldBehavior {
 
             $fields = $args;
             unset($fields['id']);
+            unset($fields['siteId']);
             unset($fields['title']);
             unset($fields['sectionId']);
             unset($fields['typeId']);
