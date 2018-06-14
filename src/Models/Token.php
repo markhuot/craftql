@@ -48,7 +48,7 @@ class Token extends ActiveRecord
      * @param bool $token
      * @return Token|null
      */
-    public static function findByToken($token=false)
+    public static function findOrAnonymous($token=false)
     {
         // If the token matches a JWT format
         if ($token && preg_match('/[^.]+\.[^.]+\.[^.]+/', $token)) {
@@ -74,7 +74,7 @@ class Token extends ActiveRecord
             return Token::forUser($user);
         }
 
-        return false;
+        return static::anonymous();
     }
 
     public static function admin(): Token

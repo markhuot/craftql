@@ -51,11 +51,7 @@ class ApiController extends Controller
 
         $authorization = Craft::$app->request->headers->get('authorization');
         preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
-        $token = Token::findByToken(@$matches['tokenId']);
-
-        if (!$token) {
-            $token = Token::anonymous();
-        }
+        $token = Token::findOrAnonymous(@$matches['tokenId']);
 
         $response = \Craft::$app->getResponse();
         if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
