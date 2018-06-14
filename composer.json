@@ -31,6 +31,7 @@
         "developerUrl": "https://www.github.com/markhuot",
         "class": "markhuot\\CraftQL\\CraftQL",
         "components": {
+            "graphQl": "markhuot\\CraftQL\\Services\\GraphQLService",
             "jwt": "markhuot\\CraftQL\\Services\\JWTService"
         }
     }
