@@ -3,17 +3,14 @@
 namespace markhuot\CraftQL\Listeners;
 
 use Craft;
-use markhuot\CraftQL\Events\GetFieldSchema;
+use craft\events\RegisterUserPermissionsEvent;
 
 class GetUserPermissions
 {
     /**
      * Handle the request for the schema
-     *
-     * @param \markhuot\CraftQL\Events\GetFieldSchema $event
-     * @return void
      */
-    function handle($event) {
+    function handle(RegisterUserPermissionsEvent $event) {
         $queryTypes = [];
         $mutationTypes = [];
         $sections = Craft::$app->sections->getAllSections();

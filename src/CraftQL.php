@@ -14,9 +14,6 @@ use yii\base\Event;
 
 use markhuot\CraftQL\Models\Token;
 
-use craft\events\RegisterUserPermissionsEvent;
-use craft\services\UserPermissions;
-
 class CraftQL extends Plugin
 {
     // const EVENT_GET_FIELD_SCHEMA = 'getFieldSchema';
