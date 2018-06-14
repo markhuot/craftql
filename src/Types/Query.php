@@ -2,8 +2,10 @@
 
 namespace markhuot\CraftQL\Types;
 
+use craft\helpers\DateTimeHelper;
 use GraphQL\Error\Error;
 use GraphQL\Error\UserError;
+use markhuot\CraftQL\CraftQL;
 use yii\base\Component;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -296,11 +298,13 @@ class Query extends Schema {
     }
 
     function addAuthSchema() {
+        $defaultTokenDuration = CraftQL::getInstance()->getSettings()->userTokenDuration;
+
         $field = $this->addField('authorize');
         $field->type(Authorize::class);
         $field->addStringArgument('username')->nonNull();
         $field->addStringArgument('password')->nonNull();
-        $field->resolve(function ($root, $args) {
+        $field->resolve(function ($root, $args) use ($defaultTokenDuration) {
             $loginName = $args['username'];
             $password = $args['password'];
 
@@ -325,9 +329,43 @@ class Query extends Schema {
                 throw new UserError('An unknown error occured');
             }
 
+            $userRow = (new \craft\db\Query())
+                ->from('users')
+                ->where(['id' => $user->id])
+                ->limit(1)
+                ->one();
+
             return  [
                 'user' => $user,
+                'token' => CraftQL::getInstance()->jwt->encode([
+                    'uid' => $userRow['uid'],
+                    'exp' => time() + $defaultTokenDuration,
+                ])
             ];
+        });
+
+        $field = $this->addStringField('refresh');
+        $field->addStringArgument('token')->nonNull();
+        $field->resolve(function ($root, $args) use ($defaultTokenDuration) {
+            $tokenData = $args['token'];
+            $tokenData = CraftQL::getInstance()->jwt->decode($tokenData);
+
+            if (time() > $tokenData->exp) {
+                throw new UserError('The token has expired');
+            }
+
+            $userRow = (new \craft\db\Query())
+                ->from('users')
+                ->where(['uid' => $tokenData->uid])
+                ->limit(1)
+                ->one();
+
+            $user = \craft\elements\User::find()->id($userRow['id'])->one();
+
+            return CraftQL::getInstance()->jwt->encode([
+                'uid' => $tokenData->uid,
+                'exp' => time() + $defaultTokenDuration,
+            ]);
         });
     }
 

@@ -4,22 +4,19 @@ namespace markhuot\CraftQL\Services;
 
 use Craft;
 use Firebase\JWT\JWT;
-use GraphQL\GraphQL;
-use GraphQL\Error\Debug;
-use GraphQL\Type\Schema;
+use markhuot\CraftQL\CraftQL;
 use yii\base\Component;
-use Yii;
 
 class JWTService extends Component {
 
     private $key;
 
     function __construct() {
-        if (!empty(\Craft::$app->config->craftql->securityKey)) {
-            $this->key = \Craft::$app->config->craftql->securityKey;
+        if (CraftQL::getInstance()->getSettings()->securityKey) {
+            $this->key = CraftQL::getInstance()->getSettings()->securityKey;
         }
         else {
-            $this->key = \Craft::$app->config->general->securityKey;
+            $this->key = Craft::$app->config->general->securityKey;
         }
     }
 
