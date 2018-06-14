@@ -59,12 +59,12 @@ class Token extends ActiveRecord
         }
 
         // If the token is in the database
-        else if ($token && $token=Token::find()->where(['token' => $token])->one()) {
+        if ($token && $token=Token::find()->where(['token' => $token])->one()) {
             return $token;
         }
 
         // If the user has an active Craft session
-        else if ($user = Craft::$app->getUser()->getIdentity()) {
+        if ($user = Craft::$app->getUser()->getIdentity()) {
             return Token::forUser($user);
         }
 
