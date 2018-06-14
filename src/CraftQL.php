@@ -6,7 +6,6 @@ use Craft;
 
 use craft\base\Plugin;
 use craft\console\Application as ConsoleApplication;
-use craft\models\Section;
 use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
 
