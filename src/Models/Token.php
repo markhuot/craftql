@@ -4,12 +4,6 @@ namespace markhuot\CraftQL\Models;
 
 use Craft;
 use craft\db\ActiveRecord;
-use craft\records\User;
-use Firebase\JWT\JWT;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\CraftQL;
 
 class Token extends ActiveRecord
