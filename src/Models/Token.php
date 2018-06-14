@@ -16,6 +16,13 @@ class Token extends ActiveRecord
     private $admin = false;
 
     /**
+     * Whether the token is for an anonymous user (pre-auth/token)
+     *
+     * @var bool
+     */
+    private $anonymous = false;
+
+    /**
      * @var \craft\elements\User
      */
     private $user = false;
@@ -54,7 +61,6 @@ class Token extends ActiveRecord
                 ->one();
             $user = \craft\elements\User::find()->id($userRow['id'])->one();
             $token = Token::forUser($user);
-            $token->setUser($user);
             return $token;
         }
 
@@ -71,23 +77,55 @@ class Token extends ActiveRecord
         return static::anonymous();
     }
 
+    /**
+     * A generic admin token
+     *
+     * @return Token
+     */
     public static function admin(): Token
     {
-        $token = new static;
-        $token->scopes = json_encode([]);
-        $token->makeAdmin();
-        return $token;
+        return (new static)->makeAdmin();
     }
 
+    /**
+     * Turn the token in to an admin token
+     *
+     * @return $this
+     */
+    public function makeAdmin() {
+        $this->admin = true;
+        return $this;
+    }
+
+    /**
+     * A generic anonymous token
+     *
+     * @return Token
+     */
     public static function anonymous(): Token {
-        $token = new static;
-        $token->scopes = json_encode([]);
-        return $token;
+        return (new static)->makeAnonymous();
     }
 
+    /**
+     * Turn the token in to an anonymous token
+     *
+     * @return $this
+     */
+    public function makeAnonymous() {
+        $this->anonymous = true;
+        return $this;
+    }
+
+    /**
+     * Returns a token with the user permissions translated over in to token permissions
+     *
+     * @param \craft\elements\User $user
+     * @return Token
+     */
     public static function forUser(\craft\elements\User $user): Token
     {
         $token = new static;
+        $token->setUser($user);
 
         $scopes = [];
         $permissions = Craft::$app->getUserPermissions()->getPermissionsByUserId($user->id);
@@ -103,10 +141,6 @@ class Token extends ActiveRecord
         }
 
         return $token;
-    }
-
-    public function makeAdmin() {
-        $this->admin = true;
     }
 
     /**
