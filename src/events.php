@@ -26,6 +26,11 @@ return [
             new \markhuot\CraftQL\Listeners\GetSelectOneFieldSchema,
         ],
     ],
+    \craft\fields\RadioButtons::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetSelectOneFieldSchema,
+        ],
+    ],
     \craft\fields\Entries::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetEntriesFieldSchema,
