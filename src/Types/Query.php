@@ -2,6 +2,8 @@
 
 namespace markhuot\CraftQL\Types;
 
+use markhuot\CraftQL\CraftQL;
+use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
 use yii\base\Component;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -23,6 +25,10 @@ class Query extends Schema {
 
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
             $this->addEntriesSchema();
+        }
+
+        if ($token->can('query:assets')) {
+            $this->addAssetsSchema();
         }
 
         if ($token->can('query:globals')) {
@@ -124,6 +130,31 @@ class Query extends Schema {
             });
 
         $draftField->addIntArgument('draftId')->nonNull();
+    }
+
+    /**
+     * The fields you can query that return assets
+     *
+     * @return Schema
+     */
+    function addAssetsSchema() {
+        if ($this->getRequest()->volumes()->count() == 0) {
+            return;
+        }
+
+        $this->addField('assets')
+            ->type(VolumeInterface::class)
+            ->use(new AssetQueryArguments)
+            ->lists()
+            ->resolve(function ($root, $args) {
+                $criteria = \craft\elements\Asset::find();
+
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+
+                return $criteria->all();
+            });
     }
 
     /**

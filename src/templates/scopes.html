@@ -62,6 +62,11 @@
                 <td>{{ forms.lightswitch({"name": "scope[query:entry.author]", "value": 1, "on": token.can('query:entry.author'), "small": true}) }}</td>
             </tr>
             <tr data-id="default">
+                <th>assets</th>
+                <td>Query any assets.</td>
+                <td>{{ forms.lightswitch({"name": "scope[query:assets]", "value": 1, "on": token.can('query:assets'), "small": true}) }}</td>
+            </tr>
+            <tr data-id="default">
                 <th>globals</th>
                 <td>Query any globals.</td>
                 <td>{{ forms.lightswitch({"name": "scope[query:globals]", "value": 1, "on": token.can('query:globals'), "small": true}) }}</td>

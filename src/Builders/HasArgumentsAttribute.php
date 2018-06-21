@@ -69,7 +69,7 @@ trait HasArgumentsAttribute {
         return $this->addArgument($name)->type(Type::boolean());
     }
 
-    function addEnumArgument($name): Enum {
+    function addEnumArgument($name): EnumField {
         if (is_a($name, CraftField::class)) {
             return $this->arguments[] = (new EnumField($this->request, $name->handle))
                 ->description($name->instructions);
