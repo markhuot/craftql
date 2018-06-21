@@ -78,6 +78,12 @@ class Query extends Schema {
                     return \Craft::$app->sections->allSections;
                 });
         }
+
+        $this->addField('subscribe')
+            ->type(Subscription::class)
+            ->resolve(function ($root, $args) {
+                return true;
+            });
     }
 
     /**
