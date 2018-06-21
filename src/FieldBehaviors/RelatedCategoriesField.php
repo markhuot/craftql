@@ -9,6 +9,10 @@ use markhuot\CraftQL\Types\EntryConnection;
 class RelatedCategoriesField extends SchemaBehavior {
 
     function initRelatedCategoriesField() {
+        if ($this->owner->getRequest()->categoryGroups()->count() == 0) {
+            return;
+        }
+
         $this->owner->addField('relatedCategories')
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
