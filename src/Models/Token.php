@@ -72,6 +72,7 @@ class Token extends ActiveRecord
         }
 
         // If the token is in the database
+        /** @var Token $token */
         if ($token && $token=Token::find()->where(['token' => $token])->one()) {
             return $token;
         }
