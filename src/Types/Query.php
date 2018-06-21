@@ -335,12 +335,17 @@ class Query extends Schema {
                 ->limit(1)
                 ->one();
 
+            $tokenData = [
+                'uid' => $userRow['uid'],
+            ];
+
+            if ($defaultTokenDuration > 0) {
+                $tokenData['exp'] = time() + $defaultTokenDuration;
+            }
+
             return  [
                 'user' => $user,
-                'token' => CraftQL::getInstance()->jwt->encode([
-                    'uid' => $userRow['uid'],
-                    'exp' => time() + $defaultTokenDuration,
-                ])
+                'token' => CraftQL::getInstance()->jwt->encode($tokenData),
             ];
         });
 
@@ -349,23 +354,8 @@ class Query extends Schema {
         $field->resolve(function ($root, $args) use ($defaultTokenDuration) {
             $tokenData = $args['token'];
             $tokenData = CraftQL::getInstance()->jwt->decode($tokenData);
-
-            if (time() > $tokenData->exp) {
-                throw new UserError('The token has expired');
-            }
-
-            $userRow = (new \craft\db\Query())
-                ->from('users')
-                ->where(['uid' => $tokenData->uid])
-                ->limit(1)
-                ->one();
-
-            $user = \craft\elements\User::find()->id($userRow['id'])->one();
-
-            return CraftQL::getInstance()->jwt->encode([
-                'uid' => $tokenData->uid,
-                'exp' => time() + $defaultTokenDuration,
-            ]);
+            $tokenData->exp = time() + $defaultTokenDuration;
+            return CraftQL::getInstance()->jwt->encode($tokenData);
         });
     }
 
