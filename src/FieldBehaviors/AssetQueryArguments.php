@@ -24,6 +24,10 @@ class AssetQueryArguments extends FieldBehavior {
         $this->owner->addStringArgument('title');
         $this->owner->addIntArgument('sourceId');
         $this->owner->addIntArgument('width');
+
+        $fieldService = \Yii::$container->get('craftQLFieldService');
+        $arguments = $fieldService->getQueryArguments($this->owner->getRequest());
+        $this->owner->addArguments($arguments, false);
     }
 
 }
