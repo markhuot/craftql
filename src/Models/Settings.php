@@ -11,6 +11,8 @@ class Settings extends Model
     public $verbs = ['POST'];
     public $allowedOrigins = [];
     public $headers = [];
+    public $maxQueryDepth = false;
+    public $maxQueryComplexity = false;
 
     function rules()
     {

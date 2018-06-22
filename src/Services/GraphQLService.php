@@ -3,9 +3,14 @@
 namespace markhuot\CraftQL\Services;
 
 use Craft;
+use Egulias\EmailValidator\Exception\CRLFAtTheEnd;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use GraphQL\Validator\DocumentValidator;
+use GraphQL\Validator\Rules\QueryComplexity;
+use GraphQL\Validator\Rules\QueryDepth;
+use markhuot\CraftQL\CraftQL;
 use yii\base\Component;
 use Yii;
 
@@ -47,6 +52,18 @@ class GraphQLService extends Component {
         $this->entryTypes->load();
         $this->sections->load();
         $this->globals->load();
+
+        $maxQueryDepth = CraftQL::getInstance()->getSettings()->maxQueryDepth;
+        if ($maxQueryDepth !== false) {
+            $rule = new QueryDepth($maxQueryDepth);
+            DocumentValidator::addRule($rule);
+        }
+
+        $maxQueryComplexity = CraftQL::getInstance()->getSettings()->maxQueryComplexity;
+        if ($maxQueryComplexity !== false) {
+            $rule = new QueryComplexity($maxQueryComplexity);
+            DocumentValidator::addRule($rule);
+        }
     }
 
     function getSchema($token) {
