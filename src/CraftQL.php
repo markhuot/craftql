@@ -18,7 +18,7 @@ class CraftQL extends Plugin
 {
     // const EVENT_GET_FIELD_SCHEMA = 'getFieldSchema';
 
-    public $schemaVersion = '1.1.0';
+    public $schemaVersion = '1.2.0';
     public $controllerNamespace = 'markhuot\\CraftQL\\Controllers';
     public $hasCpSettings = true;
     public $hasCpSection = true;

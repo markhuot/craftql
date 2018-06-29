@@ -2,6 +2,8 @@
 
 namespace markhuot\CraftQL;
 
+use markhuot\CraftQL\Models\Token;
+
 class Request {
 
     private $token;
@@ -44,7 +46,7 @@ class Request {
         $this->globals = $globals;
     }
 
-    function token() {
+    function token(): Token {
         return $this->token;
     }
 

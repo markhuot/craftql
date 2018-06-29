@@ -11,6 +11,7 @@ use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
+use markhuot\CraftQL\Request;
 use yii\base\Component;
 use Yii;
 
@@ -52,21 +53,9 @@ class GraphQLService extends Component {
         $this->entryTypes->load();
         $this->sections->load();
         $this->globals->load();
-
-        $maxQueryDepth = CraftQL::getInstance()->getSettings()->maxQueryDepth;
-        if ($maxQueryDepth !== false) {
-            $rule = new QueryDepth($maxQueryDepth);
-            DocumentValidator::addRule($rule);
-        }
-
-        $maxQueryComplexity = CraftQL::getInstance()->getSettings()->maxQueryComplexity;
-        if ($maxQueryComplexity !== false) {
-            $rule = new QueryComplexity($maxQueryComplexity);
-            DocumentValidator::addRule($rule);
-        }
     }
 
-    function getSchema($token) {
+    function createRequest($token) {
         $request = new \markhuot\CraftQL\Request($token);
         $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
         $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
@@ -74,7 +63,10 @@ class GraphQLService extends Component {
         $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
         $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
+        return $request;
+    }
 
+    function getSchema($request) {
         $schemaConfig = [];
         $schemaConfig['query'] = (new \markhuot\CraftQL\Types\Query($request))->getRawGraphQLObject();
         $schemaConfig['types'] = function () use ($request) {
@@ -119,9 +111,22 @@ class GraphQLService extends Component {
         return $schema;
     }
 
-    function execute($schema, $input, $variables = []) {
+    function execute(Request $request, Schema $schema, $input, $variables = []) {
         $debug = Craft::$app->config->getGeneral()->devMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::RETHROW_INTERNAL_EXCEPTIONS : null;
-        return GraphQL::executeQuery($schema, $input, null, null, $variables)->toArray($debug);
+
+        $validators = GraphQL::getStandardValidationRules();
+
+        $maxQueryDepth = $request->token()->maxQueryDepth;
+        if ($maxQueryDepth !== false) {
+            $validators[] = new QueryDepth($maxQueryDepth);
+        }
+
+        $maxQueryComplexity = $request->token()->maxQueryComplexity;
+        if ($maxQueryComplexity !== false) {
+            $validators[] = new QueryComplexity($maxQueryComplexity);
+        }
+
+        return GraphQL::executeQuery($schema, $input, null, null, $variables, null, null, $validators)->toArray($debug);
     }
 
 }

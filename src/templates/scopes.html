@@ -2,7 +2,7 @@
 {% import "_includes/forms" as forms %}
 
 {% set fullPageForm = true %}
-{% set title = "Token Scopes"|t %}
+{% set title = "Token Settings"|t %}
 {% set crumbs = [
     {'label': 'Settings', 'url': url('settings')},
     {'label': 'Plugins', 'url': url('settings/plugins')},
@@ -34,6 +34,28 @@
     name: 'token[name]',
     value: token.name,
     instructions: 'A descriptive label for this token',
+}) }}
+
+<hr>
+
+<h2>Security</h2>
+
+<h3>Query Complexity</h3>
+{{ forms.textField({
+    first: true,
+    name: 'token[security][maxQueryComplexity]',
+    value: token.maxQueryComplexity,
+    instructions: 'A positive integer limiting the <a href="https://sangria-graphql.org/learn/#query-complexity-analysis">estimated complexity</a> of each query.',
+    placeholder: 'Default: none, Recommendation: 150'
+}) }}
+
+<h3>Query Depth</h3>
+{{ forms.textField({
+    first: true,
+    name: 'token[security][maxQueryDepth]',
+    value: token.maxQueryDepth,
+    instructions: 'A positive integer limiting the amount of nesting a query may have.',
+    placeholder: 'Default: none, Recommendation: 10'
 }) }}
 
 <hr>

@@ -9,7 +9,14 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\CraftQL;
 
+/**
+ * Class Token
+ * @package markhuot\CraftQL\Models
+ * @property $maxQueryDepth int
+ * @property $maxQueryComplexity int
+ */
 class Token extends ActiveRecord
 {
     private $admin = false;
@@ -59,6 +66,30 @@ class Token extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%craftql_tokens}}';
+    }
+
+    function getSecurityValue($key) {
+        if (empty($this->security)) {
+            return false;
+        }
+
+        $security = json_decode($this->security ?: '{}', true);
+        return @$security[$key] ?: false;
+    }
+
+    function getMaxQueryDepth() {
+        return $this->getSecurityValue('maxQueryDepth') ?: CraftQL::getInstance()->getSettings()->maxQueryDepth;
+    }
+
+    function getMaxQueryComplexity() {
+        return $this->getSecurityValue('maxQueryComplexity') ?: CraftQL::getInstance()->getSettings()->maxQueryComplexity;
+    }
+
+    function getRequestsPerTimePeriod() {
+        return [
+            $this->getSecurityValue('requestsPerTimePeriodCount'),
+            $this->getSecurityValue('requestsPerTimePeriodDuration'),
+        ];
     }
 
     function getScopeArray(): array

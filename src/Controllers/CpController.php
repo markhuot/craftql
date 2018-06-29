@@ -40,7 +40,8 @@ class CpController extends Controller
     {
         $token = Token::find()->where(['id' => $tokenId])->one();
         $token->name = $_POST['token']['name'];
-        $token->scopes = json_encode(@$_POST['scope'] ?: []);
+        $token->scopes = json_encode(@$_POST['scope'] ?: (object)[]);
+        $token->security = json_encode(@$_POST['token']['security'] ?: (object)[]);
         $token->save();
 
         Craft::$app->getSession()->setNotice(Craft::t('app', 'Scopes saved.'));
