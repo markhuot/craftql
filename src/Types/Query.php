@@ -2,16 +2,11 @@
 
 namespace markhuot\CraftQL\Types;
 
-use craft\helpers\DateTimeHelper;
-use GraphQL\Error\Error;
+use Craft;
 use GraphQL\Error\UserError;
 use markhuot\CraftQL\CraftQL;
-use yii\base\Component;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
-use Craft;
+use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
 use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\Request;
 use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\UserQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
@@ -30,6 +25,10 @@ class Query extends Schema {
 
         if ($token->canMatch('/^query:entrytype/')) {
             $this->addEntriesSchema();
+        }
+
+        if ($token->can('query:assets')) {
+            $this->addAssetsSchema();
         }
 
         if ($token->can('query:globals')) {
@@ -131,6 +130,31 @@ class Query extends Schema {
             });
 
         $draftField->addIntArgument('draftId')->nonNull();
+    }
+
+    /**
+     * The fields you can query that return assets
+     *
+     * @return Schema
+     */
+    function addAssetsSchema() {
+        if ($this->getRequest()->volumes()->count() == 0) {
+            return;
+        }
+
+        $this->addField('assets')
+            ->type(VolumeInterface::class)
+            ->use(new AssetQueryArguments)
+            ->lists()
+            ->resolve(function ($root, $args) {
+                $criteria = \craft\elements\Asset::find();
+
+                foreach ($args as $key => $value) {
+                    $criteria = $criteria->{$key}($value);
+                }
+
+                return $criteria->all();
+            });
     }
 
     /**

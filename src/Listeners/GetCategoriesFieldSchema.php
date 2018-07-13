@@ -23,6 +23,10 @@ class GetCategoriesFieldSchema
             return;
         }
 
+        if ($event->schema->getRequest()->categoryGroups()->count() == 0) {
+            return;
+        }
+
         if (preg_match('/^group:(\d+)$/', $field->source, $matches)) {
             $groupId = $matches[1];
 

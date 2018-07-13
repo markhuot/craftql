@@ -11,6 +11,7 @@ use craft\events\RegisterUrlRulesEvent;
 
 use markhuot\CraftQL\Services\GraphQLService;
 use markhuot\CraftQL\Services\JWTService;
+use markhuot\CraftQL\Models\Settings;
 use yii\base\Event;
 
 use markhuot\CraftQL\Models\Token;
@@ -87,6 +88,14 @@ class CraftQL extends Plugin
                 }
             }
         }
+    }
+
+    public static function getInstance(): self {
+        return parent::getInstance();
+    }
+
+    public function getSettings(): Settings {
+        return parent::getSettings();
     }
 
     /**
