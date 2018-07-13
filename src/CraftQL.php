@@ -90,19 +90,15 @@ class CraftQL extends Plugin
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public static function getInstance(): self {
         return parent::getInstance();
     }
 
     public function getSettings(): Settings {
         return parent::getSettings();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getInstance(): self {
-        return parent::getInstance();
     }
 
     /**
