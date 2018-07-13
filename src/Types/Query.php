@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Types;
 
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
+use markhuot\CraftQL\FieldBehaviors\ProductQueryArguments;
 use yii\base\Component;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -41,6 +42,10 @@ class Query extends Schema {
 
         if ($token->can('query:categories')) {
             $this->addCategoriesSchema();
+        }
+
+        if (false && $token->can('query:products')) {
+            $this->addProductsSchema();
         }
 
         if ($token->can('query:users')) {
@@ -319,6 +324,55 @@ class Query extends Schema {
                     'edges' => $categories,
                 ];
             });
+    }
+
+    /**
+     * The fields you can query that return products
+     *
+     * @return Schema
+     */
+    function addProductsSchema() {
+//        if ($this->request->categoryGroups()->count() == 0) {
+//            return;
+//        }
+
+        $productResolver = function ($root, $args) {
+            $criteria = \craft\commerce\elements\Product::find();
+
+            foreach ($args as $key => $value) {
+                $criteria = $criteria->{$key}($value);
+            }
+
+            return $criteria;
+        };
+
+        $this->addField('products')
+            ->lists()
+            ->type(ProductInterface::class)
+            ->use(new ProductQueryArguments)
+            ->resolve(function ($root, $args) use ($productResolver) {
+                return $productResolver($root, $args)->all();
+            });
+
+        $this->addField('product')
+            ->type(ProductInterface::class)
+            ->use(new ProductQueryArguments)
+            ->resolve(function ($root, $args) use ($productResolver) {
+                return $productResolver($root, $args)->first();
+            });
+
+//        $this->addField('productsConnection')
+//            ->type(CategoryConnection::class)
+//            ->use(new CategoryQueryArguments)
+//            ->resolve(function ($root, $args) use ($productResolver) {
+//                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($productResolver($root, $args));
+//
+//                return [
+//                    'totalCount' => $pageInfo->total,
+//                    'pageInfo' => $pageInfo,
+//                    'edges' => $categories,
+//                ];
+//            });
     }
 
 }
