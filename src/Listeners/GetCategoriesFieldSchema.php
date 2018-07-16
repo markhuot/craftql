@@ -51,7 +51,8 @@ class GetCategoriesFieldSchema
                     $group = Craft::$app->getCategories()->getGroupById($groupId);
 
                     foreach ($values as &$value) {
-                        if (is_numeric($value)) {
+                        if (!empty($value['id']) && is_numeric($value['id'])) {
+                            $value = $value['id'];
                             continue;
                         }
 
