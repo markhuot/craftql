@@ -37,13 +37,16 @@ class ApiController extends Controller
 
     function actionIndex()
     {
-        $token = false;
+        $response = \Craft::$app->getResponse();
 
         $authorization = Craft::$app->request->headers->get('authorization');
         preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
         $token = Token::findOrAnonymous(@$matches['tokenId']);
 
-        $response = \Craft::$app->getResponse();
+        if ($user = $token->getUser()) {
+            $response->headers->add('Authorization', 'TOKEN ' . CraftQL::getInstance()->jwt->tokenForUser($user));
+        }
+
         if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
             if (is_string($allowedOrigins)) {
                 $allowedOrigins = [$allowedOrigins];

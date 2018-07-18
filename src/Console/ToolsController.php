@@ -67,13 +67,18 @@ class ToolsController extends Controller
                     $query = false;
                     $variables = [];
 
+                    $headers = [
+                        'Content-Type' => 'application/json; charset=UTF-8',
+                    ];
+
                     $authorization = @$request->getHeaders()['authorization'][0];
                     preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
                     $token = Token::findOrAnonymous(@$matches['tokenId']);
 
-                    $headers = [
-                        'Content-Type' => 'application/json; charset=UTF-8',
-                    ];
+                    if ($user = $token->getUser()) {
+                       $headers['Authorization'] = 'TOKEN ' . CraftQL::getInstance()->jwt->tokenForUser($user);
+                    }
+
                     if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
                         if (is_string($allowedOrigins)) {
                             $allowedOrigins = [$allowedOrigins];

@@ -53,27 +53,26 @@ class Token extends ActiveRecord
      */
     public static function findOrAnonymous($token=false)
     {
+        if (empty($token)) {
+            return static::anonymous();
+        }
+
         // If the token matches a JWT format
-        if ($token && preg_match('/[^.]+\.[^.]+\.[^.]+/', $token)) {
+        if (preg_match('/[^.]+\.[^.]+\.[^.]+/', $token)) {
             try {
                 $tokenData = CraftQL::getInstance()->jwt->decode($token);
             }
             catch (ExpiredException $e) {
                 throw new UserError('The token has expired');
             }
-            $userRow = (new \craft\db\Query())
-                ->from('users')
-                ->where(['uid' => $tokenData->uid])
-                ->limit(1)
-                ->one();
-            $user = \craft\elements\User::find()->id($userRow['id'])->one();
+            $user = \craft\elements\User::find()->id($tokenData->id)->one();
             $token = Token::forUser($user);
             return $token;
         }
 
         // If the token is in the database
         /** @var Token $token */
-        if ($token && $token=Token::find()->where(['token' => $token])->one()) {
+        if ($token = Token::find()->where(['token' => $token])->one()) {
             return $token;
         }
 

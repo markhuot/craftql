@@ -353,23 +353,11 @@ class Query extends Schema {
                 throw new UserError('An unknown error occured');
             }
 
-            $userRow = (new \craft\db\Query())
-                ->from('users')
-                ->where(['id' => $user->id])
-                ->limit(1)
-                ->one();
-
-            $tokenData = [
-                'uid' => $userRow['uid'],
-            ];
-
-            if ($defaultTokenDuration > 0) {
-                $tokenData['exp'] = time() + $defaultTokenDuration;
-            }
+            $tokenString = CraftQL::getInstance()->jwt->tokenForUser($user);
 
             return  [
                 'user' => $user,
-                'token' => CraftQL::getInstance()->jwt->encode($tokenData),
+                'token' => $tokenString,
             ];
         });
 
