@@ -125,7 +125,6 @@ class ApiController extends Controller
 
         // You must set the header to JSON, otherwise Craft will see HTML and try to insert
         // javascript at the bottom to run pending tasks
-        $response = \Craft::$app->getResponse();
         $response->headers->add('Content-Type', 'application/json; charset=UTF-8');
 
         return $this->asJson($result);
