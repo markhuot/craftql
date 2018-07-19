@@ -41,10 +41,19 @@ class ApiController extends Controller
 
         $authorization = Craft::$app->request->headers->get('authorization');
         preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
-        $token = Token::findOrAnonymous(@$matches['tokenId']);
+
+        try {
+            $token = Token::findOrAnonymous(@$matches['tokenId']);
+        }
+        catch (\Exception $e) {
+
+            $response->headers->add('Status', 401);
+            $response->headers->add('WWW-Authenticate', 'Bearer');
+            return $this->asJson(['error' => ['status' => 401, 'message' => 'token_invalid']]);
+        }
 
         if ($user = $token->getUser()) {
-            $response->headers->add('Authorization', 'TOKEN ' . CraftQL::getInstance()->jwt->tokenForUser($user));
+            $response->headers->add('Authorization', 'Bearer ' . CraftQL::getInstance()->jwt->tokenForUser($user));
         }
 
         if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
