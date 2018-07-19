@@ -44,7 +44,7 @@ class ApiController extends Controller
         $token = Token::findOrAnonymous(@$matches['tokenId']);
 
         if ($user = $token->getUser()) {
-            $response->headers->add('Authorization', 'TOKEN ' . CraftQL::getInstance()->jwt->tokenForUser($user));
+            $response->headers->add('Authorization', 'Bearer ' . CraftQL::getInstance()->jwt->tokenForUser($user));
         }
 
         if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {

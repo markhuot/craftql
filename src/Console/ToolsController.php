@@ -76,7 +76,7 @@ class ToolsController extends Controller
                     $token = Token::findOrAnonymous(@$matches['tokenId']);
 
                     if ($user = $token->getUser()) {
-                       $headers['Authorization'] = 'TOKEN ' . CraftQL::getInstance()->jwt->tokenForUser($user);
+                       $headers['Authorization'] = 'Bearer ' . CraftQL::getInstance()->jwt->tokenForUser($user);
                     }
 
                     if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
