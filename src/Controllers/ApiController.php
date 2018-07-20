@@ -106,6 +106,17 @@ class ApiController extends Controller
             $data = json_decode($data, true);
             $variables = @$data['variables'];
         }
+
+        if (!empty($input)) {
+            $input = [
+                ['query' => $input, 'variables' => $variables]
+            ];
+        }
+        else {
+            $data = Craft::$app->request->getRawBody();
+            $input = json_decode($data, true);
+        }
+
         Craft::trace('CraftQL: Parsing request complete');
 
         Craft::trace('CraftQL: Bootstrapping');

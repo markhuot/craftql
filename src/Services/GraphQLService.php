@@ -4,6 +4,8 @@ namespace markhuot\CraftQL\Services;
 
 use Craft;
 use Egulias\EmailValidator\Exception\CRLFAtTheEnd;
+use GraphQL\Executor\Executor;
+use GraphQL\Executor\Promise\Adapter\SyncPromiseAdapter;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
@@ -121,7 +123,29 @@ class GraphQLService extends Component {
 
     function execute($schema, $input, $variables = []) {
         $debug = Craft::$app->config->getGeneral()->devMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::RETHROW_INTERNAL_EXCEPTIONS : null;
-        return GraphQL::executeQuery($schema, $input, null, null, $variables)->toArray($debug);
+
+        $promiseAdapter = Executor::getPromiseAdapter();
+
+        $result = [];
+
+        foreach ($input as $op) {
+            $result[] = GraphQL::promiseToExecute(
+                $promiseAdapter,
+                $schema,
+                @$op['query'],
+                null,
+                null,
+                @$op['variables'] ?: []
+            );
+        }
+
+        $result = $promiseAdapter->all($result);
+
+        if ($promiseAdapter instanceof SyncPromiseAdapter) {
+            $result = $promiseAdapter->wait($result);
+        }
+
+        return $result;
     }
 
 }
