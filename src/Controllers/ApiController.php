@@ -107,14 +107,17 @@ class ApiController extends Controller
             $variables = @$data['variables'];
         }
 
-        if (!empty($input)) {
+        if (empty($input)) {
+            $singular = false;
+            $data = Craft::$app->request->getRawBody();
+            $input = json_decode($data, true);
+            $variables = null;
+        }
+        else {
+            $singular = true;
             $input = [
                 ['query' => $input, 'variables' => $variables]
             ];
-        }
-        else {
-            $data = Craft::$app->request->getRawBody();
-            $input = json_decode($data, true);
         }
 
         Craft::trace('CraftQL: Parsing request complete');
@@ -129,6 +132,9 @@ class ApiController extends Controller
 
         Craft::trace('CraftQL: Executing query');
         $result = $this->graphQl->execute($schema, $input, $variables);
+        if ($singular) {
+            $result = $result[0];
+        }
         Craft::trace('CraftQL: Execution complete');
 
         $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];
