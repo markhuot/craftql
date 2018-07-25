@@ -83,27 +83,18 @@ class ApiController extends Controller
         }
 
         Craft::trace('CraftQL: Parsing request');
-        if (Craft::$app->request->isPost && $query=Craft::$app->request->post('query')) {
-            $input = $query;
+        if (Craft::$app->request->isPost && Craft::$app->request->post('query')) {
+            $input = Craft::$app->request->post('query');
+            $variables = Craft::$app->request->post('variables');
         }
-        else if (Craft::$app->request->isGet && $query=Craft::$app->request->get('query')) {
-            $input = $query;
+        else if (Craft::$app->request->isGet && Craft::$app->request->get('query')) {
+            $input = Craft::$app->request->get('query');
+            $variables = json_decode(Craft::$app->request->get('variables') ?: '{}', true);
         }
         else {
             $data = Craft::$app->request->getRawBody();
             $data = json_decode($data, true);
             $input = @$data['query'];
-        }
-
-        if (Craft::$app->request->isPost && $query=Craft::$app->request->post('variables')) {
-            $variables = $query;
-        }
-        else if (Craft::$app->request->isGet && $query=Craft::$app->request->get('variables')) {
-            $variables = json_decode($query, true);
-        }
-        else {
-            $data = Craft::$app->request->getRawBody();
-            $data = json_decode($data, true);
             $variables = @$data['variables'];
         }
 
