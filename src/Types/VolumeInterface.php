@@ -28,6 +28,16 @@ class VolumeInterface extends InterfaceBuilder {
         $this->addDateField('dateCreated');
         $this->addDateField('dateUpdatedTimestamp');
         $this->addDateField('dateUpdated');
+
+        $focalPoint = $this->createObjectType('AssetFocalPoint');
+        $focalPoint->addFloatField('x');
+        $focalPoint->addFloatField('y');
+
+        $this->addField('focalPoint')
+            ->type($focalPoint)
+            ->resolve(function ($root, $args) {
+                return $root->getFocalPoint();
+            });
     }
 
     function getResolveType() {
