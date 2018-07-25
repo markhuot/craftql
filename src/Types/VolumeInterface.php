@@ -9,6 +9,7 @@ class VolumeInterface extends InterfaceBuilder {
 
     function boot() {
         $this->addIntField('id');
+        $this->addStringField('path');
         $this->addStringField('url')
             ->use(new AssetTransformArguments);
 
