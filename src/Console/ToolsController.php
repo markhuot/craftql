@@ -106,14 +106,25 @@ class ToolsController extends Controller
 
                     if ($postBody) {
                         $body = json_decode($postBody, true);
-                        $query = @$body['query'];
-                        $variables = @$body['variables'] ?: [];
+
+
+                        if (!empty($body['query'])) {
+                            $singular = true;
+                            $query = @$body['query'];
+                            $variables = @$body['variables'] ?: [];
+                        }
+                        else {
+                            $singular = false;
+                            $query = $body;
+                            $variables = null;
+                        }
                     }
 
                     if ($this->debug) { echo ' - Running: '.preg_replace('/[\r\n]+/', ' ', $query)."\n"; }
                     $schema = $graphQl->getSchema($token);
                     try {
                         $result = $graphQl->execute($schema, $query, $variables);
+                        if ($singular) { $result = $result[0]; }
                     } catch (\Exception $e) {
                         if ($this->debug) { echo $e; }
                     }

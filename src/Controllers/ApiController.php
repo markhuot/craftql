@@ -82,35 +82,48 @@ class ApiController extends Controller
             ]);
         }
 
+        // assume we're passing in singular, non-batched queries
+        $singular = true;
+
         Craft::trace('CraftQL: Parsing request');
+
+        // parse the post request body for data
+        $body = Craft::$app->request->getRawBody();
+        $body = json_decode($body, true);
+
+        // if we pass the query through a POST form field
         if (Craft::$app->request->isPost && Craft::$app->request->post('query')) {
             $input = Craft::$app->request->post('query');
-            $variables = Craft::$app->request->post('variables');
+            $variables = json_decode(Craft::$app->request->post('variables') ?: '{}', true);
         }
+
+        // if we pass the query through a GET form field
         else if (Craft::$app->request->isGet && Craft::$app->request->get('query')) {
             $input = Craft::$app->request->get('query');
             $variables = json_decode(Craft::$app->request->get('variables') ?: '{}', true);
         }
-        else {
-            $data = Craft::$app->request->getRawBody();
-            $data = json_decode($data, true);
-            $input = @$data['query'];
-            $variables = @$data['variables'];
+
+        // if we pass the query through the request body by itself, not in a batch
+        else if (!empty($body['query'])) {
+            $input = $body['query'];
+            $variables = @$body['variables'];
         }
 
-        if (empty($input)) {
+        // if none of the above match, assume we're passing in a batched query
+        else {
             $singular = false;
-            $data = Craft::$app->request->getRawBody();
-            $input = json_decode($data, true);
+            $input = $body;
             $variables = null;
         }
-        else {
-            $singular = true;
+
+        // if the query is a single query, convert it to a batch here so we can use
+        // the same processing regarless of input. The results will get downgraded to
+        // a single result later on
+        if ($singular) {
             $input = [
                 ['query' => $input, 'variables' => $variables]
             ];
         }
-
         Craft::trace('CraftQL: Parsing request complete');
 
         Craft::trace('CraftQL: Bootstrapping');
@@ -123,9 +136,7 @@ class ApiController extends Controller
 
         Craft::trace('CraftQL: Executing query');
         $result = $this->graphQl->execute($schema, $input, $variables);
-        if ($singular) {
-            $result = $result[0];
-        }
+        if ($singular) { $result = $result[0]; }
         Craft::trace('CraftQL: Execution complete');
 
         $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];
