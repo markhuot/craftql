@@ -23,6 +23,9 @@ class Query extends Schema {
         $this->addStringField('helloWorld')
             ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
+        $this->addStringField('ping')
+            ->resolve('pong');
+
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
             $this->addEntriesSchema();
         }
