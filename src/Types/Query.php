@@ -20,6 +20,9 @@ class Query extends Schema {
         $this->addStringField('helloWorld')
             ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
+        $this->addStringField('ping')
+            ->resolve('pong');
+
         // @TODO add plugin setting to control authorize visibility
         $this->addAuthSchema();
 
