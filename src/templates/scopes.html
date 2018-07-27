@@ -52,11 +52,6 @@
         </thead>
         <tbody>
             <tr data-id="default">
-                <th>entries</th>
-                <td>Query any entry type that is enabled, below.</td>
-                <td>{{ forms.lightswitch({"name": "scope[query:entries]", "value": 1, "on": token.can('query:entries'), "small": true}) }}</td>
-            </tr>
-            <tr data-id="default">
                 <th>entries.author</th>
                 <td>Access to users through an entries author field</td>
                 <td>{{ forms.lightswitch({"name": "scope[query:entry.author]", "value": 1, "on": token.can('query:entry.author'), "small": true}) }}</td>
@@ -122,10 +117,34 @@
                         <th>{{ section.type|ucfirst }}</th>
                         <td>{{ section.name }}</td>
                         <td>{{ entryType.name }}</td>
-                        <td>{{ forms.lightswitch({"name": "scope[query:entryType:" ~ entryType.id ~ "]", "value": 1, "on": token.can("query:entryType:" ~ entryType.id), "small": true}) }}</td>
+                        <td>{{ forms.lightswitch({"name": "scope[query:entrytype:" ~ entryType.id ~ "]", "value": 1, "on": token.can("query:entrytype:" ~ entryType.id), "small": true}) }}</td>
                     </tr>
                 {% endfor %}
             {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<div class="field">
+    <h2>Mutation Fields</h2>
+    <div class="field first last"><div class="heading"><div class="instructions"><p>Enable top level GraphQL fields when accessed through this token.</p></div></div></div>
+
+    <table id="sites" class="shadow-box editable">
+        <thead>
+        <tr>
+            <th scope="col" class="thin">Field Name</th>
+            <th scope="col">Description</th>
+            <th scope="col" class="thin"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr data-id="default">
+            <th>globals</th>
+            <td>Mutate globals</td>
+            <td>{{ forms.lightswitch({"name": "scope[mutate:globals]", "value": 1, "on": token.can('mutate:globals'), "small": true}) }}</td>
+        </tr>
         </tbody>
     </table>
 </div>
@@ -152,7 +171,7 @@
                         <th>{{ section.type|ucfirst }}</th>
                         <td>{{ section.name }}</td>
                         <td>{{ entryType.name }}</td>
-                        <td>{{ forms.lightswitch({"name": "scope[mutate:entryType:" ~ entryType.id ~ "]", "value": 1, "on": token.can("mutate:entryType:" ~ entryType.id), "small": true}) }}</td>
+                        <td>{{ forms.lightswitch({"name": "scope[mutate:entrytype:" ~ entryType.id ~ "]", "value": 1, "on": token.can("mutate:entrytype:" ~ entryType.id), "small": true}) }}</td>
                     </tr>
                 {% endfor %}
             {% endfor %}

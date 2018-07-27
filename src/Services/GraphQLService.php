@@ -6,6 +6,7 @@ use Craft;
 use Egulias\EmailValidator\Exception\CRLFAtTheEnd;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
+use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Schema;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
@@ -107,8 +108,11 @@ class GraphQLService extends Component {
             \markhuot\CraftQL\Directives\Date::directive(),
         ];
 
+        /** @var ObjectType $mutation */
         $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
-        $schemaConfig['mutation'] = $mutation;
+        if (!empty($mutation->getFields())) {
+            $schemaConfig['mutation'] = $mutation;
+        }
 
         $schema = new Schema($schemaConfig);
 

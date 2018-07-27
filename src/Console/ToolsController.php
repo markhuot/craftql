@@ -67,15 +67,18 @@ class ToolsController extends Controller
                     $query = false;
                     $variables = [];
 
-                    $authorization = @$request->getHeaders()['authorization'][0];
-                    preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
-                    $token = Token::findId(@$matches['tokenId']);
-
-                    // @todo, check user permissions when PRO license
-
                     $headers = [
                         'Content-Type' => 'application/json; charset=UTF-8',
                     ];
+
+                    $authorization = @$request->getHeaders()['authorization'][0];
+                    preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
+                    $token = Token::findOrAnonymous(@$matches['tokenId']);
+
+                    if ($user = $token->getUser()) {
+                       $headers['Authorization'] = 'Bearer ' . CraftQL::getInstance()->jwt->tokenForUser($user);
+                    }
+
                     if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
                         if (is_string($allowedOrigins)) {
                             $allowedOrigins = [$allowedOrigins];
@@ -91,17 +94,6 @@ class ToolsController extends Controller
 
                     if ($request->getMethod() == 'OPTIONS') {
                         return $resolve(new Response(200, $headers, ''));
-                    }
-
-                    if (!$token) {
-                        $response = new Response(403, $headers,
-                            json_encode([
-                                'errors' => [
-                                    ['message' => 'Not authorized']
-                                ]
-                            ])
-                        );
-                        return $resolve($response);
                     }
 
                     if ($postBody) {

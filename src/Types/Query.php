@@ -2,14 +2,11 @@
 
 namespace markhuot\CraftQL\Types;
 
+use Craft;
+use GraphQL\Error\UserError;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
-use yii\base\Component;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
-use Craft;
 use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\Request;
 use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\UserQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
@@ -23,7 +20,13 @@ class Query extends Schema {
         $this->addStringField('helloWorld')
             ->resolve('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.');
 
-        if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
+        $this->addStringField('ping')
+            ->resolve('pong');
+
+        // @TODO add plugin setting to control authorize visibility
+        $this->addAuthSchema();
+
+        if ($token->canMatch('/^query:entrytype/')) {
             $this->addEntriesSchema();
         }
 
@@ -319,6 +322,56 @@ class Query extends Schema {
                     'edges' => $categories,
                 ];
             });
+    }
+
+    function addAuthSchema() {
+        $defaultTokenDuration = CraftQL::getInstance()->getSettings()->userTokenDuration;
+
+        $field = $this->addField('authorize');
+        $field->type(Authorize::class);
+        $field->addStringArgument('username')->nonNull();
+        $field->addStringArgument('password')->nonNull();
+        $field->resolve(function ($root, $args) use ($defaultTokenDuration) {
+            $loginName = $args['username'];
+            $password = $args['password'];
+
+            // Does a user exist with that username/email?
+            $user = Craft::$app->getUsers()->getUserByUsernameOrEmail($loginName);
+
+            // Delay randomly between 0 and 1.5 seconds.
+            usleep(random_int(0, 1500000));
+
+            if (!$user || $user->password === null) {
+                // Delay again to match $user->authenticate()'s delay
+                Craft::$app->getSecurity()->validatePassword('p@ss1w0rd', '$2y$13$nj9aiBeb7RfEfYP3Cum6Revyu14QelGGxwcnFUKXIrQUitSodEPRi');
+                throw new UserError('Invalid credentials.');
+            }
+
+            // Did they submit a valid password, and is the user capable of being logged-in?
+            if (!$user->authenticate($password)) {
+                throw new UserError($user->authError);
+            }
+
+            if (!Craft::$app->getUser()->login($user, 0)) {
+                throw new UserError('An unknown error occured');
+            }
+
+            $tokenString = CraftQL::getInstance()->jwt->tokenForUser($user);
+
+            return  [
+                'user' => $user,
+                'token' => $tokenString,
+            ];
+        });
+
+        $field = $this->addStringField('refresh');
+        $field->addStringArgument('token')->nonNull();
+        $field->resolve(function ($root, $args) use ($defaultTokenDuration) {
+            $tokenData = $args['token'];
+            $tokenData = CraftQL::getInstance()->jwt->decode($tokenData);
+            $tokenData->exp = time() + $defaultTokenDuration;
+            return CraftQL::getInstance()->jwt->encode($tokenData);
+        });
     }
 
 }

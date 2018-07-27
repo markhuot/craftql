@@ -49,7 +49,7 @@ abstract class BaseFactory {
     }
 
     function count() {
-        return count($this->repository->all());
+        return count($this->all());
     }
 
     function getEnumKey($object) {

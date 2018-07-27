@@ -9,11 +9,19 @@ use craft\console\Application as ConsoleApplication;
 use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
 
+use markhuot\CraftQL\Services\GraphQLService;
+use markhuot\CraftQL\Services\JWTService;
 use markhuot\CraftQL\Models\Settings;
 use yii\base\Event;
 
 use markhuot\CraftQL\Models\Token;
 
+/**
+ * Class CraftQL
+ * @package markhuot\CraftQL
+ * @property JWTService jwt
+ * @property GraphQLService graphQl
+ */
 class CraftQL extends Plugin
 {
     // const EVENT_GET_FIELD_SCHEMA = 'getFieldSchema';
@@ -82,6 +90,9 @@ class CraftQL extends Plugin
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public static function getInstance(): self {
         return parent::getInstance();
     }

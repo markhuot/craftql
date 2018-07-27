@@ -4,53 +4,165 @@ namespace markhuot\CraftQL\Models;
 
 use Craft;
 use craft\db\ActiveRecord;
-use craft\records\User;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
+use Firebase\JWT\ExpiredException;
+use GraphQL\Error\UserError;
+use markhuot\CraftQL\CraftQL;
 
 class Token extends ActiveRecord
 {
+    /**
+     * Whether the token represents an admin role
+     *
+     * @var bool
+     */
     private $admin = false;
 
-    public function getUser() {
-        return $this->hasOne(User::class, ['id' => 'userId']);
+    /**
+     * Whether the token is for an anonymous user (pre-auth/token)
+     *
+     * @var bool
+     */
+    private $anonymous = false;
+
+    /**
+     * @var \craft\elements\User
+     */
+    private $user = false;
+
+    /**
+     * @return \craft\elements\User
+     */
+    function getUser() {
+        return $this->user;
     }
 
-    public static function findId($tokenId=false)
+    /**
+     * Sets the user
+     *
+     * @param \craft\elements\User $user
+     */
+    function setUser (\craft\elements\User $user) {
+        $this->user = $user;
+    }
+
+    /**
+     * Gets a token by the token id
+     *
+     * @param bool $token
+     * @return Token|null
+     */
+    public static function findOrAnonymous($token=false)
     {
-        if ($tokenId) {
-            return Token::find()->where(['token' => $tokenId])->one();
+        if (empty($token)) {
+            $token = static::tokenForSession();
         }
+
         else {
-            $user = Craft::$app->getUser()->getIdentity();
-            if ($user) {
-                return Token::forUser($user);
-            }
+            $token = static::tokenForString($token);
+        }
+
+        if (!$token) {
+            $token = static::anonymous();
+        }
+
+        return $token;
+    }
+
+    public static function tokenForSession() {
+        if ($user = Craft::$app->getUser()->getIdentity()) {
+            return Token::forUser($user);
         }
 
         return false;
     }
 
+    public static function tokenForString($token) {
+        // If the token matches a JWT format
+        if (preg_match('/[^.]+\.[^.]+\.[^.]+/', $token)) {
+            try {
+                $tokenData = CraftQL::getInstance()->jwt->decode($token);
+            }
+            catch (ExpiredException $e) {
+                throw new UserError('The token has expired');
+            }
+            $user = \craft\elements\User::find()->id($tokenData->id)->one();
+            $token = Token::forUser($user);
+            return $token;
+        }
+
+        // If the token is in the database
+        /** @var Token $token */
+        if ($token = Token::find()->where(['token' => $token])->one()) {
+            return $token;
+        }
+
+        return false;
+    }
+
+    /**
+     * A generic admin token
+     *
+     * @return Token
+     */
     public static function admin(): Token
     {
-        $token = new static;
-        $token->scopes = json_encode([]);
-        $token->makeAdmin();
-        return $token;
+        return (new static)->makeAdmin();
     }
 
-    public static function forUser(): Token
-    {
-        $token = new static;
-        $token->scopes = json_encode([]);
-        $token->makeAdmin();
-        return $token;
-    }
-
+    /**
+     * Turn the token in to an admin token
+     *
+     * @return $this
+     */
     public function makeAdmin() {
         $this->admin = true;
+        return $this;
+    }
+
+    /**
+     * A generic anonymous token
+     *
+     * @return Token
+     */
+    public static function anonymous(): Token {
+        return (new static)->makeAnonymous();
+    }
+
+    /**
+     * Turn the token in to an anonymous token
+     *
+     * @return $this
+     */
+    public function makeAnonymous() {
+        $this->anonymous = true;
+        return $this;
+    }
+
+    /**
+     * Returns a token with the user permissions translated over in to token permissions
+     *
+     * @param \craft\elements\User $user
+     * @return Token
+     */
+    public static function forUser(\craft\elements\User $user): Token
+    {
+        $token = new static;
+        $token->setUser($user);
+
+        $scopes = [];
+        $permissions = Craft::$app->getUserPermissions()->getPermissionsByUserId($user->id);
+        foreach ($permissions as $permission) {
+            if (substr($permission, 0, 8) == 'craftql:') {
+                $scopes[substr($permission, 8)] = 1;
+            }
+        }
+        $token->scopes = json_encode($scopes);
+
+        if ($user->admin) {
+            $token->makeAdmin();
+        }
+
+        return $token;
     }
 
     /**
@@ -63,7 +175,14 @@ class Token extends ActiveRecord
 
     function getScopeArray(): array
     {
-        return json_decode($this->scopes ?: '[]', true);
+        $scopes = [];
+
+        $rawScopes = json_decode($this->scopes ?: '[]', true);
+        foreach ($rawScopes as $key => $value) {
+            $scopes[strtolower($key)] = $value;
+        }
+
+        return $scopes;
     }
 
     function can($do): bool {
@@ -74,60 +193,7 @@ class Token extends ActiveRecord
         return !$this->can($do);
     }
 
-    // function mutableEntryTypeIds(): array {
-    //     $ids = [];
-
-    //     foreach ($this->scopeArray as $scope => $enabled) {
-    //         if ($enabled && preg_match('/mutation:entryType:(\d+)/', $scope, $matches)) {
-    //             $ids[] = $matches[1];
-    //         }
-    //     }
-
-    //     return $ids;
-    // }
-
-    // function queryableEntryTypeIds(): array {
-    //     $ids = [];
-
-    //     foreach ($this->scopeArray as $scope => $enabled) {
-    //         if ($enabled && preg_match('/query:entryType:(\d+)/', $scope, $matches)) {
-    //             $ids[] = $matches[1];
-    //         }
-    //     }
-
-    //     return $ids;
-    // }
-
-    // private $entryTypeEnum;
-
-    // function entryTypeEnum() {
-    //     if ($this->entryTypeEnum) {
-    //         return $this->entryTypeEnum;
-    //     }
-
-    //     $entryTypeEnumValues = [];
-    //     // $sectionEnumValues = [];
-
-    //     foreach (\markhuot\CraftQL\Repositories\EntryType::all() as $entryType) {
-    //         if (in_array($entryType->id, $this->queryableEntryTypeIds())) {
-    //             $name = \markhuot\CraftQL\Types\EntryType::getName($entryType);
-    //             $entryTypeEnumValues[$name] = $entryType->id;
-    //             // $sectionEnumValues[$entryType->section->handle] = $entryType->section->id;
-    //         }
-    //     }
-
-    //     return $this->entryTypeEnum = new EnumType([
-    //         'name' => 'EntryTypeEnum',
-    //         'values' => $entryTypeEnumValues,
-    //     ]);
-
-    //     // $this->sectionArgEnum = new EnumType([
-    //     //     'name' => 'SectionEnum',
-    //     //     'values' => $sectionEnumValues,
-    //     // ]);
-    // }
-
-    function allowsMatch($regex): bool {
+    function canMatch($regex): bool {
         if ($this->admin) {
             return true;
         }

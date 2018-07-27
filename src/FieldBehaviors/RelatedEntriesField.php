@@ -8,6 +8,10 @@ use markhuot\CraftQL\Types\EntryConnection;
 class RelatedEntriesField extends SchemaBehavior {
 
     function initRelatedEntriesField() {
+        if ($this->owner->request->entryTypes()->count() == 0) {
+            return;
+        }
+
         $this->owner->addField('relatedEntries')
             ->type(EntryConnection::class)
             ->use(new EntryQueryArguments)
