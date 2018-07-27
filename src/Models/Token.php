@@ -54,9 +54,29 @@ class Token extends ActiveRecord
     public static function findOrAnonymous($token=false)
     {
         if (empty($token)) {
-            return static::anonymous();
+            $token = static::tokenForSession();
         }
 
+        else {
+            $token = static::tokenForString($token);
+        }
+
+        if (!$token) {
+            $token = static::anonymous();
+        }
+
+        return $token;
+    }
+
+    public static function tokenForSession() {
+        if ($user = Craft::$app->getUser()->getIdentity()) {
+            return Token::forUser($user);
+        }
+
+        return false;
+    }
+
+    public static function tokenForString($token) {
         // If the token matches a JWT format
         if (preg_match('/[^.]+\.[^.]+\.[^.]+/', $token)) {
             try {
@@ -76,12 +96,7 @@ class Token extends ActiveRecord
             return $token;
         }
 
-        // If the user has an active Craft session
-        if ($user = Craft::$app->getUser()->getIdentity()) {
-            return Token::forUser($user);
-        }
-
-        return static::anonymous();
+        return false;
     }
 
     /**
