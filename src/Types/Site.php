@@ -19,6 +19,7 @@ class Site extends Schema {
         $this->addStringField('originalBaseUrl');
         $this->addStringField('originalName');
         $this->addStringField('sortOrder');
+        $this->addBooleanField('primary');
     }
 
 }
