@@ -18,6 +18,7 @@ class Site extends Schema {
         $this->addStringField('language');
         $this->addStringField('originalBaseUrl');
         $this->addStringField('originalName');
+        $this->addStringField('sortOrder');
     }
 
 }
