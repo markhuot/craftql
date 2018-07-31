@@ -52,6 +52,11 @@
         </thead>
         <tbody>
             <tr data-id="default">
+                <th>sites</th>
+                <td>Query any sites.</td>
+                <td>{{ forms.lightswitch({"name": "scope[query:sites]", "value": 1, "on": token.can('query:sites'), "small": true}) }}</td>
+            </tr>
+            <tr data-id="default">
                 <th>entries</th>
                 <td>Query any entry type that is enabled, below.</td>
                 <td>{{ forms.lightswitch({"name": "scope[query:entries]", "value": 1, "on": token.can('query:entries'), "small": true}) }}</td>

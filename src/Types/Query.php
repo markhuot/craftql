@@ -26,6 +26,10 @@ class Query extends Schema {
         $this->addStringField('ping')
             ->resolve('pong');
 
+        if ($token->can('query:sites')) {
+            $this->addSitesSchema();
+        }
+
         if ($token->can('query:entries') && $token->allowsMatch('/^query:entryType/')) {
             $this->addEntriesSchema();
         }
@@ -81,6 +85,34 @@ class Query extends Schema {
                     return \Craft::$app->sections->allSections;
                 });
         }
+    }
+
+    /**
+     * Adds sites to the schema
+     */
+    function addSitesSchema() {
+        $field = $this->addField('sites')
+            ->type(Site::class)
+            ->lists()
+            ->resolve(function ($root, $args) {
+                if (!empty($args['handle'])) {
+                    return [Craft::$app->sites->getSiteByHandle($args['handle'])];
+                }
+
+                if (!empty($args['id'])) {
+                    return [Craft::$app->sites->getSiteById($args['id'])];
+                }
+
+                if (!empty($args['primary'])) {
+                    return [Craft::$app->sites->getPrimarySite()];
+                }
+
+                return Craft::$app->sites->getAllSites();
+            });
+
+        $field->addStringArgument('handle');
+        $field->addIntArgument('id');
+        $field->addBooleanArgument('primary');
     }
 
     /**
