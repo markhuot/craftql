@@ -41,7 +41,16 @@ class ApiController extends Controller
 
         $authorization = Craft::$app->request->headers->get('authorization');
         preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
-        $token = Token::findOrAnonymous(@$matches['tokenId']);
+
+        try {
+            $token = Token::findOrAnonymous(@$matches['tokenId']);
+        }
+        catch (\Exception $e) {
+
+            $response->headers->add('Status', 401);
+            $response->headers->add('WWW-Authenticate', 'Bearer');
+            return $this->asJson(['error' => ['status' => 401, 'message' => 'token_invalid']]);
+        }
 
         if ($user = $token->getUser()) {
             $response->headers->add('Authorization', 'Bearer ' . CraftQL::getInstance()->jwt->tokenForUser($user));
@@ -125,7 +134,6 @@ class ApiController extends Controller
 
         // You must set the header to JSON, otherwise Craft will see HTML and try to insert
         // javascript at the bottom to run pending tasks
-        $response = \Craft::$app->getResponse();
         $response->headers->add('Content-Type', 'application/json; charset=UTF-8');
 
         return $this->asJson($result);

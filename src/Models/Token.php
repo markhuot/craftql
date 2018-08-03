@@ -4,7 +4,6 @@ namespace markhuot\CraftQL\Models;
 
 use Craft;
 use craft\db\ActiveRecord;
-use Firebase\JWT\ExpiredException;
 use GraphQL\Error\UserError;
 use markhuot\CraftQL\CraftQL;
 
@@ -79,12 +78,7 @@ class Token extends ActiveRecord
     public static function tokenForString($token) {
         // If the token matches a JWT format
         if (preg_match('/[^.]+\.[^.]+\.[^.]+/', $token)) {
-            try {
-                $tokenData = CraftQL::getInstance()->jwt->decode($token);
-            }
-            catch (ExpiredException $e) {
-                throw new UserError('The token has expired');
-            }
+            $tokenData = CraftQL::getInstance()->jwt->decode($token);
             $user = \craft\elements\User::find()->id($tokenData->id)->one();
             $token = Token::forUser($user);
             return $token;
