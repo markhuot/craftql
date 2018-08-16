@@ -55,7 +55,7 @@ class CpController extends Controller
 
     function actionGraphiql()
     {
-        $url = \craft\helpers\UrlHelper::siteUrl();
+        $url = \craft\helpers\UrlHelper::baseRequestUrl();
         $instance = \markhuot\CraftQL\CraftQL::getInstance();
         $uri = $instance->settings->uri;
 
@@ -69,7 +69,7 @@ class CpController extends Controller
 
     function actionGraphiqlas($token)
     {
-        $url = \craft\helpers\UrlHelper::siteUrl();
+        $url = \craft\helpers\UrlHelper::baseRequestUrl();
         $instance = \markhuot\CraftQL\CraftQL::getInstance();
         $uri = $instance->settings->uri;
 
