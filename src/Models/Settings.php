@@ -7,6 +7,7 @@ use markhuot\CraftQL\Models\Token;
 
 class Settings extends Model
 {
+    public $baseUrl = null;
     public $uri = 'api';
     public $verbs = ['POST'];
     public $allowedOrigins = [];
