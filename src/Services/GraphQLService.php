@@ -11,6 +11,7 @@ use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
+use markhuot\CraftQL\Events\AlterQuerySchema;
 use yii\base\Component;
 use Yii;
 
@@ -76,7 +77,14 @@ class GraphQLService extends Component {
         $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
 
         $schemaConfig = [];
-        $schemaConfig['query'] = (new \markhuot\CraftQL\Types\Query($request))->getRawGraphQLObject();
+
+        $query = new \markhuot\CraftQL\Types\Query($request);
+
+        $event = new AlterQuerySchema;
+        $event->query = $query;
+        $query->trigger(AlterQuerySchema::EVENT, $event);
+
+        $schemaConfig['query'] = $query->getRawGraphQLObject();
         $schemaConfig['types'] = function () use ($request) {
             return array_merge(
                 array_map(function ($section) {
