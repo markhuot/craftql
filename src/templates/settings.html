@@ -68,6 +68,15 @@ You can access your GraphQL endpoint in two ways,
     <hr>
 
 <div class="" style="width: 70%">
+    <h2>Custom Authorization Header</h2>
+
+    {{ forms.textField({
+        first: true,
+        name: 'authorizationHeader',
+        value: settings.authorizationHeader,
+        instructions: 'Custom header to be used check for authorization token. Useful if site is behind Basic Auth.'
+    }) }}
+
     <h2>URI</h2>
 
     {{ forms.textField({

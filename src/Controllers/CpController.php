@@ -78,6 +78,7 @@ class CpController extends Controller
         $this->renderTemplate('craftql/graphiql', [
             'url' => "{$url}{$uri}",
             'token' => $token,
+            'authorizationHeader' => $instance->settings->authorizationHeader,
         ]);
     }
 }
