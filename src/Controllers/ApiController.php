@@ -153,27 +153,15 @@ class ApiController extends Controller
         // resolution, if possible.
         $tokenId = null;
 
-        $hadHeader = false;
-
         if ($authorizationHeader) {
             if ($headers->has($authorizationHeader)) {
-                $hadHeader = true;
-
                 $tokenId = $headers->get($authorizationHeader);
             }
         } else if ($headers->has('authorization')) {
-            $hadHeader = true;
-
             $authorization = $headers->get('authorization');
             preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
             $tokenId = @$matches['tokenId'];
         }
-
-        /*
-        if ($hadHeader && !$tokenId) {
-            return false;
-        }
-        */
 
         return Token::findId($tokenId);
     }
