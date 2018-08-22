@@ -148,9 +148,9 @@
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            {% if authorizationHeader %}
+            {% if authorizationHeader and token %}
             '{{ authorizationHeader }}': '{{ token }}',
-            {% else %}
+            {% elseif token %}
             'Authorization': 'Bearer {{ token }}',
             {% endif %}
           },
