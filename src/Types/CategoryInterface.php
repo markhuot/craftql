@@ -60,7 +60,7 @@ class CategoryInterface extends InterfaceBuilder {
             $criteria = $criteria->{$key}($value);
         }
 
-        return $criteria;
+        return $criteria->all();
     }
 
 }
