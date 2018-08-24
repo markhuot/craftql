@@ -8,6 +8,7 @@ use GraphQL\Type\Definition\ObjectType;
 use markhuot\CraftQL\Behaviors\SchemaBehavior;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Field as BaseField;
+use markhuot\CraftQL\Events\GetSchemaBuilderFields;
 
 class Schema extends BaseBuilder {
 
@@ -185,6 +186,10 @@ class Schema extends BaseBuilder {
     function getFields(): array {
         $this->boot();
         $this->bootBehaviors();
+
+        $event = new GetSchemaBuilderFields;
+        $this->trigger(GetSchemaBuilderFields::EVENT, $event);
+
         return $this->fields;
     }
 
