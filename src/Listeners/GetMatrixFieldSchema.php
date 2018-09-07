@@ -5,6 +5,8 @@ namespace markhuot\CraftQL\Listeners;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\UnionType;
 use markhuot\CraftQL\Builders\Field;
+use markhuot\CraftQL\Helpers\StringHelper;
+use markhuot\CraftQL\Types\Entry;
 
 class GetMatrixFieldSchema
 {
@@ -48,7 +50,17 @@ class GetMatrixFieldSchema
         $blockTypes = $field->getBlockTypes();
 
         foreach ($blockTypes as $blockType) {
-            $type = $union->addType(ucfirst($field->handle).ucfirst($blockType->handle), $blockType);
+            $typeNames = array_map(function (Entry $type) {
+                return StringHelper::graphQLNameForEntryType($type->getContext());
+            }, $schema->getRequest()->entryTypes()->all());
+
+            $matrixBlockName = ucfirst($field->handle).ucfirst($blockType->handle);
+
+            if (in_array($matrixBlockName, $typeNames)) {
+                $matrixBlockName .= 'Matrix';
+            }
+
+            $type = $union->addType($matrixBlockName, $blockType);
             $type->addStringField('id'); // ideally this would be an `int`, but draft matrix blocks have an id of `new1`
             $type->addFieldsByLayoutId($blockType->fieldLayoutId);
 
