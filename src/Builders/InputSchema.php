@@ -28,6 +28,16 @@ class InputSchema extends BaseBuilder {
         return $this;
     }
 
+    /**
+     * Create a new builder
+     *
+     * @param [type] $name
+     * @return self
+     */
+    function createInputObjectType($name): InputSchema {
+        return new InputSchema($this->request, $name);
+    }
+
     function getArguments() {
         $this->bootBehaviors();
         return $this->getArgumentConfig();
