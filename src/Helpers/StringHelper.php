@@ -30,9 +30,6 @@ class StringHelper {
         $string = preg_replace_callback('/\s+(.)/', function ($match) {
             return ucfirst($match[1]);
         }, $string);
-        if ($string === '') {
-            $string = 'empty';
-        }
         return $string;
     }
 

@@ -34,7 +34,8 @@ class GetSelectOneFieldSchema
 
         foreach ($craftField['settings']['options'] as $option) {
             $value = StringHelper::graphQLEnumValueForString($option['value']);
-            $values[$value] = ['description' => $option['label']];
+            $name = $value === '' ? 'empty' : $value;
+            $values[$name] = ['description' => $option['label'], 'value' => $value];
         }
 
         return $values;
