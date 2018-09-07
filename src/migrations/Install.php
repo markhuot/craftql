@@ -16,7 +16,7 @@ class Install extends Migration
                 'userId' => $this->integer()->notNull(),
                 'name' => $this->char(128),
                 'token' => $this->char(64)->notNull(),
-                'scopes' => $this->string(2048, '[]'),
+                'scopes' => $this->text(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),
