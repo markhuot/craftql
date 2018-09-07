@@ -86,6 +86,11 @@ return [
             new \markhuot\CraftQL\Listeners\GetVideosFieldSchema,
         ],
     ],
+    \TDE\GeoAddress\fields\GeoAddressField::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetGeoAddressFieldSchema,
+        ],
+    ],
     \craft\base\Field::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetDefaultFieldSchema,
