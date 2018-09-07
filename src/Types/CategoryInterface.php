@@ -34,6 +34,11 @@ class CategoryInterface extends InterfaceBuilder {
                     'edges' => $categories,
                 ];
             });
+        $this->addField('parent')->type(CategoryInterface::class);
+        $this->addField('next')->type(CategoryInterface::class);
+        $this->addField('nextSibling')->type(CategoryInterface::class);
+        $this->addField('prev')->type(CategoryInterface::class);
+        $this->addField('prevSibling')->type(CategoryInterface::class);
     }
 
     function getResolveType() {
