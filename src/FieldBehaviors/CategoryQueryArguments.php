@@ -13,7 +13,7 @@ class CategoryQueryArguments extends FieldBehavior {
         $this->owner->addIntArgument('descendantOf');
         $this->owner->addIntArgument('descendantDist');
         $this->owner->addBooleanArgument('fixedOrder');
-        // $this->owner->addIntArgument('group' => $this->request->categoryGroups()->enum(),
+        $this->owner->addArgument('group')->type($this->owner->request->categoryGroups()->enum())->lists();
         $this->owner->addIntArgument('groupId');
         $this->owner->addIntArgument('id')->lists();
         $this->owner->addStringArgument('indexBy');
