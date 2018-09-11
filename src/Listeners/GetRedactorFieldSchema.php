@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Listeners;
 
 class GetRedactorFieldSchema
 {
+    static $outputSchema;
 
     /**
      * Handle the request for the schema
@@ -14,11 +15,25 @@ class GetRedactorFieldSchema
     function handle($event) {
         $event->handled = true;
 
-        $outputSchema = $event->schema->createObjectType(ucfirst($event->sender->handle).'RedactorFieldData');
+        $outputSchema = static::type($event->schema);
+
+        $event->schema->addField($event->sender)->type($outputSchema);
+        $event->query->addStringArgument($event->sender);
+        $event->mutation->addStringArgument($event->sender);
+    }
+
+    static function type($schema) {
+        if (static::$outputSchema) {
+            return static::$outputSchema;
+        }
+
+        $outputSchema = $schema->createObjectType('RedactorFieldData');
+
         $outputSchema->addIntField('totalPages')
             ->resolve(function ($root, $args) {
                 return $root->getTotalPages();
             });
+
         $outputSchema->addStringField('content')
             ->arguments(function ($field) {
                 $field->addIntArgument('page');
@@ -31,8 +46,6 @@ class GetRedactorFieldSchema
                 return (string)$root;
             });
 
-        $event->schema->addField($event->sender)->type($outputSchema);
-        $event->query->addStringArgument($event->sender);
-        $event->mutation->addStringArgument($event->sender);
+        return static::$outputSchema=$outputSchema;
     }
 }
