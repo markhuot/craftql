@@ -140,6 +140,7 @@ class Query extends Schema {
              ->resolve(function ($root, $args, $context, $info) {
                  $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
                  list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
+                 $pageInfo->limit = @$args['limit'] ?: 100;
 
                  return [
                      'totalCount' => $pageInfo->total,
@@ -291,6 +292,7 @@ class Query extends Schema {
                 }
 
                 list($pageInfo, $tags) = \craft\helpers\Template::paginateCriteria($criteria);
+                $pageInfo->limit = @$args['limit'] ?: 100;
 
                 return [
                     'totalCount' => $pageInfo->total,
@@ -347,6 +349,7 @@ class Query extends Schema {
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args) use ($categoryResolver) {
                 list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($categoryResolver($root, $args));
+                $pageInfo->limit = @$args['limit'] ?: 100;
 
                 return [
                     'totalCount' => $pageInfo->total,

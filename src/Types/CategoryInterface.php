@@ -27,6 +27,7 @@ class CategoryInterface extends InterfaceBuilder {
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
                 list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria(static::criteriaResolver($root, $args, $context, $info, $root->getChildren()));
+                $pageInfo->limit = @$args['limit'] ?: 100;
 
                 return [
                     'totalCount' => $pageInfo->total,

@@ -24,6 +24,7 @@ class RelatedCategoriesField extends SchemaBehavior {
                 }
 
                 list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($criteria);
+                $pageInfo->limit = @$args['limit'] ?: 100;
 
                 return [
                     'totalCount' => $pageInfo->total,

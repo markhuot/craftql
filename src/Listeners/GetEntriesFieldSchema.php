@@ -33,6 +33,7 @@ class GetEntriesFieldSchema
             ->resolve(function ($root, $args, $context, $info) use ($field, $request) {
                 $criteria = $request->entries($root->{$field->handle}, $root, $args, $context, $info);
                 list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
+                $pageInfo->limit = @$args['limit'] ?: 100;
 
                 return [
                     'totalCount' => $pageInfo->total,

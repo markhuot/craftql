@@ -29,6 +29,7 @@ class CategoryEdge extends Schema {
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
                 list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria(CategoryInterface::criteriaResolver($root, $args, $context, $info, $root['node']->getChildren()));
+                $pageInfo->limit = @$args['limit'] ?: 100;
 
                 return [
                     'totalCount' => $pageInfo->total,
