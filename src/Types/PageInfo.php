@@ -25,13 +25,8 @@ class PageInfo extends Schema {
         });
 
         $this->addIntField('currentPage')
-            ->resolve(function (Paginate $root, $args) {
-                // last and first are not inclusive so add one to the range
-                $perPage = ceil($root->last - $root->first + 1);
-
-                // first is 1-based so subtract one to work with 0 based indexes
-                // add one at the end because Craft's pages are, by default, 1 based
-                return floor(($root->first - 1) / $perPage) + 1;
+            ->resolve(function (Paginate $root, $args, $context, $info) {
+                return floor(($root->first - 1) / (@$root->limit ?: 100)) + 1;
             });
 
         $this->addIntField('totalPages');
