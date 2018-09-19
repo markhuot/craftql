@@ -35,6 +35,12 @@ class GetSelectOneFieldSchema
         foreach ($craftField['settings']['options'] as $option) {
             $value = StringHelper::graphQLEnumValueForString($option['value']);
             $name = $value === '' ? 'empty' : $value;
+
+            if (is_numeric($name)) {
+                //$name = \craft\helpers\StringHelper::toPascalCase($option['label']);
+                throw new \Exception('The `'.$craftField->handle.'` field contains numeric values which violates the GraphQL spec. Please use string based values instead.');
+            }
+
             $values[$name] = ['description' => $option['label'], 'value' => $value];
         }
 
