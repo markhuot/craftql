@@ -74,6 +74,14 @@ class Token extends ActiveRecord
         return !$this->can($do);
     }
 
+    function uid():string {
+        if ($this->token) {
+            return $this->token;
+        }
+
+        return \Craft::$app->session->getId();
+    }
+
     // function mutableEntryTypeIds(): array {
     //     $ids = [];
 

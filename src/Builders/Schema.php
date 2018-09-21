@@ -203,26 +203,34 @@ class Schema extends BaseBuilder {
 
         foreach ($this->getInterfaces() as $interface) {
             foreach ($interface->getFields() as $field) {
+                \Yii::beginProfile($field->getName(), 'createFieldConfig');
                 $fields[$field->getName()] = $field->getConfig();
+                \Yii::endProfile($field->getName(), 'createFieldConfig');
             }
         }
 
         foreach ($this->getFields() as $field) {
+            \Yii::beginProfile($field->getName(), 'createFieldConfig');
             $fields[$field->getName()] = $field->getConfig();
+            \Yii::endProfile($field->getName(), 'createFieldConfig');
         }
 
         return $fields;
     }
 
     function getConfig() {
-        return [
+        $foo = [
             'name' => $this->getName(),
             'fields' => function () {
-                return $this->getFieldConfig();
+                \Yii::beginProfile($this->getName(), 'resolveFields');
+                $foo = $this->getFieldConfig();
+                \Yii::endProfile($this->getName(), 'resolveFields');
+                return $foo;
             },
             'interfaces' => $this->getInterfaceConfig(),
             'resolveType' => $this->getResolveType(),
         ];
+        return $foo;
     }
 
     /**

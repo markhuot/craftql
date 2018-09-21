@@ -14,7 +14,9 @@ class Entry extends Schema {
     ];
 
     function boot() {
+        \Yii::beginProfile($this->getName(), 'bootEntry');
         $this->addFieldsByLayoutId($this->context->fieldLayoutId);
+        \Yii::endProfile($this->getName(), 'bootEntry');
     }
 
     function getName(): string {

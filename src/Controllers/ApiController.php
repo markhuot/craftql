@@ -8,6 +8,7 @@ use craft\records\User;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Models\Token;
 use yii\web\ForbiddenHttpException;
+use Yii;
 
 class ApiController extends Controller
 {
@@ -109,15 +110,21 @@ class ApiController extends Controller
         Craft::trace('CraftQL: Parsing request complete');
 
         Craft::trace('CraftQL: Bootstrapping');
+        Yii::beginProfile('bootstrap', 'craftql');
         $this->graphQl->bootstrap();
+        Yii::endProfile('bootstrap', 'craftql');
         Craft::trace('CraftQL: Bootstrapping complete');
 
         Craft::trace('CraftQL: Fetching schema');
+        Yii::beginProfile('newSchema', 'craftql');
         $schema = $this->graphQl->getSchema($token);
+        Yii::endProfile('newSchema', 'craftql');
         Craft::trace('CraftQL: Schema built');
 
         Craft::trace('CraftQL: Executing query');
+        Yii::beginProfile('execute', 'craftql');
         $result = $this->graphQl->execute($schema, $input, $variables);
+        Yii::endProfile('execute', 'craftql');
         Craft::trace('CraftQL: Execution complete');
 
         $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];

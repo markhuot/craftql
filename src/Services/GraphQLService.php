@@ -6,7 +6,11 @@ use Craft;
 use Egulias\EmailValidator\Exception\CRLFAtTheEnd;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
+use GraphQL\Language\Parser;
 use GraphQL\Type\Schema;
+use GraphQL\Utils\AST;
+use GraphQL\Utils\BuildSchema;
+use GraphQL\Utils\SchemaPrinter;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
@@ -54,6 +58,9 @@ class GraphQLService extends Component {
         $this->sections->load();
         $this->globals->load();
 
+        $fieldService = \Yii::$container->get('craftQLFieldService');
+        $fieldService->load();
+
         $maxQueryDepth = CraftQL::getInstance()->getSettings()->maxQueryDepth;
         if ($maxQueryDepth !== false) {
             $rule = new QueryDepth($maxQueryDepth);
@@ -68,6 +75,8 @@ class GraphQLService extends Component {
     }
 
     function getSchema($token) {
+        $cacheKey = 'craftQlSchema'.$token->uid();
+
         $request = new \markhuot\CraftQL\Request($token);
         $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
         $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
@@ -107,7 +116,10 @@ class GraphQLService extends Component {
                     return $entryType->getRawGraphQLObject();
                 }, $request->entryTypes()->all()),
 
-                [\markhuot\CraftQL\Directives\Date::dateFormatTypesEnum()]
+                [
+                    \markhuot\CraftQL\Directives\Date::dateFormatTypesEnum(),
+//                    (new \markhuot\CraftQL\Types\Element($request))->getRawGraphQLObject(),
+                ]
             );
         };
 
@@ -118,7 +130,15 @@ class GraphQLService extends Component {
         $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
         $schemaConfig['mutation'] = $mutation;
 
+        if ($cacheValue = \Craft::$app->cache->get($cacheKey)) {
+            $doc = Parser::parse($cacheValue);
+            $schema = BuildSchema::build($doc);
+            return $schema;
+        }
+
         $schema = new Schema($schemaConfig);
+
+        \Craft::$app->cache->add($cacheKey, SchemaPrinter::doPrint($schema));
 
         if (Craft::$app->config->general->devMode) {
             $schema->assertValid();

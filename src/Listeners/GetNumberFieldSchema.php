@@ -20,6 +20,7 @@ class GetNumberFieldSchema
         if ($field->decimals == 0) {
             $event->schema->addIntField($field);
             $event->query->addIntArgument($field);
+            $event->query->addStringArgument($field->handle.'_Query')->overwrite($field->handle)->lists();
             $event->mutation->addIntArgument($field);
         }
         else {

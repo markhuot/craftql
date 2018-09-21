@@ -12,10 +12,20 @@ class Argument extends BaseBuilder {
     use HasIsListAttribute;
     use HasNonNullAttribute;
     use HasOnSaveAttribute;
+    use HasOverwriteAttribute;
 
     function __construct(Request $request, string $name) {
         $this->request = $request;
         $this->name = $name;
+
+        $this->bootTraits();
+    }
+
+    /**
+     * @TODO make dynamic
+     */
+    function bootTraits() {
+        $this->bootHasOverwriteAttribute();
     }
 
     function getConfig() {

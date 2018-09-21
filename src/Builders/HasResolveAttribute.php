@@ -3,6 +3,8 @@
 namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Events\ResolveField;
+use yii\base\Event;
 
 trait HasResolveAttribute {
 
@@ -30,17 +32,27 @@ trait HasResolveAttribute {
      * @return callable|null
      */
     function getResolve() /* php 7.1: ?callable*/ {
-        if (is_callable($this->resolve)) {
-            return $this->resolve;
+        if (empty($this->resolve)) {
+            return null;
         }
 
-        if ($this->resolve !== null) {
-            return function($value) {
+        return function($root, $args, $context, $info) {
+            $event = new ResolveField;
+            $event->root = $root;
+            $event->args = $args;
+            $event->context = $context;
+            $event->info = $info;
+            Event::trigger(static::class, 'craftqlresolve', $event);
+            $args = $event->args;
+
+            if (is_callable($this->resolve)) {
+                return call_user_func_array($this->resolve, [$root, $args, $context, $info]);
+            }
+
+            if ($this->resolve !== null) {
                 return $this->resolve;
-            };
-        }
-
-        return null;
+            }
+        };
     }
 
 }

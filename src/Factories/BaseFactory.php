@@ -6,6 +6,10 @@ use GraphQL\Type\Definition\EnumType;
 
 abstract class BaseFactory {
 
+    /** @var string */
+    private $enumName;
+
+    /** @var array */
     static $enums = [];
 
     protected $repository;
@@ -58,11 +62,13 @@ abstract class BaseFactory {
     }
 
     function enum() {
-        $reflect = new \ReflectionClass($this);
-        $name = $reflect->getShortName().'sEnum';
+        if (empty($this->enumName)) {
+            $reflect = new \ReflectionClass($this);
+            $this->enumName = $reflect->getShortName().'sEnum';
+        }
 
-        if (!empty(static::$enums[$name])) {
-            return static::$enums[$name];
+        if (!empty(static::$enums[$this->enumName])) {
+            return static::$enums[$this->enumName];
         }
 
         $values = [];
@@ -77,7 +83,7 @@ abstract class BaseFactory {
             $values['empty'] = 'Empty';
         }
 
-        return static::$enums[$name] = new EnumType([
+        return static::$enums[$this->enumName] = new EnumType([
             'name' => $reflect->getShortName().'sEnum',
             'values' => $values,
         ]);

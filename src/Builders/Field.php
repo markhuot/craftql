@@ -16,8 +16,6 @@ class Field extends BaseBuilder {
     use HasArgumentsAttribute;
     use HasDeprecationReasonAttribute;
 
-//    protected $arguments = [];
-
     function __construct(Request $request, string $name) {
         $this->request = $request;
         $this->name = $name;
@@ -62,19 +60,22 @@ class Field extends BaseBuilder {
         }
 
         // init behaviors
+        \Yii::beginProfile($this->getName(), 'getFieldConfig');
         if ($behaviors=$this->getBehaviors()) {
             foreach ($behaviors as $key => $behavior) {
                 $this->{"init{$key}"}();
             }
         }
 
-        return [
+        $foo = [
             'type' => $type,
             'description' => $this->getDescription(),
             'args' => $this->getArgumentConfig(),
             'resolve' => $this->getResolve(),
             'deprecationReason' => $this->getDeprecationReason(),
         ];
+        \Yii::endProfile($this->getName(), 'getFieldConfig');
+        return $foo;
     }
 
     function onSave(callable $callback) {
