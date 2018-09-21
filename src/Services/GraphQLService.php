@@ -76,6 +76,22 @@ class GraphQLService extends Component {
 
     function getSchema($token) {
         $cacheKey = 'craftQlSchema'.$token->uid();
+//        Craft::$app->cache->delete($cacheKey);
+
+        if ($cacheValue = \Craft::$app->cache->get($cacheKey)) {
+            $doc = Parser::parse($cacheValue);
+//            var_dump($doc);
+//            die;
+//            var_dump(BuildSchema::buildAST($doc));
+//            die;
+            $schema = BuildSchema::build($doc);
+//            var_dump($schema);
+//            die;
+//            header('content-type: text/plain');
+//            echo($cacheValue);
+//            die;
+            return $schema;
+        }
 
         $request = new \markhuot\CraftQL\Request($token);
         $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
@@ -129,15 +145,16 @@ class GraphQLService extends Component {
         $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
         $schemaConfig['mutation'] = $mutation;
 
-        if ($cacheValue = \Craft::$app->cache->get($cacheKey)) {
-            $doc = Parser::parse($cacheValue);
-            $schema = BuildSchema::build($doc);
-            return $schema;
-        }
-
         $schema = new Schema($schemaConfig);
 
+//        var_dump(serialize($schema));
+//        header('content-type: text/plain');
+//        echo SchemaPrinter::doPrint($schema);
+//        die;
+
         \Craft::$app->cache->add($cacheKey, SchemaPrinter::doPrint($schema));
+//        var_dump($schema);
+//        die;
 
         if (Craft::$app->config->general->devMode) {
             $schema->assertValid();
