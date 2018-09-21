@@ -85,7 +85,7 @@ class GraphQLService extends Component {
         $query->trigger(AlterQuerySchema::EVENT, $event);
 
         $schemaConfig['query'] = $query->getRawGraphQLObject();
-        $schemaConfig['types'] = function () use ($request) {
+        $schemaConfig['types'] = function () use ($request, $query) {
             return array_merge(
                 array_map(function ($section) {
                     return $section->getRawGraphQLObject();
@@ -107,7 +107,9 @@ class GraphQLService extends Component {
                     return $entryType->getRawGraphQLObject();
                 }, $request->entryTypes()->all()),
 
-                [\markhuot\CraftQL\Directives\Date::dateFormatTypesEnum()]
+                [\markhuot\CraftQL\Directives\Date::dateFormatTypesEnum()],
+
+                $query->getConcreteTypes()
             );
         };
 

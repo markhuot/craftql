@@ -16,6 +16,7 @@ class Schema extends BaseBuilder {
     protected $context;
     protected $interfaces = [];
     protected $parent;
+    protected static $concreteTypes = [];
 
     function __construct(Request $request, $context=null, $parent=null) {
         $this->request = $request;
@@ -53,6 +54,14 @@ class Schema extends BaseBuilder {
      */
     function getContext() {
         return $this->context;
+    }
+
+    function addConcreteType($type) {
+        static::$concreteTypes[] = $type;
+    }
+
+    function getConcreteTypes() {
+        return static::$concreteTypes;
     }
 
     /**
