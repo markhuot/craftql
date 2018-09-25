@@ -55,7 +55,7 @@ You can access your GraphQL endpoint in two ways,
 
 2. **Curl**
 {% if settings.tokens|length %}<p>You can query your schema directly by passing a GraphQL statement throuh a `query` variable. The following Curl statement should get you started,</p>
-<p><pre style="background: whiteSmoke; padding: 15px;"><code class="shell">$ curl -H "Authorization: bearer {{ settings.tokens[0].token|default('{TOKEN}') }}" -H "Content-type: application/json" -d '{"query":"{ helloWorld }"}' {{ siteUrl }}{{ settings.uri }}</code></pre></p>
+<p><pre style="background: whiteSmoke; padding: 15px;"><code class="shell">$ curl -H "{{ curlAuthorizationHeader }} {{ settings.tokens[0].token|default('{TOKEN}') }}" -H "Content-type: application/json" -d '{"query":"{ helloWorld }"}' {{ siteUrl }}{{ settings.uri }}</code></pre></p>
 {% else %}
 <p>Before you can use Curl you need to [add a token]({{ url('craftql/token-gen') }}) for authenticated access in to Craft.</p>
 {% endif %}
@@ -68,6 +68,15 @@ You can access your GraphQL endpoint in two ways,
     <hr>
 
 <div class="" style="width: 70%">
+    <h2>Custom Authorization Header</h2>
+
+    {{ forms.textField({
+        first: true,
+        name: 'authorizationHeader',
+        value: settings.authorizationHeader,
+        instructions: 'Custom header to be used to check for authorization token. Useful if site is behind Basic Auth and conflicts with default Authorization Bearer.'
+    }) }}
+
     <h2>URI</h2>
 
     {{ forms.textField({

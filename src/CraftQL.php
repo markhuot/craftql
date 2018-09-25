@@ -107,8 +107,13 @@ class CraftQL extends Plugin
      */
     protected function settingsHtml()
     {
+        $settings = $this->getSettings();
+
+        $curlAuthorizationHeader = $settings->authorizationHeader ? "{$settings->authorizationHeader}:" : 'Authorization: Bearer';
+
         return \Craft::$app->getView()->renderTemplate('craftql/settings', [
-            'settings' => $this->getSettings()
+            'settings' => $settings,
+            'curlAuthorizationHeader' => $curlAuthorizationHeader
         ]);
     }
 

@@ -148,7 +148,11 @@
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            {% if authorizationHeader and token %}
+            '{{ authorizationHeader }}': '{{ token }}',
+            {% elseif token %}
             'Authorization': 'Bearer {{ token }}',
+            {% endif %}
           },
           body: JSON.stringify(graphQLParams),
           credentials: 'include',

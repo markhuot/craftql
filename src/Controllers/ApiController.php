@@ -47,16 +47,14 @@ class ApiController extends Controller
 
     function actionIndex()
     {
-        $token = false;
+        $settings = CraftQL::getInstance()->getSettings();
 
-        $authorization = Craft::$app->request->headers->get('authorization');
-        preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
-        $token = Token::findId(@$matches['tokenId']);
+        $token = static::findToken($settings->authorizationHeader, Craft::$app->request->headers);
 
         // @todo, check user permissions when PRO license
 
         $response = \Craft::$app->getResponse();
-        if ($allowedOrigins = CraftQL::getInstance()->getSettings()->allowedOrigins) {
+        if ($allowedOrigins = $settings->allowedOrigins) {
             if (is_string($allowedOrigins)) {
                 $allowedOrigins = [$allowedOrigins];
             }
@@ -65,9 +63,15 @@ class ApiController extends Controller
                 $response->headers->add('Access-Control-Allow-Origin', $origin);
             }
             $response->headers->add('Access-Control-Allow-Credentials', 'true');
-            $response->headers->add('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+
+            $allowedHeaders = ['Authorization', 'Content-Type'];
+            if ($settings->authorizationHeader) {
+                $allowedHeaders[] = $settings->authorizationHeader;
+            }
+
+            $response->headers->add('Access-Control-Allow-Headers', implode(', ', $allowedHeaders));
         }
-        $response->headers->add('Allow', implode(', ', CraftQL::getInstance()->getSettings()->verbs));
+        $response->headers->add('Allow', implode(', ', $settings->verbs));
 
         if (\Craft::$app->getRequest()->isOptions) {
             return '';
@@ -120,7 +124,7 @@ class ApiController extends Controller
         $result = $this->graphQl->execute($schema, $input, $variables);
         Craft::trace('CraftQL: Execution complete');
 
-        $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];
+        $customHeaders = $settings->headers ?: [];
         foreach ($customHeaders as $key => $value) {
             if (is_callable($value)) {
                 $value = $value($schema, $input, $variables, $result);
@@ -147,5 +151,24 @@ class ApiController extends Controller
         $response->headers->add('Content-Type', 'application/json; charset=UTF-8');
 
         return $this->asJson($result);
+    }
+
+    private static function findToken($authorizationHeader, $headers)
+    {
+        // Default, for cases when token header is not found to use user based token
+        // resolution, if possible.
+        $tokenId = null;
+
+        if ($authorizationHeader) {
+            if ($headers->has($authorizationHeader)) {
+                $tokenId = $headers->get($authorizationHeader);
+            }
+        } else if ($headers->has('authorization')) {
+            $authorization = $headers->get('authorization');
+            preg_match('/^(?:b|B)earer\s+(?<tokenId>.+)/', $authorization, $matches);
+            $tokenId = @$matches['tokenId'];
+        }
+
+        return Token::findId($tokenId);
     }
 }
