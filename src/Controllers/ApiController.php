@@ -63,7 +63,13 @@ class ApiController extends Controller
                 $response->headers->add('Access-Control-Allow-Origin', $origin);
             }
             $response->headers->add('Access-Control-Allow-Credentials', 'true');
-            $response->headers->add('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+
+            $allowedHeaders = ['Authorization', 'Content-Type'];
+            if ($settings->authorizationHeader) {
+                $allowedHeaders[] = $settings->authorizationHeader;
+            }
+
+            $response->headers->add('Access-Control-Allow-Headers', implode(', ', $allowedHeaders));
         }
         $response->headers->add('Allow', implode(', ', $settings->verbs));
 
