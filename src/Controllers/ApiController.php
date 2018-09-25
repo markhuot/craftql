@@ -64,10 +64,10 @@ class ApiController extends Controller
             if (in_array($origin, $allowedOrigins) || in_array('*', $allowedOrigins)) {
                 $response->headers->set('Access-Control-Allow-Origin', $origin);
             }
-            $response->headers->add('Access-Control-Allow-Credentials', 'true');
-            $response->headers->add('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+            $response->headers->set('Access-Control-Allow-Credentials', 'true');
+            $response->headers->set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
         }
-        $response->headers->add('Allow', implode(', ', CraftQL::getInstance()->getSettings()->verbs));
+        $response->headers->set('Allow', implode(', ', CraftQL::getInstance()->getSettings()->verbs));
 
         if (\Craft::$app->getRequest()->isOptions) {
             return '';
