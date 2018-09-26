@@ -41,6 +41,18 @@ class FieldService {
         }
     }
 
+    function isA($fieldHandle, $class) {
+        foreach ($this->rawFields as $field) {
+            if ($field->handle == $fieldHandle) {
+                if (is_a($field, $class)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     function getSchemaForField(\craft\base\Field $field, \markhuot\CraftQL\Request $request, $parent) {
         if (!isset($this->fieldSchemas[$field->id])) {
             $event = new GetFieldSchemaEvent;

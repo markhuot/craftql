@@ -44,7 +44,7 @@ class VolumeInterface extends InterfaceBuilder {
 
     function getResolveType() {
         return function ($type) {
-            return ucfirst($type->volume->handle).'Volume';
+            return ucfirst($this->request->volumes()->get($type->volumeId)->getContext()->handle).'Volume';
         };
     }
 

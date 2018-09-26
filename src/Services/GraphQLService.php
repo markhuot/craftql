@@ -76,7 +76,7 @@ class GraphQLService extends Component {
 
     function getSchema($token) {
         $cacheKey = 'craftQlSchema'.$token->uid();
-        Craft::$app->cache->delete($cacheKey);
+//        Craft::$app->cache->delete($cacheKey);
 
         if ($cacheValue = \Craft::$app->cache->get($cacheKey)) {
             $doc = Parser::parse($cacheValue);
@@ -146,13 +146,20 @@ class GraphQLService extends Component {
         $schemaConfig['mutation'] = $mutation;
 
         $schema = new Schema($schemaConfig);
+//        var_dump($schema);
+//        serialize($schema);
+//        die;
+//        var_dump($schema->getAstNode());
+//        die;
+//        var_dump(AST::toArray($schema));
+//        die;
 
 //        var_dump(serialize($schema));
 //        header('content-type: text/plain');
 //        echo SchemaPrinter::doPrint($schema);
 //        die;
 
-        \Craft::$app->cache->add($cacheKey, SchemaPrinter::doPrint($schema));
+//        \Craft::$app->cache->add($cacheKey, SchemaPrinter::doPrint($schema));
 //        var_dump($schema);
 //        die;
 

@@ -2,6 +2,11 @@
 
 namespace markhuot\CraftQL;
 
+use craft\fields\Assets;
+use craft\fields\Entries;
+use GraphQL\Type\Definition\ResolveInfo;
+use markhuot\CraftQL\Services\FieldService;
+
 class Request {
 
     private $token;
@@ -93,7 +98,7 @@ class Request {
         return $relations;
     }
 
-    function entries($criteria, $root, $args, $context, $info) {
+    function entries($criteria, $root, $args, $context, ResolveInfo $info) {
         if (empty($args['section'])) {
             $args['sectionId'] = array_map(function ($value) {
                 return $value->value;
@@ -136,12 +141,32 @@ class Request {
             $criteria = $criteria->{$key}($value);
         }
 
+        /** @var FieldService $fieldService */
+        $fieldService = \Yii::$container->get('craftQLFieldService');
+
+        $with = [];
         if (!empty($info->fieldNodes)) {
             foreach ($info->fieldNodes[0]->selectionSet->selections as $selection) {
                 if (isset($selection->name->value) && $selection->name->value == 'author') {
-                    $criteria->with('author');
+                    $with[] = 'author';
                 }
             }
+        }
+
+        if (json_encode($args['sectionId']) == '["7"]') {
+            $fieldNames = array_keys($info->getFieldSelection());
+            foreach ($fieldNames as $fieldName) {
+                if ($fieldService->isA($fieldName, Entries::class)) {
+                    $with[] = $fieldName;
+                }
+                if ($fieldService->isA($fieldName, Assets::class)) {
+                    $with[] = $fieldName;
+                }
+            }
+        }
+
+        if (!empty($with)) {
+            $criteria = $criteria->with($with);
         }
 
         return $criteria;

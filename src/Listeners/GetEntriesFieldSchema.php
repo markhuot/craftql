@@ -2,6 +2,7 @@
 
 namespace markhuot\CraftQL\Listeners;
 
+use craft\elements\db\EntryQuery;
 use markhuot\CraftQL\Types\EntryInterface;
 use markhuot\CraftQL\Types\EntryConnection;
 
@@ -23,8 +24,12 @@ class GetEntriesFieldSchema
             ->type(EntryInterface::class)
             ->lists()
             ->resolve(function ($root, $args, $context, $info) use ($field, $request) {
-                return $request->entries($root->{$field->handle}, $root, $args, $context, $info)
-                    ->all();
+                if (is_a($root->{$field->handle}, EntryQuery::class)) {
+                    return $request->entries($root->{$field->handle}, $root, $args, $context, $info)
+                        ->all();
+                }
+
+                return $root->{$field->handle};
             });
 
         $event->schema->addField($field)

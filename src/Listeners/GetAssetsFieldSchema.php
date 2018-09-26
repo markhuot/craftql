@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Listeners;
 
 use Craft;
 use craft\elements\Asset;
+use craft\elements\db\AssetQuery;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\InputObjectType;
 use markhuot\CraftQL\Types\Volume;
@@ -28,7 +29,11 @@ class GetAssetsFieldSchema
             ->lists()
             ->type(VolumeInterface::class)
             ->resolve(function ($root, $args) use ($field) {
-                return $root->{$field->handle}->all();
+                if (is_a($root->{$field->handle}, AssetQuery::class)) {
+                    return $root->{$field->handle}->all();
+                }
+
+                return $root->{$field->handle};
             });
 
         $inputObject = $event->mutation->createInputObjectType(ucfirst($field->handle).'AssetInput');
