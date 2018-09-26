@@ -36,22 +36,30 @@ trait HasResolveAttribute {
             return null;
         }
 
+//        return $this->resolve;
+
         return function($root, $args, $context, $info) {
+//            \Yii::beginProfile('getResolve', 'getResolve');
+
+            // @TODO this is costly and takes a lot of time to complete. see if there's a better way to do this
             $event = new ResolveField;
             $event->root = $root;
             $event->args = $args;
             $event->context = $context;
             $event->info = $info;
-            Event::trigger(static::class, 'craftqlresolve', $event);
+            Event::trigger($this, 'craftqlresolve', $event);
             $args = $event->args;
 
             if (is_callable($this->resolve)) {
-                return call_user_func_array($this->resolve, [$root, $args, $context, $info]);
+                $foo = call_user_func_array($this->resolve, [$root, $args, $context, $info]);
             }
 
-            if ($this->resolve !== null) {
-                return $this->resolve;
+            else if ($this->resolve !== null) {
+                $foo = $this->resolve;
             }
+
+//            \Yii::endProfile('getResolve', 'getResolve');
+            return $foo;
         };
     }
 

@@ -6,38 +6,39 @@ use yii\base\Event;
 
 trait HasOverwriteAttribute {
 
-    /**
-     * @var string
-     */
-    protected $overwrite;
+    static $booted = false;
+
+    static protected $overwritten = [];
 
     /**
-     * Boot the trait
+     * Boot the trait. We only need one listener not one on _every_ field.
+     * It would be good, later, to see if there's a better way to do this.
      */
     function bootHasOverwriteAttribute() {
-        Event::on(Field::class, 'craftqlresolve', function ($event) {
-            // get the args
-            $args = $event->args;
+        if (static::$booted) {
+            return;
+        }
 
-            // see if this argument is even passed as an argument
-            if (!isset($args[$this->name])) {
+        Event::on(Field::class, 'craftqlresolve', function ($event) {
+            if (empty(static::overwrites())) {
                 return;
             }
 
-            // grab the value
-            $value = $args[$this->name];
+            $args = $event->args;
 
-            // if this argument should overwrite another arg check that
-            if ($overwrite = $this->overwrites()) {
-
-                // do the overwrite
-                $args[$overwrite] = $value;
-                unset($args[$this->name]);
+            $overwrites = static::overwrites();
+            foreach ($overwrites as $old => $new) {
+                if (isset($args[$old])) {
+                    $args[$new] = $args[$old];
+                    unset($args[$old]);
+                }
             }
 
-            // reset the args
+
             $event->args = $args;
         });
+
+        static::$booted = true;
     }
 
     /**
@@ -46,7 +47,7 @@ trait HasOverwriteAttribute {
      * @param $fieldName
      */
     function overwrite($fieldName) {
-        $this->overwrite = $fieldName;
+        static::$overwritten[$this->name] = $fieldName;
         return $this;
     }
 
@@ -54,10 +55,10 @@ trait HasOverwriteAttribute {
     /**
      * Get the argument this argument overwrites, if any
      *
-     * @return string
+     * @return array
      */
     function overwrites() {
-        return $this->overwrite;
+        return static::$overwritten;
     }
 
 }
