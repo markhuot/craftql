@@ -153,15 +153,13 @@ class Request {
             }
         }
 
-        if (json_encode($args['sectionId']) == '["7"]') {
-            $fieldNames = array_keys($info->getFieldSelection());
-            foreach ($fieldNames as $fieldName) {
-                if ($fieldService->isA($fieldName, Entries::class)) {
-                    $with[] = $fieldName;
-                }
-                if ($fieldService->isA($fieldName, Assets::class)) {
-                    $with[] = $fieldName;
-                }
+        $fieldNames = array_keys($info->getFieldSelection());
+        foreach ($fieldNames as $fieldName) {
+            if ($fieldService->isA($fieldName, Entries::class)) {
+                $with[] = $fieldName;
+            }
+            if ($fieldService->isA($fieldName, Assets::class)) {
+                $with[] = $fieldName;
             }
         }
 
