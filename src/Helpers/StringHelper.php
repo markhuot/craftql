@@ -2,9 +2,26 @@
 
 namespace markhuot\CraftQL\Helpers;
 
+use craft\base\Element;
 use craft\models\EntryType;
+use markhuot\CraftQL\Request;
 
 class StringHelper {
+
+    /**
+     * Convert a Craft Entry in to a valid GraphQL Entry Type Name
+     *
+     * This caches better than the `graphQLNameForEntryType` which makes a DB query for the _full_
+     * entry type, which we don't necessarily need
+     *
+     * @return string
+     */
+    static function graphQLNameForEntry(Request $request, Element $entry): string {
+        $sectionHandle = ucfirst($request->sections()->get($entry->sectionId)->getContext()->handle);
+        $typeHandle = ucfirst($request->entryTypes()->get($entry->typeId)->getContext()->handle);
+
+        return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
+    }
 
     /**
      * Convert a Craft Entry Type in to a valid GraphQL Name

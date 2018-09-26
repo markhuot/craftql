@@ -95,11 +95,11 @@ trait HasArgumentsAttribute {
     function getArgumentConfig(): array {
         $arguments = [];
 
-        \Yii::beginProfile('arg:'.$this->getName(), 'getArgumentConfig');
+//        \Yii::beginProfile('arg:'.$this->getName(), 'getArgumentConfig');
         foreach ($this->arguments as $argument) {
             $arguments[$argument->getName()] = $argument->getConfig();
         }
-        \Yii::endProfile('arg:'.$this->getName(), 'getArgumentConfig');
+//        \Yii::endProfile('arg:'.$this->getName(), 'getArgumentConfig');
 
         return $arguments;
     }

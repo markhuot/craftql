@@ -120,15 +120,15 @@ class ApiController extends Controller
         Craft::trace('CraftQL: Bootstrapping complete');
 
         Craft::trace('CraftQL: Fetching schema');
-        Yii::beginProfile('newSchema', 'craftql');
+        Yii::beginProfile('craftQlGetSchema', 'craftQlGetSchema');
         $schema = $this->graphQl->getSchema($token);
-        Yii::endProfile('newSchema', 'craftql');
+        Yii::endProfile('craftQlGetSchema', 'craftQlGetSchema');
         Craft::trace('CraftQL: Schema built');
 
         Craft::trace('CraftQL: Executing query');
-        Yii::beginProfile('execute', 'craftql');
+        Yii::beginProfile('craftQlExecute', 'craftQlExecute');
         $result = $this->graphQl->execute($schema, $input, $variables);
-        Yii::endProfile('execute', 'craftql');
+        Yii::endProfile('craftQlExecute', 'craftQlExecute');
         Craft::trace('CraftQL: Execution complete');
 
         $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];

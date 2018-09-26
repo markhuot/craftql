@@ -218,16 +218,16 @@ class Schema extends BaseBuilder {
 
         foreach ($this->getInterfaces() as $interface) {
             foreach ($interface->getFields() as $field) {
-                \Yii::beginProfile($field->getName(), 'createFieldConfig');
+//                \Yii::beginProfile($field->getName(), 'createFieldConfig');
                 $fields[$field->getName()] = $field->getConfig();
-                \Yii::endProfile($field->getName(), 'createFieldConfig');
+//                \Yii::endProfile($field->getName(), 'createFieldConfig');
             }
         }
 
         foreach ($this->getFields() as $field) {
-            \Yii::beginProfile($field->getName(), 'createFieldConfig');
+//            \Yii::beginProfile($field->getName(), 'createFieldConfig');
             $fields[$field->getName()] = $field->getConfig();
-            \Yii::endProfile($field->getName(), 'createFieldConfig');
+//            \Yii::endProfile($field->getName(), 'createFieldConfig');
         }
 
         return $fields;
@@ -237,9 +237,9 @@ class Schema extends BaseBuilder {
         $foo = [
             'name' => $this->getName(),
             'fields' => function () {
-                \Yii::beginProfile($this->getName(), 'resolveFields');
+//                \Yii::beginProfile($this->getName(), 'resolveFields');
                 $foo = $this->getFieldConfig();
-                \Yii::endProfile($this->getName(), 'resolveFields');
+//                \Yii::endProfile($this->getName(), 'resolveFields');
                 return $foo;
             },
             'interfaces' => $this->getInterfaceConfig(),

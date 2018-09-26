@@ -10,13 +10,13 @@ class Entry extends Schema {
 
     protected $interfaces = [
         \markhuot\CraftQL\Types\EntryInterface::class,
-        \markhuot\CraftQL\Types\ElementInterface::class,
+//        \markhuot\CraftQL\Types\ElementInterface::class,
     ];
 
     function boot() {
-        \Yii::beginProfile($this->getName(), 'bootEntry');
+//        \Yii::beginProfile($this->getName(), 'bootEntry');
         $this->addFieldsByLayoutId($this->context->fieldLayoutId);
-        \Yii::endProfile($this->getName(), 'bootEntry');
+//        \Yii::endProfile($this->getName(), 'bootEntry');
     }
 
     function getName(): string {

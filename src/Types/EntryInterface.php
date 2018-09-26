@@ -41,7 +41,7 @@ class EntryInterface extends InterfaceBuilder {
 
     function getResolveType() {
         return function ($entry) {
-            return StringHelper::graphQLNameForEntryType($entry->type);
+            return StringHelper::graphQLNameForEntry($this->request, $entry);
         };
     }
 

@@ -76,7 +76,7 @@ class GraphQLService extends Component {
 
     function getSchema($token) {
         $cacheKey = 'craftQlSchema'.$token->uid();
-//        Craft::$app->cache->delete($cacheKey);
+        Craft::$app->cache->delete($cacheKey);
 
         if ($cacheValue = \Craft::$app->cache->get($cacheKey)) {
             $doc = Parser::parse($cacheValue);

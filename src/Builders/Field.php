@@ -60,7 +60,7 @@ class Field extends BaseBuilder {
         }
 
         // init behaviors
-        \Yii::beginProfile($this->getName(), 'getFieldConfig');
+//        \Yii::beginProfile($this->getName(), 'getFieldConfig');
         if ($behaviors=$this->getBehaviors()) {
             foreach ($behaviors as $key => $behavior) {
                 $this->{"init{$key}"}();
@@ -74,7 +74,7 @@ class Field extends BaseBuilder {
             'resolve' => $this->getResolve(),
             'deprecationReason' => $this->getDeprecationReason(),
         ];
-        \Yii::endProfile($this->getName(), 'getFieldConfig');
+//        \Yii::endProfile($this->getName(), 'getFieldConfig');
         return $foo;
     }
 
