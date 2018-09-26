@@ -38,9 +38,13 @@ class ApiController extends Controller
     }
 
     function actionDebug() {
+        $instance = \markhuot\CraftQL\CraftQL::getInstance();
+
         $oldMode = \Craft::$app->getView()->getTemplateMode();
         \Craft::$app->getView()->setTemplateMode(\craft\web\View::TEMPLATE_MODE_CP);
-        $data = $this->getView()->renderPageTemplate('craftql/debug-input', []);
+        $data = $this->getView()->renderPageTemplate('craftql/debug-input', [
+            'uri' => $instance->getSettings()->uri,
+        ]);
         \Craft::$app->getView()->setTemplateMode($oldMode);
         return $data;
     }
