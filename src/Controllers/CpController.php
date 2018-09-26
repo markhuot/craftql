@@ -56,13 +56,13 @@ class CpController extends Controller
     function actionGraphiql()
     {
         $instance = \markhuot\CraftQL\CraftQL::getInstance();
-        $baseUrl = $instance->settings->baseUrl ?? \craft\helpers\UrlHelper::siteUrl();
+        $graphiqlFetchUrl = $instance->settings->graphiqlFetchUrl ?? \craft\helpers\UrlHelper::siteUrl();
         $uri = $instance->settings->uri;
 
         $this->view->registerAssetBundle(GraphiQLAssetBundle::class);
 
         $this->renderTemplate('craftql/graphiql', [
-            'url' => "{$baseUrl}{$uri}",
+            'url' => "{$graphiqlFetchUrl}{$uri}",
             'token' => false,
         ]);
     }
@@ -70,13 +70,13 @@ class CpController extends Controller
     function actionGraphiqlas($token)
     {
         $instance = \markhuot\CraftQL\CraftQL::getInstance();
-        $baseUrl = $instance->settings->baseUrl ?? \craft\helpers\UrlHelper::siteUrl();
+        $graphiqlFetchUrl = $instance->settings->graphiqlFetchUrl ?? \craft\helpers\UrlHelper::siteUrl();
         $uri = $instance->settings->uri;
 
         $this->view->registerAssetBundle(GraphiQLAssetBundle::class);
 
         $this->renderTemplate('craftql/graphiql', [
-            'url' => "{$baseUrl}{$uri}",
+            'url' => "{$graphiqlFetchUrl}{$uri}",
             'token' => $token,
         ]);
     }
