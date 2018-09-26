@@ -3,6 +3,9 @@
 namespace markhuot\CraftQL\Listeners;
 
 use markhuot\CraftQL\Helpers\StringHelper;
+use markhuot\CraftQL\Types\MultiOptionFieldData;
+use markhuot\CraftQL\Types\OptionFieldData;
+
 class GetSelectMultipleFieldSchema
 {
     /**
@@ -36,5 +39,19 @@ class GetSelectMultipleFieldSchema
         $event->mutation->addArgument($craftField)
             ->lists()
             ->type($graphqlField->getType());
+
+        $event->schema->addField("{$craftField->handle}_FieldData")
+            ->type(MultiOptionFieldData::class)
+            ->resolve(function ($root, $args, $context, $info) use ($craftField) {
+                return [
+                    'selected' => array_map(function ($option) {
+                        return [
+                            'label' => $option->label,
+                            'value' => $option->value,
+                        ];
+                    }, (array)$root->{$craftField->handle}),
+                    'options' => $root->{$craftField->handle}->getOptions(),
+                ];
+            });
     }
 }

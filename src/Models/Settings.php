@@ -7,6 +7,7 @@ use markhuot\CraftQL\Models\Token;
 
 class Settings extends Model
 {
+    public $graphiqlFetchUrl = null; // defaults to siteUrl via CpController
     public $uri = 'api';
     public $verbs = ['POST'];
     public $allowedOrigins = [];
