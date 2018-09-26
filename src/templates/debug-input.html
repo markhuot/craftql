@@ -1,4 +1,4 @@
-<form action="/api" method="post">
+<form action="/{{ uri|trim('/') }}" method="post">
     <input type="hidden" name="debug" value="1">
     <textarea rows="10" cols="80" name="query"></textarea>
     <button>Go</button>
