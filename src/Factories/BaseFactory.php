@@ -3,6 +3,7 @@
 namespace markhuot\CraftQL\Factories;
 
 use GraphQL\Type\Definition\EnumType;
+use markhuot\CraftQL\Request;
 
 abstract class BaseFactory {
 
@@ -13,6 +14,8 @@ abstract class BaseFactory {
     static $enums = [];
 
     protected $repository;
+
+    /** @var Request */
     protected $request;
     private $objects = [];
 

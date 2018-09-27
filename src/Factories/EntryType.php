@@ -21,4 +21,12 @@ class EntryType extends BaseFactory {
         return StringHelper::graphQLNameForEntryType($object->getContext());
     }
 
+    /**
+     * return type stub
+     * @return \markhuot\CraftQL\Types\EntryType[]
+     */
+    function all($mode='query') {
+        return parent::all($mode);
+    }
+
 }
