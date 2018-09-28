@@ -14,6 +14,8 @@ class Argument extends BaseBuilder {
     use HasOnSaveAttribute;
     use HasOverwriteAttribute;
 
+    private $configCache;
+
     function __construct(Request $request, string $name) {
         $this->request = $request;
         $this->name = $name;
@@ -29,6 +31,11 @@ class Argument extends BaseBuilder {
     }
 
     function getConfig() {
+        if (!empty($this->configCache)) {
+            return $this->configCache;
+        }
+
+//        \Yii::beginProfile($this->getName(), 'argumentGetConfig');
         $type = $this->getTypeConfig();
 
         if ($this->isList) {
@@ -39,10 +46,13 @@ class Argument extends BaseBuilder {
             $type = Type::nonNull($type);
         }
 
-        return [
+        $foo = [
             'type' => $type,
             'description' => $this->getDescription(),
         ];
+
+//        \Yii::endProfile($this->getName(), 'argumentGetConfig');
+        return $this->configCache = $foo;
     }
 
 }

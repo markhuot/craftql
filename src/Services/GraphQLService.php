@@ -75,6 +75,7 @@ class GraphQLService extends Component {
     }
 
     function getSchema($token) {
+//        xdebug_start_trace('/Users/markhuot/Desktop/getSchema');
         $cacheKey = 'craftQlSchema'.$token->uid();
 //        Craft::$app->cache->delete($cacheKey);
 
@@ -145,7 +146,12 @@ class GraphQLService extends Component {
         $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
         $schemaConfig['mutation'] = $mutation;
 
+        $request->fooBar();
+//        \Yii::beginProfile('newSchema', 'newSchema');
+//        xdebug_start_trace('/Users/markhuot/Desktop/newSchemaShorter');
         $schema = new Schema($schemaConfig);
+//        xdebug_stop_trace();
+//        \Yii::endProfile('newSchema', 'newSchema');
 //        var_dump($schema);
 //        serialize($schema);
 //        die;
@@ -167,6 +173,7 @@ class GraphQLService extends Component {
             $schema->assertValid();
         }
 
+//        xdebug_stop_trace();
         return $schema;
     }
 

@@ -63,11 +63,17 @@ class Token extends ActiveRecord
 
     function getScopeArray(): array
     {
-        return json_decode($this->scopes ?: '[]', true);
+//        \Yii::beginProfile('getScopeArray', 'getScopeArray');
+        $foo = json_decode($this->scopes ?: '[]', true);
+//        \Yii::endProfile('getScopeArray', 'getScopeArray');
+        return $foo;
     }
 
     function can($do): bool {
-        return $this->admin || @$this->scopeArray[$do] ?: false;
+//        \Yii::beginProfile('tokenCan', 'tokenCan');
+        $result = $this->admin || @$this->scopeArray[$do] ?: false;
+//        \Yii::endProfile('tokenCan', 'tokenCan');
+        return $result;
     }
 
     function canNot($do): bool {

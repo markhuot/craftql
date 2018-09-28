@@ -133,8 +133,10 @@ class FieldService {
 
         $return = [];
         foreach ($this->rawFields as $field) {
-            if (in_array($field->id, @$this->mapping[$layoutId] ?: [])) {
-                $return[] = $field;
+            if (!empty($this->mapping[$layoutId])) {
+                if (in_array($field->id, $this->mapping[$layoutId])) {
+                    $return[] = $field;
+                }
             }
         }
 

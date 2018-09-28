@@ -5,6 +5,7 @@ namespace markhuot\CraftQL;
 use craft\fields\Assets;
 use craft\fields\Entries;
 use GraphQL\Type\Definition\ResolveInfo;
+use markhuot\CraftQL\Models\Token;
 use markhuot\CraftQL\Services\FieldService;
 
 class Request {
@@ -49,8 +50,13 @@ class Request {
         $this->globals = $globals;
     }
 
+    /** @return Token */
     function token() {
         return $this->token;
+    }
+
+    function fooBar() {
+        // debugging
     }
 
     function categoryGroup($id) {
@@ -168,6 +174,20 @@ class Request {
         }
 
         return $criteria;
+    }
+
+    static $caches = [];
+
+    function getCache($key) {
+        if (isset(static::$caches[$key])) {
+            return static::$caches[$key];
+        }
+
+        return null;
+    }
+
+    function setCache($key, $value) {
+        static::$caches[$key] = $value;
     }
 
 }

@@ -130,9 +130,9 @@ class Query extends Schema {
             ->type(EntryInterface::class)
             ->use(new EntryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
-                Craft::beginProfile('craftQlEntriesResolver', 'craftQlEntriesResolver');
+//                Craft::beginProfile('craftQlEntriesResolver', 'craftQlEntriesResolver');
                 $foo = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->all();
-                Craft::endProfile('craftQlEntriesResolver', 'craftQlEntriesResolver');
+//                Craft::endProfile('craftQlEntriesResolver', 'craftQlEntriesResolver');
                 return $foo;
             });
 

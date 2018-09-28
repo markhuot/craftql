@@ -29,21 +29,31 @@ abstract class BaseFactory {
     // }
 
     function get($id, $mode='query') {
-        if ($this->can($id, $mode) === false) {
-            return false;
-        }
-
+//        \Yii::beginProfile('GET::'.static::class.'::'.$id, 'GET::'.static::class.'::'.$id);
         if (isset($this->objects[$id])) {
             return $this->objects[$id];
         }
 
-        return $this->objects[$id] = $this->make($this->repository->get($id), $this->request);
+        if ($this->can($id, $mode) === false) {
+            $this->objects[$id] = false;
+            return false;
+        }
+
+        $foo = $this->objects[$id] = $this->make($this->repository->get($id), $this->request);
+//        \Yii::endProfile('GET::'.static::class.'::'.$id, 'GET::'.static::class.'::'.$id);
+        return $foo;
     }
 
     abstract function can($id, $mode='query');
     abstract function make($raw, $request);
 
     function all($mode='query') {
+        $cacheKey = static::class.'all'.$mode;
+        $cache = $this->request->getCache($cacheKey);
+        if ($cache !== null) {
+            return $cache;
+        }
+
         $objects = [];
 
         foreach ($this->repository->all() as $raw) {
@@ -51,6 +61,8 @@ abstract class BaseFactory {
                 $objects[] = $object;
             }
         }
+
+        $this->request->setCache($cacheKey, $objects);
 
         return $objects;
     }
