@@ -11,6 +11,7 @@ class Settings extends Model
     public $uri = 'api';
     public $verbs = ['POST'];
     public $allowedOrigins = [];
+    public $allowedHeaders = ['Authorization, Content-Type'];
     public $headers = [];
     public $maxQueryDepth = false;
     public $maxQueryComplexity = false;
