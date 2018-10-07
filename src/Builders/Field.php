@@ -96,13 +96,18 @@ class Field extends BaseBuilder
     }
 
     function getResolve() {
+
+        // a critical alternative here, to stay out of the schema build
+        // at present, Field is the place we want to hit for list directive
         return $this->resolve
             ? $this->resolve
             : function ($root, $args, $context, $info) {
+
             $inVals = '0';
             $listField = 'children';
 
             if (isset($info->fieldNodes[0]->directives[0])) {
+
                 $directive = $info->fieldNodes[0]->directives[0];
                 if ($directive->arguments) {
                     foreach ($directive->arguments as $arg) {
@@ -126,110 +131,20 @@ class Field extends BaseBuilder
             }
 
             if(is_null($root)) {
-                return Utils::undefined();
-//                return Executor::defaultFieldResolver($source, $args, $context, $info);
+                return Utils::undefined(); // safety; shouldn't occur
             }
 
             $field = $root->{$info->fieldName};
-
-//            if ($this->isNonNull() && !$date) {
-//                throw new Error("`{$info->fieldName}` is a required field but has no value");
-//            }
-
             if (!$field) {
-                return null;
+                return null; // safety; shouldn't occur
             }
 
-//            $date->setTimezone(new DateTimeZone($timezone));
-//
-//            $date = $date->format($format);
-//            $cast = ($format === 'U') ? 'intval' : 'strval';
-//            return $cast($date);
-
-                // hard line
             if ($info->fieldName === $listField) {
+                // *todo* hard line only from here? alternate databases...
                 $field->where = 'elements.id not in (' . $inVals . ')';
-//                $field->where = 'elements.id not in (20, 574, 733)';
-
-//                $field->where = [
-//                    $field->where = [
-//                    'not' => [
-//                        'elements.id' => [ 22, 574, 733 ]
-//                    ]
-//                ];
             }
 
             return $field;
         };
     }
-
-// can't do any of this either. How about parent?
-//    function getResolve()
-//    {
-////        if ($this instanceof ListOfType) {
-//        if ($this->getIsList()) {
-//            return Executor::defaultFieldResolver($source, $args, $context, $info);
-//        } else {
-//            return function ($source, $args, $context, $info) {
-//
-//                return false && is_null($source)
-//                    ? null
-//                    : Executor::defaultFieldResolver($source, $args, $context, $info);
-//            };
-//        }
-//    }
-
-//    function getResolve() {
-//        return function ($root, $args, $context, $info) {
-//            $ins = [];
-//
-//            if (isset($info->fieldNodes[0]->directives[0])) {
-//                $directive = $info->fieldNodes[0]->directives[0];
-//                if ($directive->arguments) {
-//                    foreach ($directive->arguments as $arg) {
-//                        switch ($arg->name->value) {
-//                            case 'in':
-//                                $ins = $arg->value->value;
-//                                break;
-//                        }
-//                    }
-//                }
-//            } else {
-////                if ($this->resolve !== null) {
-////                    return function($value) {
-////                        return $this->resolve;
-////                    };
-////                }
-//                $children = $root
-//                    ? $root->{$info->fieldName}
-//                    : null;
-//
-//                return $children;
-//            }
-//
-//            $children = $root
-//                ? $root->{$info->fieldName}
-//                : null;
-//
-////
-////            if ($this->isNonNull() && !$date) {
-////                throw new Error("`{$info->fieldName}` is a required field but has no value");
-////            }
-////
-////            if (!$date) {
-////                return null;
-////            }
-//
-//
-//            // here examine the id/arrayids of the returned entry vs. list
-//            // if in list, return empty/null -- are we array here?
-////            $date->setTimezone(new DateTimeZone($timezone));
-////
-////            $date = $date->format($format);
-////            $cast = ($format === 'U') ? 'intval' : 'strval';
-////            return $cast($date);
-//            return $children;
-//        };
-//    }
-
 }
