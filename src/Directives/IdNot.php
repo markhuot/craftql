@@ -20,7 +20,7 @@ class IdNot {
 
         return static::$directive = new Directive([
             'name' => 'idNot',
-            'description' => 'Mask records in array of ids against appearing for fields',
+            'description' => 'Mask records in an array of ids, against appearing for a field',
             'locations' => [
                 DirectiveLocation::FIELD,
                 DirectiveLocation::FRAGMENT_SPREAD,
@@ -28,36 +28,18 @@ class IdNot {
             ],
             'args' => [
                 new FieldArgument([
+                    'name' => 'field',
+                    'type' => Type::nonNull(Type::string()),
+                    'description' => 'string name of field to mask',
+                    'defaultValue' => 0
+                ]),
+                new FieldArgument([
                     'name' => 'in',
-                    'type' => Type::nonNull(Type::id()),
+                    'type' => Type::nonNull(Type::listOf(Type::int())),
                     'description' => 'array of ids',
                     'defaultValue' => 0
                 ])
             ]
         ]);
     }
-
-    static function dateFormatTypesEnum() {
-        if (!empty(static::$dateFormatTypesEnum)) {
-            return static::$dateFormatTypesEnum;
-        }
-
-        return static::$dateFormatTypesEnum = new EnumType([
-            'name' => 'DateFormatTypes',
-            'values' => [
-                'atom' => ['description' => 'Atom feeds'],
-                'cookie' => ['description' => 'HTTP cookies'],
-                'iso8601' => ['description' => 'ISO-8601 spec'],
-                'rfc822' => ['description' => 'RFC-822 spec'],
-                'rfc850' => ['description' => 'RFC-850 spec'],
-                'rfc1036' => ['description' => 'RFC-1036 spec'],
-                'rfc1123' => ['description' => 'RFC-1123 spec'],
-                'rfc2822' => ['description' => 'RFC-2822 spec'],
-                'rfc3339' => ['description' => 'RFC-3339 spec'],
-                'rss' => ['description' => 'RSS feed'],
-                'w3c' => ['description' => 'W3C spec'],
-            ]
-        ]);
-    }
-
 }
