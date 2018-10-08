@@ -20,7 +20,9 @@ class VolumeInterface extends InterfaceBuilder {
 
         $this->addIntField('size');
         $this->addField('folder')->type(VolumeFolder::class);
+        $this->addStringField('volumeId');
         $this->addStringField('mimeType');
+        $this->addStringField('kind');
         $this->addStringField('title');
         $this->addStringField('extension');
         $this->addStringField('filename');
