@@ -111,11 +111,31 @@ class Field extends BaseBuilder
                 $directive = $info->fieldNodes[0]->directives[0];
                 if ($directive->arguments) {
                     foreach ($directive->arguments as $arg) {
+
+                        $argValues = null;
+
+                        if ($arg->value->kind === 'Argument') {
+                            // so far for array case, untied below
+                            $argValues = $arg->value->values;
+                        }
+                        else if ($arg->value->kind === 'Variable') {
+                            // unwind the variable
+                            $argValues = [];
+                            foreach($info->variableValues[$arg->value->name->value] as $value) {
+                                $argValues[] = (object)[ 'value' => $value ];
+                            }
+                        }
+                        else {
+                            throw new \Exception ('Unknown argument type for '
+                                . $arg->name->value . ' in '
+                                . $directive->name);
+                        }
+
                         switch ($arg->name->value) {
                             case 'in':
                                 $i = 0;
                                 // tricky here - don't point to internal of values
-                                foreach ($arg->value->values as $value) {
+                                foreach ($argValues as $value) {
                                     $i++ === 0
                                         ? $inVals = $value->value
                                         : $inVals .= ', ' . $value->value;
