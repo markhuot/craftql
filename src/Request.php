@@ -125,7 +125,8 @@ class Request {
         }
 
         if (!empty($args['idNot'])) {
-            $criteria->id('not '.implode(', ', $args['idNot']));
+            // this looks a little unusual to fit craft\helpers\Db::parseParam
+            $criteria->id('and, !='.implode(', !=', $args['idNot']));
             unset($args['idNot']);
         }
 
