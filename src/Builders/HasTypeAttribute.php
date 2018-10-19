@@ -34,7 +34,7 @@ trait HasTypeAttribute {
     }
 
     /**
-     * Get the GraphQL compatable type
+     * Get the GraphQL compatible type
      *
      * @return Type
      */
