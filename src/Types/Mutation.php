@@ -2,6 +2,8 @@
 
 namespace markhuot\CraftQL\Types;
 
+use craft\base\Element;
+use GraphQL\Error\UserError;
 use yii\base\Component;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -47,6 +49,75 @@ class Mutation extends Schema {
                         return $globalSetElement;
                     });
             }
+        }
+
+        if ($this->request->token()->can('mutate:users')) {
+            $updateUser = $this->addField('upsertUser')
+                ->type(User::class)
+                ->resolve(function ($root, $args, $context, $info) {
+                    $values = $args;
+
+                    if (!empty($args['id'])) {
+                        $userId = @$args['id'];
+                        unset($values['id']);
+
+                        $user = \craft\elements\User::find()->id($userId)->anyStatus()->one();
+                        if (!$user) {
+                            throw new UserError('Could not find user '.$userId);
+                        }
+                    }
+                    else {
+                        $user = new \craft\elements\User;
+                    }
+
+                    foreach (['firstName', 'lastName', 'username', 'email'] as $fieldName) {
+                        if (isset($values[$fieldName])) {
+                            $user->{$fieldName} = $values[$fieldName];
+                            unset($values[$fieldName]);
+                        }
+                    }
+
+                    $permissions = [];
+                    if (!empty($values['permissions'])) {
+                        $permissions = $values['permissions'];
+                        unset($values['permissions']);
+                    }
+
+                    if (!empty($values)) {
+                        $user->setFieldValues($values);
+                    }
+
+                    $user->setScenario(Element::SCENARIO_LIVE);
+
+                    if (!Craft::$app->elements->saveElement($user)) {
+                        if (!empty($user->getErrors())) {
+                            foreach ($user->getErrors() as $key => $errors) {
+                                foreach ($errors as $error) {
+                                    throw new UserError($error);
+                                }
+                            }
+                        }
+                    }
+
+                    if (!empty($permissions)) {
+                        Craft::$app->getUserPermissions()->saveUserPermissions($user->id, $permissions);
+                    }
+
+                    return $user;
+                });
+
+            $updateUser->addIntArgument('id');
+            $updateUser->addStringArgument('firstName');
+            $updateUser->addStringArgument('lastName');
+            $updateUser->addStringArgument('username');
+            $updateUser->addStringArgument('email');
+
+            if ($this->request->token()->can('mutate:userPermissions')) {
+                $updateUser->addStringArgument('permissions')->lists();
+            }
+
+            $fieldLayout = Craft::$app->getFields()->getLayoutByType(\craft\elements\User::class);
+            $updateUser->addArgumentsByLayoutId($fieldLayout->id);
         }
 
         // $fields['upsertField'] = [

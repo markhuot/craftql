@@ -51,30 +51,7 @@ class Query extends Schema {
         }
 
         if ($token->can('query:users')) {
-            $userResolver = function ($root, $args) {
-                $criteria = \craft\elements\User::find();
-
-                foreach ($args as $key => $value) {
-                    $criteria = $criteria->{$key}($value);
-                }
-
-                return $criteria;
-            };
-
-            $this->addField('users')
-                ->lists()
-                ->type(User::class)
-                ->use(new UserQueryArguments)
-                ->resolve(function ($root, $args) use ($userResolver) {
-                    return $userResolver($root, $args)->all();
-                });
-
-            $this->addField('user')
-                ->type(User::class)
-                ->use(new UserQueryArguments)
-                ->resolve(function ($root, $args) use ($userResolver) {
-                    return $userResolver($root, $args)->first();
-                });
+            $this->addUsersSchema();
         }
 
         if ($token->can('query:sections')) {
@@ -173,8 +150,6 @@ class Query extends Schema {
 
     /**
      * The fields you can query that return assets
-     *
-     * @return Schema
      */
     function addAssetsSchema() {
         if ($this->getRequest()->volumes()->count() == 0) {
@@ -198,8 +173,6 @@ class Query extends Schema {
 
     /**
      * The fields you can query that return globals
-     *
-     * @return Schema
      */
     function addGlobalsSchema() {
 
@@ -252,8 +225,6 @@ class Query extends Schema {
 
     /**
      * The fields you can query that return tags
-     *
-     * @return Schema
      */
     function addTagsSchema() {
         if ($this->request->tagGroups()->count() == 0) {
@@ -309,8 +280,6 @@ class Query extends Schema {
 
     /**
      * The fields you can query that return categories
-     *
-     * @return Schema
      */
     function addCategoriesSchema() {
         if ($this->request->categoryGroups()->count() == 0) {
@@ -359,6 +328,33 @@ class Query extends Schema {
                     'pageInfo' => $pageInfo,
                     'edges' => $categories,
                 ];
+            });
+    }
+
+    function addUsersSchema() {
+        $userResolver = function ($root, $args) {
+            $criteria = \craft\elements\User::find();
+
+            foreach ($args as $key => $value) {
+                $criteria = $criteria->{$key}($value);
+            }
+
+            return $criteria;
+        };
+
+        $this->addField('users')
+            ->lists()
+            ->type(User::class)
+            ->use(new UserQueryArguments)
+            ->resolve(function ($root, $args) use ($userResolver) {
+                return $userResolver($root, $args)->all();
+            });
+
+        $this->addField('user')
+            ->type(User::class)
+            ->use(new UserQueryArguments)
+            ->resolve(function ($root, $args) use ($userResolver) {
+                return $userResolver($root, $args)->first();
             });
     }
 

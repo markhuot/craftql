@@ -3,6 +3,7 @@
 namespace markhuot\CraftQL\Types;
 
 use markhuot\CraftQL\Builders\InterfaceBuilder;
+use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
 use markhuot\CraftQL\Helpers\StringHelper;
 
 class EntryInterface extends InterfaceBuilder {
@@ -31,7 +32,15 @@ class EntryInterface extends InterfaceBuilder {
         }
 
         $this->addField('ancestors')->lists()->type(EntryInterface::class);
-        $this->addField('children')->lists()->type(EntryInterface::class);
+
+        $this->addField('children')
+            ->lists()
+            ->type(EntryInterface::class)
+            ->use(new EntryQueryArguments)
+            ->resolve(function ($root, $args, $context, $info) {
+                return $this->request->entries($root->{$info->fieldName}, $root, $args, $context, $info);
+            });
+
         $this->addField('descendants')->lists()->type(EntryInterface::class);
         $this->addBooleanField('hasDescendants')->nonNull();
         $this->addIntField('level');

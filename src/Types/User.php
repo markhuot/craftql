@@ -34,6 +34,13 @@ class User extends Schema {
 
         $fieldLayoutId = Craft::$app->getFields()->getLayoutByType(CraftUserElement::class)->id;
         $this->addFieldsByLayoutId($fieldLayoutId);
+
+        if ($this->request->token()->can('query:userPermissions')) {
+            $this->addStringField('permissions')->lists()->resolve(function ($root, $args, $context, $info) {
+                /** @var \craft\elements\User $root */
+                return Craft::$app->getUserPermissions()->getPermissionsByUserId($root->id);
+            });
+        }
     }
 
 }

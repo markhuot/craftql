@@ -290,6 +290,42 @@ For added functionality query categories and tags through their related `Connect
 }
 ```
 
+## Users
+
+Users can be queried via a top-level `users` field,
+
+```graphql
+{
+  users {
+    id
+    name
+    email
+  }
+}
+```
+
+You can also mutate users via the `upsertUser` field. When passed an `id:` it will update the user. If the `id:` attribute is missing it will create a new user,
+
+```graphql
+mutation {
+  upsertUser(id:1, firstName:"Mark", lastName:"Huot") {
+    id
+    name # returns `Mark Huot` after the mutation
+  }
+}
+```
+
+Permissions can be set as well, but you must _always_ pass the full list of permissions for the user. E.g.,
+
+```graphql
+mutation {
+  upsertUser(id:1, permissions:["accessCp","editEntries:17","createEntries:17","deleteEntries:17"]) {
+    id
+    name # returns `Mark Huot` after the mutation
+  }
+}
+```
+
 ## Security
 
 CraftQL supports GraphQl field level permissions. By default a token will have no rights. You must click into the "Scopes" section to adjust what each token can do.

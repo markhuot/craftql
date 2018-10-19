@@ -92,6 +92,11 @@
                 <td>{{ forms.lightswitch({"name": "scope[query:users]", "value": 1, "on": token.can('query:users'), "small": true}) }}</td>
             </tr>
             <tr data-id="default">
+                <th>users.permissions</th>
+                <td>Query a user&rsquo;s permissions.¢</td>
+                <td>{{ forms.lightswitch({"name": "scope[query:userPermissions]", "value": 1, "on": token.can('query:userPermissions'), "small": true}) }}</td>
+            </tr>
+            <tr data-id="default">
                 <th>sections</th>
                 <td>Query the sections (and nested Entry Types) that have been enabled below.</td>
                 <td>{{ forms.lightswitch({"name": "scope[query:sections]", "value": 1, "on": token.can('query:sections'), "small": true}) }}</td>
@@ -131,6 +136,35 @@
                     </tr>
                 {% endfor %}
             {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<hr>
+
+<div class="field">
+    <h2>Mutation Fields</h2>
+    <div class="field first last"><div class="heading"><div class="instructions"><p>Enable top level GraphQL mutations when accessed through this token.</p></div></div></div>
+
+    <table id="sites" class="shadow-box editable">
+        <thead>
+            <tr>
+                <th scope="col" class="thin">Field Name</th>
+                <th scope="col">Description</th>
+                <th scope="col" class="thin"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr data-id="default">
+                <td>users</td>
+                <td>Add and update users</td>
+                <td>{{ forms.lightswitch({"name": "scope[mutate:users]", "value": 1, "on": token.can("mutate:users"), "small": true}) }}</td>
+            </tr>
+            <tr data-id="default">
+                <td>user.permissions</td>
+                <td>Set user permissions</td>
+                <td>{{ forms.lightswitch({"name": "scope[mutate:userPermissions]", "value": 1, "on": token.can("mutate:users"), "small": true}) }}</td>
+            </tr>
         </tbody>
     </table>
 </div>
