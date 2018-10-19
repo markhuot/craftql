@@ -16,6 +16,11 @@ return [
             new \markhuot\CraftQL\Listeners\GetSelectMultipleFieldSchema,
         ],
     ],
+    \craft\fields\Color::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetColorFieldSchema,
+        ],
+    ],
     \craft\fields\Date::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetDateFieldSchema,
