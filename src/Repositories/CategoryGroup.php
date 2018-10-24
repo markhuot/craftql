@@ -18,6 +18,9 @@ class CategoryGroup extends Component {
     }
 
     function get($id) {
+      if (empty($this->groups[$id])) {
+          return false;
+      }
       return $this->groups[$id];
     }
 
