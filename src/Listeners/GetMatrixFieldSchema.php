@@ -4,7 +4,9 @@ namespace markhuot\CraftQL\Listeners;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\UnionType;
+use markhuot\CraftQL\Builders\Argument;
 use markhuot\CraftQL\Builders\Field;
+use markhuot\CraftQL\Builders\InputSchema;
 
 class GetMatrixFieldSchema
 {
@@ -89,7 +91,7 @@ class GetMatrixFieldSchema
             $event->mutation->addArgument($event->sender)
                 ->lists()
                 ->type($inputType)
-                ->onSave(function ($values) {
+                ->onSave(function ($values) use ($inputType) {
                     $newValues = [];
 
                     foreach ($values as $index => $value) {
@@ -102,6 +104,17 @@ class GetMatrixFieldSchema
                         else {
                             $type = array_keys($value)[0];
                             $fields = $value[$type];
+                        }
+
+                        foreach ($fields as $fieldHandle => &$fieldValue) {
+                            /** @var Argument $blockArgument */
+                            $blockArgument = $inputType->getArgument($type);
+                            /** @var InputSchema $blockType */
+                            $blockType = $blockArgument->getType();
+                            $callback = $blockType->getArgument($fieldHandle)->getOnSave();
+                            if ($callback) {
+                                $fieldValue = $callback($fieldValue);
+                            }
                         }
 
                         $newValues[$id] = [
