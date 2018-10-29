@@ -6,7 +6,12 @@ use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
 use markhuot\CraftQL\Helpers\StringHelper;
 
-class Entry extends Schema {
+/**
+ * Class Entry
+ * @package markhuot\CraftQL\Types
+ * @craftql-extends EntryInterface
+ */
+class Entry extends EntryInterface {
 
     protected $interfaces = [
         \markhuot\CraftQL\Types\EntryInterface::class,

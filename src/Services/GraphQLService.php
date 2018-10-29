@@ -6,6 +6,7 @@ use Craft;
 use Egulias\EmailValidator\Exception\CRLFAtTheEnd;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
+use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\SchemaPrinter;
 use GraphQL\Validator\DocumentValidator;
@@ -13,6 +14,7 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
+use markhuot\CraftQL\Types\EntryInterface;
 use markhuot\CraftQL\Types\Query;
 use yii\base\Component;
 use Yii;
@@ -80,8 +82,14 @@ class GraphQLService extends Component {
         // $query->trigger(AlterQuerySchema::EVENT, $event);
 
         $schemaObj = new \markhuot\CraftQL\Builder2\Schema;
-        $parser = new DocBlockObjectParser;
-        $schemaConfig['query'] = $parser->parse(Query::class);
+        $schemaConfig['query'] = $schemaObj->getType(Query::class);
+
+        $schemaObj->addConcreteType(EntryInterface::class, [
+            'name' => 'Blog',
+            'description' => 'foo',
+        ]);
+
+        $schemaConfig['types'] = $schemaObj->getTypes();
 
         // $schemaConfig['query'] = $query->getGraphQlConfig();
 //        $schemaConfig['types'] = function () use ($request, $query) {
@@ -122,7 +130,8 @@ class GraphQLService extends Component {
         $schema = new Schema($schemaConfig);
 
        $print = SchemaPrinter::doPrint($schema);
-       var_dump($print);
+       header('content-type: text/plain');
+       echo $print;
        die;
 
         if (Craft::$app->config->general->devMode) {
@@ -134,7 +143,7 @@ class GraphQLService extends Component {
 
     function execute($schema, $input, $variables = []) {
         $debug = Craft::$app->config->getGeneral()->devMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::RETHROW_INTERNAL_EXCEPTIONS : null;
-        return GraphQL::executeQuery($schema, $input, null, null, $variables, '', function ($source, $args, $context, $info) {
+        return GraphQL::executeQuery($schema, $input, new Query, null, $variables, '', function ($source, $args, $context, ResolveInfo $info) {
             $fieldName = $info->fieldName;
 
             if (!empty($info->parentType->description)) {
@@ -161,10 +170,19 @@ class GraphQLService extends Component {
                 if (isset($source[$fieldName])) {
                     $property = $source[$fieldName];
                 }
-            } else if (is_object($source)) {
+            }
+            else if (is_object($source)) {
                 if (isset($source->{$fieldName})) {
                     $property = $source->{$fieldName};
                 }
+                else if (method_exists($source, $method='get'.ucfirst($fieldName))) {
+                    $property = $source->{$method}($source, $args, $context, $info);
+                }
+            }
+
+            // downcast things we're able to
+            switch (get_class($info->returnType)) {
+                case \GraphQL\Type\Definition\StringType::class: $property = (string)$property;
             }
 
             return $property instanceof \Closure ? $property($source, $args, $context) : $property;

@@ -6,52 +6,80 @@ use markhuot\CraftQL\Builders\InterfaceBuilder;
 use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
 use markhuot\CraftQL\Helpers\StringHelper;
 
-class EntryInterface extends InterfaceBuilder {
+/**
+ * Class EntryInterface
+ * @package markhuot\CraftQL\Types
+ * @craftql-type interface
+ */
+class EntryInterface {
 
-    function boot() {
-        $this->addIntField('id')->nonNull();
+    /** @var int */
+    public $id;
 
-        if ($this->request->token()->can('query:entry.author')) {
-            $this->addField('author')->type(User::class)->nonNull();
-        }
+    /** @var User */
+    public $author;
 
-        $this->addStringField('title')->nonNull();
-        $this->addStringField('slug')->nonNull();
-        $this->addDateField('dateCreated')->nonNull();
-        $this->addDateField('dateUpdated')->nonNull();
-        $this->addDateField('expiryDate');
-        $this->addDateField('postDate');
-        $this->addBooleanField('enabled')->nonNull();
-        $this->addStringField('status')->nonNull();
-        $this->addStringField('uri');
-        $this->addStringField('url');
+    /** @var string */
+    public $title;
 
-        if ($this->request->token()->can('query:sections')) {
-            $this->addField('section')->type(Section::class);
-            $this->addField('type')->type(EntryType::class);
-        }
+    /** @var string */
+    public $slug;
 
-        $this->addField('ancestors')->lists()->type(EntryInterface::class);
+    /** @var Timestamp */
+    public $dateCreated;
 
-        $this->addField('children')
-            ->lists()
-            ->type(EntryInterface::class)
-            ->use(new EntryQueryArguments)
-            ->resolve(function ($root, $args, $context, $info) {
-                return $this->request->entries($root->{$info->fieldName}, $root, $args, $context, $info);
-            });
+    /** @var Timestamp */
+    public $dateUpdated;
 
-        $this->addField('descendants')->lists()->type(EntryInterface::class);
-        $this->addBooleanField('hasDescendants')->nonNull();
-        $this->addIntField('level');
-        $this->addField('parent')->type(EntryInterface::class);
-        $this->addField('siblings')->lists()->type(EntryInterface::class);
-    }
+    /** @var Timestamp */
+    public $expiryDate;
 
-    function getResolveType() {
-        return function ($entry) {
-            return StringHelper::graphQLNameForEntryType($entry->type);
-        };
-    }
+    /** @var Timestamp */
+    public $postDate;
+
+    /** @var bool */
+    public $enabled;
+
+    /** @var string */
+    public $status;
+
+    /** @var string */
+    public $uri;
+
+    /** @var string */
+    public $url;
+
+    /** @var Section */
+    public $section;
+
+    /** @var EntryType */
+    public $type;
+
+    /** @var static[] */
+    public $ancestors;
+
+    /** @var static[] */
+    public $children;
+
+    /** @var static[] */
+    public $descendants;
+
+    /** @var bool */
+    public $hasDescendants;
+
+    /** @var int */
+    public $level;
+
+    /** @var static */
+    public $parent;
+
+    /** @var static[] */
+    public $siblings;
+
+    // function getResolveType() {
+    //     return function ($entry) {
+    //         return StringHelper::graphQLNameForEntryType($entry->type);
+    //     };
+    // }
 
 }
