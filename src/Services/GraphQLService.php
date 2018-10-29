@@ -7,11 +7,13 @@ use Egulias\EmailValidator\Exception\CRLFAtTheEnd;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use GraphQL\Utils\SchemaPrinter;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
+use markhuot\CraftQL\Types\Query;
 use yii\base\Component;
 use Yii;
 
@@ -47,13 +49,6 @@ class GraphQLService extends Component {
      * @return void
      */
     function bootstrap() {
-        $this->volumes->load();
-        $this->categoryGroups->load();
-        $this->tagGroups->load();
-        $this->entryTypes->load();
-        $this->sections->load();
-        $this->globals->load();
-
         $maxQueryDepth = CraftQL::getInstance()->getSettings()->maxQueryDepth;
         if ($maxQueryDepth !== false) {
             $rule = new QueryDepth($maxQueryDepth);
@@ -80,47 +75,55 @@ class GraphQLService extends Component {
 
         $query = new \markhuot\CraftQL\Types\Query($request);
 
-        $event = new AlterQuerySchema;
-        $event->query = $query;
-        $query->trigger(AlterQuerySchema::EVENT, $event);
+        // $event = new AlterQuerySchema;
+        // $event->query = $query;
+        // $query->trigger(AlterQuerySchema::EVENT, $event);
 
-        $schemaConfig['query'] = $query->getRawGraphQLObject();
-        $schemaConfig['types'] = function () use ($request, $query) {
-            return array_merge(
-                array_map(function ($section) {
-                    return $section->getRawGraphQLObject();
-                }, $request->sections()->all()),
+        $schemaObj = new \markhuot\CraftQL\Builder2\Schema;
+        $parser = new DocBlockObjectParser;
+        $schemaConfig['query'] = $parser->parse(Query::class);
 
-                array_map(function ($volume) {
-                    return $volume->getRawGraphQLObject();
-                }, $request->volumes()->all()),
+        // $schemaConfig['query'] = $query->getGraphQlConfig();
+//        $schemaConfig['types'] = function () use ($request, $query) {
+//            return array_merge(
+//                array_map(function ($section) {
+//                    return $section->getRawGraphQLObject();
+//                }, $request->sections()->all()),
+//
+//                array_map(function ($volume) {
+//                    return $volume->getRawGraphQLObject();
+//                }, $request->volumes()->all()),
+//
+//                array_map(function ($categoryGroup) {
+//                    return $categoryGroup->getRawGraphQLObject();
+//                }, $request->categoryGroups()->all()),
+//
+//                array_map(function ($tagGroup) {
+//                    return $tagGroup->getRawGraphQLObject();
+//                }, $request->tagGroups()->all()),
+//
+//                array_map(function ($entryType) {
+//                    return $entryType->getRawGraphQLObject();
+//                }, $request->entryTypes()->all()),
+//
+//                [\markhuot\CraftQL\Directives\Date::dateFormatTypesEnum()],
+//
+//                $query->getConcreteTypes()
+//            );
+//        };
 
-                array_map(function ($categoryGroup) {
-                    return $categoryGroup->getRawGraphQLObject();
-                }, $request->categoryGroups()->all()),
-
-                array_map(function ($tagGroup) {
-                    return $tagGroup->getRawGraphQLObject();
-                }, $request->tagGroups()->all()),
-
-                array_map(function ($entryType) {
-                    return $entryType->getRawGraphQLObject();
-                }, $request->entryTypes()->all()),
-
-                [\markhuot\CraftQL\Directives\Date::dateFormatTypesEnum()],
-
-                $query->getConcreteTypes()
-            );
-        };
-
-        $schemaConfig['directives'] = [
-            \markhuot\CraftQL\Directives\Date::directive(),
-        ];
-
-        $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
-        $schemaConfig['mutation'] = $mutation;
+//        $schemaConfig['directives'] = [
+//            \markhuot\CraftQL\Directives\Date::directive(),
+//        ];
+//
+//        $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
+//        $schemaConfig['mutation'] = $mutation;
 
         $schema = new Schema($schemaConfig);
+
+       $print = SchemaPrinter::doPrint($schema);
+       var_dump($print);
+       die;
 
         if (Craft::$app->config->general->devMode) {
             $schema->assertValid();
@@ -131,7 +134,41 @@ class GraphQLService extends Component {
 
     function execute($schema, $input, $variables = []) {
         $debug = Craft::$app->config->getGeneral()->devMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::RETHROW_INTERNAL_EXCEPTIONS : null;
-        return GraphQL::executeQuery($schema, $input, null, null, $variables)->toArray($debug);
+        return GraphQL::executeQuery($schema, $input, null, null, $variables, '', function ($source, $args, $context, $info) {
+            $fieldName = $info->fieldName;
+
+            if (!empty($info->parentType->description)) {
+                // $factory = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
+                // $description = $info->parentType->description;
+                // $docs = $factory->create($description);
+                // $resolveTags = $docs->getTagsByName('resolve');
+                // if (!empty($resolveTags)) {
+                //     $className = '\\'.trim($resolveTags[0]->getDescription(), '/');
+                //     $class = new $className;
+                //     $methodName = 'resolve'.ucfirst($fieldName).'Field';
+                //     if (method_exists($class, $methodName)) {
+                //         return $class->$methodName($source, $args, $context, $info);
+                //     }
+                //     else if (property_exists($class, $fieldName)) {
+                //         return $class->{$fieldName};
+                //     }
+                // }
+            }
+
+            $property = null;
+
+            if (is_array($source) || $source instanceof \ArrayAccess) {
+                if (isset($source[$fieldName])) {
+                    $property = $source[$fieldName];
+                }
+            } else if (is_object($source)) {
+                if (isset($source->{$fieldName})) {
+                    $property = $source->{$fieldName};
+                }
+            }
+
+            return $property instanceof \Closure ? $property($source, $args, $context) : $property;
+        })->toArray($debug);
     }
 
 }

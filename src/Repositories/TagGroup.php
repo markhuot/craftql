@@ -5,24 +5,18 @@ namespace markhuot\CraftQL\Repositories;
 use Craft;
 use yii\base\Component;
 
-class TagGroup extends Component {
-
-    private $groups = [];
+class TagGroup extends Repository {
 
     function load() {
-      foreach (Craft::$app->tags->allTagGroups as $group) {
+        $groups = [];
+
+        foreach (Craft::$app->tags->allTagGroups as $group) {
             if (!isset($this->groups[$group->id])) {
-              $this->groups[$group->id] = $group;
+                $groups[$group->id] = $group;
             }
         }
-    }
 
-    function get($id) {
-      return $this->groups[$id];
-    }
-
-    function all() {
-        return $this->groups;
+        return $groups;
     }
 
 }

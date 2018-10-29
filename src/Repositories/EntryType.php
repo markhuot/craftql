@@ -4,24 +4,18 @@ namespace markhuot\CraftQL\Repositories;
 
 use Craft;
 
-class EntryType {
-
-    private $entryTypes = [];
+class EntryType extends Repository {
 
     function load() {
+        $entryTypes = [];
+
         foreach (Craft::$app->sections->allSections as $section) {
             foreach ($section->entryTypes as $entryType) {
-                $this->entryTypes[$entryType->id] = $entryType;
+                $entryTypes[$entryType->id] = $entryType;
             }
         }
-    }
 
-    function get($id) {
-        return $this->entryTypes[$id];
-    }
-
-    function all() {
-        return $this->entryTypes;
+        return $entryTypes;
     }
 
 }

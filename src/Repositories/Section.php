@@ -4,22 +4,16 @@ namespace markhuot\CraftQL\Repositories;
 
 use Craft;
 
-class Section {
-
-    private $sections = [];
+class Section extends Repository {
 
     function load() {
-        foreach (Craft::$app->sections->allSections as $section) {
-            $this->sections[$section->id] = $section;
-        }
-    }
-    
-    function get($id) {
-        return $this->sections[$id];
-    }
+        $sections = [];
 
-    function all() {
-        return $this->sections;
+        foreach (Craft::$app->sections->allSections as $section) {
+            $sections[$section->id] = $section;
+        }
+
+        return $sections;
     }
 
 }

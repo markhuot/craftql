@@ -193,8 +193,8 @@ class Schema extends BaseBuilder {
      * @return array
      */
     function getFields(): array {
-        $this->boot();
-        $this->bootBehaviors();
+//        $this->boot();
+//        $this->bootBehaviors();
 
         $event = new AlterSchemaFields;
         $event->schema = $this;

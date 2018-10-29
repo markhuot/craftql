@@ -9,6 +9,7 @@ use craft\console\Application as ConsoleApplication;
 use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
 
+use Doctrine\Common\Annotations\AnnotationRegistry;
 use markhuot\CraftQL\Models\Settings;
 use yii\base\Event;
 

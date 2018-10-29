@@ -4,22 +4,16 @@ namespace markhuot\CraftQL\Repositories;
 
 use Craft;
 
-class Globals {
-
-    private $sets = [];
+class Globals extends Repository {
 
     function load() {
+        $sets = [];
+
         foreach (Craft::$app->globals->allSets as $set) {
-            $this->sets[$set->id] = $set;
+            $sets[$set->id] = $set;
         }
-    }
 
-    function get($id) {
-        return $this->sets[$id];
-    }
-
-    function all() {
-        return $this->sets;
+        return $sets;
     }
 
 }

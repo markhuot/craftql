@@ -4,22 +4,16 @@ namespace markhuot\CraftQL\Repositories;
 
 use Craft;
 
-class Volumes {
+class Volumes extends Repository {
 
-  public $volumes = [];
+    function load() {
+        $volumes = [];
 
-  function load() {
-    foreach (Craft::$app->volumes->getAllVolumes() as $volume) {
-      $this->volumes[$volume->id] = $volume;
+        foreach (Craft::$app->volumes->getAllVolumes() as $volume) {
+            $volumes[$volume->id] = $volume;
+        }
+
+        return $volumes;
     }
-  }
-
-  function get($id) {
-    return $this->volumes[$id];
-  }
-
-  function all() {
-      return $this->volumes;
-  }
 
 }
