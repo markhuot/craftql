@@ -69,6 +69,10 @@ trait HasArgumentsAttribute {
         return $this->addArgument($name)->type(Type::boolean());
     }
 
+    function addDateArgument($name): Argument {
+        return $this->addArgument($name)->type(\markhuot\CraftQL\Types\Timestamp::type());
+    }
+
     function addEnumArgument($name): EnumField {
         if (is_a($name, CraftField::class)) {
             return $this->arguments[] = (new EnumField($this->request, $name->handle))

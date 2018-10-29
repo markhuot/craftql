@@ -23,8 +23,8 @@ class EntryMutationArguments extends FieldBehavior {
         $this->owner->addIntArgument('authorId');
         $this->owner->addStringArgument('title');
         $this->owner->addBooleanArgument('enabled');
-        $this->owner->addIntArgument('postDate');
-        $this->owner->addIntArgument('expiryDate');
+        $this->owner->addDateArgument('postDate');
+        $this->owner->addDateArgument('expiryDate');
 
         $mutationQueryObject = $this->owner->createInputObjectType('MutationQuery');
         $mutationQueryObject->use(new EntryQueryArguments);
