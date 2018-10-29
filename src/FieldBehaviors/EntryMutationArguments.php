@@ -5,6 +5,7 @@ namespace markhuot\CraftQL\FieldBehaviors;
 use craft\base\Element;
 use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
+use craft\helpers\DateTimeHelper;
 use markhuot\CraftQL\Behaviors\FieldBehavior;
 use markhuot\CraftQL\Builders\Field;
 use Craft;
@@ -22,6 +23,8 @@ class EntryMutationArguments extends FieldBehavior {
         $this->owner->addIntArgument('authorId');
         $this->owner->addStringArgument('title');
         $this->owner->addBooleanArgument('enabled');
+        $this->owner->addIntArgument('postDate');
+        $this->owner->addIntArgument('expiryDate');
 
         $mutationQueryObject = $this->owner->createInputObjectType('MutationQuery');
         $mutationQueryObject->use(new EntryQueryArguments);
@@ -73,6 +76,14 @@ class EntryMutationArguments extends FieldBehavior {
                 $entry->enabled = $args['enabled'];
             }
 
+            if (isset($args['postDate'])) {
+                $entry->postDate = DateTimeHelper::toDateTime($args['postDate']);
+            }
+
+            if (isset($args['expiryDate'])) {
+                $entry->expiryDate = DateTimeHelper::toDateTime($args['expiryDate']);
+            }
+
             $fields = $args;
             unset($fields['id']);
             unset($fields['siteId']);
@@ -81,6 +92,8 @@ class EntryMutationArguments extends FieldBehavior {
             unset($fields['typeId']);
             unset($fields['authorId']);
             unset($fields['enabled']);
+            unset($fields['postDate']);
+            unset($fields['expiryDate']);
             unset($fields['query']);
 
             $fieldService = \Yii::$container->get('craftQLFieldService');
