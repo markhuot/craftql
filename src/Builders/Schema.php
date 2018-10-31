@@ -91,6 +91,10 @@ class Schema extends BaseBuilder {
             ->name($name);
     }
 
+    function createObjectTypeFromClass($className, $depth=1): self {
+        return (new InferredSchema($this->request))->parse($className);
+    }
+
     /**
      * Create a new builder
      *

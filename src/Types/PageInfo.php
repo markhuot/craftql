@@ -9,29 +9,71 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Builders\Schema;
 
-class PageInfo extends Schema {
+class PageInfo {
 
-    function boot() {
-        $this->addBooleanField('hasPreviousPage')
-            ->nonNull()
-            ->resolve(function ($root, $args) {
-                return $root->currentPage > 1;
-            });
+    /**
+     * @var int
+     */
+    public $limit = 100;
 
-        $this->addBooleanField('hasNextPage')
-            ->nonNull()
-            ->resolve( function ($root, $args) {
-            return $root->currentPage < $root->totalPages;
-        });
+    /**
+     * @var int
+     */
+    public $first;
 
-        $this->addIntField('currentPage')
-            ->resolve(function (Paginate $root, $args, $context, $info) {
-                return floor(($root->first - 1) / (@$root->limit ?: 100)) + 1;
-            });
+    /**
+     * @var int
+     */
+    public $last;
 
-        $this->addIntField('totalPages');
-        $this->addIntField('first');
-        $this->addIntField('last');
+    /**
+     * @var int
+     */
+    public $total = 0;
+
+    /**
+     * @var int
+     */
+    public $currentPage;
+
+    /**
+     * @var int
+     */
+    public $totalPages = 0;
+
+    /**
+     * PageInfo constructor.
+     * @param Paginate $paginate
+     * @param int $limit
+     */
+    function __construct(Paginate $paginate, $limit=null) {
+        foreach (['first', 'last', 'total', 'currentPage', 'totalPages'] as $key) {
+            $this->{$key} = $paginate->{$key};
+        }
+        if (is_numeric($limit)) {
+            $this->limit = $limit;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    function getCurrentPage() {
+        return floor($this->first / $this->total) + 1;
+    }
+
+    /**
+     * @return bool
+     */
+    function getHasPreviousPage() {
+        return $this->getCurrentPage() > 1;
+    }
+
+    /**
+     * @return bool
+     */
+    function getHasNextPage() {
+        return $this->getCurrentPage() < $this->totalPages;
     }
 
 }

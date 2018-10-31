@@ -8,11 +8,10 @@ use craft\base\Plugin;
 use craft\console\Application as ConsoleApplication;
 use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
-
 use markhuot\CraftQL\Models\Settings;
+use markhuot\CraftQL\Models\Token;
 use yii\base\Event;
 
-use markhuot\CraftQL\Models\Token;
 
 class CraftQL extends Plugin
 {
@@ -22,6 +21,10 @@ class CraftQL extends Plugin
     public $controllerNamespace = 'markhuot\\CraftQL\\Controllers';
     public $hasCpSettings = true;
     public $hasCpSection = true;
+
+    static function PATH() {
+        return rtrim(__DIR__, '/').'/';
+    }
 
     /**
      * Init for the entire plugin

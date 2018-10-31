@@ -17,19 +17,8 @@ class GetColorFieldSchema
     function handle($event) {
         $event->handled = true;
 
-        $color = $event->schema->createObjectType('Color');
-        $color->addStringField('hex')->resolve(function (ColorData $root) { return $root->getHex(); });
-        $color->addStringField('rgb')->resolve(function (ColorData $root) { return $root->getRgb(); });
-        $color->addFloatField('luma')->resolve(function (ColorData $root) { return $root->getLuma(); });
-        $color->addIntField('r')->resolve(function (ColorData $root) { return $root->getR(); });;
-        $color->addIntField('g')->resolve(function (ColorData $root) { return $root->getG(); });;
-        $color->addIntField('b')->resolve(function (ColorData $root) { return $root->getB(); });;
-
-        $event->schema->addStringField($event->sender)
-            ->type($color)
-            ->resolve(function ($root, $args, $context, ResolveInfo $info) {
-                return $root->{$info->fieldName};
-            });
+        $event->schema->addField($event->sender)
+            ->type(ColorData::class);
 
         $event->mutation->addStringArgument($event->sender);
     }

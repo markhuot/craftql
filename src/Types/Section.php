@@ -18,11 +18,7 @@ class Section extends Schema {
         $this->addStringField('type')->nonNull();
         $this->addStringField('siteSettings')
             ->lists()
-            ->type(SectionSiteSettings::class)
-            ->resolve(function ($root, $args) {
-                /** @var \craft\models\Section $root */
-                return $root->getSiteSettings();
-            });
+            ->type(SectionSiteSettings::class);
         $this->addIntField('maxLevels');
         $this->addBooleanField('hasUrls');
         $this->addBooleanField('enableVersioning');

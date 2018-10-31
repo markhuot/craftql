@@ -117,11 +117,11 @@ class ApiController extends Controller
         Craft::trace('CraftQL: Bootstrapping complete');
 
         Craft::trace('CraftQL: Fetching schema');
-        $schema = $this->graphQl->getSchema($token);
+        list($request, $schema) = $this->graphQl->getSchema($token);
         Craft::trace('CraftQL: Schema built');
 
         Craft::trace('CraftQL: Executing query');
-        $result = $this->graphQl->execute($schema, $input, $variables);
+        $result = $this->graphQl->execute($request, $schema, $input, $variables);
         Craft::trace('CraftQL: Execution complete');
 
         $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];

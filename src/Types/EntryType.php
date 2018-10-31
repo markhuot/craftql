@@ -15,17 +15,11 @@ class EntryType extends Schema {
         $this->addIntField('id')->nonNull();
         $this->addStringField('name')->nonNull();
         $this->addStringField('handle')->nonNull();
-        $this->addStringField('graphQlTypeName')
-            ->nonNull()
-            ->resolve(function($root, $args) {
-                return StringHelper::graphQLNameForEntryType($root);
-            });
+        $this->addStringField('graphQlTypeName')->nonNull();
         $this->addField('fields')
             ->nonNull()
             ->lists()
-            ->type(Field::class)->resolve(function ($root, $args) {
-                return Craft::$app->fields->getLayoutById($root->fieldLayoutId)->getFields();
-            });
+            ->type(Field::class);
     }
 
 }

@@ -36,10 +36,8 @@ class User extends Schema {
         $this->addFieldsByLayoutId($fieldLayoutId);
 
         if ($this->request->token()->can('query:userPermissions')) {
-            $this->addStringField('permissions')->lists()->resolve(function ($root, $args, $context, $info) {
-                /** @var \craft\elements\User $root */
-                return Craft::$app->getUserPermissions()->getPermissionsByUserId($root->id);
-            });
+            $this->addStringField('permissions')
+                ->lists();
         }
     }
 

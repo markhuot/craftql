@@ -2,6 +2,7 @@
 
 namespace markhuot\CraftQL\Builders;
 
+use craft\fields\data\ColorData;
 use GraphQL\Type\Definition\Type;
 
 trait HasTypeAttribute {
@@ -43,6 +44,12 @@ trait HasTypeAttribute {
 
         if (is_string($type) && is_subclass_of($type, Schema::class)) {
             $rawType = (new $type($this->request))->getRawGraphQLObject();
+        }
+
+        else if (is_string($type) && class_exists($type)) {
+            $rawType = (new InferredSchema($this->request))->parse($type)->getRawGraphQLObject();
+            // var_dump($rawType->config['fields']());
+            // die;
         }
 
         else if (is_a($type, Schema::class) || is_subclass_of($type, Schema::class)) {

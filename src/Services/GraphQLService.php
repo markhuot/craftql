@@ -3,7 +3,6 @@
 namespace markhuot\CraftQL\Services;
 
 use Craft;
-use Egulias\EmailValidator\Exception\CRLFAtTheEnd;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
@@ -12,8 +11,8 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
+use markhuot\CraftQL\Types\Query;
 use yii\base\Component;
-use Yii;
 
 class GraphQLService extends Component {
 
@@ -126,12 +125,77 @@ class GraphQLService extends Component {
             $schema->assertValid();
         }
 
-        return $schema;
+        return [$request, $schema];
     }
 
-    function execute($schema, $input, $variables = []) {
+    function execute($request, $schema, $input, $variables = []) {
         $debug = Craft::$app->config->getGeneral()->devMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::RETHROW_INTERNAL_EXCEPTIONS : null;
-        return GraphQL::executeQuery($schema, $input, null, null, $variables)->toArray($debug);
+        return GraphQL::executeQuery($schema, $input, new Query($request), null, $variables, '', function ($source, $args, $context, $info) {
+            $fieldName = $info->fieldName;
+
+            if (!empty($info->parentType->description)) {
+                // $factory = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
+                // $description = $info->parentType->description;
+                // $docs = $factory->create($description);
+                // $resolveTags = $docs->getTagsByName('resolve');
+                // if (!empty($resolveTags)) {
+                //     $className = '\\'.trim($resolveTags[0]->getDescription(), '/');
+                //     $class = new $className;
+                //     $methodName = 'resolve'.ucfirst($fieldName).'Field';
+                //     if (method_exists($class, $methodName)) {
+                //         return $class->$methodName($source, $args, $context, $info);
+                //     }
+                //     else if (property_exists($class, $fieldName)) {
+                //         return $class->{$fieldName};
+                //     }
+                // }
+            }
+
+            $property = null;
+
+            if (is_object($source)) {
+
+                // Because we can't modify internal classes we dynamically attach
+                // behaviors here based on our behavior mappings
+                if (is_subclass_of($source, Component::class)) {
+                    $behaviors = require(CraftQL::PATH() . 'behaviors.php');
+                    $sourceClassName = get_class($source);
+                    if (in_array($sourceClassName, array_keys($behaviors))) {
+                        foreach ($behaviors[$sourceClassName] as $behavior) {
+                            if (!$source->getBehavior($behavior)) {
+                                $source->attachBehavior($behavior, $behavior);
+                            }
+                        }
+                    }
+                }
+
+                if (method_exists($source, $method='getCraftQL'.ucfirst($fieldName))) {
+                    $property = $source->{$method}($source, $args, $context, $info);
+                }
+                else if (method_exists($source, 'hasMethod') && $source->hasMethod($method='getCraftQL'.ucfirst($fieldName))) {
+                    $property = $source->{$method}($source, $args, $context, $info);
+                }
+                else if (method_exists($source, $method='get'.ucfirst($fieldName))) {
+                    $property = $source->{$method}($source, $args, $context, $info);
+                }
+                else if (isset($source->{$fieldName})) {
+                    $property = $source->{$fieldName};
+                }
+            }
+
+            if ($property == null && is_array($source) || $source instanceof \ArrayAccess) {
+                if (isset($source[$fieldName])) {
+                    $property = $source[$fieldName];
+                }
+            }
+
+            // downcast things we're able to
+            switch (get_class($info->returnType)) {
+                case \GraphQL\Type\Definition\StringType::class: $property = (string)$property;
+            }
+
+            return $property instanceof \Closure ? $property($source, $args, $context) : $property;
+        })->toArray($debug);
     }
 
 }
