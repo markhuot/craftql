@@ -2,38 +2,54 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Request;
-use markhuot\CraftQL\GraphQLFields\Query\Connection\Edges as EdgesField;
-use markhuot\CraftQL\Builders\Schema;
+use craft\web\twig\variables\Paginate;
 
-class CategoryConnection extends Schema {
+class CategoryConnection {
 
-    function boot() {
-        $this->addIntField('totalCount')
-            ->nonNull();
+    /**
+     * Our internal list of categories
+     * @var \craft\elements\Category[]
+     */
+    private $categories;
 
-        $this->addField('pageInfo')
-            ->type(PageInfo::class);
+    /**
+     * @var Paginate
+     */
+    private $pageInfo;
 
-        $this->addField('edges')
-            ->lists()
-            ->type(CategoryEdge::class)
-            ->resolve(function ($root, $args, $context, $info) {
-                return array_map(function ($category) {
-                    return [
-                        'cursor' => '',
-                        'node' => $category
-                    ];
-                }, $root['edges']);
-            });
+    /**
+     * CategoryConnection constructor.
+     * @param $pageInfo Paginate
+     * @param $categories \craft\elements\Category[]
+     */
+    function __construct($pageInfo, $categories) {
+        $this->pageInfo = $pageInfo;
+        $this->categories = $categories;
+    }
 
-        $this->addField('categories')
-            ->lists()
-            ->type(CategoryInterface::class)
-            ->resolve(function ($root, $args) {
-                return $root['edges'];
-            });
+    /**
+     * @return int
+     */
+    function getTotalCount() {
+        return count($this->categories);
+    }
+
+    function getPageInfo() {
+        return $this->pageInfo;
+    }
+
+    /**
+     * @craftql-return CategoryEdge[]
+     * @return \craft\elements\Category[]
+     */
+    function getEdges() {
+        return array_map(function ($category) {
+            return new CategoryEdge($category);
+        }, $this->categories);
+    }
+
+    function getCategories() {
+        return $this->categories;
     }
 
 }

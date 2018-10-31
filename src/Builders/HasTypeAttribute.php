@@ -60,6 +60,11 @@ trait HasTypeAttribute {
             $rawType = $type->getRawGraphQLType();
         }
 
+        else if ($type === 'string') { $rawType = Type::string(); }
+        else if ($type === 'int') { $rawType = Type::int(); }
+        else if ($type === 'float') { $rawType = Type::float(); }
+        else if ($type === 'bool') { $rawType = Type::boolean(); }
+
         else {
             $rawType = $type ?: Type::string();
         }

@@ -130,26 +130,8 @@ class GraphQLService extends Component {
 
     function execute($request, $schema, $input, $variables = []) {
         $debug = Craft::$app->config->getGeneral()->devMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::RETHROW_INTERNAL_EXCEPTIONS : null;
-        return GraphQL::executeQuery($schema, $input, new Query($request), null, $variables, '', function ($source, $args, $context, $info) {
+        return GraphQL::executeQuery($schema, $input, new Query($request), null, $variables, '', function ($source, $args, $context, $info) use ($request) {
             $fieldName = $info->fieldName;
-
-            if (!empty($info->parentType->description)) {
-                // $factory = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
-                // $description = $info->parentType->description;
-                // $docs = $factory->create($description);
-                // $resolveTags = $docs->getTagsByName('resolve');
-                // if (!empty($resolveTags)) {
-                //     $className = '\\'.trim($resolveTags[0]->getDescription(), '/');
-                //     $class = new $className;
-                //     $methodName = 'resolve'.ucfirst($fieldName).'Field';
-                //     if (method_exists($class, $methodName)) {
-                //         return $class->$methodName($source, $args, $context, $info);
-                //     }
-                //     else if (property_exists($class, $fieldName)) {
-                //         return $class->{$fieldName};
-                //     }
-                // }
-            }
 
             $property = null;
 
@@ -170,13 +152,17 @@ class GraphQLService extends Component {
                 }
 
                 if (method_exists($source, $method='getCraftQL'.ucfirst($fieldName))) {
-                    $property = $source->{$method}($source, $args, $context, $info);
+                    $property = $source->{$method}($request, $source, $args, $context, $info);
                 }
                 else if (method_exists($source, 'hasMethod') && $source->hasMethod($method='getCraftQL'.ucfirst($fieldName))) {
-                    $property = $source->{$method}($source, $args, $context, $info);
+                    $property = $source->{$method}($request, $source, $args, $context, $info);
                 }
                 else if (method_exists($source, $method='get'.ucfirst($fieldName))) {
-                    $property = $source->{$method}($source, $args, $context, $info);
+                    // we're not passing $source, $args, $context, $info here because
+                    // we don't have confidence that the getField method is GraphQL
+                    // aware and it could be expecting a completely different set of
+                    // parameters.
+                    $property = $source->{$method}();
                 }
                 else if (isset($source->{$fieldName})) {
                     $property = $source->{$fieldName};

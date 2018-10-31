@@ -67,7 +67,7 @@ class Timestamp extends ScalarType
      * @return string
      * @throws Error
      */
-    public function parseLiteral($valueNode)
+    public function parseLiteral($valueNode, ?array $variables = NULL)
     {
         // Note: throwing GraphQL\Error\Error vs \UnexpectedValueException to benefit from GraphQL
         // error location in query:

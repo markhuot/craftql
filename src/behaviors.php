@@ -7,4 +7,7 @@ return [
     \craft\elements\User::class => [
         \markhuot\CraftQL\Behaviors\User::class,
     ],
+    \craft\elements\Entry::class => [
+        \markhuot\CraftQL\Behaviors\Entry::class,
+    ],
 ];

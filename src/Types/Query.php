@@ -20,11 +20,19 @@ class Query extends Schema {
     public $helloWorld = 'Welcome to GraphQL! You now have a fully functional GraphQL endpoint.';
     public $ping = 'pong';
 
-    function getSections() {
+    function getCraftQLEntries($request, $root, $args, $context, $info) {
+        return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->all();
+    }
+
+    function getCraftQLEntry($request, $root, $args, $context, $info) {
+        return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
+    }
+
+    function getCraftQLSections() {
         return \Craft::$app->sections->getAllSections();
     }
 
-    function getSites($root, $args, $context, $info) {
+    function getCraftQLSites($request, $root, $args, $context, $info) {
         if (!empty($args['handle'])) {
             return [Craft::$app->sites->getSiteByHandle($args['handle'])];
         }
@@ -40,11 +48,11 @@ class Query extends Schema {
         return Craft::$app->sites->getAllSites();
     }
 
-    function getDraft($root, $args, $context, $info) {
+    function getCraftQLDraft($request, $root, $args, $context, $info) {
         return Craft::$app->entryRevisions->getDraftById($args['draftId']);
     }
 
-    function getAssets($root, $args) {
+    function getCraftQLAssets($request, $root, $args) {
         $criteria = \craft\elements\Asset::find();
 
         foreach ($args as $key => $value) {
@@ -54,7 +62,7 @@ class Query extends Schema {
         return $criteria->all();
     }
 
-    function getGlobals($root, $args, $context, $info) {
+    function getCraftQLGlobals($request, $root, $args, $context, $info) {
         if (!empty($args['site'])) {
             $siteId = Craft::$app->getSites()->getSiteByHandle($args['site'])->id;
         }
@@ -76,7 +84,7 @@ class Query extends Schema {
         return $sets;
     }
 
-    function getTags($root, $args, $context, $info) {
+    function getCraftQLTags($request, $root, $args, $context, $info) {
         $criteria = \craft\elements\Tag::find();
 
         if (isset($args['group'])) {
@@ -91,7 +99,7 @@ class Query extends Schema {
         return $criteria->all();
     }
 
-    function getTagsConnection($root, $args, $context, $info) {
+    function getCraftQLTagsConnection($request, $root, $args, $context, $info) {
         $criteria = \craft\elements\Tag::find();
 
         if (isset($args['group'])) {
@@ -115,26 +123,27 @@ class Query extends Schema {
         ];
     }
 
-    function getCategories($root, $args) {
-        return $this->getCategoryCriteria($root, $args)->all();
+    function getCraftQLCategories($request, $root, $args) {
+        return $this->getCraftQLCategoryCriteria($request, $root, $args)->all();
     }
 
-    function getCategory($root, $args) {
-        return $this->getCategoryCriteria($root, $args)->one();
+    function getCraftQLCategory($request, $root, $args) {
+        return $this->getCraftQLCategoryCriteria($request, $root, $args)->one();
     }
 
-    function getCategoriesConnection($root, $args) {
-        list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($this->getCategoryCriteria($root, $args));
-        $pageInfo->limit = @$args['limit'] ?: 100;
-
-        return [
-            'totalCount' => $pageInfo->total,
-            'pageInfo' => $pageInfo,
-            'edges' => $categories,
-        ];
+    function getCraftQLCategoriesConnection($request, $root, $args) {
+        list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($this->getCraftQLCategoryCriteria($request, $root, $args));
+        return new CategoryConnection($pageInfo, $categories);
+        // $pageInfo->limit = @$args['limit'] ?: 100;
+        //
+        // return [
+        //     'totalCount' => $pageInfo->total,
+        //     'pageInfo' => $pageInfo,
+        //     'edges' => $categories,
+        // ];
     }
 
-    protected function getCategoryCriteria($root, $args) {
+    protected function getCraftQLCategoryCriteria($request, $root, $args) {
         $criteria = \craft\elements\Category::find();
 
         if (isset($args['group'])) {
@@ -149,7 +158,7 @@ class Query extends Schema {
         return $criteria;
     }
 
-    protected function getUserCriteria($root, $args) {
+    protected function getCraftQLUserCriteria($request, $root, $args) {
         $criteria = \craft\elements\User::find();
 
         foreach ($args as $key => $value) {
@@ -159,15 +168,25 @@ class Query extends Schema {
         return $criteria;
     }
 
-    function getUsers($root, $args) {
-        return $this->getUserCriteria($root, $args)->all();
+    protected function getUserCriteria($request, $root, $args) {
+        $criteria = \craft\elements\User::find();
+
+        foreach ($args as $key => $value) {
+            $criteria = $criteria->{$key}($value);
+        }
+
+        return $criteria;
     }
 
-    function getUser($root, $args) {
-        return $this->getUserCriteria($root, $args)->first();
+    function getCraftQLUsers($request, $root, $args) {
+        return $this->getUserCriteria($request, $root, $args)->all();
     }
 
-    function getEntriesConnection($root, $args, $context, $info) {
+    function getCraftQLUser($request, $root, $args) {
+        return $this->getUserCriteria($request, $root, $args)->first();
+    }
+
+    function getCraftQLEntriesConnection($request, $root, $args, $context, $info) {
         $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
         list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
 
@@ -235,10 +254,6 @@ class Query extends Schema {
         $field->addBooleanArgument('primary');
     }
 
-    function getEntries($root, $args, $context, $info) {
-        return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->all();
-    }
-
     /**
      * The fields you can query that return entries
      *
@@ -261,10 +276,7 @@ class Query extends Schema {
 
         $this->addField('entry')
             ->type(EntryInterface::class)
-            ->use(new EntryQueryArguments)
-            ->resolve(function ($root, $args, $context, $info) {
-                return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
-            });
+            ->use(new EntryQueryArguments);
 
         $draftField = $this->addField('draft')
             ->type(EntryInterface::class)

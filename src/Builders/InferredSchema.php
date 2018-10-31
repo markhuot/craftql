@@ -3,6 +3,12 @@
 namespace markhuot\CraftQL\Builders;
 
 use markhuot\CraftQL\Request;
+use phpDocumentor\Reflection\DocBlock\Tags\Return_;
+use phpDocumentor\Reflection\Fqsen;
+use phpDocumentor\Reflection\FqsenResolver;
+use phpDocumentor\Reflection\TypeResolver;
+use phpDocumentor\Reflection\Types\ContextFactory;
+use phpDocumentor\Reflection\Types\Object_;
 
 class InferredSchema {
 
@@ -63,10 +69,64 @@ class InferredSchema {
      * @param $method \ReflectionMethod
      */
     function parseMethod($method) {
-        if (preg_match('/^get([A-Z][a-zA-Z0-9_]*)$/', $method->getName(), $matches)) {
-            $name = lcfirst($matches[1]);
-            $this->type->addStringField($name);
+
+        if ($method->getName() == 'getEdges') {
+            $type = $this->getTypeFromDoc($method);
+            $name = 'edges';
+            $this->type->addField($name)->type((string)$type)->lists();
         }
+
+        else if (preg_match('/^get([A-Z][a-zA-Z0-9_]*)$/', $method->getName(), $matches)) {
+            $name = lcfirst($matches[1]);
+            $type = $this->getTypeFromDoc($method);
+            $this->type->addField($name)->type($type);
+        }
+    }
+
+    protected function getTypeFromDoc($reflected) {
+        if (empty($reflected->getDocComment())) {
+            return false;
+        }
+
+        if ($type = $this->getCraftQlReturnType($reflected)) {
+            return $type;
+        }
+
+        if ($type = $this->getPhpReturnType($reflected)) {
+            return $type;
+        }
+
+        return false;
+    }
+
+    protected function getCraftQlReturnType($reflected) {
+        $factory  = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
+        $docblock = $factory->create($reflected->getDocComment());
+        if (!$docblock->hasTag('craftql-return')) {
+            return false;
+        }
+
+        $returnType = $docblock->getTagsByName('craftql-return')[0]->getDescription()->render();
+        $typeResolver = new TypeResolver();
+        $contextFactory = new ContextFactory();
+        $context = $contextFactory->createFromReflector($reflected);
+        /** @var Object_ $type */
+        $type = $typeResolver->resolve($returnType, $context);
+        var_dump((string)$type);
+        die;
+        return (string)$type;
+    }
+
+    protected function getPhpReturnType($reflected) {
+        $factory  = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
+        $docblock = $factory->create($reflected->getDocComment());
+        if (!$docblock->hasTag('return')) {
+            return false;
+        }
+
+        /** @var Return_ $returnType */
+        $returnType = $docblock->getTagsByName('return')[0];
+        return (string)$returnType->getType();
     }
 
 }
