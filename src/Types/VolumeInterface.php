@@ -2,50 +2,113 @@
 
 namespace markhuot\CraftQL\Types;
 
-use markhuot\CraftQL\Builders\InterfaceBuilder;
-use markhuot\CraftQL\FieldBehaviors\AssetTransformArguments;
+/**
+ * Class VolumeInterface
+ * @package markhuot\CraftQL\Types
+ * @craftql-type interface
+ */
+class VolumeInterface {
 
-class VolumeInterface extends InterfaceBuilder {
+    /**
+     * @var int
+     */
+    public $id;
 
-    function boot() {
-        $this->addIntField('id');
-        $this->addStringField('url')
-            ->use(new AssetTransformArguments);
+    /**
+     * @var string
+     */
+    public $url;
 
-        $this->addStringField('width')
-            ->use(new AssetTransformArguments);
+    /**
+     * @var string
+     */
+    public $width;
 
-        $this->addStringField('height')
-            ->use(new AssetTransformArguments);
+    /**
+     * @var string
+     */
+    public $height;
 
-        $this->addIntField('size');
-        $this->addField('folder')->type(VolumeFolder::class);
-        $this->addStringField('volumeId');
-        $this->addStringField('mimeType');
-        $this->addStringField('kind');
-        $this->addStringField('title');
-        $this->addStringField('extension');
-        $this->addStringField('filename');
-        $this->addDateField('dateCreatedTimestamp');
-        $this->addDateField('dateCreated');
-        $this->addDateField('dateUpdatedTimestamp');
-        $this->addDateField('dateUpdated');
+    /**
+     * @var int
+     */
+    public $size;
 
-        $focalPoint = $this->createObjectType('AssetFocalPoint');
-        $focalPoint->addFloatField('x');
-        $focalPoint->addFloatField('y');
+    /**
+     * @var VolumeFolder
+     */
+    public $folder;
 
-        $this->addField('focalPoint')
-            ->type($focalPoint)
-            ->resolve(function ($root, $args) {
-                return $root->getFocalPoint();
-            });
-    }
+    /**
+     * @var string
+     */
+    public $volumeId;
 
-    function getResolveType() {
-        return function ($type) {
-            return ucfirst($type->volume->handle).'Volume';
-        };
-    }
+    /**
+     * @var string
+     */
+    public $mimeType;
+
+    /**
+     * @var string
+     */
+    public $kind;
+
+    /**
+     * @var string
+     */
+    public $title;
+
+    /**
+     * @var string
+     */
+    public $extension;
+
+    /**
+     * @var string
+     */
+    public $filename;
+
+    /**
+     * @var Timestamp
+     */
+    public $dateCreatedTimestamp;
+
+    /**
+     * @var Timestamp
+     */
+    public $dateCreated;
+
+    /**
+     * @var Timestamp
+     */
+    public $dateUpdatedTimestamp;
+
+    /**
+     * @var Timestamp
+     */
+    public $dateUpdated;
+
+    /**
+     * @var AssetFocalPoint
+     */
+    public $focalPoint;
+
+    // function boot() {
+    //     $this->addStringField('url')
+    //         ->use(new AssetTransformArguments);
+    //     $this->addStringField('width')
+    //         ->use(new AssetTransformArguments);
+    //     $this->addStringField('height')
+    //         ->use(new AssetTransformArguments);
+    // }
+
+    // function resolveType() {
+    //     var_dump('volumeinterface!!!!');
+    //     die;
+    //     return function ($type) {
+    //         return ucfirst($type->volume->handle).'Volume';
+    //     };
+    // }
 
 }

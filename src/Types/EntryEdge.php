@@ -11,35 +11,30 @@ use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\FieldBehaviors\RelatedEntriesField;
 
-class EntryEdge extends Schema {
+class EntryEdge {
 
-    function boot() {
-        $this->addStringField('cursor');
+    /**
+     * @var EntryInterface
+     */
+    public $node;
 
-        $this->addField('node')
-            ->type(EntryInterface::class)
-            ->resolve(function ($root) {
-                return $root['node'];
-            });
+    public $cursor = 'Not implemented';
 
-        $this->use(new RelatedEntriesField);
-        $this->use(new RelatedCategoriesField);
-
-        $this->addField('drafts')
-            ->type(EntryDraftConnection::class)
-            ->resolve(function ($root, $args, $context, $info) {
-                $drafts = Craft::$app->entryRevisions->getDraftsByEntryId($root['node']->id);
-                return [
-                    'totalCount' => count($drafts),
-                    'pageInfo' => [
-                        'currentPage' => 1,
-                        'totalPages' => 1,
-                        'first' => 1,
-                        'last' => 1,
-                    ],
-                    'edges' => $drafts,
-                ];
-            });
+    function __construct($entry) {
+        $this->node = $entry;
     }
+
+    /**
+     * @return EntryDraftConnection
+     */
+    function getDrafts() {
+        $drafts = Craft::$app->entryRevisions->getDraftsByEntryId($this->node->id);
+        return new EntryDraftConnection($drafts);
+    }
+
+    // function boot() {
+    //     $this->use(new RelatedEntriesField);
+    //     $this->use(new RelatedCategoriesField);
+    // }
 
 }

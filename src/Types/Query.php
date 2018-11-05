@@ -132,15 +132,9 @@ class Query extends Schema {
     }
 
     function getCraftQLCategoriesConnection($request, $root, $args) {
-        list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($this->getCraftQLCategoryCriteria($request, $root, $args));
-        return new CategoryConnection($pageInfo, $categories);
-        // $pageInfo->limit = @$args['limit'] ?: 100;
-        //
-        // return [
-        //     'totalCount' => $pageInfo->total,
-        //     'pageInfo' => $pageInfo,
-        //     'edges' => $categories,
-        // ];
+        $criteria = $this->getCraftQLCategoryCriteria($request, $root, $args);
+        list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($criteria);
+        return new CategoryConnection(new PageInfo($pageInfo, @$args['limit']), $categories);
     }
 
     protected function getCraftQLCategoryCriteria($request, $root, $args) {
@@ -189,14 +183,7 @@ class Query extends Schema {
     function getCraftQLEntriesConnection($request, $root, $args, $context, $info) {
         $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
         list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
-
-        return [
-            'totalCount' => $pageInfo->total,
-            'pageInfo' => new PageInfo($pageInfo, @$args['limit']),
-            'edges' => $entries,
-            'criteria' => $criteria,
-            'args' => $args,
-        ];
+        return new EntryConnection(new PageInfo($pageInfo, @$args['limit']), $entries);
     }
 
     function boot() {
@@ -270,7 +257,6 @@ class Query extends Schema {
             ->use(new EntryQueryArguments);
 
         $this->addField('entriesConnection')
-            ->name('entriesConnection')
             ->type(EntryConnection::class)
             ->use(new EntryQueryArguments);
 

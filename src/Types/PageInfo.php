@@ -34,11 +34,6 @@ class PageInfo {
     /**
      * @var int
      */
-    public $currentPage;
-
-    /**
-     * @var int
-     */
     public $totalPages = 0;
 
     /**
@@ -47,7 +42,7 @@ class PageInfo {
      * @param int $limit
      */
     function __construct(Paginate $paginate, $limit=null) {
-        foreach (['first', 'last', 'total', 'currentPage', 'totalPages'] as $key) {
+        foreach (['first', 'last', 'total', 'totalPages'] as $key) {
             $this->{$key} = $paginate->{$key};
         }
         if (is_numeric($limit)) {
@@ -59,7 +54,7 @@ class PageInfo {
      * @return int
      */
     function getCurrentPage() {
-        return floor($this->first / $this->total) + 1;
+        return floor(($this->first - 1) / $this->limit) +  1;
     }
 
     /**

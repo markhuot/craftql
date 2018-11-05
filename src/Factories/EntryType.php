@@ -18,7 +18,7 @@ class EntryType extends BaseFactory {
     }
 
     function getEnumKey($object) {
-        return StringHelper::graphQLNameForEntryType($object->getContext());
+        return StringHelper::graphQLNameForEntryType($object);
     }
 
 }

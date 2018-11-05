@@ -9,19 +9,33 @@ use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Builders\Schema;
 
-class Field extends Schema {
+class Field {
 
-    function boot() {
-        $this->addStringField('name');
-        $this->addStringField('handle');
-        $this->addStringField('fieldType')
-            ->resolve(function ($root, $args) {
-                return get_class($root);
-            });
-        $this->addStringField('settings')
-            ->resolve(function ($root, $args) {
-                return json_encode($root['settings']);
-            });
-    }
+    /**
+     * @var string
+     */
+    public $name;
+
+    /**
+     * @var string
+     */
+    public $handle;
+
+    /**
+     * @var string
+     */
+    public $fieldType;
+
+    /**
+     * @var string
+     */
+    public $settings;
+
+    // function boot() {
+    //     $this->addStringField('settings')
+    //         ->resolve(function ($root, $args) {
+    //             return json_encode($root['settings']);
+    //         });
+    // }
 
 }

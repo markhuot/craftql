@@ -2,27 +2,60 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Builders\Schema;
+class Section {
 
-class Section extends Schema {
+    /**
+     * @todo nonnull
+     * @var int
+     */
+    public $id;
 
-    function boot() {
-        $this->addIntField('id')->nonNull();
-        $this->addIntField('structureId');
-        $this->addStringField('name')->nonNull();
-        $this->addStringField('handle')->nonNull();
-        $this->addStringField('type')->nonNull();
-        $this->addStringField('siteSettings')
-            ->lists()
-            ->type(SectionSiteSettings::class);
-        $this->addIntField('maxLevels');
-        $this->addBooleanField('hasUrls');
-        $this->addBooleanField('enableVersioning');
-        $this->addField('entryTypes')->lists()->type(EntryType::class);
-    }
+    /**
+     * @var int
+     */
+    public $structureId;
+
+    /**
+     * @todo nonnull
+     * @var string
+     */
+    public $name;
+
+    /**
+     * @todo nonnull
+     * @var string
+     */
+    public $handle;
+
+    /**
+     * @todo nonnull
+     * @var string
+     */
+    public $type;
+
+    /**
+     * @var SectionSiteSettings[]
+     */
+    public $siteSettings;
+
+    /**
+     * @var int
+     */
+    public $maxLevels;
+
+    /**
+     * @var bool
+     */
+    public $hasUrls;
+
+    /**
+     * @var boolean
+     */
+    public $enableVersioning;
+
+    /**
+     * @var EntryType[]
+     */
+    public $entryTypes;
 
 }

@@ -2,39 +2,54 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Request;
-use markhuot\CraftQL\GraphQLFields\Query\Connection\Edges as EdgesField;
-use markhuot\CraftQL\Types\Entry;
-use markhuot\CraftQL\Builders\Schema;
+use craft\web\twig\variables\Paginate;
 
-class EntryConnection extends Schema {
+class EntryConnection {
 
-    function boot() {
-        $this->addIntField('totalCount')
-            ->nonNull();
+    /**
+     * Our internal list of entries
+     *
+     * @var \craft\elements\Entry[]
+     */
+    private $entries;
 
-        $this->addField('pageInfo')
-            ->type(PageInfo::class);
+    /**
+     * @var PageInfo
+     */
+    public $pageInfo;
 
-        $this->addField('edges')
-            ->lists()
-            ->type(EntryEdge::class)
-            ->resolve(function ($root, $args, $context, $info) {
-                return array_map(function ($category) {
-                    return [
-                        'cursor' => '',
-                        'node' => $category
-                    ];
-                }, $root['edges']);
-            });
+    /**
+     * CategoryConnection constructor.
+     * @param $pageInfo PageInfo
+     * @param $entries \craft\elements\Entry[]
+     */
+    function __construct($pageInfo, $entries) {
+        $this->pageInfo = $pageInfo;
+        $this->entries = $entries;
+    }
 
-        $this->addField('entries')
-            ->lists()
-            ->type(EntryInterface::class)
-            ->resolve(function ($root, $args) {
-                return $root['edges'];
-            });
+    /**
+     * @todo nonnull
+     * @return int
+     */
+    function getTotalCount() {
+        return $this->pageInfo->total;
+    }
+
+    /**
+     * @return EntryEdge[]
+     */
+    function getEdges() {
+        return array_map(function ($entry) {
+            return new EntryEdge($entry);
+        }, $this->entries);
+    }
+
+    /**
+     * @return EntryInterface[]
+     */
+    function getEntries() {
+        return $this->entries;
     }
 
 }

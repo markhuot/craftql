@@ -2,11 +2,15 @@
 
 namespace markhuot\CraftQL\Builders;
 
+use GraphQL\Type\Definition\ScalarType;
 use markhuot\CraftQL\Request;
+use markhuot\CraftQL\Types\Timestamp;
+use markhuot\CraftQL\Types\VolumeInterface;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\FqsenResolver;
 use phpDocumentor\Reflection\TypeResolver;
+use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use phpDocumentor\Reflection\Types\Object_;
 
@@ -23,6 +27,10 @@ class InferredSchema {
     }
 
     function parse($class) {
+        if ($this->request->hasType($class)) {
+            return $this->request->getType($class);
+        }
+
         $reflect = new \ReflectionClass($class);
 
         $type = Schema::class;
@@ -34,9 +42,19 @@ class InferredSchema {
         $this->type = new $type($this->request);
         $this->type->name($reflect->getShortName());
 
+        // if ($class == VolumeInterface::class) {
+        //     /** @var InterfaceBuilder $type */
+        //     $type = $this->type;
+        //     $this->type->resolveType(function () {
+        //         var_dump('foo!');
+        //         die;
+        //     });
+        // }
+
         $this->parseProperties($reflect->getProperties());
         $this->parseMethods($reflect->getMethods());
 
+        $this->request->addType($class, $this->type);
         return $this->type;
     }
     /**
@@ -55,7 +73,9 @@ class InferredSchema {
             return;
         }
 
-        $this->type->addStringField($property->getName());
+        list($type, $isList) = $this->getTypeFromDoc($property);
+
+        $this->type->addField($property->getName())->type($type)->lists($isList);
     }
     /**
      * @param $methods \ReflectionMethod[]
@@ -69,18 +89,13 @@ class InferredSchema {
      * @param $method \ReflectionMethod
      */
     function parseMethod($method) {
-
-        if ($method->getName() == 'getEdges') {
-            $type = $this->getTypeFromDoc($method);
-            $name = 'edges';
-            $this->type->addField($name)->type((string)$type)->lists();
+        if (!preg_match('/^get([A-Z][a-zA-Z0-9_]*)$/', $method->getName(), $matches)) {
+            return;
         }
 
-        else if (preg_match('/^get([A-Z][a-zA-Z0-9_]*)$/', $method->getName(), $matches)) {
-            $name = lcfirst($matches[1]);
-            $type = $this->getTypeFromDoc($method);
-            $this->type->addField($name)->type($type);
-        }
+        $name = lcfirst($matches[1]);
+        list($type, $isList) = $this->getTypeFromDoc($method);
+        $this->type->addField($name)->type($type)->lists($isList);
     }
 
     protected function getTypeFromDoc($reflected) {
@@ -92,7 +107,11 @@ class InferredSchema {
             return $type;
         }
 
-        if ($type = $this->getPhpReturnType($reflected)) {
+        if ($type = $this->getPhpReturnType($reflected, 'return')) {
+            return $type;
+        }
+
+        if ($type = $this->getPhpReturnType($reflected, 'var')) {
             return $type;
         }
 
@@ -100,8 +119,11 @@ class InferredSchema {
     }
 
     protected function getCraftQlReturnType($reflected) {
+        $isList = false;
+        $contextFactory = new ContextFactory;
+        $context = $contextFactory->createFromReflector($reflected);
         $factory  = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
-        $docblock = $factory->create($reflected->getDocComment());
+        $docblock = $factory->create($reflected->getDocComment(), $context);
         if (!$docblock->hasTag('craftql-return')) {
             return false;
         }
@@ -110,23 +132,33 @@ class InferredSchema {
         $typeResolver = new TypeResolver();
         $contextFactory = new ContextFactory();
         $context = $contextFactory->createFromReflector($reflected);
-        /** @var Object_ $type */
+        /** @var Object_|Array_ $type */
         $type = $typeResolver->resolve($returnType, $context);
-        var_dump((string)$type);
-        die;
-        return (string)$type;
+        if (is_a($type, Array_::class)) {
+            $isList = true;
+            $type = $type->getValueType();
+        }
+        return [(string)$type, $isList];
     }
 
-    protected function getPhpReturnType($reflected) {
+    protected function getPhpReturnType($reflected, $tag='return') {
+        $isList = false;
+        $contextFactory = new ContextFactory;
+        $context = $contextFactory->createFromReflector($reflected);
         $factory  = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
-        $docblock = $factory->create($reflected->getDocComment());
-        if (!$docblock->hasTag('return')) {
+        $docblock = $factory->create($reflected->getDocComment(), $context);
+        if (!$docblock->hasTag($tag)) {
             return false;
         }
 
         /** @var Return_ $returnType */
-        $returnType = $docblock->getTagsByName('return')[0];
-        return (string)$returnType->getType();
+        $returnType = $docblock->getTagsByName($tag)[0];
+        $type = $returnType->getType();
+        if (is_a($type, Array_::class)) {
+            $isList = true;
+            $type = $type->getValueType();
+        }
+        return [(string)$type, $isList];
     }
 
 }

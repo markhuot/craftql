@@ -14,14 +14,6 @@ class Timestamp extends ScalarType
 
     public $description = "The `Timestamp` scalar type represents a unix timestamp. The Timestamp type can be converted to a human friendly format with the `@date` directive.\r\n\r\n    {\r\n      entries {\r\n        dateCreated @date(as:\"F j, Y\")\r\n      }\r\n    }";
 
-    static function type() {
-        if (static::$type) {
-            return static::$type;
-        }
-
-        return static::$type = new static;
-    }
-
     /**
      * Serializes an internal value to include in a response.
      *

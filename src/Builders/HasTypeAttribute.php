@@ -3,7 +3,9 @@
 namespace markhuot\CraftQL\Builders;
 
 use craft\fields\data\ColorData;
+use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Types\Timestamp;
 
 trait HasTypeAttribute {
 
@@ -46,10 +48,18 @@ trait HasTypeAttribute {
             $rawType = (new $type($this->request))->getRawGraphQLObject();
         }
 
+        else if (is_string($type) && is_subclass_of($type, ScalarType::class)) {
+            if (!$this->request->hasType($type)) {
+                $rawType = new $type;
+                $this->request->addType($type, $rawType);
+            }
+            else {
+                $rawType = $this->request->getType($type);
+            }
+        }
+
         else if (is_string($type) && class_exists($type)) {
             $rawType = (new InferredSchema($this->request))->parse($type)->getRawGraphQLObject();
-            // var_dump($rawType->config['fields']());
-            // die;
         }
 
         else if (is_a($type, Schema::class) || is_subclass_of($type, Schema::class)) {
@@ -67,6 +77,10 @@ trait HasTypeAttribute {
 
         else {
             $rawType = $type ?: Type::string();
+        }
+
+        if (is_string($rawType)) {
+            throw new \Exception('Could not find type: '.$type);
         }
 
         return $rawType;

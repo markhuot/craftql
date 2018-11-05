@@ -6,11 +6,13 @@ use Craft;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
+use GraphQL\Utils\SchemaPrinter;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
+use markhuot\CraftQL\Types\EntryConnection;
 use markhuot\CraftQL\Types\Query;
 use yii\base\Component;
 
@@ -86,9 +88,9 @@ class GraphQLService extends Component {
         $schemaConfig['query'] = $query->getRawGraphQLObject();
         $schemaConfig['types'] = function () use ($request, $query) {
             return array_merge(
-                array_map(function ($section) {
-                    return $section->getRawGraphQLObject();
-                }, $request->sections()->all()),
+                // array_map(function ($section) {
+                //     return $section->getRawGraphQLObject();
+                // }, $request->sections()->all()),
 
                 array_map(function ($volume) {
                     return $volume->getRawGraphQLObject();
@@ -121,6 +123,11 @@ class GraphQLService extends Component {
 
         $schema = new Schema($schemaConfig);
 
+        // header('content-type: text/plain');
+        // $foo = SchemaPrinter::doPrint($schema);
+        // echo $foo;
+        // die;
+
         if (Craft::$app->config->general->devMode) {
             $schema->assertValid();
         }
@@ -133,6 +140,11 @@ class GraphQLService extends Component {
         return GraphQL::executeQuery($schema, $input, new Query($request), null, $variables, '', function ($source, $args, $context, $info) use ($request) {
             $fieldName = $info->fieldName;
 
+            // if ($fieldName == 'fieldType') {
+            //     var_dump($source);
+            //     die;
+            // }
+
             $property = null;
 
             if (is_object($source)) {
@@ -141,9 +153,14 @@ class GraphQLService extends Component {
                 // behaviors here based on our behavior mappings
                 if (is_subclass_of($source, Component::class)) {
                     $behaviors = require(CraftQL::PATH() . 'behaviors.php');
-                    $sourceClassName = get_class($source);
-                    if (in_array($sourceClassName, array_keys($behaviors))) {
-                        foreach ($behaviors[$sourceClassName] as $behavior) {
+                    // $sourceClassName = get_class($source);
+                    // if (in_array($sourceClassName, array_keys($behaviors))) {
+                    foreach ($behaviors as $foo => $bar) {
+                        if (!is_a($source, $foo) && !is_subclass_of($source, $foo)) {
+                            continue;
+                        }
+
+                        foreach ($bar as $behavior) {
                             if (!$source->getBehavior($behavior)) {
                                 $source->attachBehavior($behavior, $behavior);
                             }
@@ -169,7 +186,7 @@ class GraphQLService extends Component {
                 }
             }
 
-            if ($property == null && is_array($source) || $source instanceof \ArrayAccess) {
+            if ($property == null && (is_array($source) || $source instanceof \ArrayAccess)) {
                 if (isset($source[$fieldName])) {
                     $property = $source[$fieldName];
                 }

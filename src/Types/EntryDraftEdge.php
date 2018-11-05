@@ -9,22 +9,31 @@ use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
 
-class EntryDraftEdge extends Schema {
+class EntryDraftEdge {
 
-    function boot() {
-        $this->addStringField('cursor');
+    /**
+     * @var string
+     */
+    public $cursor = 'Not implemented';
 
-        $this->addField('node')
-            ->type(EntryInterface::class)
-            ->resolve(function ($root, $args) {
-                return $root['node'];
-            });
+    /**
+     * @var EntryInterface
+     */
+    public $node;
 
-        $this->addField('draftInfo')
-            ->type(EntryDraftInfo::class)
-            ->resolve(function ($root, $args) {
-                return $root['node'];
-            });
+    /**
+     * @var EntryDraftInfo
+     */
+    public $draftInfo;
+
+    /**
+     * EntryDraftEdge constructor.
+     *
+     * @param \craft\elements\Entry $draft
+     */
+    function __construct(\craft\elements\Entry $draft) {
+        $this->node = $draft;
+        $this->draftInfo = new EntryDraftInfo($draft);
     }
 
 }

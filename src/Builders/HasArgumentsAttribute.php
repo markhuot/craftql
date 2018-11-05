@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\Type;
 use craft\base\Field as CraftField;
+use markhuot\CraftQL\Types\Timestamp;
 
 trait HasArgumentsAttribute {
 
@@ -70,7 +71,7 @@ trait HasArgumentsAttribute {
     }
 
     function addDateArgument($name): Argument {
-        return $this->addArgument($name)->type(\markhuot\CraftQL\Types\Timestamp::type());
+        return $this->addArgument($name)->type(Timestamp::class);
     }
 
     function addEnumArgument($name): EnumField {

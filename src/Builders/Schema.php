@@ -178,6 +178,10 @@ class Schema extends BaseBuilder {
                 $interfaces[] = $interface;
             }
 
+            else if (is_string($interface) && class_exists($interface)) {
+                $interfaces[] = (new InferredSchema($this->request))->parse($interface);
+            }
+
             else {
                 throw new \Exception('The interface is not a subclass of a known builder');
             }
@@ -241,8 +245,22 @@ class Schema extends BaseBuilder {
             },
             'interfaces' => $this->getInterfaceConfig(),
             'resolveType' => $this->getResolveType(),
+            'isTypeOf' => $this->getIsTypeOf(),
         ];
     }
+
+    protected $isTypeOf;
+
+    function getIsTypeOf() {
+        return $this->isTypeOf;
+    }
+
+    function isTypeOf($isTypeOf) {
+        $this->isTypeOf = $isTypeOf;
+        return $this;
+    }
+
+    protected $resolveType;
 
     /**
      * Gets a function that will resolve an interface in to a valid type
@@ -250,7 +268,12 @@ class Schema extends BaseBuilder {
      * @return callable
      */
     function getResolveType() {
-        return null;
+        return $this->resolveType;
+    }
+
+    function resolveType($resolveType) {
+        $this->resolveType = $resolveType;
+        return $this;
     }
 
     function getRawGraphQLObject(): Type {

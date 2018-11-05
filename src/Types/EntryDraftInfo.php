@@ -2,21 +2,43 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Builders\Schema;
+use craft\models\EntryDraft;
 
-class EntryDraftInfo extends Schema {
+class EntryDraftInfo {
 
-    function boot() {
-        $this->addIntField('draftId');
-        $this->addStringField('name');
-        $this->addStringField('notes')
-            ->resolve(function ($root, $args) {
-                return $root->revisionNotes;
-            });
+    /**
+     * @var EntryDraft
+     */
+    private $draft;
+
+    /**
+     * EntryDraftInfo constructor.
+     *
+     * @param EntryDraft $draft
+     */
+    function __construct(EntryDraft $draft) {
+        $this->draft = $draft;
+    }
+
+    /**
+     * @return int
+     */
+    function getDraftId() {
+        return $this->draft->draftId;
+    }
+
+    /**
+     * @return string
+     */
+    function getName() {
+        return $this->draft->name;
+    }
+
+    /**
+     * @return string
+     */
+    function getNotes() {
+        return $this->draft->revisionNotes;
     }
 
 }

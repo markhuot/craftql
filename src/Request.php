@@ -2,6 +2,8 @@
 
 namespace markhuot\CraftQL;
 
+use markhuot\CraftQL\Builders\InferredSchema;
+
 class Request {
 
     private $token;
@@ -146,6 +148,27 @@ class Request {
         }
 
         return $criteria;
+    }
+
+    protected $types = [];
+
+    function hasType($class) {
+        $class = ltrim($class, '\\');
+        return !empty($this->types[$class]);
+    }
+
+    function getType($class) {
+        $class = ltrim($class, '\\');
+        if (!empty($this->types[$class])) {
+            return $this->types[$class];
+        }
+
+        return null;
+    }
+
+    function addType($class, $type) {
+        $class = ltrim($class, '\\');
+        $this->types[$class] = $type;
     }
 
 }

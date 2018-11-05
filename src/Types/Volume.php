@@ -2,8 +2,6 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Builders\Schema;
 
 class Volume extends Schema {
@@ -19,5 +17,11 @@ class Volume extends Schema {
     function getName(): string {
         return ucfirst($this->context->handle).'Volume';
     }
+
+    // function getIsTypeOf() {
+    //     return function() {
+    //         return 'VolumeInterface';
+    //     };
+    // }
 
 }

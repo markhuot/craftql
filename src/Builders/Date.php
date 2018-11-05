@@ -2,14 +2,13 @@
 
 namespace markhuot\CraftQL\Builders;
 
-use DateTime;
 use DateTimeZone;
+use markhuot\CraftQL\Types\Timestamp;
 
 class Date extends Field {
 
     function getType() {
-        $this->type = \markhuot\CraftQL\Types\Timestamp::type();
-        return parent::getType();
+        return Timestamp::class;
     }
 
     function getResolve() {

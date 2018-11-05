@@ -10,4 +10,10 @@ return [
     \craft\elements\Entry::class => [
         \markhuot\CraftQL\Behaviors\Entry::class,
     ],
+    \craft\base\Field::class => [
+        \markhuot\CraftQL\Behaviors\Field::class,
+    ],
+    \craft\elements\Asset::class => [
+        \markhuot\CraftQL\Behaviors\Asset::class,
+    ],
 ];

@@ -6,10 +6,13 @@ use yii\base\Behavior;
 
 class User extends Behavior {
 
+    /**
+     * @var \craft\elements\User
+     */
+    public $owner;
+
     public function getCraftQLPermissions() {
-        /** @var \craft\elements\User $user */
-        $user = $this->owner;
-        return \Craft::$app->getUserPermissions()->getPermissionsByUserId($user->id);
+        return \Craft::$app->getUserPermissions()->getPermissionsByUserId($this->owner->id);
     }
 
 }

@@ -8,18 +8,19 @@ class CategoryConnection {
 
     /**
      * Our internal list of categories
+     *
      * @var \craft\elements\Category[]
      */
     private $categories;
 
     /**
-     * @var Paginate
+     * @var PageInfo
      */
     private $pageInfo;
 
     /**
      * CategoryConnection constructor.
-     * @param $pageInfo Paginate
+     * @param $pageInfo PageInfo
      * @param $categories \craft\elements\Category[]
      */
     function __construct($pageInfo, $categories) {
@@ -31,11 +32,7 @@ class CategoryConnection {
      * @return int
      */
     function getTotalCount() {
-        return count($this->categories);
-    }
-
-    function getPageInfo() {
-        return $this->pageInfo;
+        return $this->pageInfo->total;
     }
 
     /**
