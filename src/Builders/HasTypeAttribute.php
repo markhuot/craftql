@@ -6,6 +6,7 @@ use craft\fields\data\ColorData;
 use GraphQL\Type\Definition\ScalarType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Types\Timestamp;
+use markhuot\CraftQL\Types\Volume;
 
 trait HasTypeAttribute {
 

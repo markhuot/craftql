@@ -36,20 +36,20 @@ class EntryQueryArguments extends FieldBehavior {
         $this->owner->addIntArgument('positionedBefore');
         $this->owner->addStringArgument('postDate');
         $this->owner->addIntArgument('prevSiblingOf');
-        $this->owner->addStringArgument('relatedTo')->lists()->type($this->relatedToInputObject());
-        $this->owner->addStringArgument('orRelatedTo')->lists()->type($this->relatedToInputObject());
+        // $this->owner->addStringArgument('relatedTo')->lists()->type($this->relatedToInputObject());
+        // $this->owner->addStringArgument('orRelatedTo')->lists()->type($this->relatedToInputObject());
         $this->owner->addStringArgument('search');
-        $this->owner->addStringArgument('section')->lists()->type($this->owner->getRequest()->sections()->enum());
+        // $this->owner->addStringArgument('section')->lists()->type($this->owner->getRequest()->sections()->enum());
         $this->owner->addIntArgument('siblingOf');
         $this->owner->addStringArgument('slug');
         $this->owner->addStringArgument('status');
         $this->owner->addStringArgument('title');
-        $this->owner->addStringArgument('type')->lists()->type($this->owner->getRequest()->entryTypes()->enum());
+        // $this->owner->addStringArgument('type')->lists()->type($this->owner->getRequest()->entryTypes()->enum());
         $this->owner->addStringArgument('uri');
 
-        $fieldService = \Yii::$container->get('craftQLFieldService');
-        $arguments = $fieldService->getQueryArguments($this->owner->getRequest());
-        $this->owner->addArguments($arguments, false);
+        // $fieldService = \Yii::$container->get('craftQLFieldService');
+        // $arguments = $fieldService->getQueryArguments($this->owner->getRequest());
+        // $this->owner->addArguments($arguments, false);
     }
 
     function relatedToInputObject() {

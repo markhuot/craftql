@@ -12,8 +12,13 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
+use markhuot\CraftQL\Helpers\StringHelper;
+use markhuot\CraftQL\TypeRegistry;
+use markhuot\CraftQL\Types\Entry;
 use markhuot\CraftQL\Types\EntryConnection;
 use markhuot\CraftQL\Types\Query;
+use markhuot\CraftQL\Types\Site;
+use markhuot\CraftQL\Types\Volume;
 use yii\base\Component;
 
 class GraphQLService extends Component {
@@ -86,40 +91,50 @@ class GraphQLService extends Component {
         $query->trigger(AlterQuerySchema::EVENT, $event);
 
         $schemaConfig['query'] = $query->getRawGraphQLObject();
-        $schemaConfig['types'] = function () use ($request, $query) {
-            return array_merge(
-                // array_map(function ($section) {
-                //     return $section->getRawGraphQLObject();
-                // }, $request->sections()->all()),
 
-                array_map(function ($volume) {
-                    return $volume->getRawGraphQLObject();
-                }, $request->volumes()->all()),
-
-                array_map(function ($categoryGroup) {
-                    return $categoryGroup->getRawGraphQLObject();
-                }, $request->categoryGroups()->all()),
-
-                array_map(function ($tagGroup) {
-                    return $tagGroup->getRawGraphQLObject();
-                }, $request->tagGroups()->all()),
-
-                array_map(function ($entryType) {
-                    return $entryType->getRawGraphQLObject();
-                }, $request->entryTypes()->all()),
-
-                [\markhuot\CraftQL\Directives\Date::dateFormatTypesEnum()],
-
-                $query->getConcreteTypes()
-            );
+        $registry = new TypeRegistry($request);
+        $registry->registerNamespace('\\markhuot\\CraftQL\\Types');
+        foreach ($this->entryTypes->all() as $type) {
+            $registry->add(StringHelper::graphQLNameForEntryType($type), Entry::class, $type);
+        }
+        $schemaConfig['typeLoader'] = function ($name) use ($registry) {
+            return $registry->get($name);
         };
+
+        // $schemaConfig['types'] = function () use ($request, $query) {
+        //     return array_merge(
+        //         // array_map(function ($section) {
+        //         //     return $section->getRawGraphQLObject();
+        //         // }, $request->sections()->all()),
+        //
+        //         array_map(function ($volume) {
+        //             return $volume->getRawGraphQLObject();
+        //         }, $request->volumes()->all()),
+        //
+        //         array_map(function ($categoryGroup) {
+        //             return $categoryGroup->getRawGraphQLObject();
+        //         }, $request->categoryGroups()->all()),
+        //
+        //         array_map(function ($tagGroup) {
+        //             return $tagGroup->getRawGraphQLObject();
+        //         }, $request->tagGroups()->all()),
+        //
+        //         array_map(function ($entryType) {
+        //             return $entryType->getRawGraphQLObject();
+        //         }, $request->entryTypes()->all()),
+        //
+        //         [\markhuot\CraftQL\Directives\Date::dateFormatTypesEnum()],
+        //
+        //         $query->getConcreteTypes()
+        //     );
+        // };
 
         $schemaConfig['directives'] = [
             \markhuot\CraftQL\Directives\Date::directive(),
         ];
 
-        $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
-        $schemaConfig['mutation'] = $mutation;
+        // $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
+        // $schemaConfig['mutation'] = $mutation;
 
         $schema = new Schema($schemaConfig);
 
@@ -129,7 +144,7 @@ class GraphQLService extends Component {
         // die;
 
         if (Craft::$app->config->general->devMode) {
-            $schema->assertValid();
+            // $schema->assertValid();
         }
 
         return [$request, $schema];
@@ -156,7 +171,7 @@ class GraphQLService extends Component {
                     // $sourceClassName = get_class($source);
                     // if (in_array($sourceClassName, array_keys($behaviors))) {
                     foreach ($behaviors as $foo => $bar) {
-                        if (!is_a($source, $foo) && !is_subclass_of($source, $foo)) {
+                        if (!is_a($source, $foo) || !is_subclass_of($source, $foo)) {
                             continue;
                         }
 

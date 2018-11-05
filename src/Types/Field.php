@@ -31,11 +31,4 @@ class Field {
      */
     public $settings;
 
-    // function boot() {
-    //     $this->addStringField('settings')
-    //         ->resolve(function ($root, $args) {
-    //             return json_encode($root['settings']);
-    //         });
-    // }
-
 }

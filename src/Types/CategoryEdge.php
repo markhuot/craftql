@@ -27,14 +27,6 @@ class CategoryEdge {
     }
 
     function boot() {
-        // $this->addStringField('cursor');
-        //
-        // $this->addField('node')
-        //     ->type(CategoryInterface::class)
-        //     ->resolve(function ($root) {
-        //         return $root['node'];
-        //     });
-
         $this->use(new RelatedEntriesField);
 
         $this->addField('children')

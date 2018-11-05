@@ -7,19 +7,56 @@ use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Builders\Schema;
 
-class Site extends Schema {
+class Site {
 
-    function boot() {
-        $this->addIntField('id');
-        $this->addStringField('name');
-        $this->addStringField('handle');
-        $this->addStringField('baseUrl');
-        $this->addBooleanField('hasUrls');
-        $this->addStringField('language');
-        $this->addStringField('originalBaseUrl');
-        $this->addStringField('originalName');
-        $this->addStringField('sortOrder');
-        $this->addBooleanField('primary');
-    }
+    /**
+     * @var int
+     */
+    public $id;
+
+    /**
+     * @var string
+     */
+    public $name;
+
+    /**
+     * @var string
+     */
+    public $handle;
+
+    /**
+     * @var string
+     */
+    public $baseUrl;
+
+    /**
+     * @var bool
+     */
+    public $hasUrls;
+
+    /**
+     * @var string
+     */
+    public $language;
+
+    /**
+     * @var string
+     */
+    public $originalBaseUrl;
+
+    /**
+     * @var string
+     */
+    public $originalName;
+
+    /**
+     * @var string
+     */
+    public $sortOrder;
+
+    /**
+     * @var bool
+     */
+    public $primary;
 
 }

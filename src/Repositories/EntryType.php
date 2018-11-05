@@ -3,16 +3,29 @@
 namespace markhuot\CraftQL\Repositories;
 
 use Craft;
+use craft\db\Query;
 
 class EntryType {
 
     private $entryTypes = [];
 
     function load() {
-        foreach (Craft::$app->sections->allSections as $section) {
-            foreach ($section->entryTypes as $entryType) {
-                $this->entryTypes[$entryType->id] = $entryType;
-            }
+        $entryTypes = (new Query())
+            ->select([
+                'id',
+                'sectionId',
+                'fieldLayoutId',
+                'name',
+                'handle',
+                'hasTitleField',
+                'titleLabel',
+                'titleFormat',
+            ])
+            ->from(['{{%entrytypes}}'])
+            ->all();
+
+        foreach ($entryTypes as $entryType) {
+            $this->entryTypes[$entryType['id']] = new \craft\models\EntryType($entryType);
         }
     }
 

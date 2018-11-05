@@ -11,11 +11,44 @@ use craft\helpers\Assets;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Events\GetFieldSchema as GetFieldSchemaEvent;
 use GraphQL\Error\Error;
+use craft\base\Field;
+use craft\db\Query;
 
 
 class FieldService {
 
+    /** @var Field[] */
+    private $rawFields = [];
+
+    /** @var Field[] */
+    private $fieldsPerLayoutId = [];
+
+    /** @var array */
+    private $mapping = [];
+
     private $fieldSchemas = [];
+
+    function load() {
+        $this->rawFields = Craft::$app->fields->getAllFields();
+        $this->mapping = [];
+        $rows = (new Query())
+            ->select(['layoutId', 'fieldId'])
+            ->from(['{{%fieldlayoutfields}}'])
+            ->all();
+        foreach ($rows as $row) {
+            $this->mapping[$row['layoutId']][] = $row['fieldId'];
+        }
+    }
+    function isA($fieldHandle, $class) {
+        foreach ($this->rawFields as $field) {
+            if ($field->handle == $fieldHandle) {
+                if (is_a($field, $class)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     function getSchemaForField(\craft\base\Field $field, \markhuot\CraftQL\Request $request, $parent) {
         if (!isset($this->fieldSchemas[$field->id])) {
@@ -37,8 +70,7 @@ class FieldService {
     function getQueryArguments($request) {
         $graphQlArgs = [];
 
-        $fields = Craft::$app->fields->getAllFields();
-        foreach ($fields as $field) {
+        foreach ($this->rawFields as $field) {
             $query = $this->getSchemaForField($field, $request, null)['query'];
             $graphQlArgs = array_merge($graphQlArgs, $query->getArguments());
         }
@@ -50,8 +82,7 @@ class FieldService {
         $graphQlArgs = [];
 
         if ($fieldLayoutId) {
-            $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
-            foreach ($fieldLayout->getFields() as $field) {
+            foreach ($this->getFieldsByLayoutId($fieldLayoutId) as $field) {
                 $schema = $this->getSchemaForField($field, $request, null)['mutation'];
                 $graphQlArgs = array_merge($graphQlArgs, $schema->getArguments());
             }
@@ -64,14 +95,41 @@ class FieldService {
         $graphQlFields = [];
 
         if ($fieldLayoutId) {
-            $fieldLayout = Craft::$app->fields->getLayoutById($fieldLayoutId);
-            foreach ($fieldLayout->getFields() as $field) {
+            foreach ($this->getFieldsByLayoutId($fieldLayoutId) as $field) {
                 $schema = $this->getSchemaForField($field, $request, $parent)['schema'];
                 $graphQlFields = array_merge($graphQlFields, $schema->getFields());
             }
         }
 
         return $graphQlFields;
+    }
+
+    function getAllFields($request, $parent=null) {
+        $graphQlFields = [];
+
+        foreach ($this->rawFields as $field) {
+            $schema = $this->getSchemaForField($field, $request, $parent)['schema'];
+            $graphQlFields = array_merge($graphQlFields, $schema->getFields());
+        }
+
+        return $graphQlFields;
+    }
+    protected function getFieldsByLayoutId($layoutId) {
+        if (isset($this->fieldsPerLayoutId[$layoutId])) {
+            return $this->fieldsPerLayoutId[$layoutId];
+        }
+
+        $return = [];
+
+        foreach ($this->rawFields as $field) {
+            if (!empty($this->mapping[$layoutId])) {
+                if (in_array($field->id, $this->mapping[$layoutId])) {
+                    $return[] = $field;
+                }
+            }
+        }
+
+        return $this->fieldsPerLayoutId[$layoutId] = $return;
     }
 
 }

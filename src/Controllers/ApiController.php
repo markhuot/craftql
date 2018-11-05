@@ -112,17 +112,17 @@ class ApiController extends Controller
         }
         Craft::trace('CraftQL: Parsing request complete');
 
-        Craft::trace('CraftQL: Bootstrapping');
+        Craft::beginProfile('CraftQL: Bootstrapping', 'craftqlBootstrap');
         $this->graphQl->bootstrap();
-        Craft::trace('CraftQL: Bootstrapping complete');
+        Craft::endProfile('CraftQL: Bootstrapping', 'craftqlBootstrap');
 
-        Craft::trace('CraftQL: Fetching schema');
+        Craft::beginProfile('CraftQL: Fetching schema', 'craftqlSchema');
         list($request, $schema) = $this->graphQl->getSchema($token);
-        Craft::trace('CraftQL: Schema built');
+        Craft::endProfile('CraftQL: Fetching schema', 'craftqlSchema');
 
-        Craft::trace('CraftQL: Executing query');
+        Craft::beginProfile('CraftQL: Executing query', 'craftqlExecute');
         $result = $this->graphQl->execute($request, $schema, $input, $variables);
-        Craft::trace('CraftQL: Execution complete');
+        Craft::endProfile('CraftQL: Executing query', 'craftqlExecute');
 
         $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];
         foreach ($customHeaders as $key => $value) {
