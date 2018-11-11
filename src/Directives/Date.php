@@ -37,11 +37,11 @@ class Date {
                     'description' => 'The full name of the timezone, defaults to GMT. (E.g., America/New_York)',
                     'defaultValue' => 'GMT'
                 ]),
-                new FieldArgument([
-                    'name' => 'format',
-                    'type' => static::dateFormatTypesEnum(),
-                    'description' => 'A standard format to use, overrides the `as` argument',
-                ])
+                // new FieldArgument([
+                //     'name' => 'format',
+                //     'type' => static::dateFormatTypesEnum(),
+                //     'description' => 'A standard format to use, overrides the `as` argument',
+                // ])
             ]
         ]);
     }

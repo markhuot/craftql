@@ -5,7 +5,11 @@ namespace markhuot\CraftQL\Services;
 use Craft;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
+use GraphQL\Language\Parser;
 use GraphQL\Type\Schema;
+use GraphQL\Utils\AST;
+use GraphQL\Utils\BuildSchema;
 use GraphQL\Utils\SchemaPrinter;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
@@ -14,8 +18,9 @@ use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
 use markhuot\CraftQL\Helpers\StringHelper;
 use markhuot\CraftQL\TypeRegistry;
-use markhuot\CraftQL\Types\Entry;
+use markhuot\CraftQL\Types\DynamicEntryType;
 use markhuot\CraftQL\Types\EntryConnection;
+use markhuot\CraftQL\Types\EntryInterface;
 use markhuot\CraftQL\Types\Query;
 use markhuot\CraftQL\Types\Site;
 use markhuot\CraftQL\Types\Volume;
@@ -82,6 +87,28 @@ class GraphQLService extends Component {
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
         $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
 
+        $registry = new TypeRegistry($request);
+        $registry->registerNamespace('\\markhuot\\CraftQL\\Types');
+
+        // if ($schemaText = Craft::$app->cache->get('foo')) {
+        //     $typeConfigDecorator = function ($type) use ($registry) {
+        //         if (get_class($type['astNode']) == InterfaceTypeDefinitionNode::class) {
+        //             $fqen = $registry->getClassForName($type['name']);
+        //             $type['resolveType'] = function ($source) use ($fqen) {
+        //                 return $fqen::craftQLResolveType($source);
+        //             };
+        //         }
+        //         return $type;
+        //     };
+        //     $schema = BuildSchema::build(AST::fromArray(unserialize($schemaText)), $typeConfigDecorator);
+        //     return [$request, $schema];
+        // }
+
+        foreach ($this->entryTypes->all() as $type) {
+            $name = StringHelper::graphQLNameForEntryType($type);
+            $registry->add($name, DynamicEntryType::class, $type);
+        }
+
         $schemaConfig = [];
 
         $query = new \markhuot\CraftQL\Types\Query($request);
@@ -92,13 +119,11 @@ class GraphQLService extends Component {
 
         $schemaConfig['query'] = $query->getRawGraphQLObject();
 
-        $registry = new TypeRegistry($request);
-        $registry->registerNamespace('\\markhuot\\CraftQL\\Types');
-        foreach ($this->entryTypes->all() as $type) {
-            $registry->add(StringHelper::graphQLNameForEntryType($type), Entry::class, $type);
-        }
         $schemaConfig['typeLoader'] = function ($name) use ($registry) {
-            return $registry->get($name);
+            Craft::beginProfile('load type '.$name, 'craftqlTypeLoader');
+            $foo = $registry->get($name);
+            Craft::endProfile('load type '.$name, 'craftqlTypeLoader');
+            return $foo;
         };
 
         // $schemaConfig['types'] = function () use ($request, $query) {
@@ -136,16 +161,20 @@ class GraphQLService extends Component {
         // $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
         // $schemaConfig['mutation'] = $mutation;
 
-        $schema = new Schema($schemaConfig);
+        $schemaConfig['types'] = $registry->all();
 
-        // header('content-type: text/plain');
-        // $foo = SchemaPrinter::doPrint($schema);
-        // echo $foo;
-        // die;
+        $schema = new Schema($schemaConfig);
 
         if (Craft::$app->config->general->devMode) {
             // $schema->assertValid();
         }
+
+        $schemaText = SchemaPrinter::doPrint($schema);
+        $schemaText = serialize(AST::toArray(Parser::parse($schemaText)));
+        // header('content-type: text/plain');
+        // echo $schemaText;
+        // die;
+        Craft::$app->cache->set('foo', $schemaText);
 
         return [$request, $schema];
     }

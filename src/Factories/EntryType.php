@@ -4,13 +4,13 @@ namespace markhuot\CraftQL\Factories;
 
 use markhuot\CraftQL\Factories\BaseFactory;
 use GraphQL\Type\Definition\EnumType;
-use markhuot\CraftQL\Types\Entry as EntryObjectType;
+use markhuot\CraftQL\Types\DynamicEntryType;
 use markhuot\CraftQL\Helpers\StringHelper;
 
 class EntryType extends BaseFactory {
 
     function make($raw, $request) {
-        return new EntryObjectType($request, $raw);
+        return new DynamicEntryType($request, $raw);
     }
 
     function can($id, $mode='query') {

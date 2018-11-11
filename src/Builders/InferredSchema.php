@@ -4,6 +4,8 @@ namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\ScalarType;
 use markhuot\CraftQL\Request;
+use markhuot\CraftQL\Types\DynamicEntryType;
+use markhuot\CraftQL\Types\EntryInterface;
 use markhuot\CraftQL\Types\Timestamp;
 use markhuot\CraftQL\Types\VolumeInterface;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
@@ -42,14 +44,21 @@ class InferredSchema {
         $this->type = new $type($this->request);
         $this->type->name($reflect->getShortName());
 
-        // if ($class == VolumeInterface::class) {
-        //     /** @var InterfaceBuilder $type */
-        //     $type = $this->type;
-        //     $this->type->resolveType(function () {
-        //         var_dump('foo!');
-        //         die;
-        //     });
-        // }
+        // This is for uncached schemas, it is not used when the
+        // schema is cached because the closure is lost.
+        if ($type == InterfaceBuilder::class) {
+            $this->type->resolveType(function($source) use ($class) {
+                return $class::craftQLResolveType($source);
+            });
+        }
+
+        foreach ($reflect->getTraits() as $trait) {
+            if (preg_match('/@craftql-type interface/', $trait->getDocComment())) {
+                /** @var Schema $type */
+                $type = $this->type;
+                $type->interface($trait->getName());
+            }
+        }
 
         $this->parseProperties($reflect->getProperties());
         $this->parseMethods($reflect->getMethods());

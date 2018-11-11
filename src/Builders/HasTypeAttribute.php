@@ -59,7 +59,7 @@ trait HasTypeAttribute {
             }
         }
 
-        else if (is_string($type) && class_exists($type)) {
+        else if (is_string($type) && (class_exists($type) || trait_exists($type))) {
             $rawType = (new InferredSchema($this->request))->parse($type)->getRawGraphQLObject();
         }
 

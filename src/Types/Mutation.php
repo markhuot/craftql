@@ -9,7 +9,7 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use Craft;
 use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\Types\Entry;
+use markhuot\CraftQL\Types\DynamicEntryType;
 use markhuot\CraftQL\FieldBehaviors\EntryMutationArguments;
 
 class Mutation extends Schema {

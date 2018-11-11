@@ -31,6 +31,25 @@ class TypeRegistry {
         $this->dynamicTypes[$name] = [$class, $context];
     }
 
+    function getClassForName($name) {
+        foreach ($this->namespaces as $prefix => $namespaces) {
+            // if name starts with prefix...
+            foreach ($namespaces as $namespace) {
+                $fqen = "{$namespace}\\{$name}";
+                if (class_exists($fqen) || trait_exists($fqen)) {
+                    return $fqen;
+                }
+            }
+        }
+
+        if (isset($this->dynamicTypes[$name])) {
+            list($class, $context) = $this->dynamicTypes[$name];
+            return $class;
+        }
+
+        return false;
+    }
+
     function get($name) {
         if (isset($this->cache[$name])) {
             return $this->cache[$name];
@@ -40,7 +59,7 @@ class TypeRegistry {
             // if name starts with prefix...
             foreach ($namespaces as $namespace) {
                 $fqen = "{$namespace}\\{$name}";
-                if (class_exists($fqen)) {
+                if (class_exists($fqen) || trait_exists($fqen)) {
                     /** @var Schema $obj */
                     $obj = (new InferredSchema($this->request))->parse($fqen);
                     if (method_exists($obj, 'getRawGraphQLObject')) {
@@ -55,25 +74,25 @@ class TypeRegistry {
 
         if (isset($this->dynamicTypes[$name])) {
             list($class, $context) = $this->dynamicTypes[$name];
-            return $this->cache[$name] = (new $class($this->request, $context))->getRawGraphQLObject();
+            $obj = (new InferredSchema($this->request))->parse($class)->name($name);
+            return $this->cache[$name] = $obj->getRawGraphQLObject();
+            // var_dump($obj);
+            // die;
+            // $obj = new $class($this->request, $context);
+            // return $this->cache[$name] = $obj->getRawGraphQLObject();
         }
 
-        var_dump($name);
-        die;
-
-        if (isset($this->types[$name])) {
-            return $this->resolve($this->types[$name]);
-        }
-
-        foreach ($this->formats as $format) {
-            if (preg_match($format, $name)) {
-                return $this->resolve($this->formats[$format]);
-            }
-        }
+        throw new \Exception('could not resolve type'.$name);
     }
 
-    function resolve($implementation) {
-        return $implementation;
+    function all() {
+        $types = [];
+
+        foreach ($this->dynamicTypes as $name => $config) {
+            $types[] = $this->get($name);
+        }
+
+        return $types;
     }
 
 }

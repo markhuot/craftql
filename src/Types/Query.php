@@ -21,7 +21,14 @@ class Query extends Schema {
     public $ping = 'pong';
 
     function getCraftQLEntries($request, $root, $args, $context, $info) {
-        return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->all();
+        $entries = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->all();
+        return array_map(function ($entry) {
+            return $entry;
+            // return [
+            //     '__typename' => 'Homepage',
+            //     'id' => $entry->id,
+            // ];
+        }, $entries);
     }
 
     function getCraftQLEntry($request, $root, $args, $context, $info) {
@@ -205,23 +212,23 @@ class Query extends Schema {
             $this->addAssetsSchema();
         }
 
-        if ($token->can('query:globals')) {
+        if (false && $token->can('query:globals')) {
             $this->addGlobalsSchema();
         }
 
-        if ($token->can('query:tags')) {
+        if (false && $token->can('query:tags')) {
             $this->addTagsSchema();
         }
 
-        if ($token->can('query:categories')) {
+        if (false && $token->can('query:categories')) {
             $this->addCategoriesSchema();
         }
 
-        if ($token->can('query:users')) {
+        if (false && $token->can('query:users')) {
             $this->addUsersSchema();
         }
 
-        if ($token->can('query:sections')) {
+        if (false && $token->can('query:sections')) {
             $this->addField('sections')
                 ->lists()
                 ->type(Section::class);

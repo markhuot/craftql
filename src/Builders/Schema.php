@@ -166,6 +166,11 @@ class Schema extends BaseBuilder {
         return $this;
     }
 
+    function interface($interface) {
+        $this->interfaces[] = $interface;
+        return $this;
+    }
+
     function getInterfaces(): array {
         $interfaces = [];
 
@@ -178,7 +183,7 @@ class Schema extends BaseBuilder {
                 $interfaces[] = $interface;
             }
 
-            else if (is_string($interface) && class_exists($interface)) {
+            else if (is_string($interface) && (class_exists($interface) || trait_exists($interface))) {
                 $interfaces[] = (new InferredSchema($this->request))->parse($interface);
             }
 
@@ -238,15 +243,19 @@ class Schema extends BaseBuilder {
     }
 
     function getConfig() {
-        return [
+        $foo = [
             'name' => $this->getName(),
             'fields' => function () {
-                return $this->getFieldConfig();
+                \Craft::beginProfile('get config '.$this->getName(), 'craftqlGetSchemaFields');
+                $foo = $this->getFieldConfig();
+                \Craft::endProfile('get config '.$this->getName(), 'craftqlGetSchemaFields');
+                return $foo;
             },
             'interfaces' => $this->getInterfaceConfig(),
             'resolveType' => $this->getResolveType(),
             'isTypeOf' => $this->getIsTypeOf(),
         ];
+        return $foo;
     }
 
     protected $isTypeOf;

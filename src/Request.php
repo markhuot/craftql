@@ -157,6 +157,10 @@ class Request {
         return !empty($this->types[$class]);
     }
 
+    /**
+     * @param $class
+     * @return GraphQL\Type\Definition\Type
+     */
     function getType($class) {
         $class = ltrim($class, '\\');
         if (!empty($this->types[$class])) {
