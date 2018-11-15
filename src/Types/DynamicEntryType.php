@@ -13,11 +13,6 @@ class DynamicEntryType {
 
     use EntryInterface;
 
-    // protected $interfaces = [
-    //     \markhuot\CraftQL\Types\EntryInterface::class,
-    //     \markhuot\CraftQL\Types\ElementInterface::class,
-    // ];
-    //
     // function boot() {
     //     $this->addFieldsByLayoutId($this->context->fieldLayoutId);
     // }

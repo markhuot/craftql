@@ -120,9 +120,9 @@ class GraphQLService extends Component {
         $schemaConfig['query'] = $query->getRawGraphQLObject();
 
         $schemaConfig['typeLoader'] = function ($name) use ($registry) {
-            Craft::beginProfile('load type '.$name, 'craftqlTypeLoader');
+            // Craft::beginProfile('load type '.$name, 'craftqlTypeLoader');
             $foo = $registry->get($name);
-            Craft::endProfile('load type '.$name, 'craftqlTypeLoader');
+            // Craft::endProfile('load type '.$name, 'craftqlTypeLoader');
             return $foo;
         };
 

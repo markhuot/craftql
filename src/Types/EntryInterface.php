@@ -30,26 +30,22 @@ trait EntryInterface {
     public $slug;
 
     /**
-     * @todo this should be a date
-     * @var string
+     * @var Timestamp
      */
     public $dateCreated;
 
     /**
-     * @todo this should be a date
-     * @var string
+     * @var Timestamp
      */
     public $dateUpdated;
 
     /**
-     * @todo this should be a date
-     * @var string
+     * @var Timestamp
      */
     public $expiryDate;
 
     /**
-     * @todo this should be a date
-     * @var string
+     * @var Timestamp
      */
     public $postDate;
 
