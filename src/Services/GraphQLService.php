@@ -184,7 +184,7 @@ class GraphQLService extends Component {
         return GraphQL::executeQuery($schema, $input, new Query($request), null, $variables, '', function ($source, $args, $context, $info) use ($request) {
             $fieldName = $info->fieldName;
 
-            // if ($fieldName == 'fieldType') {
+            // if ($fieldName == 'dateCreated') {
             //     var_dump($source);
             //     die;
             // }
@@ -197,10 +197,11 @@ class GraphQLService extends Component {
                 // behaviors here based on our behavior mappings
                 if (is_subclass_of($source, Component::class)) {
                     $behaviors = require(CraftQL::PATH() . 'behaviors.php');
+
                     // $sourceClassName = get_class($source);
                     // if (in_array($sourceClassName, array_keys($behaviors))) {
                     foreach ($behaviors as $foo => $bar) {
-                        if (!is_a($source, $foo) || !is_subclass_of($source, $foo)) {
+                        if (!is_a($source, $foo) && !is_subclass_of($source, $foo)) {
                             continue;
                         }
 

@@ -15,4 +15,20 @@ class Entry extends Behavior {
         return $request->entries($entry->{$info->fieldName}, $entry, $args, $context, $info);
     }
 
+    function getCraftQLDateCreated(Request $request, \craft\elements\Entry $entry, $args, $context, ResolveInfo $info) {
+        return (int)$entry->dateCreated->format('U');
+    }
+
+    function getCraftQLDateUpdated(Request $request, \craft\elements\Entry $entry, $args, $context, ResolveInfo $info) {
+        return (int)$entry->dateUpdated->format('U');
+    }
+
+    function getCraftQLExpiryDate(Request $request, \craft\elements\Entry $entry, $args, $context, ResolveInfo $info) {
+        return (int)$entry->expiryDate->format('U');
+    }
+
+    function getCraftQLPostDate(Request $request, \craft\elements\Entry $entry, $args, $context, ResolveInfo $info) {
+        return (int)$entry->postDate->format('U');
+    }
+
 }
