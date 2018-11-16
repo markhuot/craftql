@@ -3,25 +3,15 @@
 namespace markhuot\CraftQL\Types;
 
 use Craft;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\FieldBehaviors\RelatedCategoriesField;
-use markhuot\CraftQL\Request;
-use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\FieldBehaviors\RelatedEntriesField;
+use craft\web\twig\variables\Paginate;
 
-class EntryEdge {
+class EntryEdge extends Edge {
 
     /**
-     * @var EntryInterface
+     * @return EntryInterface
      */
-    public $node;
-
-    public $cursor = 'Not implemented';
-
-    function __construct($entry) {
-        $this->node = $entry;
+    function getNode() {
+        return $this->node;
     }
 
     /**
@@ -29,11 +19,16 @@ class EntryEdge {
      */
     function getDrafts() {
         $drafts = Craft::$app->entryRevisions->getDraftsByEntryId($this->node->id);
-        return new EntryDraftConnection($drafts);
+        $pageinate = new Paginate();
+        $pageinate->first = 1;
+        $pageinate->last = count($drafts);
+        $pageinate->total = count($drafts);
+        $pageinate->totalPages = 1;
+        $pageInfo = new PageInfo($pageinate, 100);
+        return new EntryDraftConnection($pageInfo, $drafts);
     }
 
     // function boot() {
-    //     $this->use(new RelatedEntriesField);
     //     $this->use(new RelatedCategoriesField);
     // }
 

@@ -2,41 +2,22 @@
 
 namespace markhuot\CraftQL\Types;
 
-// use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Request;
-use markhuot\CraftQL\Types\Category;
-use markhuot\CraftQL\Builders\Schema;
+class TagConnection extends Connection {
 
-class TagConnection extends Schema {
+    /**
+     * @return TagEdge[]
+     */
+    function getEdges() {
+        return array_map(function ($category) {
+            return new TagEdge($category);
+        }, $this->elements);
+    }
 
-    function boot() {
-        $this->addIntField('totalCount')
-            ->nonNull();
-
-        $this->addField('pageInfo')
-            ->type(PageInfo::class);
-
-        $this->addField('edges')
-            ->lists()
-            ->type(TagEdge::class)
-            ->resolve(function ($root, $args, $context, $info) {
-                return array_map(function ($category) {
-                    return [
-                        'cursor' => '',
-                        'node' => $category
-                    ];
-                }, $root['edges']);
-            });
-
-        $this->addField('tags')
-            ->lists()
-            ->type(TagInterface::class)
-            ->resolve(function ($root, $args) {
-                return $root['edges'];
-            });
+    /**
+     * @return TagInterface[]
+     */
+    function getTags() {
+        return $this->elements;
     }
 
 }

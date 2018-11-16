@@ -2,21 +2,41 @@
 
 namespace markhuot\CraftQL\Types;
 
-use markhuot\CraftQL\Builders\InterfaceBuilder;
+/**
+ * Trait TagInterface
+ * @package markhuot\CraftQL\Types
+ * @craftql-type interface
+ */
+trait TagInterface {
 
-class TagInterface extends InterfaceBuilder {
+    /**
+     * @var int
+     */
+    public $id;
 
-    function boot() {
-        $this->addIntField('id')->nonNull();
-        $this->addStringField('title')->nonNull();
-        $this->addStringField('slug')->nonNull();
-        $this->addField('group')->nonNull()->type(TagGroup::class);
-    }
+    /**
+     * @var string
+     */
+    public $title;
 
-    function getResolveType() {
-        return function ($tag) {
-            return ucfirst($tag->group->handle).'Tags';
-        };
+    /**
+     * @var string
+     */
+    public $slug;
+
+    /**
+     * @var TagGroup
+     */
+    public $group;
+
+    /**
+     * Get the GraphQL type for the passed Craft Tag
+     *
+     * @param \craft\elements\Tag $tag
+     * @return string
+     */
+    static function craftQLResolveType(\craft\elements\Tag $tag) {
+        return ucfirst($tag->group->handle).'Tags';
     }
 
 }

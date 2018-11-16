@@ -9,17 +9,32 @@ use markhuot\CraftQL\Builders\Schema;
 use craft\models\EntryType as CraftEntryType;
 use markhuot\CraftQL\Helpers\StringHelper;
 
-class EntryType extends Schema {
+class EntryType {
 
-    function boot() {
-        $this->addIntField('id')->nonNull();
-        $this->addStringField('name')->nonNull();
-        $this->addStringField('handle')->nonNull();
-        $this->addStringField('graphQlTypeName')->nonNull();
-        $this->addField('fields')
-            ->nonNull()
-            ->lists()
-            ->type(Field::class);
-    }
+    /**
+     * @var int
+     */
+    public $id;
+
+    /**
+     * @var string
+     */
+    public $name;
+
+    /**
+     * @var string
+     */
+    public $handle;
+
+    /**
+     * @var string
+     */
+    public $graphQlTypeName;
+
+    /**
+     * @todo nonnull
+     * @var Field[]
+     */
+    public $fields;
 
 }

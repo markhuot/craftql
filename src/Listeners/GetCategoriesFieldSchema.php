@@ -18,6 +18,9 @@ class GetCategoriesFieldSchema
     function handle(GetFieldSchema $event) {
         $event->handled = true;
 
+        /** @TODO fix this */
+        return;
+
         $field = $event->sender;
 
         if (!$event->schema->getRequest()->token()->can('query:categories')) {

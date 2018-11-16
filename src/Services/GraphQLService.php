@@ -5,11 +5,9 @@ namespace markhuot\CraftQL\Services;
 use Craft;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
-use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
-use GraphQL\Utils\BuildSchema;
 use GraphQL\Utils\SchemaPrinter;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
@@ -18,17 +16,14 @@ use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
 use markhuot\CraftQL\Helpers\StringHelper;
 use markhuot\CraftQL\TypeRegistry;
-use markhuot\CraftQL\Types\DynamicEntryType;
-use markhuot\CraftQL\Types\EntryConnection;
-use markhuot\CraftQL\Types\EntryInterface;
+use markhuot\CraftQL\Types\Category;
+use markhuot\CraftQL\Types\Entry;
 use markhuot\CraftQL\Types\Query;
-use markhuot\CraftQL\Types\Site;
-use markhuot\CraftQL\Types\Volume;
+use markhuot\CraftQL\Types\Tag;
 use yii\base\Component;
 
 class GraphQLService extends Component {
 
-    private $schema;
     private $volumes;
     private $categoryGroups;
     private $tagGroups;
@@ -44,6 +39,7 @@ class GraphQLService extends Component {
         \markhuot\CraftQL\Repositories\Section $sections,
         \markhuot\CraftQL\Repositories\Globals $globals
     ) {
+        parent::__construct();
         $this->volumes = $volumes;
         $this->categoryGroups = $categoryGroups;
         $this->tagGroups = $tagGroups;
@@ -58,6 +54,7 @@ class GraphQLService extends Component {
      * @return void
      */
     function bootstrap() {
+        \Yii::$container->get('craftQLFieldService')->load();
         $this->volumes->load();
         $this->categoryGroups->load();
         $this->tagGroups->load();
@@ -80,8 +77,8 @@ class GraphQLService extends Component {
 
     function getSchema($token) {
         $request = new \markhuot\CraftQL\Request($token);
-        $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
-        $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
+        // $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
+        // $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
         $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
         $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
@@ -104,14 +101,24 @@ class GraphQLService extends Component {
         //     return [$request, $schema];
         // }
 
-        foreach ($this->entryTypes->all() as $type) {
-            $name = StringHelper::graphQLNameForEntryType($type);
-            $registry->add($name, DynamicEntryType::class, $type);
+        foreach ($this->entryTypes->all() as $entryType) {
+            $name = StringHelper::graphQLNameForEntryType($entryType);
+            $registry->add($name, Entry::class, $entryType);
+        }
+
+        foreach ($this->categoryGroups->all() as $categoryGroup) {
+            $name = ucfirst($categoryGroup->handle).'Category';
+            $registry->add($name, Category::class, $categoryGroup);
+        }
+
+        foreach ($this->tagGroups->all() as $tagGroup) {
+            $name = ucfirst($tagGroup->handle).'Tags';
+            $registry->add($name, Tag::class, $tagGroup);
         }
 
         $schemaConfig = [];
 
-        $query = new \markhuot\CraftQL\Types\Query($request);
+        $query = new Query($request);
 
         $event = new AlterQuerySchema;
         $event->query = $query;
@@ -161,7 +168,7 @@ class GraphQLService extends Component {
         // $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
         // $schemaConfig['mutation'] = $mutation;
 
-        $schemaConfig['types'] = $registry->all();
+        $schemaConfig['types'] = $registry->getDynamicTypes();
 
         $schema = new Schema($schemaConfig);
 
@@ -170,11 +177,11 @@ class GraphQLService extends Component {
         }
 
         $schemaText = SchemaPrinter::doPrint($schema);
-        $schemaText = serialize(AST::toArray(Parser::parse($schemaText)));
+        $schemaAST = serialize(AST::toArray(Parser::parse($schemaText)));
         // header('content-type: text/plain');
         // echo $schemaText;
         // die;
-        Craft::$app->cache->set('foo', $schemaText);
+        Craft::$app->cache->set('foo', $schemaAST);
 
         return [$request, $schema];
     }
@@ -205,6 +212,7 @@ class GraphQLService extends Component {
                             continue;
                         }
 
+                        /** @var Component $source */
                         foreach ($bar as $behavior) {
                             if (!$source->getBehavior($behavior)) {
                                 $source->attachBehavior($behavior, $behavior);

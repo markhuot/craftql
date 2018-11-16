@@ -2,6 +2,7 @@
 
 namespace markhuot\CraftQL\Types;
 
+use craft\elements\Entry;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
 use yii\base\Component;
@@ -21,14 +22,7 @@ class Query extends Schema {
     public $ping = 'pong';
 
     function getCraftQLEntries($request, $root, $args, $context, $info) {
-        $entries = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->all();
-        return array_map(function ($entry) {
-            return $entry;
-            // return [
-            //     '__typename' => 'Homepage',
-            //     'id' => $entry->id,
-            // ];
-        }, $entries);
+        return static::getEntriesCriteria($args)->all();
     }
 
     function getCraftQLEntry($request, $root, $args, $context, $info) {
@@ -119,33 +113,28 @@ class Query extends Schema {
         }
 
         list($pageInfo, $tags) = \craft\helpers\Template::paginateCriteria($criteria);
-        $pageInfo->limit = @$args['limit'] ?: 100;
-
-        return [
-            'totalCount' => $pageInfo->total,
-            'pageInfo' => $pageInfo,
-            'edges' => $tags,
-            'criteria' => $criteria,
-            'args' => $args,
-        ];
+        $pageInfo = new PageInfo($pageInfo, @$args['limit'] ?: 100);
+        return new TagConnection($pageInfo, $tags);
     }
 
     function getCraftQLCategories($request, $root, $args) {
-        return $this->getCraftQLCategoryCriteria($request, $root, $args)->all();
+        return static::getCategoryCriteria($args)->all();
     }
 
     function getCraftQLCategory($request, $root, $args) {
-        return $this->getCraftQLCategoryCriteria($request, $root, $args)->one();
+        return static::getCategoryCriteria($args)->one();
     }
 
     function getCraftQLCategoriesConnection($request, $root, $args) {
-        $criteria = $this->getCraftQLCategoryCriteria($request, $root, $args);
+        $criteria = static::getCategoryCriteria($args);
         list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($criteria);
         return new CategoryConnection(new PageInfo($pageInfo, @$args['limit']), $categories);
     }
 
-    protected function getCraftQLCategoryCriteria($request, $root, $args) {
-        $criteria = \craft\elements\Category::find();
+    static function getCategoryCriteria($args, $criteria=null) {
+        if (empty($criteria)) {
+            $criteria = \craft\elements\Category::find();
+        }
 
         if (isset($args['group'])) {
             $args['groupId'] = $args['group'];
@@ -188,9 +177,70 @@ class Query extends Schema {
     }
 
     function getCraftQLEntriesConnection($request, $root, $args, $context, $info) {
-        $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
+        $criteria = static::getEntriesCriteria($args);
         list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
         return new EntryConnection(new PageInfo($pageInfo, @$args['limit']), $entries);
+    }
+
+    static function getEntriesCriteria($args, $criteria=null) {
+        if (empty($criteria)) {
+            $criteria = Entry::find();
+        }
+
+        // @TODO, need access to the request that we don't have
+        // if (empty($args['section'])) {
+        //     $args['sectionId'] = array_map(function ($value) {
+        //         return $value->value;
+        //     }, $this->sections()->enum()->getValues());
+        // }
+        // else {
+        //     $args['sectionId'] = $args['section'];
+        //     unset($args['section']);
+        // }
+
+        // @TODO, need access to the request that we don't have
+        // if (empty($args['type'])) {
+        //     $args['typeId'] = array_map(function ($value) {
+        //         return $value->value;
+        //     }, $this->entryTypes()->enum()->getValues());
+        // }
+        // else {
+        //     $args['typeId'] = $args['type'];
+        //     unset($args['type']);
+        // }
+
+        // if (!empty($args['relatedTo'])) {
+        //     $criteria->relatedTo(array_merge(['and'], $this->parseRelatedTo($args['relatedTo'], @$root['node']->id)));
+        //     unset($args['relatedTo']);
+        // }
+
+        // if (!empty($args['orRelatedTo'])) {
+        //     $criteria->relatedTo(array_merge(['or'], $this->parseRelatedTo($args['orRelatedTo'], @$root['node']->id)));
+        //     unset($args['orRelatedTo']);
+        // }
+
+        if (!empty($args['idNot'])) {
+            // this looks a little unusual to fit craft\helpers\Db::parseParam
+            $criteria->id('and, !='.implode(', !=', $args['idNot']));
+            unset($args['idNot']);
+        }
+
+        // var_dump($args);
+        // die;
+
+        foreach ($args as $key => $value) {
+            $criteria = $criteria->{$key}($value);
+        }
+
+        // if (!empty($info->fieldNodes)) {
+        //     foreach ($info->fieldNodes[0]->selectionSet->selections as $selection) {
+        //         if (isset($selection->name->value) && $selection->name->value == 'author') {
+        //             $criteria->with('author');
+        //         }
+        //     }
+        // }
+
+        return $criteria;
     }
 
     function boot() {
@@ -216,11 +266,11 @@ class Query extends Schema {
             $this->addGlobalsSchema();
         }
 
-        if (false && $token->can('query:tags')) {
+        if ($token->can('query:tags')) {
             $this->addTagsSchema();
         }
 
-        if (false && $token->can('query:categories')) {
+        if ($token->can('query:categories')) {
             $this->addCategoriesSchema();
         }
 
@@ -254,9 +304,10 @@ class Query extends Schema {
      * @return Schema
      */
     function addEntriesSchema() {
-        if ($this->request->entryTypes()->count() == 0) {
-            return;
-        }
+        // @TODO implement this even though we're probably getting rid of the factories
+        // if ($this->request->entryTypes()->count() == 0) {
+        //     return;
+        // }
 
         $this->addField('entries')
             ->lists()
@@ -329,9 +380,10 @@ class Query extends Schema {
      * The fields you can query that return categories
      */
     function addCategoriesSchema() {
-        if ($this->request->categoryGroups()->count() == 0) {
-            return;
-        }
+        // @TODO implement this even though we're probably getting rid of the factories
+        // if ($this->request->categoryGroups()->count() == 0) {
+        //     return;
+        // }
 
         $this->addField('categories')
             ->lists()

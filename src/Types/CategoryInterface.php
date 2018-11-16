@@ -6,28 +6,85 @@ use GraphQL\Type\Definition\InterfaceType;
 use markhuot\CraftQL\Builders\InterfaceBuilder;
 use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
 
-class CategoryInterface extends InterfaceBuilder {
+/**
+ * Trait CategoryInterface
+ * @package markhuot\CraftQL\Types
+ * @craftql-type interface
+ */
+trait CategoryInterface {
 
-    function boot() {
-        $this->addIntField('id')->nonNull();
-        $this->addStringField('title')->nonNull();
-        $this->addStringField('slug');
-        $this->addStringField('uri');
-        $this->addIntField('level');
-        $this->addStringField('group')->type(CategoryGroup::class);
-        $this->addField('children')->type(CategoryInterface::class)->lists()->use(new CategoryQueryArguments);
-        $this->addField('childrenConnection')->type(CategoryConnection::class)->use(new CategoryQueryArguments);
-        $this->addField('parent')->type(CategoryInterface::class);
-        $this->addField('next')->type(CategoryInterface::class);
-        $this->addField('nextSibling')->type(CategoryInterface::class);
-        $this->addField('prev')->type(CategoryInterface::class);
-        $this->addField('prevSibling')->type(CategoryInterface::class);
-    }
+    /**
+     * @var int
+     */
+    public $id;
 
-    function getResolveType() {
-        return function ($category) {
-            return ucfirst($category->group->handle).'Category';
-        };
+    /**
+     * @var string
+     */
+    public $title;
+
+    /**
+     * @var string
+     */
+    public $slug;
+
+    /**
+     * @var string
+     */
+    public $uri;
+
+    /**
+     * @var int
+     */
+    public $level;
+
+    /**
+     * @var CategoryGroup
+     */
+    public $group;
+
+    /**
+     * @var CategoryInterface[]
+     */
+    public $children;
+
+    /**
+     * @var CategoryConnection
+     */
+    public $childrenConnection;
+
+    /**
+     * @var CategoryInterface
+     */
+    public $parent;
+
+    /**
+     * @var CategoryInterface
+     */
+    public $next;
+
+    /**
+     * @var CategoryInterface
+     */
+    public $nextSibling;
+
+    /**
+     * @var CategoryInterface
+     */
+    public $prev;
+
+    /**
+     * @var CategoryInterface
+     */
+    public $prevSibling;
+
+    /**
+     * Get the GraphQL type for the passed Craft category
+     *
+     * @return string
+     */
+    static function craftQLResolveType(\craft\elements\Category $category) {
+        return ucfirst($category->group->handle).'Category';
     }
 
 }

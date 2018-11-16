@@ -74,7 +74,7 @@ class TypeRegistry {
 
         if (isset($this->dynamicTypes[$name])) {
             list($class, $context) = $this->dynamicTypes[$name];
-            $obj = (new InferredSchema($this->request))->parse($class)->name($name);
+            $obj = (new InferredSchema($this->request, $context))->parse($class)->name($name);
             return $this->cache[$name] = $obj->getRawGraphQLObject();
             // var_dump($obj);
             // die;
@@ -82,10 +82,10 @@ class TypeRegistry {
             // return $this->cache[$name] = $obj->getRawGraphQLObject();
         }
 
-        throw new \Exception('could not resolve type'.$name);
+        throw new \Exception('could not resolve type `'.$name.'`');
     }
 
-    function all() {
+    function getDynamicTypes() {
         $types = [];
 
         foreach ($this->dynamicTypes as $name => $config) {

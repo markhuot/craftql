@@ -4,7 +4,7 @@ namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\ScalarType;
 use markhuot\CraftQL\Request;
-use markhuot\CraftQL\Types\DynamicEntryType;
+use markhuot\CraftQL\Types\Entry;
 use markhuot\CraftQL\Types\EntryInterface;
 use markhuot\CraftQL\Types\Timestamp;
 use markhuot\CraftQL\Types\VolumeInterface;
@@ -24,8 +24,17 @@ class InferredSchema {
     /** @var Request */
     private $request;
 
-    function __construct($request) {
+    /**
+     * The context of this inference, if any. This is most commonly used
+     * during the field generation to add custom fields to the GraphQL type
+     *
+     * @var mixed
+     */
+    private $context;
+
+    function __construct($request, $context=null) {
         $this->request = $request;
+        $this->context = $context;
     }
 
     function parse($class) {
@@ -47,7 +56,10 @@ class InferredSchema {
         // This is for uncached schemas, it is not used when the
         // schema is cached because the closure is lost.
         if ($type == InterfaceBuilder::class) {
+            // var_dump($class);
             $this->type->resolveType(function($source) use ($class) {
+                // var_dump($class, $source);
+                // die;
                 return $class::craftQLResolveType($source);
             });
         }
@@ -62,6 +74,12 @@ class InferredSchema {
 
         $this->parseProperties($reflect->getProperties());
         $this->parseMethods($reflect->getMethods());
+
+        if ($this->context) {
+            if (!empty($this->context->fieldLayoutId)) {
+                $this->type->addFieldsByLayoutId($this->context->fieldLayoutId);
+            }
+        }
 
         $this->request->addType($class, $this->type);
         return $this->type;
@@ -102,7 +120,8 @@ class InferredSchema {
             return;
         }
 
-        $name = lcfirst($matches[1]);
+        $name = preg_replace('/^CraftQL/', '', $matches[1]);
+        $name = lcfirst($name);
         list($type, $isList) = $this->getTypeFromDoc($method);
         $this->type->addField($name)->type($type)->lists($isList);
     }
