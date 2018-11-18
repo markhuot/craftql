@@ -5,9 +5,11 @@ namespace markhuot\CraftQL\Services;
 use Craft;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
+use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
 use GraphQL\Language\Parser;
 use GraphQL\Type\Schema;
 use GraphQL\Utils\AST;
+use GraphQL\Utils\BuildSchema;
 use GraphQL\Utils\SchemaPrinter;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
@@ -89,19 +91,19 @@ class GraphQLService extends Component {
         $registry->registerNamespace('\\markhuot\\CraftQL\\Types');
         $request->addRegistry($registry);
 
-        // if ($schemaText = Craft::$app->cache->get('foo')) {
-        //     $typeConfigDecorator = function ($type) use ($registry) {
-        //         if (get_class($type['astNode']) == InterfaceTypeDefinitionNode::class) {
-        //             $fqen = $registry->getClassForName($type['name']);
-        //             $type['resolveType'] = function ($source) use ($fqen) {
-        //                 return $fqen::craftQLResolveType($source);
-        //             };
-        //         }
-        //         return $type;
-        //     };
-        //     $schema = BuildSchema::build(AST::fromArray(unserialize($schemaText)), $typeConfigDecorator);
-        //     return [$request, $schema];
-        // }
+        if (false && $schemaText = Craft::$app->cache->get('foo')) {
+            $typeConfigDecorator = function ($type) use ($registry) {
+                if (get_class($type['astNode']) == InterfaceTypeDefinitionNode::class) {
+                    $fqen = $registry->getClassForName($type['name']);
+                    $type['resolveType'] = function ($source) use ($fqen) {
+                        return $fqen::craftQLResolveType($source);
+                    };
+                }
+                return $type;
+            };
+            $schema = BuildSchema::build(AST::fromArray(unserialize($schemaText)), $typeConfigDecorator);
+            return [$request, $schema];
+        }
 
         foreach ($this->entryTypes->all() as $entryType) {
             $name = StringHelper::graphQLNameForEntryType($entryType);
