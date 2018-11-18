@@ -18,6 +18,7 @@ use markhuot\CraftQL\Helpers\StringHelper;
 use markhuot\CraftQL\TypeRegistry;
 use markhuot\CraftQL\Types\Category;
 use markhuot\CraftQL\Types\Entry;
+use markhuot\CraftQL\Types\Globals;
 use markhuot\CraftQL\Types\Query;
 use markhuot\CraftQL\Types\Tag;
 use yii\base\Component;
@@ -82,10 +83,11 @@ class GraphQLService extends Component {
         $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
         $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
-        $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
+        // $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
 
         $registry = new TypeRegistry($request);
         $registry->registerNamespace('\\markhuot\\CraftQL\\Types');
+        $request->addRegistry($registry);
 
         // if ($schemaText = Craft::$app->cache->get('foo')) {
         //     $typeConfigDecorator = function ($type) use ($registry) {
@@ -114,6 +116,11 @@ class GraphQLService extends Component {
         foreach ($this->tagGroups->all() as $tagGroup) {
             $name = ucfirst($tagGroup->handle).'Tags';
             $registry->add($name, Tag::class, $tagGroup);
+        }
+
+        foreach ($this->globals->all() as $set) {
+            $name = ucfirst($set->handle);
+            $registry->add($name, Globals::class, $set);
         }
 
         $schemaConfig = [];

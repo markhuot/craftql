@@ -2,11 +2,7 @@
 
 namespace markhuot\CraftQL\Types;
 
-use markhuot\CraftQL\FieldTraits\RelatedEntries;
-
 class EntryConnection extends Connection {
-
-    use RelatedEntries;
 
     /**
      * @return EntryEdge[]

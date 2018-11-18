@@ -2,16 +2,16 @@
 
 namespace markhuot\CraftQL\Types;
 
-use markhuot\CraftQL\Builders\Schema;
+class OptionFieldData {
 
-class OptionFieldData extends Schema {
+    /**
+     * @var OptionFieldDataOptions
+     */
+    public $selected;
 
-    function boot() {
-        $this->addField('selected')
-            ->type(OptionFieldDataOptions::class);
-        $this->addField('options')
-            ->type(OptionFieldDataOptions::class)
-            ->lists();
-    }
+    /**
+     * @var OptionFieldDataOptions[]
+     */
+    public $options;
 
 }

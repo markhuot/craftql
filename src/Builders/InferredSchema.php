@@ -8,6 +8,7 @@ use markhuot\CraftQL\Types\Entry;
 use markhuot\CraftQL\Types\EntryInterface;
 use markhuot\CraftQL\Types\Timestamp;
 use markhuot\CraftQL\Types\VolumeInterface;
+use phpDocumentor\Reflection\DocBlock\Tags\Generic;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
 use phpDocumentor\Reflection\Fqsen;
 use phpDocumentor\Reflection\FqsenResolver;
@@ -81,6 +82,14 @@ class InferredSchema {
             }
         }
 
+        if (method_exists($class, 'craftQlFields')) {
+            $class::craftQlFields($this->type, $this->request);
+        }
+
+        // if ($class == GlobalsSet::class) {
+        //     var_dump($this->type);
+        // }
+
         $this->request->addType($class, $this->type);
         return $this->type;
     }
@@ -102,7 +111,11 @@ class InferredSchema {
 
         list($type, $isList) = $this->getTypeFromDoc($property);
 
-        $this->type->addField($property->getName())->type($type)->lists($isList);
+        $field = $this->type->addField($property->getName())->type($type)->lists($isList);
+
+        if ($this->getNonNullFromdoc($property)) {
+            $field->nonNull();
+        }
     }
     /**
      * @param $methods \ReflectionMethod[]
@@ -187,6 +200,14 @@ class InferredSchema {
             $type = $type->getValueType();
         }
         return [(string)$type, $isList];
+    }
+
+    /**
+     * @param $reflected
+     * @return bool
+     */
+    function getNonNullFromdoc($reflected) {
+        return strpos($reflected->getDocComment(), '@craftql-nonNull') !== false;
     }
 
 }

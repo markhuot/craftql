@@ -13,6 +13,7 @@ class Request {
     private $tagGroups;
     private $sections;
     private $globals;
+    private $registry;
 
     function __construct($token) {
         $this->token = $token;
@@ -44,6 +45,10 @@ class Request {
 
     function addGlobals(\markhuot\CraftQL\Factories\Globals $globals) {
         $this->globals = $globals;
+    }
+
+    function addRegistry(TypeRegistry $registry) {
+        $this->registry = $registry;
     }
 
     function token() {
@@ -80,6 +85,10 @@ class Request {
 
     function globals(): \markhuot\CraftQL\Factories\Globals {
         return $this->globals;
+    }
+
+    function registry(): TypeRegistry {
+        return $this->registry;
     }
 
     private function parseRelatedTo($relations, $id) {

@@ -2,9 +2,12 @@
 
 namespace markhuot\CraftQL\Types;
 
-use craft\base\Element;
+use markhuot\CraftQL\FieldTraits\RelatedEntries;
 
 abstract class Connection {
+
+    // @TODO this should grab all entries related to the collection of edges
+    // use RelatedEntries;
 
     /**
      * Our internal list of edges

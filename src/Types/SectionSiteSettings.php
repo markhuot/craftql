@@ -2,21 +2,41 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Builders\Schema;
+class SectionSiteSettings {
 
-class SectionSiteSettings extends Schema {
+    /**
+     * @var int
+     * @craftql-nonNull
+     */
+    public $id;
 
-    function boot() {
-        $this->addIntField('id')->nonNull();
-        $this->addIntField('siteId')->nonNull();
-        $this->addBooleanField('enabledByDefault')->nonNull();
-        $this->addBooleanField('hasUrls')->nonNull();
-        $this->addStringField('uriFormat');
-        $this->addStringField('template')->nonNull();
-    }
+    /**
+     * @var int
+     * @craftql-nonNull
+     */
+    public $siteId;
+
+    /**
+     * @var bool
+     * @craftql-nonNull
+     */
+    public $enabledByDefault;
+
+    /**
+     * @var bool
+     * @craftql-nonNull
+     */
+    public $hasUrls;
+
+    /**
+     * @var string
+     */
+    public $uriFormat;
+
+    /**
+     * @var string
+     * @craftql-nonNull
+     */
+    public $template;
 
 }

@@ -2,16 +2,23 @@
 
 namespace markhuot\CraftQL\Types;
 
+use craft\models\EntryDraft;
+
 class EntryDraftEdge extends Edge {
+
+    /**
+     * @var EntryDraftInfo
+     */
+    protected $draftInfo;
 
     /**
      * EntryDraftEdge constructor.
      *
-     * @param \craft\elements\Entry $draft
+     * @param EntryInterface $entry
      */
-    function __construct(\craft\elements\Entry $draft) {
-        $this->node = $draft;
-        $this->draftInfo = new EntryDraftInfo($draft);
+    function __construct($entry) {
+        parent::__construct($entry);
+        $this->draftInfo = new EntryDraftInfo($this->node);
     }
 
     /**

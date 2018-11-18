@@ -2,14 +2,21 @@
 
 namespace markhuot\CraftQL\Types;
 
-use markhuot\CraftQL\Builders\Schema;
+class OptionFieldDataOptions {
 
-class OptionFieldDataOptions extends Schema {
+    /**
+     * @var string
+     */
+    public $value;
 
-    function boot() {
-        $this->addStringField('value');
-        $this->addStringField('label');
-        $this->addBooleanField('selected');
-    }
+    /**
+     * @var string
+     */
+    public $label;
+
+    /**
+     * @var bool
+     */
+    public $selected;
 
 }

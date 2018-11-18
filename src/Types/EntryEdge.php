@@ -28,8 +28,4 @@ class EntryEdge extends Edge {
         return new EntryDraftConnection($pageInfo, $drafts);
     }
 
-    // function boot() {
-    //     $this->use(new RelatedCategoriesField);
-    // }
-
 }

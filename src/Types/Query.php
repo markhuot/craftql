@@ -26,7 +26,7 @@ class Query extends Schema {
     }
 
     function getCraftQLEntry($request, $root, $args, $context, $info) {
-        return $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info)->one();
+        return static::getEntriesCriteria($args)->one();
     }
 
     function getCraftQLSections() {
@@ -262,7 +262,7 @@ class Query extends Schema {
             $this->addAssetsSchema();
         }
 
-        if (false && $token->can('query:globals')) {
+        if ($token->can('query:globals')) {
             $this->addGlobalsSchema();
         }
 
@@ -347,15 +347,15 @@ class Query extends Schema {
      * The fields you can query that return globals
      */
     function addGlobalsSchema() {
-
-        if ($this->request->globals()->count() > 0) {
+        // if ($this->request->globals()->count() > 0) {
             $this->addField('globals')
-                ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
-                ->arguments(function ($field) {
-                    $field->addStringArgument('site');
-                    $field->addIntArgument('siteId');
-                });
-        }
+                ->type(GlobalSets::class)
+                // ->arguments(function ($field) {
+                //     $field->addStringArgument('site');
+                //     $field->addIntArgument('siteId');
+                // })
+            ;
+        // }
     }
 
     /**

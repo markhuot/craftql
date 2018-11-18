@@ -3,11 +3,6 @@
 namespace markhuot\CraftQL\Types;
 
 use craft\web\twig\variables\Paginate;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Builders\Schema;
 
 class PageInfo {
 
