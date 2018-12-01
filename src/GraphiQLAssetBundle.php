@@ -24,11 +24,11 @@ class GraphiQLAssetBundle extends AssetBundle
             'fetch/0.9.0/fetch.min.js',
             'react/15.4.2/react.min.js',
             'react/15.4.2/react-dom.min.js',
-            'ajax/libs/graphiql/0.11.10/graphiql.js',
+            'ajax/libs/graphiql/0.12.0/graphiql.js',
         ];
 
         $this->css = [
-            'ajax/libs/graphiql/0.11.10/graphiql.min.css',
+            'ajax/libs/graphiql/0.12.0/graphiql.min.css',
         ];
 
         parent::init();
