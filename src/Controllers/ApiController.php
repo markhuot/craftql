@@ -86,7 +86,6 @@ class ApiController extends Controller
             ]);
         }
 
-        Craft::trace('CraftQL: Parsing request');
         if (Craft::$app->request->isPost && $query=Craft::$app->request->post('query')) {
             $input = $query;
         }
@@ -110,13 +109,12 @@ class ApiController extends Controller
             $data = json_decode($data, true);
             $variables = @$data['variables'];
         }
-        Craft::trace('CraftQL: Parsing request complete');
 
-        xdebug_start_trace('/Users/markhuot/Desktop/craftql', XDEBUG_TRACE_COMPUTERIZED);
+        // xdebug_start_trace('/Users/markhuot/Desktop/craftql', XDEBUG_TRACE_COMPUTERIZED);
         $this->graphQl->bootstrap();
         list($request, $schema) = $this->graphQl->getSchema($token);
         $result = $this->graphQl->execute($request, $schema, $input, $variables);
-        xdebug_stop_trace();
+        // xdebug_stop_trace();
 
         $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];
         foreach ($customHeaders as $key => $value) {

@@ -26,6 +26,9 @@ class InferredSchema {
      */
     private $context;
 
+    private $reflectionContext;
+    private $reflectionFactory;
+
     function __construct($request, $context=null) {
         $this->request = $request;
         $this->context = $context;
@@ -41,6 +44,10 @@ class InferredSchema {
         }
 
         $reflect = new \ReflectionClass($class);
+
+        $contextFactory = new ContextFactory;
+        $this->reflectionContext = $contextFactory->createFromReflector($reflect);
+        $this->reflectionFactory  = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
 
         $type = Schema::class;
         $doc = $reflect->getDocComment();
@@ -184,12 +191,7 @@ class InferredSchema {
 
             if ($type) {
                 $arguments = (new InferredArguments($this->request))->parse($type->getName());
-                // var_dump($arguments);
-                // die;
                 $field->addArguments($arguments);
-                $field->addStringArgument('foo');
-                // var_dump($field);
-                // die;
             }
         }
     }
@@ -216,10 +218,7 @@ class InferredSchema {
 
     protected function getCraftQlReturnType($reflected) {
         $isList = false;
-        $contextFactory = new ContextFactory;
-        $context = $contextFactory->createFromReflector($reflected);
-        $factory  = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
-        $docblock = $factory->create($reflected->getDocComment(), $context);
+        $docblock = $this->reflectionFactory->create($reflected->getDocComment(), $this->reflectionContext);
         if (!$docblock->hasTag('craftql-return')) {
             return false;
         }
@@ -239,10 +238,7 @@ class InferredSchema {
 
     protected function getPhpReturnType($reflected, $tag='return') {
         $isList = false;
-        $contextFactory = new ContextFactory;
-        $context = $contextFactory->createFromReflector($reflected);
-        $factory  = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
-        $docblock = $factory->create($reflected->getDocComment(), $context);
+        $docblock = $this->reflectionFactory->create($reflected->getDocComment(), $this->reflectionContext);
         if (!$docblock->hasTag($tag)) {
             return false;
         }

@@ -158,7 +158,12 @@ class GraphQLService extends Component {
         // $schemaConfig['mutation'] = $mutation;
 
         // @TODO need to do this if we're printing the schema or we won't get a full schema
+        // use a closure on the dynamic types. this ensures that the full list of types will
+        // only be loaded when GraphQL determines they are needed such as an introspection query
         // $schemaConfig['types'] = $registry->getDynamicTypes();
+        $schemaConfig['types'] = function () use ($registry) {
+            return $registry->getDynamicTypes();
+        };
 
         $schema = new Schema($schemaConfig);
 
