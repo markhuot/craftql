@@ -80,6 +80,11 @@ trait EntryInterface {
     public $type;
 
     /**
+     * @var User
+     */
+    public $author;
+
+    /**
      * @var EntryInterface[]
      */
     public $ancestors;
@@ -114,6 +119,10 @@ trait EntryInterface {
      */
     public $siblings;
 
+    /**
+     * @param $entry
+     * @return string
+     */
     static function craftQLResolveType(Entry $entry) {
         return StringHelper::graphQLNameForEntryType($entry->type);
     }

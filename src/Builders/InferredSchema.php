@@ -2,16 +2,9 @@
 
 namespace markhuot\CraftQL\Builders;
 
-use GraphQL\Type\Definition\ScalarType;
 use markhuot\CraftQL\Request;
-use markhuot\CraftQL\Types\Entry;
-use markhuot\CraftQL\Types\EntryInterface;
-use markhuot\CraftQL\Types\Timestamp;
-use markhuot\CraftQL\Types\VolumeInterface;
-use phpDocumentor\Reflection\DocBlock\Tags\Generic;
+use markhuot\CraftQL\Types\ProxyObject;
 use phpDocumentor\Reflection\DocBlock\Tags\Return_;
-use phpDocumentor\Reflection\Fqsen;
-use phpDocumentor\Reflection\FqsenResolver;
 use phpDocumentor\Reflection\TypeResolver;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\ContextFactory;
@@ -39,8 +32,12 @@ class InferredSchema {
     }
 
     function parse($class) {
-        if ($this->request->hasType($class)) {
-            return $this->request->getType($class);
+        $cacheKey = $class;
+        if (!empty($this->context->id)) {
+            $cacheKey = "{$cacheKey}::{$this->context->id}";
+        }
+        if ($this->request->hasType($cacheKey)) {
+            return $this->request->getType($cacheKey);
         }
 
         $reflect = new \ReflectionClass($class);
@@ -49,6 +46,9 @@ class InferredSchema {
         $doc = $reflect->getDocComment();
         if (preg_match('/@craftql-type interface/', $doc)) {
             $type = InterfaceBuilder::class;
+        }
+        else if (preg_match('/@craftql-type enum/', $doc)) {
+            $type = EnumObject::class;
         }
 
         $this->type = new $type($this->request);
@@ -61,6 +61,10 @@ class InferredSchema {
             $this->type->resolveType(function($source) use ($class) {
                 // var_dump($class, $source);
                 // die;
+                // @TODO this is gross, needs to be cleaned up
+                if (is_subclass_of($source, ProxyObject::class)) {
+                    $source = $source->getSource();
+                }
                 return $class::craftQLResolveType($source);
             });
         }
@@ -73,26 +77,43 @@ class InferredSchema {
             }
         }
 
-        $this->parseProperties($reflect->getProperties());
-        $this->parseMethods($reflect->getMethods());
+        // get enum constants
+        $this->parseConstants($reflect->getReflectionConstants());
 
-        if ($this->context) {
-            if (!empty($this->context->fieldLayoutId)) {
-                $this->type->addFieldsByLayoutId($this->context->fieldLayoutId);
+        // get object fields
+        $this->type->addFieldClosure(function () use ($class, $reflect) {
+            $this->parseProperties($reflect->getProperties());
+            $this->parseMethods($reflect->getMethods());
+
+            if ($this->context) {
+                if (!empty($this->context->fieldLayoutId)) {
+                    $this->type->addFieldsByLayoutId($this->context->fieldLayoutId);
+                }
             }
-        }
 
-        if (method_exists($class, 'craftQlFields')) {
-            $class::craftQlFields($this->type, $this->request);
-        }
+            if (method_exists($class, 'craftQlFields')) {
+                $class::craftQlFields($this->type, $this->request);
+            }
+        });
 
-        // if ($class == GlobalsSet::class) {
-        //     var_dump($this->type);
+        // $this->parseProperties($reflect->getProperties());
+        // $this->parseMethods($reflect->getMethods());
+        // $this->parseConstants($reflect->getReflectionConstants());
+
+        // if ($this->context) {
+        //     if (!empty($this->context->fieldLayoutId)) {
+        //         $this->type->addFieldsByLayoutId($this->context->fieldLayoutId);
+        //     }
         // }
 
-        $this->request->addType($class, $this->type);
+        // if (method_exists($class, 'craftQlFields')) {
+        //     $class::craftQlFields($this->type, $this->request);
+        // }
+
+        $this->request->addType($cacheKey, $this->type);
         return $this->type;
     }
+
     /**
      * @param $properties \ReflectionProperty[]
      */
@@ -101,6 +122,7 @@ class InferredSchema {
             $this->parseProperty($property);
         }
     }
+
     /**
      * @param $property \ReflectionProperty
      */
@@ -117,6 +139,7 @@ class InferredSchema {
             $field->nonNull();
         }
     }
+
     /**
      * @param $methods \ReflectionMethod[]
      */
@@ -125,18 +148,50 @@ class InferredSchema {
             $this->parseMethod($method);
         }
     }
+
     /**
      * @param $method \ReflectionMethod
      */
     function parseMethod($method) {
+        // skip any method that does not follow the `getFieldName()` pattern
         if (!preg_match('/^get([A-Z][a-zA-Z0-9_]*)$/', $method->getName(), $matches)) {
+            return;
+        }
+
+        // skip any non-public methods
+        if (!$method->isPublic()) {
+            return;
+        }
+
+        // skip static methods
+        if ($method->isStatic()) {
             return;
         }
 
         $name = preg_replace('/^CraftQL/', '', $matches[1]);
         $name = lcfirst($name);
         list($type, $isList) = $this->getTypeFromDoc($method);
-        $this->type->addField($name)->type($type)->lists($isList);
+
+        /** @var Field $field */
+        $field = $this->type->addField($name)->type($type)->lists($isList);
+
+        if ($method->getName() == 'getCraftQLEntry') {
+            /** @var \ReflectionParameter $param */
+            $param = $method->getParameters()[2];
+
+            /** @var \ReflectionNamedType $type */
+            $type = $param->getType();
+
+            if ($type) {
+                $arguments = (new InferredArguments($this->request))->parse($type->getName());
+                // var_dump($arguments);
+                // die;
+                $field->addArguments($arguments);
+                $field->addStringArgument('foo');
+                // var_dump($field);
+                // die;
+            }
+        }
     }
 
     protected function getTypeFromDoc($reflected) {
@@ -208,6 +263,20 @@ class InferredSchema {
      */
     function getNonNullFromdoc($reflected) {
         return strpos($reflected->getDocComment(), '@craftql-nonNull') !== false;
+    }
+
+    /**
+     *
+     */
+    function parseConstants($constants) {
+        foreach ($constants as $constant) {
+            $this->parseConstant($constant);
+        }
+    }
+
+    function parseConstant(\ReflectionClassConstant $reflected) {
+        // @TODO only add ENUM "values" if the type is an actual ENUM. There's a chance that regular objects could have CONST attributes too
+        $this->type->addValue($reflected->getName(), $reflected->getValue());
     }
 
 }

@@ -3,42 +3,108 @@
 namespace markhuot\CraftQL\Types;
 
 use Craft;
-use markhuot\CraftQL\Builders\Schema;
 use craft\elements\User as CraftUserElement;
 
-class User extends Schema {
+class User extends ProxyObject {
 
-    function boot() {
-        $this->addIntField('id')->nonNull();
-        $this->addStringField('name')->nonNull();
-        $this->addStringField('fullName');
-        $this->addStringField('friendlyName')->nonNull();
-        $this->addStringField('firstName');
-        $this->addStringField('lastName');
-        $this->addStringField('username')->nonNull();
-        $this->addStringField('email')->nonNull();
-        $this->addBooleanField('admin')->nonNull();
-        $this->addBooleanField('isCurrent')->nonNull();
-        $this->addStringField('preferredLocale');
-        // $this->addField('status')->type(UsersField::statusEnum())->nonNull();
+    /**
+     * @var int
+     * @craftql-nonNull
+     */
+    public $id;
 
-        // $volumeId = Craft::$app->getSystemSettings()->getSetting('users', 'photoVolumeId');
-        // if ($volumeId) {
-        //     $this->addField('photo')
-        //         ->type($this->request->volumes()->get($volumeId));
-        // }
+    /**
+     * @var string
+     * @craftql-nonNull
+     */
+    public $name;
 
-        $this->addDateField('dateCreated')->nonNull();
-        $this->addDateField('dateUpdated')->nonNull();
-        $this->addDateField('lastLoginDate')->nonNull();
+    /**
+     * @var string
+     */
+    public $fullName;
 
-        $fieldLayoutId = Craft::$app->getFields()->getLayoutByType(CraftUserElement::class)->id;
-        $this->addFieldsByLayoutId($fieldLayoutId);
+    /**
+     * @var string
+     * @craftql-nonNull
+     */
+    public $friendlyName;
 
-        if ($this->request->token()->can('query:userPermissions')) {
-            $this->addStringField('permissions')
-                ->lists();
-        }
+    /**
+     * @var string
+     */
+    public $firstName;
+
+    /**
+     * @var string
+     */
+    public $lastName;
+
+    /**
+     * @var string
+     * @craftql-nonNull
+     */
+    public $username;
+
+    /**
+     * @var string
+     * @craftql-nonNull
+     */
+    public $email;
+
+    /**
+     * @var boolean
+     * @craftql-nonNull
+     */
+    public $admin;
+
+    /**
+     * @var boolean
+     * @craftql-nonNull
+     */
+    public $isCurrent;
+
+    /**
+     * @var string
+     */
+    public $preferredLocale;
+
+    /**
+     * @var Timestamp
+     */
+    public $dateCreated;
+
+    /**
+     * @var Timestamp
+     */
+    public $dateUpdated;
+
+    /**
+     * @var Timestamp
+     */
+    public $lastLoginDate;
+
+    /**
+     * @craftql-nonNull
+     * @var UserStatusEnum
+     */
+    public $status;
+
+    // $volumeId = Craft::$app->getSystemSettings()->getSetting('users', 'photoVolumeId');
+    // if ($volumeId) {
+    //     $this->addField('photo')
+    //         ->type($this->request->volumes()->get($volumeId));
+    // }
+
+    // $fieldLayoutId = Craft::$app->getFields()->getLayoutByType(CraftUserElement::class)->id;
+    // $this->addFieldsByLayoutId($fieldLayoutId);
+
+    /**
+     * @return string[]
+     * @todo make conditional based on token scopes
+     */
+    function getPermissions() {
+        return \Craft::$app->getUserPermissions()->getPermissionsByUserId($this->source->id);
     }
 
 }

@@ -30,7 +30,8 @@ class GetTagsFieldSchema
 
             $schema->addField($field)
                 ->lists()
-                ->type($schema->getRequest()->tagGroups()->get($groupId))
+                // @TODO this is weird, fix this
+                ->type($schema->getRequest()->getType('Tag::'.$groupId))
                 ->resolve(function ($root, $args) use ($field) {
                     return $root->{$field->handle}->all();
                 });

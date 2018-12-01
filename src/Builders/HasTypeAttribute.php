@@ -81,7 +81,7 @@ trait HasTypeAttribute {
         }
 
         if (is_string($rawType)) {
-            throw new \Exception('Could not find type: '.$type);
+            throw new \Exception('Could not find type: '.$type.' on '.$this->getName());
         }
 
         return $rawType;

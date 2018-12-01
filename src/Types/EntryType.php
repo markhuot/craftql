@@ -9,7 +9,7 @@ use markhuot\CraftQL\Builders\Schema;
 use craft\models\EntryType as CraftEntryType;
 use markhuot\CraftQL\Helpers\StringHelper;
 
-class EntryType {
+class EntryType extends ProxyObject {
 
     /**
      * @var int
@@ -27,9 +27,11 @@ class EntryType {
     public $handle;
 
     /**
-     * @var string
+     * @return string
      */
-    public $graphQlTypeName;
+    function getGraphQlTypeName() {
+        return StringHelper::graphQLNameForEntryType($this->source);
+    }
 
     /**
      * @todo nonnull

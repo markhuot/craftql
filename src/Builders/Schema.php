@@ -65,6 +65,13 @@ class Schema extends BaseBuilder {
         return static::$concreteTypes;
     }
 
+    private $fieldClosure;
+
+    function addFieldClosure(callable $closure) {
+        $this->fieldClosure = $closure;
+        return $this;
+    }
+
     /**
      * Add a new field to this schema
      *
@@ -201,6 +208,10 @@ class Schema extends BaseBuilder {
         }, $this->getInterfaces());
     }
 
+    function getRawFields() {
+        return $this->fields;
+    }
+
     /**
      * @TODO rename `boot` to some sort of WillFields method to better reflect what's happening
      * @return array
@@ -208,6 +219,11 @@ class Schema extends BaseBuilder {
     function getFields(): array {
         $this->boot();
         $this->bootBehaviors();
+
+        if ($this->fieldClosure) {
+            $closure = $this->fieldClosure;
+            $closure();
+        }
 
         $event = new AlterSchemaFields;
         $event->schema = $this;
@@ -246,10 +262,7 @@ class Schema extends BaseBuilder {
         $foo = [
             'name' => $this->getName(),
             'fields' => function () {
-                \Craft::beginProfile('get config '.$this->getName(), 'craftqlGetSchemaFields');
-                $foo = $this->getFieldConfig();
-                \Craft::endProfile('get config '.$this->getName(), 'craftqlGetSchemaFields');
-                return $foo;
+                return $this->getFieldConfig();
             },
             'interfaces' => $this->getInterfaceConfig(),
             'resolveType' => $this->getResolveType(),

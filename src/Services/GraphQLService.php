@@ -3,6 +3,10 @@
 namespace markhuot\CraftQL\Services;
 
 use Craft;
+use craft\base\Field;
+use craft\elements\User;
+use craft\models\EntryType;
+use craft\redactor\FieldData;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
 use GraphQL\Language\AST\InterfaceTypeDefinitionNode;
@@ -14,6 +18,8 @@ use GraphQL\Utils\SchemaPrinter;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
+use markhuot\CraftQL\Arguments\EntryQueryArguments;
+use markhuot\CraftQL\Builders\InferredSchema;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
 use markhuot\CraftQL\Helpers\StringHelper;
@@ -21,7 +27,9 @@ use markhuot\CraftQL\TypeRegistry;
 use markhuot\CraftQL\Types\Category;
 use markhuot\CraftQL\Types\Entry;
 use markhuot\CraftQL\Types\Globals;
+use markhuot\CraftQL\Types\ProxyObject;
 use markhuot\CraftQL\Types\Query;
+use markhuot\CraftQL\Types\RedactorFieldData;
 use markhuot\CraftQL\Types\Tag;
 use yii\base\Component;
 
@@ -57,14 +65,6 @@ class GraphQLService extends Component {
      * @return void
      */
     function bootstrap() {
-        \Yii::$container->get('craftQLFieldService')->load();
-        $this->volumes->load();
-        $this->categoryGroups->load();
-        $this->tagGroups->load();
-        $this->entryTypes->load();
-        $this->sections->load();
-        $this->globals->load();
-
         $maxQueryDepth = CraftQL::getInstance()->getSettings()->maxQueryDepth;
         if ($maxQueryDepth !== false) {
             $rule = new QueryDepth($maxQueryDepth);
@@ -80,12 +80,6 @@ class GraphQLService extends Component {
 
     function getSchema($token) {
         $request = new \markhuot\CraftQL\Request($token);
-        // $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
-        // $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
-        $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
-        $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
-        $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
-        // $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
 
         $registry = new TypeRegistry($request);
         $registry->registerNamespace('\\markhuot\\CraftQL\\Types');
@@ -96,6 +90,10 @@ class GraphQLService extends Component {
                 if (get_class($type['astNode']) == InterfaceTypeDefinitionNode::class) {
                     $fqen = $registry->getClassForName($type['name']);
                     $type['resolveType'] = function ($source) use ($fqen) {
+                        // @TODO this is gross, needs to be cleaned up
+                        if (is_subclass_of($source, ProxyObject::class)) {
+                            $source = $source->getSource();
+                        }
                         return $fqen::craftQLResolveType($source);
                     };
                 }
@@ -104,6 +102,17 @@ class GraphQLService extends Component {
             $schema = BuildSchema::build(AST::fromArray(unserialize($schemaText)), $typeConfigDecorator);
             return [$request, $schema];
         }
+
+        // now that the cached schema has been returned we know we're building a full schema so load
+        // everything here.
+        // @TODO don't load _everything_. Instead only load what's needed on demand
+        \Yii::$container->get('craftQLFieldService')->load();
+        $this->volumes->load();
+        $this->categoryGroups->load();
+        $this->tagGroups->load();
+        $this->entryTypes->load();
+        $this->sections->load();
+        $this->globals->load();
 
         foreach ($this->entryTypes->all() as $entryType) {
             $name = StringHelper::graphQLNameForEntryType($entryType);
@@ -127,48 +136,19 @@ class GraphQLService extends Component {
 
         $schemaConfig = [];
 
-        $query = new Query($request);
+        // $query = new Query($request);
+        $query = (new InferredSchema($request))->parse(Query::class);
 
-        $event = new AlterQuerySchema;
-        $event->query = $query;
-        $query->trigger(AlterQuerySchema::EVENT, $event);
+        // @TODO need to bring this back but in a different place, probably. Or not on the naked Query object, maybe on the inferred schema?
+        // $event = new AlterQuerySchema;
+        // $event->query = $query;
+        // $query->trigger(AlterQuerySchema::EVENT, $event);
 
         $schemaConfig['query'] = $query->getRawGraphQLObject();
 
         $schemaConfig['typeLoader'] = function ($name) use ($registry) {
-            // Craft::beginProfile('load type '.$name, 'craftqlTypeLoader');
-            $foo = $registry->get($name);
-            // Craft::endProfile('load type '.$name, 'craftqlTypeLoader');
-            return $foo;
+            return $registry->get($name);
         };
-
-        // $schemaConfig['types'] = function () use ($request, $query) {
-        //     return array_merge(
-        //         // array_map(function ($section) {
-        //         //     return $section->getRawGraphQLObject();
-        //         // }, $request->sections()->all()),
-        //
-        //         array_map(function ($volume) {
-        //             return $volume->getRawGraphQLObject();
-        //         }, $request->volumes()->all()),
-        //
-        //         array_map(function ($categoryGroup) {
-        //             return $categoryGroup->getRawGraphQLObject();
-        //         }, $request->categoryGroups()->all()),
-        //
-        //         array_map(function ($tagGroup) {
-        //             return $tagGroup->getRawGraphQLObject();
-        //         }, $request->tagGroups()->all()),
-        //
-        //         array_map(function ($entryType) {
-        //             return $entryType->getRawGraphQLObject();
-        //         }, $request->entryTypes()->all()),
-        //
-        //         [\markhuot\CraftQL\Directives\Date::dateFormatTypesEnum()],
-        //
-        //         $query->getConcreteTypes()
-        //     );
-        // };
 
         $schemaConfig['directives'] = [
             \markhuot\CraftQL\Directives\Date::directive(),
@@ -177,7 +157,8 @@ class GraphQLService extends Component {
         // $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
         // $schemaConfig['mutation'] = $mutation;
 
-        $schemaConfig['types'] = $registry->getDynamicTypes();
+        // @TODO need to do this if we're printing the schema or we won't get a full schema
+        // $schemaConfig['types'] = $registry->getDynamicTypes();
 
         $schema = new Schema($schemaConfig);
 
@@ -185,52 +166,32 @@ class GraphQLService extends Component {
             // $schema->assertValid();
         }
 
-        $schemaText = SchemaPrinter::doPrint($schema);
-        $schemaAST = serialize(AST::toArray(Parser::parse($schemaText)));
+        // $schemaText = SchemaPrinter::doPrint($schema);
         // header('content-type: text/plain');
         // echo $schemaText;
         // die;
-        Craft::$app->cache->set('foo', $schemaAST);
+        // $schemaAST = serialize(AST::toArray(Parser::parse($schemaText)));
+        // Craft::$app->cache->set('foo', $schemaAST);
 
         return [$request, $schema];
     }
 
     function execute($request, $schema, $input, $variables = []) {
         $debug = Craft::$app->config->getGeneral()->devMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::RETHROW_INTERNAL_EXCEPTIONS : null;
+        $debug = null;
+        // @TODO pass an empty array as validators to speed up execution even more
         return GraphQL::executeQuery($schema, $input, new Query($request), null, $variables, '', function ($source, $args, $context, $info) use ($request) {
             $fieldName = $info->fieldName;
-
-            // if ($fieldName == 'dateCreated') {
-            //     var_dump($source);
-            //     die;
-            // }
 
             $property = null;
 
             if (is_object($source)) {
-
-                // Because we can't modify internal classes we dynamically attach
-                // behaviors here based on our behavior mappings
-                if (is_subclass_of($source, Component::class)) {
-                    $behaviors = require(CraftQL::PATH() . 'behaviors.php');
-
-                    // $sourceClassName = get_class($source);
-                    // if (in_array($sourceClassName, array_keys($behaviors))) {
-                    foreach ($behaviors as $foo => $bar) {
-                        if (!is_a($source, $foo) && !is_subclass_of($source, $foo)) {
-                            continue;
-                        }
-
-                        /** @var Component $source */
-                        foreach ($bar as $behavior) {
-                            if (!$source->getBehavior($behavior)) {
-                                $source->attachBehavior($behavior, $behavior);
-                            }
-                        }
-                    }
-                }
-
                 if (method_exists($source, $method='getCraftQL'.ucfirst($fieldName))) {
+                    if ($fieldName == 'entry') {
+                        $newArgs = new EntryQueryArguments;
+                        $newArgs->id = @$args['id'];
+                        $args = $newArgs;
+                    }
                     $property = $source->{$method}($request, $source, $args, $context, $info);
                 }
                 else if (method_exists($source, 'hasMethod') && $source->hasMethod($method='getCraftQL'.ucfirst($fieldName))) {
@@ -243,6 +204,10 @@ class GraphQLService extends Component {
                     // parameters.
                     $property = $source->{$method}();
                 }
+                else if (is_subclass_of($source, ProxyObject::class)) {
+                    /** @var ProxyObject $source */
+                    $property = $source->getProxiedValue($fieldName, $request, $source, $args, $context, $info);
+                }
                 else if (isset($source->{$fieldName})) {
                     $property = $source->{$fieldName};
                 }
@@ -254,10 +219,38 @@ class GraphQLService extends Component {
                 }
             }
 
-            // downcast things we're able to
-            switch (get_class($info->returnType)) {
-                case \GraphQL\Type\Definition\StringType::class: $property = (string)$property;
+            // proxy things
+            $proxy = function ($prop) {
+                if (is_a($prop, FieldData::class)) {
+                    $prop = new RedactorFieldData($prop);
+                }
+
+                if (is_a($prop, Field::class)) {
+                    $prop = new \markhuot\CraftQL\Types\Field($prop);
+                }
+
+                if (is_a($prop, EntryType::class)) {
+                    $prop = new \markhuot\CraftQL\Types\EntryType($prop);
+                }
+
+                if (is_a($prop, User::class)) {
+                    $prop = new \markhuot\CraftQL\Types\User($prop);
+                }
+
+                if (is_a($prop, \craft\elements\Entry::class)) {
+                    $prop = new Entry($prop);
+                }
+
+                return $prop;
+            };
+
+            if (is_array($property)) {
+                $property = array_map($proxy, $property);
             }
+            else {
+                $property = $proxy($property);
+            }
+            // end proxying
 
             return $property instanceof \Closure ? $property($source, $args, $context) : $property;
         })->toArray($debug);

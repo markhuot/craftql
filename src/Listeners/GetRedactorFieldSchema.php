@@ -2,10 +2,11 @@
 
 namespace markhuot\CraftQL\Listeners;
 
+use craft\redactor\FieldData;
+use markhuot\CraftQL\Types\RedactorFieldData;
+
 class GetRedactorFieldSchema
 {
-    static $outputSchema;
-
     /**
      * Handle the request for the schema
      *
@@ -15,37 +16,8 @@ class GetRedactorFieldSchema
     function handle($event) {
         $event->handled = true;
 
-        $outputSchema = static::type($event->schema);
-
-        $event->schema->addField($event->sender)->type($outputSchema);
+        $event->schema->addField($event->sender)->type(RedactorFieldData::class);
         $event->query->addStringArgument($event->sender);
         $event->mutation->addStringArgument($event->sender);
-    }
-
-    static function type($schema) {
-        if (static::$outputSchema) {
-            return static::$outputSchema;
-        }
-
-        $outputSchema = $schema->createObjectType('RedactorFieldData');
-
-        $outputSchema->addIntField('totalPages')
-            ->resolve(function ($root, $args) {
-                return $root->getTotalPages();
-            });
-
-        $outputSchema->addStringField('content')
-            ->arguments(function ($field) {
-                $field->addIntArgument('page');
-            })
-            ->resolve(function ($root, $args) {
-                if (!empty($args['page'])) {
-                    return (string)$root->getPage($args['page']);
-                }
-
-                return (string)$root;
-            });
-
-        return static::$outputSchema=$outputSchema;
     }
 }

@@ -7,7 +7,7 @@ namespace markhuot\CraftQL\Types;
  * @package markhuot\CraftQL\Types
  * @craftql-type interface
  */
-class VolumeInterface {
+trait VolumeInterface {
 
     /**
      * @var int
