@@ -27,7 +27,7 @@ class Mutation extends Schema {
                 ->use(new EntryMutationArguments);
         }
 
-        if ($this->request->globals()->count()) {
+        if ($this->request->globals()->count() && $this->request->token()->can('mutate:globals')) {
             /** @var \markhuot\CraftQL\Types\Globals $globalSet */
             foreach ($this->request->globals()->all() as $globalSet) {
                 $upsertField = $this->addField('upsert'.$globalSet->getName().'Globals')
