@@ -10,31 +10,14 @@ use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\ContextFactory;
 use phpDocumentor\Reflection\Types\Object_;
 
-class InferredSchema {
+class InferredSchema extends InferredBase {
 
     /** @var BaseBuilder */
     private $type;
 
-    /** @var Request */
-    private $request;
-
-    /**
-     * The context of this inference, if any. This is most commonly used
-     * during the field generation to add custom fields to the GraphQL type
-     *
-     * @var mixed
-     */
-    private $context;
-
-    private $reflectionContext;
-    private $reflectionFactory;
-
-    function __construct($request, $context=null) {
-        $this->request = $request;
-        $this->context = $context;
-    }
-
     function parse($class) {
+        parent::parse($class);
+
         $cacheKey = $class;
         if (!empty($this->context->id)) {
             $cacheKey = "{$cacheKey}::{$this->context->id}";
@@ -43,19 +26,18 @@ class InferredSchema {
             return $this->request->getType($cacheKey);
         }
 
-        $reflect = new \ReflectionClass($class);
+        $reflect = $this->reflectedClass;
 
-        $contextFactory = new ContextFactory;
-        $this->reflectionContext = $contextFactory->createFromReflector($reflect);
-        $this->reflectionFactory  = \phpDocumentor\Reflection\DocBlockFactory::createInstance();
-
-        $type = Schema::class;
+        $type = ObjectType::class;
         $doc = $reflect->getDocComment();
         if (preg_match('/@craftql-type interface/', $doc)) {
             $type = InterfaceBuilder::class;
         }
         else if (preg_match('/@craftql-type enum/', $doc)) {
             $type = EnumObject::class;
+        }
+        else if (preg_match('/@craftql-type input/', $doc)) {
+            $type = InputSchema::class;
         }
 
         $this->type = new $type($this->request);
@@ -102,20 +84,6 @@ class InferredSchema {
                 $class::craftQlFields($this->type, $this->request);
             }
         });
-
-        // $this->parseProperties($reflect->getProperties());
-        // $this->parseMethods($reflect->getMethods());
-        // $this->parseConstants($reflect->getReflectionConstants());
-
-        // if ($this->context) {
-        //     if (!empty($this->context->fieldLayoutId)) {
-        //         $this->type->addFieldsByLayoutId($this->context->fieldLayoutId);
-        //     }
-        // }
-
-        // if (method_exists($class, 'craftQlFields')) {
-        //     $class::craftQlFields($this->type, $this->request);
-        // }
 
         $this->request->addType($cacheKey, $this->type);
         return $this->type;
@@ -194,63 +162,6 @@ class InferredSchema {
                 $field->addArguments($arguments);
             }
         }
-    }
-
-    protected function getTypeFromDoc($reflected) {
-        if (empty($reflected->getDocComment())) {
-            return false;
-        }
-
-        if ($type = $this->getCraftQlReturnType($reflected)) {
-            return $type;
-        }
-
-        if ($type = $this->getPhpReturnType($reflected, 'return')) {
-            return $type;
-        }
-
-        if ($type = $this->getPhpReturnType($reflected, 'var')) {
-            return $type;
-        }
-
-        return false;
-    }
-
-    protected function getCraftQlReturnType($reflected) {
-        $isList = false;
-        $docblock = $this->reflectionFactory->create($reflected->getDocComment(), $this->reflectionContext);
-        if (!$docblock->hasTag('craftql-return')) {
-            return false;
-        }
-
-        $returnType = $docblock->getTagsByName('craftql-return')[0]->getDescription()->render();
-        $typeResolver = new TypeResolver();
-        $contextFactory = new ContextFactory();
-        $context = $contextFactory->createFromReflector($reflected);
-        /** @var Object_|Array_ $type */
-        $type = $typeResolver->resolve($returnType, $context);
-        if (is_a($type, Array_::class)) {
-            $isList = true;
-            $type = $type->getValueType();
-        }
-        return [(string)$type, $isList];
-    }
-
-    protected function getPhpReturnType($reflected, $tag='return') {
-        $isList = false;
-        $docblock = $this->reflectionFactory->create($reflected->getDocComment(), $this->reflectionContext);
-        if (!$docblock->hasTag($tag)) {
-            return false;
-        }
-
-        /** @var Return_ $returnType */
-        $returnType = $docblock->getTagsByName($tag)[0];
-        $type = $returnType->getType();
-        if (is_a($type, Array_::class)) {
-            $isList = true;
-            $type = $type->getValueType();
-        }
-        return [(string)$type, $isList];
     }
 
     /**

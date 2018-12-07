@@ -3,8 +3,6 @@
 namespace markhuot\CraftQL\Types;
 
 use craft\elements\Entry;
-use markhuot\CraftQL\Builders\InterfaceBuilder;
-use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
 use markhuot\CraftQL\Helpers\StringHelper;
 
 /**

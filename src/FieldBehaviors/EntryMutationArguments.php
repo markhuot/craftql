@@ -27,7 +27,7 @@ class EntryMutationArguments extends FieldBehavior {
         $this->owner->addDateArgument('expiryDate');
 
         $mutationQueryObject = $this->owner->createInputObjectType('MutationQuery');
-        $mutationQueryObject->use(new EntryQueryArguments);
+        // $mutationQueryObject->use(new EntryQueryArguments);
         $this->owner->addArgument('query')->type($mutationQueryObject);
 
         $fieldLayoutId = $this->owner->getType()->getContext()->fieldLayoutId;

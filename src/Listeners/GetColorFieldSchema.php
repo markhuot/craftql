@@ -15,9 +15,7 @@ class GetColorFieldSchema
     function handle($event) {
         $event->handled = true;
 
-        $event->schema->addField($event->sender)
-            ->type(ColorData::class);
-
+        $event->schema->addField($event->sender)->type(ColorData::class);
         $event->mutation->addStringArgument($event->sender);
     }
 }

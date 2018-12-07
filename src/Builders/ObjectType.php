@@ -10,7 +10,7 @@ use markhuot\CraftQL\Events\AlterSchemaFields;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Field as BaseField;
 
-class Schema extends BaseBuilder {
+class ObjectType extends BaseBuilder {
 
     protected static $objects;
     protected $fields = [];

@@ -4,25 +4,18 @@ namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\Type;
 
-class InferredArguments {
+class InferredArguments extends InferredBase {
 
     private $arguments = [];
-    private $request;
-    private $context;
-
-    function __construct($request, $context=null) {
-        $this->request = $request;
-        $this->context = $context;
-    }
 
     /**
      * @param $class string
      * @return array
      */
     function parse($class) {
-        $reflect = new \ReflectionClass($class);
+        parent::parse($class);
 
-        $this->parseProperties($reflect->getProperties());
+        $this->parseProperties($this->reflectedClass->getProperties());
 
         return $this->arguments;
     }
@@ -38,7 +31,8 @@ class InferredArguments {
 
     function parseProperty(\ReflectionProperty $property) {
         $arg = new Argument($this->request, $property->getName());
-        $arg->type(Type::int());
+        list($type, $isList) = $this->getTypeFromDoc($property);
+        $arg->type($type)->lists($isList);
 
         $this->arguments[$property->getName()] = $arg;
     }

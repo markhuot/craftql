@@ -104,6 +104,7 @@ trait HasArgumentsAttribute {
             $arguments[$argument->getName()] = $argument->getConfig();
         }
 
+
         return $arguments;
     }
 

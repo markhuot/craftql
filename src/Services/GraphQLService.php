@@ -136,7 +136,6 @@ class GraphQLService extends Component {
 
         $schemaConfig = [];
 
-        // $query = new Query($request);
         $query = (new InferredSchema($request))->parse(Query::class);
 
         // @TODO need to bring this back but in a different place, probably. Or not on the naked Query object, maybe on the inferred schema?
@@ -183,9 +182,10 @@ class GraphQLService extends Component {
 
     function execute($request, $schema, $input, $variables = []) {
         $debug = Craft::$app->config->getGeneral()->devMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::RETHROW_INTERNAL_EXCEPTIONS : null;
-        $debug = null;
+        // $debug = null;
+
         // @TODO pass an empty array as validators to speed up execution even more
-        return GraphQL::executeQuery($schema, $input, new Query($request), null, $variables, '', function ($source, $args, $context, $info) use ($request) {
+        return GraphQL::executeQuery($schema, $input, new Query, null, $variables, '', function ($source, $args, $context, $info) use ($request) {
             $fieldName = $info->fieldName;
 
             $property = null;

@@ -10,7 +10,7 @@ class RelatedEntriesField extends SchemaBehavior {
     function initRelatedEntriesField() {
         $this->owner->addField('relatedEntries')
             ->type(EntryConnection::class)
-            ->use(new EntryQueryArguments)
+            // ->use(new EntryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = $this->owner->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
 

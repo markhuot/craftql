@@ -5,13 +5,13 @@ namespace markhuot\CraftQL\Builders;
 use GraphQL\Type\Definition\InputObjectType;
 use markhuot\CraftQL\Behaviors\FieldBehavior;
 
-class InputSchema extends BaseBuilder {
+class InputObjectType extends BaseBuilder {
 
     use HasArgumentsAttribute;
 
     protected static $objects;
 
-    function __construct($request, $name) {
+    function __construct($request, $name=null) {
         $this->request = $request;
         $this->name = $name;
     }

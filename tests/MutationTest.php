@@ -32,135 +32,135 @@ final class MutationTest extends TestCase
         return self::$service->execute(self::$schema, $input, $variables);
     }
 
-    public function testSimpleQuery(): void
-    {
-        $input = '{ helloWorld }';
+    // public function testSimpleQuery(): void
+    // {
+    //     $input = '{ helloWorld }';
+    //
+    //     $result = $this->execute($input);
+    //
+    //     $this->assertEquals('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.', @$result['data']['helloWorld']);
+    // }
 
-        $result = $this->execute($input);
+    // public function testPlainTextMutation(): void
+    // {
+    //     $input = 'mutation { story: upsertStories(title:"Text Test'.date('U').'", body:"text in the body") { id, title, body } }';
+    //
+    //     $result = $this->execute($input);
+    //
+    //     $this->assertEquals('text in the body', @$result['data']['story']['body']);
+    // }
 
-        $this->assertEquals('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.', @$result['data']['helloWorld']);
-    }
+    // public function testDateMutation(): void
+    // {
+    //     $originalDate = new DateTime('2017-02-04 03:12:18', new DateTimeZone('UTC'));
+    //     $input = 'mutation { story: upsertStories(title:"Date Test'.date('U').'", releaseDate:'.$originalDate->getTimestamp().') { id, releaseDateTimestamp: releaseDate, releaseDateFormatted: releaseDate @date(as:"Y-m-d H:i:s"), releaseDateLa: releaseDate @date(as:"Y-m-d H:i:s", timezone: "America/Los_Angeles") } }';
+    //
+    //     $result = $this->execute($input);
+    //
+    //     $utcDateTime = new DateTime('2017-02-04 03:12:18', new DateTimeZone('UTC'));
+    //     $this->assertEquals($utcDateTime->format('U'), @$result['data']['story']['releaseDateTimestamp']);
+    //
+    //     $this->assertEquals('2017-02-04 03:12:18', @$result['data']['story']['releaseDateFormatted']);
+    //
+    //     $laTimestamp = (clone $utcDateTime)
+    //         ->setTimezone(new DateTimeZone('America/Los_Angeles'))
+    //         ->format('Y-m-d H:i:s');
+    //
+    //     $this->assertEquals($laTimestamp, @$result['data']['story']['releaseDateLa']);
+    // }
 
-    public function testPlainTextMutation(): void
-    {
-        $input = 'mutation { story: upsertStories(title:"Text Test'.date('U').'", body:"text in the body") { id, title, body } }';
+    // public function testLightswitchMutation(): void
+    // {
+    //     $input = 'mutation { story: upsertStories(title:"Lightswitch Test'.date('U').'", promoted:true) { id, promoted } }';
+    //
+    //     $result = $this->execute($input);
+    //
+    //     $this->assertTrue(@$result['data']['story']['promoted']);
+    // }
 
-        $result = $this->execute($input);
+    // public function testCheckboxMutation(): void
+    // {
+    //     $input = 'mutation { story: upsertStories(title:"Checkbox Test'.date('U').'", socialLinks:[fb, tw]) { id, socialLinks } }';
+    //
+    //     $result = $this->execute($input);
+    //
+    //     $this->assertEquals('["fb","tw"]', json_encode(@$result['data']['story']['socialLinks']));
+    // }
 
-        $this->assertEquals('text in the body', @$result['data']['story']['body']);
-    }
+    // public function testDropdownMutation(): void
+    // {
+    //     $input = 'mutation { story: upsertStories(title:"Dropdown Test'.date('U').'", language:cn) { id, language } }';
+    //
+    //     $result = $this->execute($input);
+    //
+    //     $this->assertEquals('cn', @$result['data']['story']['language']);
+    // }
 
-    public function testDateMutation(): void
-    {
-        $originalDate = new DateTime('2017-02-04 03:12:18', new DateTimeZone('UTC'));
-        $input = 'mutation { story: upsertStories(title:"Date Test'.date('U').'", releaseDate:'.$originalDate->getTimestamp().') { id, releaseDateTimestamp: releaseDate, releaseDateFormatted: releaseDate @date(as:"Y-m-d H:i:s"), releaseDateLa: releaseDate @date(as:"Y-m-d H:i:s", timezone: "America/Los_Angeles") } }';
+    // public function testEntriesMutation(): void
+    // {
+    //     $input = 'mutation { story: upsertStories(title:"Entries Test One'.date('U').'", body:"My first test") { id } }';
+    //     $first = $this->execute($input);
+    //     $firstId = @$first['data']['story']['id'];
+    //     $this->assertGreaterThan(0, $firstId);
+    //
+    //     $input = 'mutation { story: upsertStories(title:"Entries Test Two'.date('U').'", relatedEntry:['.$firstId.']) { id, relatedEntry { id } } }';
+    //     $second = $this->execute($input);
+    //     $secondId = @$second['data']['story']['id'];
+    //     $this->assertEquals(1, count(@$second['data']['story']['relatedEntry']), 'Entries field behavior is not properly limiting to the field.');
+    //     $this->assertEquals($firstId, @$second['data']['story']['relatedEntry'][0]['id'], 'Entries field behavior is not returning the correct entries.');
+    //
+    //     $input = 'query { entry(relatedTo:[{element:'.$firstId.'}]) { id } }';
+    //     $third = $this->execute($input);
+    //     $this->assertEquals($secondId, @$third['data']['entry']['id']);
+    //
+    //     $input = 'query { entriesConnection(id:'.$firstId.') { edges { relatedEntries { entries { id } } } } }';
+    //     $fourth = $this->execute($input);
+    //     $this->assertEquals($secondId, @$fourth['data']['entriesConnection']['edges'][0]['relatedEntries']['entries'][0]['id']);
+    // }
 
-        $result = $this->execute($input);
+    // public function testMultiSelectMutation(): void
+    // {
+    //     $input = 'mutation { story: upsertStories(title:"Multi Select Test'.date('U').'", socialLinksTwo:[fb, tw]) { id, socialLinksTwo } }';
+    //
+    //     $result = $this->execute($input);
+    //
+    //     $this->assertEquals('["fb","tw"]', json_encode(@$result['data']['story']['socialLinksTwo']));
+    // }
 
-        $utcDateTime = new DateTime('2017-02-04 03:12:18', new DateTimeZone('UTC'));
-        $this->assertEquals($utcDateTime->format('U'), @$result['data']['story']['releaseDateTimestamp']);
+    // public function testCategoriesMutation(): void
+    // {
+    //     $hash = date('U');
+    //     $input = 'mutation { story: upsertStories(title:"Category Test'.date('U').'", storyTypes:[{title:"foo bar", slug:"foo-bar'.$hash.'"}]) { id, storyTypes { id, title, slug } } }';
+    //
+    //     $result = $this->execute($input);
+    //
+    //     $this->assertEquals('foo-bar'.$hash, @$result['data']['story']['storyTypes'][0]['slug']);
+    // }
 
-        $this->assertEquals('2017-02-04 03:12:18', @$result['data']['story']['releaseDateFormatted']);
+    // public function testTagsMutation(): void
+    // {
+    //     $hash = date('U');
+    //     $input = 'mutation { story: upsertStories(title:"Tag Test'.date('U').'", storyTags:[{title:"foo'.$hash.'"}]) { id, storyTags { id, title, slug } } }';
+    //
+    //     $result = $this->execute($input);
+    //
+    //     $this->assertEquals('foo'.$hash, @$result['data']['story']['storyTags'][0]['slug']);
+    //
+    //     $input = '{ story: entriesConnection(id:'.$result['data']['story']['id'].') { edges { node { ...on Stories { storyTags { id, title, slug } } } } } }';
+    //     $result2 = $this->execute($input);
+    //     $this->assertEquals('foo'.$hash, @$result2['data']['story']['edges'][0]['node']['storyTags'][0]['slug']);
+    //
+    //     $input = '{ tags: tagsConnection(id:'.$result['data']['story']['storyTags'][0]['id'].') { edges { relatedEntries { edges { node { id } } } } } }';
+    //     $result3 = $this->execute($input);
+    //     $this->assertEquals($result['data']['story']['id'], @$result3['data']['tags']['edges'][0]['relatedEntries']['edges'][0]['node']['id']);
+    // }
 
-        $laTimestamp = (clone $utcDateTime)
-            ->setTimezone(new DateTimeZone('America/Los_Angeles'))
-            ->format('Y-m-d H:i:s');
-
-        $this->assertEquals($laTimestamp, @$result['data']['story']['releaseDateLa']);
-    }
-
-    public function testLightswitchMutation(): void
-    {
-        $input = 'mutation { story: upsertStories(title:"Lightswitch Test'.date('U').'", promoted:true) { id, promoted } }';
-
-        $result = $this->execute($input);
-
-        $this->assertTrue(@$result['data']['story']['promoted']);
-    }
-
-    public function testCheckboxMutation(): void
-    {
-        $input = 'mutation { story: upsertStories(title:"Checkbox Test'.date('U').'", socialLinks:[fb, tw]) { id, socialLinks } }';
-
-        $result = $this->execute($input);
-
-        $this->assertEquals('["fb","tw"]', json_encode(@$result['data']['story']['socialLinks']));
-    }
-
-    public function testDropdownMutation(): void
-    {
-        $input = 'mutation { story: upsertStories(title:"Dropdown Test'.date('U').'", language:cn) { id, language } }';
-
-        $result = $this->execute($input);
-
-        $this->assertEquals('cn', @$result['data']['story']['language']);
-    }
-
-    public function testEntriesMutation(): void
-    {
-        $input = 'mutation { story: upsertStories(title:"Entries Test One'.date('U').'", body:"My first test") { id } }';
-        $first = $this->execute($input);
-        $firstId = @$first['data']['story']['id'];
-        $this->assertGreaterThan(0, $firstId);
-
-        $input = 'mutation { story: upsertStories(title:"Entries Test Two'.date('U').'", relatedEntry:['.$firstId.']) { id, relatedEntry { id } } }';
-        $second = $this->execute($input);
-        $secondId = @$second['data']['story']['id'];
-        $this->assertEquals(1, count(@$second['data']['story']['relatedEntry']), 'Entries field behavior is not properly limiting to the field.');
-        $this->assertEquals($firstId, @$second['data']['story']['relatedEntry'][0]['id'], 'Entries field behavior is not returning the correct entries.');
-
-        $input = 'query { entry(relatedTo:[{element:'.$firstId.'}]) { id } }';
-        $third = $this->execute($input);
-        $this->assertEquals($secondId, @$third['data']['entry']['id']);
-
-        $input = 'query { entriesConnection(id:'.$firstId.') { edges { relatedEntries { entries { id } } } } }';
-        $fourth = $this->execute($input);
-        $this->assertEquals($secondId, @$fourth['data']['entriesConnection']['edges'][0]['relatedEntries']['entries'][0]['id']);
-    }
-
-    public function testMultiSelectMutation(): void
-    {
-        $input = 'mutation { story: upsertStories(title:"Multi Select Test'.date('U').'", socialLinksTwo:[fb, tw]) { id, socialLinksTwo } }';
-
-        $result = $this->execute($input);
-
-        $this->assertEquals('["fb","tw"]', json_encode(@$result['data']['story']['socialLinksTwo']));
-    }
-
-    public function testCategoriesMutation(): void
-    {
-        $hash = date('U');
-        $input = 'mutation { story: upsertStories(title:"Category Test'.date('U').'", storyTypes:[{title:"foo bar", slug:"foo-bar'.$hash.'"}]) { id, storyTypes { id, title, slug } } }';
-
-        $result = $this->execute($input);
-
-        $this->assertEquals('foo-bar'.$hash, @$result['data']['story']['storyTypes'][0]['slug']);
-    }
-
-    public function testTagsMutation(): void
-    {
-        $hash = date('U');
-        $input = 'mutation { story: upsertStories(title:"Tag Test'.date('U').'", storyTags:[{title:"foo'.$hash.'"}]) { id, storyTags { id, title, slug } } }';
-
-        $result = $this->execute($input);
-
-        $this->assertEquals('foo'.$hash, @$result['data']['story']['storyTags'][0]['slug']);
-
-        $input = '{ story: entriesConnection(id:'.$result['data']['story']['id'].') { edges { node { ...on Stories { storyTags { id, title, slug } } } } } }';
-        $result2 = $this->execute($input);
-        $this->assertEquals('foo'.$hash, @$result2['data']['story']['edges'][0]['node']['storyTags'][0]['slug']);
-
-        $input = '{ tags: tagsConnection(id:'.$result['data']['story']['storyTags'][0]['id'].') { edges { relatedEntries { edges { node { id } } } } } }';
-        $result3 = $this->execute($input);
-        $this->assertEquals($result['data']['story']['id'], @$result3['data']['tags']['edges'][0]['relatedEntries']['edges'][0]['node']['id']);
-    }
-
-    public function testAssetsMutation(): void
-    {
-        $input = 'mutation { story: upsertStories(title:"Asset Test'.date('U').'", heroImage:{url:"https://assets.imgix.net/examples/treefrog.jpg"}) { id, ...on Stories { heroImage { url } } } }';
-
-        $result = $this->execute($input);
-
-        $this->assertEquals('/uploads/treefrog', substr(@$result['data']['story']['heroImage'][0]['url'], 0, 17));
-    }
+    // public function testAssetsMutation(): void
+    // {
+    //     $input = 'mutation { story: upsertStories(title:"Asset Test'.date('U').'", heroImage:{url:"https://assets.imgix.net/examples/treefrog.jpg"}) { id, ...on Stories { heroImage { url } } } }';
+    //
+    //     $result = $this->execute($input);
+    //
+    //     $this->assertEquals('/uploads/treefrog', substr(@$result['data']['story']['heroImage'][0]['url'], 0, 17));
+    // }
 }
