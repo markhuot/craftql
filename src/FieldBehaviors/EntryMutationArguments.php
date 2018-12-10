@@ -22,9 +22,11 @@ class EntryMutationArguments extends FieldBehavior {
         $this->owner->addIntArgument('siteId');
         $this->owner->addIntArgument('authorId');
         $this->owner->addStringArgument('title');
+        $this->owner->addStringArgument('slug');
         $this->owner->addBooleanArgument('enabled');
         $this->owner->addDateArgument('postDate');
         $this->owner->addDateArgument('expiryDate');
+        $this->owner->addIntArgument('parentId');
 
         $mutationQueryObject = $this->owner->createInputObjectType('MutationQuery');
         $mutationQueryObject->use(new EntryQueryArguments);
@@ -72,8 +74,16 @@ class EntryMutationArguments extends FieldBehavior {
                 $entry->title = $args['title'];
             }
 
+            if (isset($args['slug'])) {
+                $entry->slug = $args['slug'];
+            }
+
             if (isset($args['enabled'])) {
                 $entry->enabled = $args['enabled'];
+            }
+
+            if (isset($args['parentId'])) {
+                $entry->newParentId = $args['parentId'];
             }
 
             if (isset($args['postDate'])) {
@@ -88,10 +98,12 @@ class EntryMutationArguments extends FieldBehavior {
             unset($fields['id']);
             unset($fields['siteId']);
             unset($fields['title']);
+            unset($fields['slug']);
             unset($fields['sectionId']);
             unset($fields['typeId']);
             unset($fields['authorId']);
             unset($fields['enabled']);
+            unset($fields['parentId']);
             unset($fields['postDate']);
             unset($fields['expiryDate']);
             unset($fields['query']);

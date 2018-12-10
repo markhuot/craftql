@@ -113,9 +113,9 @@ class GraphQLService extends Component {
             );
         };
 
-        $schemaConfig['directives'] = [
+        $schemaConfig['directives'] = array_merge(GraphQL::getStandardDirectives(), [
             \markhuot\CraftQL\Directives\Date::directive(),
-        ];
+        ]);
 
         $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
         $schemaConfig['mutation'] = $mutation;
