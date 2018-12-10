@@ -22,6 +22,7 @@ class EntryMutationArguments extends FieldBehavior {
         $this->owner->addIntArgument('siteId');
         $this->owner->addIntArgument('authorId');
         $this->owner->addStringArgument('title');
+        $this->owner->addStringArgument('slug');
         $this->owner->addBooleanArgument('enabled');
         $this->owner->addDateArgument('postDate');
         $this->owner->addDateArgument('expiryDate');
@@ -73,6 +74,10 @@ class EntryMutationArguments extends FieldBehavior {
                 $entry->title = $args['title'];
             }
 
+            if (isset($args['slug'])) {
+                $entry->slug = $args['slug'];
+            }
+
             if (isset($args['enabled'])) {
                 $entry->enabled = $args['enabled'];
             }
@@ -93,6 +98,7 @@ class EntryMutationArguments extends FieldBehavior {
             unset($fields['id']);
             unset($fields['siteId']);
             unset($fields['title']);
+            unset($fields['slug']);
             unset($fields['sectionId']);
             unset($fields['typeId']);
             unset($fields['authorId']);
