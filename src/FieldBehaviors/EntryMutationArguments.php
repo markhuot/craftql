@@ -25,6 +25,7 @@ class EntryMutationArguments extends FieldBehavior {
         $this->owner->addBooleanArgument('enabled');
         $this->owner->addDateArgument('postDate');
         $this->owner->addDateArgument('expiryDate');
+        $this->owner->addIntArgument('parentId');
 
         $mutationQueryObject = $this->owner->createInputObjectType('MutationQuery');
         $mutationQueryObject->use(new EntryQueryArguments);
@@ -76,6 +77,10 @@ class EntryMutationArguments extends FieldBehavior {
                 $entry->enabled = $args['enabled'];
             }
 
+            if (isset($args['parentId'])) {
+                $entry->newParentId = $args['parentId'];
+            }
+
             if (isset($args['postDate'])) {
                 $entry->postDate = DateTimeHelper::toDateTime($args['postDate']);
             }
@@ -92,6 +97,7 @@ class EntryMutationArguments extends FieldBehavior {
             unset($fields['typeId']);
             unset($fields['authorId']);
             unset($fields['enabled']);
+            unset($fields['parentId']);
             unset($fields['postDate']);
             unset($fields['expiryDate']);
             unset($fields['query']);
