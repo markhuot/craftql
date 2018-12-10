@@ -52,6 +52,7 @@ class GetMatrixFieldSchema
         foreach ($blockTypes as $blockType) {
             $type = $union->addType(ucfirst($field->handle).ucfirst($blockType->handle), $blockType);
             $type->addStringField('id'); // ideally this would be an `int`, but draft matrix blocks have an id of `new1`
+            $type->addBooleanField('enabled');
             $type->addFieldsByLayoutId($blockType->fieldLayoutId);
 
             if (empty($type->getFields())) {
@@ -75,6 +76,7 @@ class GetMatrixFieldSchema
         if (!empty($blockTypes)) {
             $inputType = $event->mutation->createInputObjectType(ucfirst($event->sender->handle) . 'Input');
             $inputType->addStringArgument('id');
+            $inputType->addBooleanArgument('enabled');
 
             foreach ($blockTypes as $blockType) {
                 $blockInputType = $event->mutation->createInputObjectType(ucfirst($event->sender->handle) . ucfirst($blockType->handle) . 'Input');
@@ -96,13 +98,24 @@ class GetMatrixFieldSchema
 
                     foreach ($values as $index => $value) {
                         $id = @$value['id'] ? $value['id'] : "new{$index}";
+                        $enabled = @$value['enabled'] ? $value['enabled']: 0;
                         unset($value['id']);
                         if (isset($value['type'])) {
                             $type = $value['type'];
                             $fields = $value['fields'];
                         }
                         else {
-                            $type = array_keys($value)[0];
+                            // get the keys
+                            $keys = array_keys($value);
+                            // remove known keys
+                            $keys = array_flip($keys);
+                            unset($keys['id']);
+                            unset($keys['enabled']);
+                            unset($keys['type']);
+                            unset($keys['fields']);
+                            $keys = array_merge(array_flip($keys));
+                            // type is the only remaining key
+                            $type = $keys[0];
                             $fields = $value[$type];
                         }
 
@@ -119,7 +132,7 @@ class GetMatrixFieldSchema
 
                         $newValues[$id] = [
                             'type' => $type,
-                            'enabled' => 1,
+                            'enabled' => $enabled,
                             'fields' => $fields,
                         ];
                     }

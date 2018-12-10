@@ -6,6 +6,7 @@ use Craft;
 use craft\elements\Asset;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\InputObjectType;
+use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
 use markhuot\CraftQL\Types\Volume;
 use markhuot\CraftQL\Types\VolumeInterface;
 use markhuot\CraftQL\Events\GetFieldSchema;
@@ -27,6 +28,7 @@ class GetAssetsFieldSchema
         $schema->addField($field)
             ->lists()
             ->type(VolumeInterface::class)
+            ->use(new AssetQueryArguments)
             ->resolve(function ($root, $args) use ($field) {
                 return $root->{$field->handle}->all();
             });
