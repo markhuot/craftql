@@ -123,8 +123,11 @@ class Request {
         // check if we're a user token, and if so if the user has access to
         // all entries or just their own
         if ($this->token->user) {
+            $id = $args['sectionId'][0];
             if (!$this->token->can('query:otheruserentries')) {
-                $args['authorId'] = $this->token->user->id;
+                if (!$id || !$this->token->can("query:entrytype:{$id}:all")) {
+                    $args['authorId'] = $this->token->user->id;
+                }
             }
         }
 

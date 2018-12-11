@@ -14,7 +14,7 @@ class EntryType extends BaseFactory {
     }
 
     function can($id, $mode='query') {
-        return $this->request->token()->can("{$mode}:entrytype:{$id}");
+        return $this->request->token()->can("{$mode}:entrytype:{$id}") || $this->request->token()->can("{$mode}:entrytype:{$id}:all");
     }
 
     function getEnumKey($object) {

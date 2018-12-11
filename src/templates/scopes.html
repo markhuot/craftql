@@ -107,7 +107,8 @@
                 <th scope="col" class="thin">Type</th>
                 <th scope="col">Section</th>
                 <th scope="col">Entry Type</th>
-                <th scope="col" class="thin"></th>
+                <th scope="col" class="thin">Self</th>
+                <th scope="col" class="thin">All</th>
             </tr>
         </thead>
         <tbody>
@@ -118,6 +119,7 @@
                         <td>{{ section.name }}</td>
                         <td>{{ entryType.name }}</td>
                         <td>{{ forms.lightswitch({"name": "scope[query:entrytype:" ~ entryType.id ~ "]", "value": 1, "on": token.can("query:entrytype:" ~ entryType.id), "small": true}) }}</td>
+                        <td>{{ forms.lightswitch({"name": "scope[query:entrytype:" ~ entryType.id ~ ":all]", "value": 1, "on": token.can("query:entrytype:" ~ entryType.id ~":all"), "small": true}) }}</td>
                     </tr>
                 {% endfor %}
             {% endfor %}
