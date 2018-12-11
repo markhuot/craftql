@@ -120,16 +120,24 @@ class Request {
             unset($args['type']);
         }
 
-        // check if we're a user token, and if so if the user has access to
-        // all entries or just their own
-        if ($this->token->user) {
-            $id = $args['sectionId'][0];
-            if (!$this->token->can('query:otheruserentries')) {
-                if (!$id || !$this->token->can("query:entrytype:{$id}:all")) {
-                    $args['authorId'] = $this->token->user->id;
-                }
+        $limitedTypes = [];
+        foreach ($args['typeId'] as $typeId) {
+            if ($this->token->can('query:otheruserentries') || $this->token->can("query:entrytype:{$typeId}:all")) {
+                $limitedTypes[] = $typeId;
+            } elseif ($this->token->can("query:entrytype:{$typeId}")) {
+                $args['authorId'] = $this->token->user->id;
+                $limitedTypes[] = $typeId;
             }
         }
+        $args['typeId'] = $limitedTypes;
+
+        // check if we're a user token, and if so if the user has access to
+        // all entries or just their own
+        /*if ($this->token->user) {
+            if (!$this->token->can('query:otheruserentries')) {
+                $args['authorId'] = $this->token->user->id;
+            }
+        }*/
 
         if (!empty($args['relatedTo'])) {
             $criteria->relatedTo(array_merge(['and'], $this->parseRelatedTo($args['relatedTo'], @$root['node']->id)));
