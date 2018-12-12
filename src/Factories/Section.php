@@ -14,7 +14,7 @@ class Section extends BaseFactory {
     function can($id, $mode='query') {
         $section = $this->repository->get($id);
         foreach ($section->entryTypes as $type) {
-            if ($this->request->token()->can("{$mode}:entrytype:{$type->id}")) {
+            if ($this->request->token()->can("{$mode}:entrytype:{$type->id}") || $this->request->token()->can("{$mode}:entrytype:{$type->id}:all")) {
                 return true;
             }
         }
