@@ -110,22 +110,27 @@ class Request {
             unset($args['section']);
         }
 
+        /* Only allow users to view their own entires if explicitly defined in $args['type'] */
         if (empty($args['type'])) {
-            $args['typeId'] = array_map(function ($value) {
-                return $value->value;
-            }, $this->entryTypes()->enum()->getValues());
+            $args['typeId'] = [];
+            foreach ($this->entryTypes()->enum()->getValues() as $value) {
+                $typeId = $value->value;
+                if ($this->token->can('query:otheruserentries') || $this->token->can("query:entrytype:{$typeId}:all")) {
+                    $args['typeId'][] = $typeId;
+                }
+            }
         }
         else {
-            $args['typeId'] = $args['type'];
-            unset($args['type']);
-        }
-
-        // check if we're a user token, and if so if the user has access to
-        // all entries or just their own
-        if ($this->token->user) {
-            if (!$this->token->can('query:otheruserentries')) {
-                $args['authorId'] = $this->token->user->id;
+            $args['typeId'] = [];
+            foreach ($args['type'] as $typeId) {
+                if ($this->token->can('query:otheruserentries') || $this->token->can("query:entrytype:{$typeId}:all")) {
+                    $args['typeId'][] = $typeId;
+                } elseif ($this->token->can("query:entrytype:{$typeId}")) {
+                    $args['authorId'] = $this->token->user->id;
+                    $args['typeId'][] = $typeId;
+                }
             }
+            unset($args['type']);
         }
 
         if (!empty($args['relatedTo'])) {

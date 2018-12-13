@@ -57,6 +57,7 @@ class ApiController extends Controller
             }
             $response->headers->add('Access-Control-Allow-Credentials', 'true');
             $response->headers->add('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+            $response->headers->add('Access-Control-Expose-Headers', 'Authorization');
         }
         $response->headers->add('Allow', implode(', ', CraftQL::getInstance()->getSettings()->verbs));
 

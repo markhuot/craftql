@@ -19,6 +19,7 @@ class GetUserPermissions
             foreach ($entryTypes as $entryType) {
                 $id = $entryType->id;
                 $queryTypes["craftql:query:entrytype:{$id}"] = ['label' => \Craft::t('craftql', 'Query their own entries of the '.$entryType->name.' entry type')];
+                $queryTypes["craftql:query:entrytype:{$id}:all"] = ['label' => \Craft::t('craftql', 'Query all entries of the '.$entryType->name.' entry type')];
                 $mutationTypes["craftql:mutate:entrytype:{$id}"] = ['label' => \Craft::t('craftql', 'Mutate their own entries of the '.$entryType->name.' entry type')];
             }
         }
