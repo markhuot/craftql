@@ -2,6 +2,15 @@
 
 - (none)
 
+## 1.2.1 - 2018-12-17
+
+### Fixed
+
+- Added field argument to custom Entries fields ([#202](https://github.com/markhuot/craftql/issues/202))
+- Adds `slug:` argument to entry mutations ([#199](https://github.com/markhuot/craftql/issues/199))
+- Adds `parentId:` argument to entry mutations ([#199](https://github.com/markhuot/craftql/issues/199))
+- Restored native `@skip` and `@include` directives ([#198](https://github.com/markhuot/craftql/issues/198))
+
 ## 1.2.0 - 2018-12-07
 
 ### Fixed
