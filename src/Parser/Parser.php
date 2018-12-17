@@ -5,6 +5,7 @@ namespace markhuot\CraftQL\Parser;
 use GraphQL\Type\Definition\InterfaceType;
 use markhuot\CraftQL\Builders\BaseBuilder;
 use markhuot\CraftQL\Builders\EnumObject;
+use markhuot\CraftQL\Builders\EnumType;
 use markhuot\CraftQL\Builders\InputObjectType;
 use markhuot\CraftQL\Builders\ObjectType;
 use markhuot\CraftQL\Request;
@@ -12,9 +13,10 @@ use markhuot\CraftQL\Request;
 class Parser {
 
     /**
-     * @var BaseBuilder
+     * @todo maybe an interface?
+     * @var ???
      */
-    protected $builder;
+    protected $parser;
 
     /**
      * @var Request
@@ -34,38 +36,35 @@ class Parser {
      */
     function __construct($request, $class) {
         $this->request = $request;
+
+        // @TODO maybe cache this if we're creating reflection classes for the same class multiple times
         $this->reflectedClass = new \ReflectionClass($class);
 
-        $builderClass = $this->getBuilderClass();
-        $this->builder = new $builderClass($this->request);
-        $this->builder->name($this->reflectedClass->getShortName());
-
-        $this->parseObjectTypeConfig();
-        $this->parseInterfaceTypeConfig();
-        $this->parseEnumTypeConfig();
+        $this->parser = $this->getParser();
+        $this->parser->parse();
     }
 
     /**
-     * Get the GraphQL builder class to manage this PHP class
+     * Get the parser to manage this GraphQL type
      *
      * @return string
      */
-    function getBuilderClass() {
+    protected function getParser() {
         $doc = $this->reflectedClass->getDocComment();
 
         if (preg_match('/@craftql-type interface/', $doc)) {
-            return InterfaceType::class;
+            return new InterfaceParser($this->request, $this->reflectedClass);
         }
 
         if (preg_match('/@craftql-type enum/', $doc)) {
-            return EnumObject::class;
+            // return EnumType::class;
         }
 
         if (preg_match('/@craftql-type input/', $doc)) {
-            return InputObjectType::class;
+            // return InputObjectType::class;
         }
 
-        return ObjectType::class;
+        // return ObjectType::class;
     }
 
 }

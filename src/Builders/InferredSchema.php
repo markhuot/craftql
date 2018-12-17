@@ -31,13 +31,13 @@ class InferredSchema extends InferredBase {
         $type = ObjectType::class;
         $doc = $reflect->getDocComment();
         if (preg_match('/@craftql-type interface/', $doc)) {
-            $type = InterfaceBuilder::class;
+            $type = InterfaceType::class;
         }
         else if (preg_match('/@craftql-type enum/', $doc)) {
-            $type = EnumObject::class;
+            $type = EnumType::class;
         }
         else if (preg_match('/@craftql-type input/', $doc)) {
-            $type = InputSchema::class;
+            $type = InputObjectType::class;
         }
 
         $this->type = new $type($this->request);

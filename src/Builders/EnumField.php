@@ -5,7 +5,7 @@ namespace markhuot\CraftQL\Builders;
 class EnumField extends Field {
 
     function boot() {
-        $this->type = (new EnumObject($this->request))
+        $this->type = (new EnumType($this->request))
             ->name(ucfirst($this->getName()).'Enum');
     }
 

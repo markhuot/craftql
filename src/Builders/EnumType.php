@@ -2,9 +2,9 @@
 
 namespace markhuot\CraftQL\Builders;
 
-use GraphQL\Type\Definition\EnumType;
+use GraphQL\Type\Definition\EnumType as BaseEnumType;
 
-class EnumObject extends Schema {
+class EnumType extends ObjectType {
 
     private $values = [];
 
@@ -37,7 +37,7 @@ class EnumObject extends Schema {
     }
 
     function getGraphQLObject() {
-        return new EnumType($this->getConfig());
+        return new BaseEnumType($this->getConfig());
     }
 
 }
