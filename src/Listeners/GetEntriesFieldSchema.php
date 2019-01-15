@@ -31,6 +31,7 @@ class GetEntriesFieldSchema
 
         $event->schema->addField($field)
             ->type(EntryConnection::class)
+            ->use(new EntryQueryArguments)
             ->name("{$field->handle}Connection")
             ->resolve(function ($root, $args, $context, $info) use ($field, $request) {
                 $criteria = $request->entries($root->{$field->handle}, $root, $args, $context, $info);
