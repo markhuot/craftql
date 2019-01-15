@@ -40,6 +40,22 @@ class EntryEdge extends Schema {
                     'edges' => $drafts,
                 ];
             });
+
+        $alternateResolver = function (\craft\elements\Entry $root, $args, $context, $info) {
+            $siteHandle = $info->fieldName;
+            $site = Craft::$app->sites->getSiteByHandle($siteHandle);
+            return Craft::$app->entries->getEntryById($root->id, $site->id);
+        };
+
+        $alternateEntries = $this->createObjectType('AlternateEntries');
+        $alternateEntries->addField('en')->type(EntryInterface::class)->resolve($alternateResolver);
+        $alternateEntries->addField('de')->type(EntryInterface::class)->resolve($alternateResolver);
+
+        $this->addField('alternates')
+            ->type($alternateEntries)
+            ->resolve(function ($root, $args, $context, $info) {
+                return $root['node'];
+            });
     }
 
 }
