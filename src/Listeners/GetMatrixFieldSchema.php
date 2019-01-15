@@ -54,14 +54,6 @@ class GetMatrixFieldSchema
             $type->addStringField('id'); // ideally this would be an `int`, but draft matrix blocks have an id of `new1`
             $type->addBooleanField('enabled');
             $type->addFieldsByLayoutId($blockType->fieldLayoutId);
-
-            if (empty($type->getFields())) {
-                $warning = 'The block type, `'.$blockType->handle.'` on `'.$field->handle.'`, has no fields. This would violate the GraphQL spec so we filled it in with this placeholder.';
-
-                $type->addStringField('empty')
-                    ->description($warning)
-                    ->resolve($warning);
-            }
         }
 
         if (empty($blockTypes)) {
