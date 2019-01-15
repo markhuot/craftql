@@ -21,6 +21,11 @@ class Union extends Field {
         return $this->resolveType;
     }
 
+    /**
+     * @param $typeName
+     * @param null $context
+     * @return Schema
+     */
     function addType($typeName, $context=null) {
         $this->types[$typeName] = new Schema($this->request, $context);
         $this->types[$typeName]->name($typeName);
@@ -52,7 +57,9 @@ class Union extends Field {
         return static::$rawTypes[$this->getName()] = new UnionType([
             'name' => ucfirst($this->getName()).'Union',
             'description' => 'A union of possible blocks types',
-            'types' => $this->getRawTypes(),
+            'types' => function () {
+                return $this->getRawTypes();
+            },
             'resolveType' => $this->getResolveType(),
         ]);
     }

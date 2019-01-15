@@ -53,6 +53,10 @@ trait HasTypeAttribute {
             $rawType = $type->getRawGraphQLType();
         }
 
+        else if (is_a($type, Union::class) || is_subclass_of($type, Union::class)) {
+            $rawType = $type->getRawType();
+        }
+
         else {
             $rawType = $type ?: Type::string();
         }
