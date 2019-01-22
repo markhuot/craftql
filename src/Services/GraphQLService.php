@@ -12,6 +12,21 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
+use markhuot\CraftQL\Types\ElementInterface;
+use markhuot\CraftQL\Types\EntryConnection;
+use markhuot\CraftQL\Types\EntryDraftConnection;
+use markhuot\CraftQL\Types\EntryDraftEdge;
+use markhuot\CraftQL\Types\EntryDraftInfo;
+use markhuot\CraftQL\Types\EntryEdge;
+use markhuot\CraftQL\Types\EntryInterface;
+use markhuot\CraftQL\Types\EntryType;
+use markhuot\CraftQL\Types\Field;
+use markhuot\CraftQL\Types\PageInfo;
+use markhuot\CraftQL\Types\Section;
+use markhuot\CraftQL\Types\SectionSiteSettings;
+use markhuot\CraftQL\Types\Site;
+use markhuot\CraftQL\Types\Timestamp;
+use markhuot\CraftQL\Types\User;
 use yii\base\Component;
 use Yii;
 
@@ -84,41 +99,63 @@ class GraphQLService extends Component {
         $event->query = $query;
         $query->trigger(AlterQuerySchema::EVENT, $event);
 
-        $schemaConfig['query'] = $query->getRawGraphQLObject();
-        $schemaConfig['types'] = function () use ($request, $query) {
-            return array_merge(
-                array_map(function ($section) {
-                    return $section->getRawGraphQLObject();
-                }, $request->sections()->all()),
+        $request->registerNamespace('\\markhuot\\CraftQL\\Types');
 
-                array_map(function ($volume) {
-                    return $volume->getRawGraphQLObject();
-                }, $request->volumes()->all()),
+        $request->registerType('Query', $query);
 
-                array_map(function ($categoryGroup) {
-                    return $categoryGroup->getRawGraphQLObject();
-                }, $request->categoryGroups()->all()),
+        array_map(function ($entryType) use ($request) {
+            $request->registerType($entryType->getName(), $entryType);
+        }, $request->entryTypes()->all());
 
-                array_map(function ($tagGroup) {
-                    return $tagGroup->getRawGraphQLObject();
-                }, $request->tagGroups()->all()),
+        $request->registerType('DateFormatTypes', \markhuot\CraftQL\Directives\Date::dateFormatTypesEnum());
 
-                array_map(function ($entryType) {
-                    return $entryType->getRawGraphQLObject();
-                }, $request->entryTypes()->all()),
+        $schemaConfig['types'] = function () use ($request) {
+            $types = array_map(function ($entryType) use ($request) {
+                return $request->getType($entryType->getName());
+            }, $request->entryTypes()->all());
+            $types[] = $request->getType('DateFormatTypes');
+            return $types;
+        };
 
-                [\markhuot\CraftQL\Directives\Date::dateFormatTypesEnum()],
+        $schemaConfig['query'] = $request->getType('Query');
 
-                $query->getConcreteTypes()
-            );
+        // $schemaConfig['types'] = function () use ($request, $query) {
+        //     return array_merge(
+        //         array_map(function ($section) {
+        //             return $section->getRawGraphQLObject();
+        //         }, $request->sections()->all()),
+        //
+        //         array_map(function ($volume) {
+        //             return $volume->getRawGraphQLObject();
+        //         }, $request->volumes()->all()),
+        //
+        //         array_map(function ($categoryGroup) {
+        //             return $categoryGroup->getRawGraphQLObject();
+        //         }, $request->categoryGroups()->all()),
+        //
+        //         array_map(function ($tagGroup) {
+        //             return $tagGroup->getRawGraphQLObject();
+        //         }, $request->tagGroups()->all()),
+        //
+        //         $query->getConcreteTypes()
+        //     );
+        // };
+
+        $schemaConfig['typeLoader'] = function ($name) use ($request) {
+            if ($request->getType($name)) {
+                return $request->getType($name);
+            }
+
+            var_dump($name.' could not be found');
+            die;
         };
 
         $schemaConfig['directives'] = array_merge(GraphQL::getStandardDirectives(), [
             \markhuot\CraftQL\Directives\Date::directive(),
         ]);
 
-        $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
-        $schemaConfig['mutation'] = $mutation;
+        // $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
+        // $schemaConfig['mutation'] = $mutation;
 
         $schema = new Schema($schemaConfig);
 

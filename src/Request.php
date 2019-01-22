@@ -148,4 +148,42 @@ class Request {
         return $criteria;
     }
 
+    private $types = [];
+    private $namespaces = [];
+
+    function registerNamespace($namespace, $prefix='') {
+        $this->namespaces[] = ['namespace' => $namespace, 'prefix' => $prefix];
+    }
+
+    function registerType($name, $obj) {
+        $this->types[$name] = $obj;
+    }
+
+    function getType($name) {
+        $type = @$this->types[$name];
+
+        if (method_exists($type, 'getRawGraphQLObject')) {
+            return $type->getRawGraphQLObject();
+        }
+
+        if (method_exists($type, 'getRawGraphQLType')) {
+            return $type->getRawGraphQLType();
+        }
+
+        foreach ($this->namespaces as $namespaceConfig) {
+            $namespace = $namespaceConfig['namespace'];
+            $prefix = $namespaceConfig['prefix'];
+            $class = $namespace.'\\'.$prefix.$name;
+            if (class_exists($class)) {
+                return (new $class($this))->getRawGraphQLObject();
+            }
+        }
+
+        if ($type) {
+            return $type;
+        }
+
+        return false;
+    }
+
 }
