@@ -41,6 +41,11 @@ class Date {
                     'name' => 'format',
                     'type' => static::dateFormatTypesEnum(),
                     'description' => 'A standard format to use, overrides the `as` argument',
+                ]),
+                new FieldArgument([
+                    'name' => 'locale',
+                    'type' => Type::string(),
+                    'description' => 'The locale to use when formatting the date',
                 ])
             ]
         ]);

@@ -2,6 +2,9 @@
 
 namespace markhuot\CraftQL\Builders;
 
+use Craft;
+use craft\elements\Entry;
+use craft\i18n\Locale;
 use DateTime;
 use DateTimeZone;
 
@@ -16,6 +19,13 @@ class Date extends Field {
         return function ($root, $args, $context, $info) {
             $format = 'U';
             $timezone = 'GMT';
+            $locale = false;
+
+            if (is_a($root, Entry::class)) {
+                /** @var Entry $entry */
+                $entry = $root;
+                $locale = $entry->site->language;
+            }
 
             if (isset($info->fieldNodes[0]->directives[0])) {
                 $directive = $info->fieldNodes[0]->directives[0];
@@ -33,11 +43,16 @@ class Date extends Field {
                             case 'format':
                                 $format = constant('DateTime::' . strtoupper($arg->value->value));
                                 break;
+
+                            case 'locale':
+                                $locale = $arg->value->value;
+                                break;
                         }
                     }
                 }
             }
 
+            /** @var DateTime $date */
             $date = $root->{$info->fieldName};
 
             if ($this->isNonNull() && !$date) {
@@ -48,11 +63,12 @@ class Date extends Field {
                 return null;
             }
 
-            $date->setTimezone(new DateTimeZone($timezone));
-
-            $date = $date->format($format);
-            $cast = ($format === 'U') ? 'intval' : 'strval';
-            return $cast($date);
+            $formatter = $locale ? (new Locale($locale))->getFormatter() : Craft::$app->getFormatter();
+            $fmtTimeZone = $formatter->timeZone;
+            $formatter->timeZone = $timezone;
+            $formatted = $formatter->asDate($date, 'php:'.$format);
+            $formatter->timeZone = $fmtTimeZone;
+            return $formatted;
         };
     }
 
