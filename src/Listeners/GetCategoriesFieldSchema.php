@@ -28,7 +28,7 @@ class GetCategoriesFieldSchema
             return;
         }
 
-        if (preg_match('/^group:(\d+)$/', $field->source, $matches)) {
+        if (preg_match('/^group:(.+)$/', $field->source, $matches)) {
             $groupId = $matches[1];
 
             $event->schema->addField($field)

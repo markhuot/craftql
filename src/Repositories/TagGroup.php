@@ -13,6 +13,7 @@ class TagGroup extends Component {
       foreach (Craft::$app->tags->allTagGroups as $group) {
             if (!isset($this->groups[$group->id])) {
               $this->groups[$group->id] = $group;
+              $this->groups[$group->uid] = $group;
             }
         }
     }

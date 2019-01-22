@@ -11,6 +11,7 @@ class Volumes {
   function load() {
     foreach (Craft::$app->volumes->getAllVolumes() as $volume) {
       $this->volumes[$volume->id] = $volume;
+      $this->volumes[$volume->uid] = $volume;
     }
   }
 

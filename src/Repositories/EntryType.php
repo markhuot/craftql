@@ -12,6 +12,7 @@ class EntryType {
         foreach (Craft::$app->sections->allSections as $section) {
             foreach ($section->entryTypes as $entryType) {
                 $this->entryTypes[$entryType->id] = $entryType;
+                $this->entryTypes[$entryType->uid] = $entryType;
             }
         }
     }
