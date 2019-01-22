@@ -28,7 +28,9 @@ class EntryEdge extends Schema {
         $this->addField('drafts')
             ->type(EntryDraftConnection::class)
             ->resolve(function ($root, $args, $context, $info) {
-                $drafts = Craft::$app->entryRevisions->getDraftsByEntryId($root['node']->id);
+                /** @var \craft\elements\Entry $entry */
+                $entry = $root['node'];
+                $drafts = Craft::$app->entryRevisions->getDraftsByEntryId($entry->id, $entry->siteId, true);
                 return [
                     'totalCount' => count($drafts),
                     'pageInfo' => [

@@ -13,6 +13,8 @@ class EntryDraftConnection extends EntryConnection {
         parent::boot();
 
         $this->getField('edges')
+            // @TODO add this in at some point, it's a breaking change though
+            // ->lists()
             ->type(EntryDraftEdge::class);
     }
 
