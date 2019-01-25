@@ -3,12 +3,17 @@
 namespace markhuot\CraftQL\Factories;
 
 use GraphQL\Type\Definition\EnumType;
+use markhuot\CraftQL\Request;
 
 abstract class BaseFactory {
 
     static $enums = [];
 
     protected $repository;
+
+    /**
+     * @var Request
+     */
     protected $request;
     private $objects = [];
 
@@ -77,10 +82,14 @@ abstract class BaseFactory {
             $values['empty'] = 'Empty';
         }
 
-        return static::$enums[$name] = new EnumType([
-            'name' => $reflect->getShortName().'sEnum',
+        static::$enums[$name] = new EnumType([
+            'name' => $name,
             'values' => $values,
         ]);
+
+        $this->request->registerType($name, static::$enums[$name]);
+
+        return static::$enums[$name];
     }
 
 }

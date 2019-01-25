@@ -149,6 +149,7 @@ class Request {
     }
 
     private $types = [];
+    static $typeCaches = [];
     private $namespaces = [];
 
     function registerNamespace($namespace, $prefix='') {
@@ -160,14 +161,18 @@ class Request {
     }
 
     function getType($name) {
+        if (!empty(static::$typeCaches[$name])) {
+            return static::$typeCaches[$name];
+        }
+
         $type = @$this->types[$name];
 
         if (method_exists($type, 'getRawGraphQLObject')) {
-            return $type->getRawGraphQLObject();
+            return static::$typeCaches[$name] = $type->getRawGraphQLObject();
         }
 
         if (method_exists($type, 'getRawGraphQLType')) {
-            return $type->getRawGraphQLType();
+            return static::$typeCaches[$name] = $type->getRawGraphQLType();
         }
 
         foreach ($this->namespaces as $namespaceConfig) {
@@ -175,12 +180,12 @@ class Request {
             $prefix = $namespaceConfig['prefix'];
             $class = $namespace.'\\'.$prefix.$name;
             if (class_exists($class)) {
-                return (new $class($this))->getRawGraphQLObject();
+                return static::$typeCaches[$name] = (new $class($this))->getRawGraphQLObject();
             }
         }
 
         if ($type) {
-            return $type;
+            return static::$typeCaches[$name] = $type;
         }
 
         return false;

@@ -107,12 +107,35 @@ class GraphQLService extends Component {
             $request->registerType($entryType->getName(), $entryType);
         }, $request->entryTypes()->all());
 
+        array_map(function ($volume) use ($request) {
+            $request->registerType($volume->getName(), $volume);
+        }, $request->volumes()->all());
+
+        array_map(function ($globalSet) use ($request) {
+            $request->registerType($globalSet->getName(), $globalSet);
+        }, $request->globals()->all());
+
+        array_map(function ($categoryGroup) use ($request) {
+            $request->registerType($categoryGroup->getName(), $categoryGroup);
+        }, $request->categoryGroups()->all());
+
         $request->registerType('DateFormatTypes', \markhuot\CraftQL\Directives\Date::dateFormatTypesEnum());
 
         $schemaConfig['types'] = function () use ($request) {
-            $types = array_map(function ($entryType) use ($request) {
+            $types = [];
+
+            $types = array_merge($types, array_map(function ($entryType) use ($request) {
                 return $request->getType($entryType->getName());
-            }, $request->entryTypes()->all());
+            }, $request->entryTypes()->all()));
+
+            $types = array_merge($types, array_map(function ($volume) use ($request) {
+                return $request->getType($volume->getName());
+            }, $request->volumes()->all()));
+
+            $types = array_merge($types, array_map(function ($categoryGroup) use ($request) {
+                return $request->getType($categoryGroup->getName());
+            }, $request->categoryGroups()->all()));
+
             $types[] = $request->getType('DateFormatTypes');
             return $types;
         };
@@ -124,14 +147,6 @@ class GraphQLService extends Component {
         //         array_map(function ($section) {
         //             return $section->getRawGraphQLObject();
         //         }, $request->sections()->all()),
-        //
-        //         array_map(function ($volume) {
-        //             return $volume->getRawGraphQLObject();
-        //         }, $request->volumes()->all()),
-        //
-        //         array_map(function ($categoryGroup) {
-        //             return $categoryGroup->getRawGraphQLObject();
-        //         }, $request->categoryGroups()->all()),
         //
         //         array_map(function ($tagGroup) {
         //             return $tagGroup->getRawGraphQLObject();
@@ -146,8 +161,7 @@ class GraphQLService extends Component {
                 return $request->getType($name);
             }
 
-            var_dump($name.' could not be found');
-            die;
+            throw new \Exception($name.' could not be found');
         };
 
         $schemaConfig['directives'] = array_merge(GraphQL::getStandardDirectives(), [
@@ -159,9 +173,9 @@ class GraphQLService extends Component {
 
         $schema = new Schema($schemaConfig);
 
-        if (Craft::$app->config->general->devMode) {
-            $schema->assertValid();
-        }
+        // if (Craft::$app->config->general->devMode) {
+        //     $schema->assertValid();
+        // }
 
         return $schema;
     }
