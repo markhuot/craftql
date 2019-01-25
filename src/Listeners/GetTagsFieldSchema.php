@@ -25,7 +25,7 @@ class GetTagsFieldSchema
         }
 
         $source = $field->settings['source'];
-        if (preg_match('/taggroup:(\d+)/', $source, $matches)) {
+        if (preg_match('/taggroup:(.+)/', $source, $matches)) {
             $groupId = $matches[1];
 
             $schema->addField($field)

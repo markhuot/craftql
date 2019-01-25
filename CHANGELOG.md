@@ -2,6 +2,21 @@
 
 - (none)
 
+## 1.3.0 - 2019-01-24
+
+### Fixed
+
+- Updated category and tag factories to use the new `uid` format that Craft 3.1 uses ([#210](https://github.com/markhuot/craftql/issues/210))
+- Updated the `@date` directive to use the locale of the entry when formatting a date field ([#209](https://github.com/markhuot/craftql/issues/209))
+- Updated the `drafts` field to ensure custom fields load the correct content ([#208](https://github.com/markhuot/craftql/issues/208))
+- Updated unions to allow circular references in preparation for Neo integration ([#86](https://github.com/markhuot/craftql/issues/86))
+
+### Added
+
+- Added a `locale:` argument to the `@date` directive so you can override the date language ([#209](https://github.com/markhuot/craftql/issues/209))
+- Added query arguments to the `entriesConnection` custom fields ([#203](https://github.com/markhuot/craftql/issues/203))
+- Added the `dateUpdated` and `dateCreated` arguments when querying entries ([#201](https://github.com/markhuot/craftql/issues/201))
+
 ## 1.2.1 - 2018-12-17
 
 ### Fixed
