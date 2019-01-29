@@ -45,7 +45,8 @@ class GetSelectOneFieldSchema
 
         foreach ($craftField['settings']['options'] as $option) {
             $value = StringHelper::graphQLEnumValueForString($option['value']);
-            $name = trim($value) === '' ? 'empty' : $value;
+            $value = trim($value) === '' ? 'empty' : $value;
+            $name = $value;
 
             if (is_numeric($name)) {
                 //$name = \craft\helpers\StringHelper::toPascalCase($option['label']);
