@@ -12,8 +12,10 @@ class CategoryGroup extends Component {
     function load() {
         foreach (Craft::$app->categories->allGroups as $group) {
             if (!isset($this->groups[$group->id])) {
-              $this->groups[$group->id] = $group;
-              $this->groups[$group->uid] = $group;
+                $this->groups[$group->id] = $group;
+                if (!empty($group->uid)) {
+                    $this->groups[$group->uid] = $group;
+                }
             }
         }
     }

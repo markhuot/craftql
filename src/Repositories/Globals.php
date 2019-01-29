@@ -11,7 +11,9 @@ class Globals {
     function load() {
         foreach (Craft::$app->globals->allSets as $set) {
             $this->sets[$set->id] = $set;
-            $this->sets[$set->uid] = $set;
+            if (!empty($set->uid)) {
+                $this->sets[$set->uid] = $set;
+            }
         }
     }
 
