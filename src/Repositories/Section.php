@@ -11,7 +11,9 @@ class Section {
     function load() {
         foreach (Craft::$app->sections->allSections as $section) {
             $this->sections[$section->id] = $section;
-            $this->sections[$section->uid] = $section;
+            if (!empty($section->uid)) {
+                $this->sections[$section->uid] = $section;
+            }
         }
     }
     

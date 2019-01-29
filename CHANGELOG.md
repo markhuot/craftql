@@ -2,6 +2,12 @@
 
 - (none)
 
+## 1.3.1 - 2019-01-29
+
+### Fixed
+
+- Fixed a bug where the `uid` improvements for 3.1.x from #210 were breaking on Craft 3.0.x ([#217](https://github.com/markhuot/craftql/issues/217))
+
 ## 1.3.0 - 2019-01-24
 
 ### Fixed

@@ -10,10 +10,12 @@ class TagGroup extends Component {
     private $groups = [];
 
     function load() {
-      foreach (Craft::$app->tags->allTagGroups as $group) {
+        foreach (Craft::$app->tags->allTagGroups as $group) {
             if (!isset($this->groups[$group->id])) {
-              $this->groups[$group->id] = $group;
-              $this->groups[$group->uid] = $group;
+                $this->groups[$group->id] = $group;
+                if (!empty($group->uid)) {
+                    $this->groups[$group->uid] = $group;
+                }
             }
         }
     }
