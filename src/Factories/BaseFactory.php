@@ -26,6 +26,10 @@ abstract class BaseFactory {
     //     return $this->repository;
     // }
 
+    function getRaw($id) {
+        return $this->repository->get($id);
+    }
+
     function get($id, $mode='query') {
         if ($this->can($id, $mode) === false) {
             return false;

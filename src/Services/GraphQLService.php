@@ -69,6 +69,9 @@ class GraphQLService extends Component {
         $this->sections->load();
         $this->globals->load();
 
+        // @TODO don't load _everything_. Instead only load what's needed on demand
+        \Yii::$container->get('craftQLFieldService')->load();
+
         $maxQueryDepth = CraftQL::getInstance()->getSettings()->maxQueryDepth;
         if ($maxQueryDepth !== false) {
             $rule = new QueryDepth($maxQueryDepth);
