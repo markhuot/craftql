@@ -13,7 +13,8 @@ class EntryQueryArguments extends FieldBehavior {
 
     function initEntryQueryArguments() {
         if (static::$args !== null) {
-            return static::$args;
+            $this->owner->addArguments(static::$args, false);
+            return;
         }
 
         $tmp = new Field($this->owner->request, 'TmpHoldingForAllQueryArgs');
@@ -60,8 +61,10 @@ class EntryQueryArguments extends FieldBehavior {
         $fieldService = \Yii::$container->get('craftQLFieldService');
         $arguments = $fieldService->getQueryArguments($tmp->getRequest());
         $tmp->addArguments($arguments, false);
+        static::$args = $tmp->getArguments();
 
-        return static::$args = $tmp->getArguments();
+        $this->owner->addArguments(static::$args, false);
+        return static::$args;
     }
 
     function relatedToInputObject() {

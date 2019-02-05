@@ -168,14 +168,15 @@ class GraphQLService extends Component {
             \markhuot\CraftQL\Directives\Date::directive(),
         ]);
 
-        // $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
-        // $schemaConfig['mutation'] = $mutation;
+        $mutation = new \markhuot\CraftQL\Types\Mutation($request);
+        $request->registerType('Mutation', $mutation);
+        $schemaConfig['mutation'] = $mutation->getRawGraphQLObject();
 
         $schema = new Schema($schemaConfig);
 
-        // if (Craft::$app->config->general->devMode) {
-        //     $schema->assertValid();
-        // }
+        if (Craft::$app->config->general->devMode) {
+            $schema->assertValid();
+        }
 
         return $schema;
     }
