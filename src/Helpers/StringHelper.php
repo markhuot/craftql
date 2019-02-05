@@ -7,6 +7,8 @@ use markhuot\CraftQL\Request;
 
 class StringHelper {
 
+    static $entryTypeMap = [];
+
     /**
      * Convert a Craft Entry Type in to a valid GraphQL Name
      *
@@ -26,13 +28,18 @@ class StringHelper {
      * @return string
      */
     static function graphQLNameForEntryTypeSection(Request $request, $entryTypeId, $sectionId): string {
+        $key = "{$entryTypeId}:{$sectionId}";
+        if (isset(static::$entryTypeMap[$key])) {
+            return static::$entryTypeMap[$key];
+        }
+
         $entryType = $request->entryTypes()->getRaw($entryTypeId);
         $section = $request->sections()->getRaw($sectionId);
 
         $typeHandle = ucfirst($entryType->handle);
         $sectionHandle = ucfirst($section->handle);
 
-        return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
+        return static::$entryTypeMap[$key] = (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
     }
 
     /**
