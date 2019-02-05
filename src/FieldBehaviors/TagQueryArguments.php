@@ -13,7 +13,7 @@ class TagQueryArguments extends FieldBehavior {
         $this->owner->addIntArgument('id');
         $this->owner->addStringArgument('indexBy');
         $this->owner->addIntArgument('limit');
-        $this->owner->addStringArgument('site');
+        $this->owner->addArgument('site')->type($this->owner->request->sites()->enum());
         $this->owner->addIntArgument('siteId');
         $this->owner->addIntArgument('offset');
         $this->owner->addStringArgument('order');

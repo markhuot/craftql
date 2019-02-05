@@ -39,6 +39,7 @@ class GraphQLService extends Component {
     private $entryTypes;
     private $sections;
     private $globals;
+    private $sites;
 
     function __construct(
         \markhuot\CraftQL\Repositories\Volumes $volumes,
@@ -46,7 +47,8 @@ class GraphQLService extends Component {
         \markhuot\CraftQL\Repositories\TagGroup $tagGroups,
         \markhuot\CraftQL\Repositories\EntryType $entryTypes,
         \markhuot\CraftQL\Repositories\Section $sections,
-        \markhuot\CraftQL\Repositories\Globals $globals
+        \markhuot\CraftQL\Repositories\Globals $globals,
+        \markhuot\CraftQL\Repositories\Site $sites
     ) {
         $this->volumes = $volumes;
         $this->categoryGroups = $categoryGroups;
@@ -54,6 +56,7 @@ class GraphQLService extends Component {
         $this->entryTypes = $entryTypes;
         $this->sections = $sections;
         $this->globals = $globals;
+        $this->sites = $sites;
     }
 
     /**
@@ -68,6 +71,7 @@ class GraphQLService extends Component {
         $this->entryTypes->load();
         $this->sections->load();
         $this->globals->load();
+        $this->sites->load();
 
         // @TODO don't load _everything_. Instead only load what's needed on demand
         \Yii::$container->get('craftQLFieldService')->load();
@@ -93,6 +97,7 @@ class GraphQLService extends Component {
         $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
         $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
         $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
+        $request->addSites(new \markhuot\CraftQL\Factories\Site($this->sites, $request));
 
         $schemaConfig = [];
 
