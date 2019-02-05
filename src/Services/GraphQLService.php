@@ -148,16 +148,13 @@ class GraphQLService extends Component {
             }, $request->sections()->all()));
 
             $types[] = $request->getType('DateFormatTypes');
+
+            $types = array_merge($types, $request->getTypeBuilder('Query')->getConcreteTypes());
+
             return $types;
         };
 
         $schemaConfig['query'] = $request->getType('Query');
-
-        // $schemaConfig['types'] = function () use ($request, $query) {
-        //     return array_merge(
-        //         $query->getConcreteTypes()
-        //     );
-        // };
 
         $schemaConfig['typeLoader'] = function ($name) use ($request) {
             if ($request->getType($name)) {

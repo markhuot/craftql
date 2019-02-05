@@ -160,6 +160,10 @@ class Request {
         $this->types[$name] = $obj;
     }
 
+    function getTypeBuilder($name) {
+        return @$this->types[$name];
+    }
+
     function getType($name) {
         if (!empty(static::$typeCaches[$name])) {
             return static::$typeCaches[$name];
