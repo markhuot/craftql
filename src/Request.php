@@ -115,12 +115,12 @@ class Request {
         }
 
         if (!empty($args['relatedTo'])) {
-            $criteria->relatedTo(array_merge(['and'], $this->parseRelatedTo($args['relatedTo'], @$root['node']->id)));
+            $criteria->relatedTo(array_merge(['and'], $this->parseRelatedTo($args['relatedTo'], @$root->id)));
             unset($args['relatedTo']);
         }
 
         if (!empty($args['orRelatedTo'])) {
-            $criteria->relatedTo(array_merge(['or'], $this->parseRelatedTo($args['orRelatedTo'], @$root['node']->id)));
+            $criteria->relatedTo(array_merge(['or'], $this->parseRelatedTo($args['orRelatedTo'], @$root->id)));
             unset($args['orRelatedTo']);
         }
 
