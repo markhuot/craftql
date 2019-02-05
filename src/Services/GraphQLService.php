@@ -139,6 +139,14 @@ class GraphQLService extends Component {
                 return $request->getType($categoryGroup->getName());
             }, $request->categoryGroups()->all()));
 
+            $types = array_merge($types, array_map(function ($tagGroup) use ($request) {
+                return $request->getType($tagGroup->getName());
+            }, $request->tagGroups()->all()));
+
+            $types = array_merge($types, array_map(function ($section) use ($request) {
+                return $request->getType($section->getName());
+            }, $request->sections()->all()));
+
             $types[] = $request->getType('DateFormatTypes');
             return $types;
         };
@@ -147,14 +155,6 @@ class GraphQLService extends Component {
 
         // $schemaConfig['types'] = function () use ($request, $query) {
         //     return array_merge(
-        //         array_map(function ($section) {
-        //             return $section->getRawGraphQLObject();
-        //         }, $request->sections()->all()),
-        //
-        //         array_map(function ($tagGroup) {
-        //             return $tagGroup->getRawGraphQLObject();
-        //         }, $request->tagGroups()->all()),
-        //
         //         $query->getConcreteTypes()
         //     );
         // };
