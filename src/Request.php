@@ -175,10 +175,6 @@ class Request {
             return static::$typeCaches[$name] = $type->getRawGraphQLObject();
         }
 
-        if (method_exists($type, 'getRawGraphQLType')) {
-            return static::$typeCaches[$name] = $type->getRawGraphQLType();
-        }
-
         foreach ($this->namespaces as $namespaceConfig) {
             $namespace = $namespaceConfig['namespace'];
             $prefix = $namespaceConfig['prefix'];

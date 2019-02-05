@@ -45,7 +45,7 @@ class Union extends BaseBuilder {
         return $types;
     }
 
-    function getRawGraphQLType() {
+    function getRawGraphQLObject() {
         if (!empty(static::$rawTypes[$this->getName()])) {
             return static::$rawTypes[$this->getName()];
         }

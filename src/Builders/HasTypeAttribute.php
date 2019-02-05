@@ -49,26 +49,6 @@ trait HasTypeAttribute {
             $rawType = $type->getRawGraphQLObject();
         }
 
-        else if (method_exists($type, 'getRawGraphQLType')) {
-            $rawType = $type->getRawGraphQLType();
-        }
-
-        // if (is_string($type) && is_subclass_of($type, Schema::class)) {
-        //     $rawType = (new $type($this->request))->getRawGraphQLObject();
-        // }
-        //
-        // else if (is_a($type, Schema::class) || is_subclass_of($type, Schema::class)) {
-        //     $rawType = $type->getRawGraphQLObject();
-        // }
-        //
-        // else if (is_a($type, InputSchema::class) || is_subclass_of($type, InputSchema::class)) {
-        //     $rawType = $type->getRawGraphQLType();
-        // }
-        //
-        // else if (is_a($type, Union::class) || is_subclass_of($type, Union::class)) {
-        //     $rawType = $type->getRawType();
-        // }
-
         else {
             $rawType = $type ?: Type::string();
         }
