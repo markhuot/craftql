@@ -38,4 +38,11 @@ class GetFieldSchema extends Event {
      */
     public $mutation;
 
+    /**
+     * Whether the event should continue to the default field handler
+     *
+     * @var bool
+     */
+    public $preventDefault = false;
+
 }

@@ -13,7 +13,7 @@ class GetRedactorFieldSchema
      * @return void
      */
     function handle($event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $outputSchema = static::type($event->schema);
 

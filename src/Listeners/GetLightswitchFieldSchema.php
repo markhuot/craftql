@@ -14,7 +14,7 @@ class GetLightswitchFieldSchema
      * @return void
      */
     function handle($event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $event->schema->addBooleanField($event->sender);
         $event->query->addBooleanArgument($event->sender);

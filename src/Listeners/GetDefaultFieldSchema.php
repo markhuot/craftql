@@ -12,7 +12,9 @@ class GetDefaultFieldSchema
      * @return void
      */
     function handle($event) {
-        $event->handled = true;
+        if ($event->preventDefault) {
+            return;
+        }
 
         $event->schema->addStringField($event->sender);
         $event->query->addStringArgument($event->sender);

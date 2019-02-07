@@ -13,7 +13,7 @@ class GetSuperTableFieldSchema
      * @return void
      */
     function handle(GetFieldSchema $event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $field = $event->sender;
 
