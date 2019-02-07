@@ -127,6 +127,10 @@ class GraphQLService extends Component {
             $request->registerType($categoryGroup->getName(), $categoryGroup);
         }, $request->categoryGroups()->all());
 
+        array_map(function ($tagGroup) use ($request) {
+            $request->registerType($tagGroup->getName(), $tagGroup);
+        }, $request->tagGroups()->all());
+
         $request->registerType('DateFormatTypes', \markhuot\CraftQL\Directives\Date::dateFormatTypesEnum());
 
         $schemaConfig['types'] = function () use ($request) {
