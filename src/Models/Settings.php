@@ -15,6 +15,7 @@ class Settings extends Model
     public $headers = [];
     public $maxQueryDepth = false;
     public $maxQueryComplexity = false;
+    public $throwSchemaBuildErrors = false;
 
     function rules()
     {
