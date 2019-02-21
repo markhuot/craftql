@@ -52,7 +52,7 @@ class InputSchema extends BaseBuilder {
         ];
     }
 
-    function getRawGraphQLType() {
+    function getRawGraphQLObject() {
         $key = $this->getName();
 
         if (!empty(static::$objects[$key])) {

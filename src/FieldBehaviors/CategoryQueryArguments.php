@@ -18,7 +18,7 @@ class CategoryQueryArguments extends FieldBehavior {
         $this->owner->addIntArgument('id')->lists();
         $this->owner->addStringArgument('indexBy');
         $this->owner->addIntArgument('limit');
-        $this->owner->addStringArgument('site');
+        $this->owner->addArgument('site')->type($this->owner->request->sites()->enum());
         $this->owner->addIntArgument('siteId');
         $this->owner->addIntArgument('nextSiblingOf');
         $this->owner->addIntArgument('offset');

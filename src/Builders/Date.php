@@ -11,7 +11,7 @@ use DateTimeZone;
 class Date extends Field {
 
     function getType() {
-        $this->type = \markhuot\CraftQL\Types\Timestamp::type();
+        $this->type = $this->request->getType('Timestamp');
         return parent::getType();
     }
 

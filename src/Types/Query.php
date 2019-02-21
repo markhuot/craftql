@@ -193,7 +193,7 @@ class Query extends Schema {
             $this->addField('globals')
                 ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
                 ->arguments(function ($field) {
-                    $field->addStringArgument('site');
+                    $field->addArgument('site')->type($this->request->sites()->enum());
                     $field->addIntArgument('siteId');
                 })
                 ->resolve(function ($root, $args) {

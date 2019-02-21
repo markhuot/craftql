@@ -18,6 +18,7 @@ class Schema extends BaseBuilder {
     protected $interfaces = [];
     protected $parent;
     protected static $concreteTypes = [];
+    protected $fieldLayouts = [];
 
     function __construct(Request $request, $context=null, $parent=null) {
         $this->request = $request;
@@ -87,8 +88,10 @@ class Schema extends BaseBuilder {
      * @return self
      */
     function createObjectType($name): self {
-        return (new Schema($this->request))
+        $schema = (new Schema($this->request))
             ->name($name);
+        $this->request->registerType($name, $schema);
+        return $schema;
     }
 
     /**
@@ -98,7 +101,9 @@ class Schema extends BaseBuilder {
      * @return self
      */
     function createInputObjectType($name): InputSchema {
-        return new InputSchema($this->request, $name);
+        $inputSchema = new InputSchema($this->request, $name);
+        $this->request->registerType($name, $inputSchema);
+        return $inputSchema;
     }
 
     /**
@@ -141,13 +146,13 @@ class Schema extends BaseBuilder {
         return $this->fields[] = new Date($this->request, $field);
     }
 
-    function addUnionField($field): Union {
+    function addUnionField($field): UnionField {
         if (is_a($field, CraftField::class)) {
-            return $this->fields[] = (new Union($this->request, $field->handle))
+            return $this->fields[] = (new UnionField($this->request, $field->handle))
                 ->description($field->instructions);
         }
 
-        return $this->fields[] = new Union($this->request, $field);
+        return $this->fields[] = new UnionField($this->request, $field);
     }
 
     function addFieldsByLayoutId($fieldLayoutId): self {
@@ -156,9 +161,16 @@ class Schema extends BaseBuilder {
             return $this;
         }
 
+        $this->fieldLayouts[] = $fieldLayoutId;
+        return $this;
+    }
+
+    function bootFieldLayouts(): self {
         $fieldService = \Yii::$container->get('craftQLFieldService');
-        $fields = $fieldService->getFields($fieldLayoutId, $this->request, $this);
-        $this->fields = array_merge($this->fields, $fields);
+        foreach ($this->fieldLayouts as $fieldLayoutId) {
+            $fields = $fieldService->getFields($fieldLayoutId, $this->request, $this);
+            $this->fields = array_merge($this->fields, $fields);
+        }
         return $this;
     }
 
@@ -195,6 +207,7 @@ class Schema extends BaseBuilder {
     function getFields(): array {
         $this->boot();
         $this->bootBehaviors();
+        $this->bootFieldLayouts();
 
         $event = new AlterSchemaFields;
         $event->schema = $this;
