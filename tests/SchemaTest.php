@@ -35,6 +35,12 @@ final class SchemaTest extends TestCase
     }
 
     function testFullSchema() {
-        $this->assertEquals(true, true);
+        $controlSchema = file_get_contents(CRAFT_VENDOR_PATH.'markhuot/craftql/test/schema.graphql');
+
+        /** @var \markhuot\CraftQL\Builders\Schema $schema */
+        $schema = self::$schema;
+        $schemaText = \GraphQL\Utils\SchemaPrinter::doPrint($schema);
+
+        $this->assertEquals($controlSchema, $schemaText);
     }
 }
