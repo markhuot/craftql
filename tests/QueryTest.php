@@ -22,7 +22,8 @@ final class QueryTest extends TestCase
             new \markhuot\CraftQL\Repositories\TagGroup,
             new \markhuot\CraftQL\Repositories\EntryType,
             new \markhuot\CraftQL\Repositories\Section,
-            new \markhuot\CraftQL\Repositories\Globals
+            new \markhuot\CraftQL\Repositories\Globals,
+            new \markhuot\CraftQL\Repositories\Site
         );
         self::$service->bootstrap();
         self::$schema = self::$service->getSchema(Token::admin());

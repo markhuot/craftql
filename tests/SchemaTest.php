@@ -22,7 +22,8 @@ final class SchemaTest extends TestCase
             new \markhuot\CraftQL\Repositories\TagGroup,
             new \markhuot\CraftQL\Repositories\EntryType,
             new \markhuot\CraftQL\Repositories\Section,
-            new \markhuot\CraftQL\Repositories\Globals
+            new \markhuot\CraftQL\Repositories\Globals,
+            new \markhuot\CraftQL\Repositories\Site
         );
         self::$service->bootstrap();
 
@@ -35,7 +36,7 @@ final class SchemaTest extends TestCase
     }
 
     function testFullSchema() {
-        $controlSchema = file_get_contents(CRAFT_VENDOR_PATH.'markhuot/craftql/test/schema.graphql');
+        $controlSchema = file_get_contents(__DIR__.'/../seeds/schema.graphql');
 
         /** @var \markhuot\CraftQL\Builders\Schema $schema */
         $schema = self::$schema;
