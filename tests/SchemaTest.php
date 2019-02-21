@@ -9,7 +9,7 @@ use markhuot\CraftQL\Services\GraphQLService;
 /**
  * @covers Email
  */
-final class MutationTest extends TestCase
+final class SchemaTest extends TestCase
 {
     static $service;
     static $schema;
@@ -25,6 +25,8 @@ final class MutationTest extends TestCase
             new \markhuot\CraftQL\Repositories\Globals
         );
         self::$service->bootstrap();
+
+        /** @var \markhuot\CraftQL\Builders\Schema schema */
         self::$schema = self::$service->getSchema(Token::admin());
     }
 
@@ -32,7 +34,7 @@ final class MutationTest extends TestCase
         return self::$service->execute(self::$schema, $input, $variables);
     }
 
-    function testNothing() {
+    function testFullSchema() {
         $this->assertEquals(true, true);
     }
 }

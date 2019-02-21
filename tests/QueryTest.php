@@ -9,7 +9,7 @@ use markhuot\CraftQL\Services\GraphQLService;
 /**
  * @covers Email
  */
-final class MutationTest extends TestCase
+final class QueryTest extends TestCase
 {
     static $service;
     static $schema;
@@ -32,7 +32,12 @@ final class MutationTest extends TestCase
         return self::$service->execute(self::$schema, $input, $variables);
     }
 
-    function testNothing() {
-        $this->assertEquals(true, true);
+    public function testSimpleQuery(): void
+    {
+        $input = '{ helloWorld }';
+
+        $result = $this->execute($input);
+
+        $this->assertEquals('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.', @$result['data']['helloWorld']);
     }
 }
