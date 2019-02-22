@@ -11,7 +11,7 @@ cache:
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS craftql;'
   # - composer create-project craftcms/craft /home/travis/build/craftcms/craft
-  - git clone git@github.com:craftcms/craft.git /home/travis/build/craftcms/craft
+  - git clone https://github.com/craftcms/craft.git /home/travis/build/craftcms/craft
   - if [[ $TRAVIS_BRANCH == [0-9]* ]]; then export COMPOSER_BRANCH="$TRAVIS_BRANCH-dev"; else export COMPOSER_BRANCH="dev-$TRAVIS_BRANCH"; fi
   - mv /home/travis/build/vendor_cache /home/travis/build/craftcms/craft/vendor 2>/dev/null
 install:
