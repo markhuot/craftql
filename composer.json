@@ -25,9 +25,6 @@
         }
     },
     "extra": {
-        "branch-alias": {
-            "dev-2.x": "2.x-dev"
-        },
         "name": "CraftQL",
         "handle": "craftql",
         "developer": "Mark Huot",
