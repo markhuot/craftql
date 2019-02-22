@@ -42,6 +42,6 @@ final class SchemaTest extends TestCase
         $schema = self::$schema;
         $schemaText = \GraphQL\Utils\SchemaPrinter::doPrint($schema);
 
-        $this->assertEquals($controlSchema, $schemaText);
+        $this->assertEquals(preg_replace("#\r\n#", "\n", $controlSchema), preg_replace("#\r\n#", "\n", $schemaText));
     }
 }
