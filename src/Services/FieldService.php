@@ -12,6 +12,7 @@ use craft\helpers\Assets;
 use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Events\GetFieldSchema as GetFieldSchemaEvent;
 use GraphQL\Error\Error;
+use yii\helpers\ArrayHelper;
 
 
 class FieldService {
@@ -29,14 +30,35 @@ class FieldService {
     private $mapping = [];
 
     function load() {
-        $this->rawFields = Craft::$app->fields->getAllFields();
+        $fieldQuery = (new Query())
+            ->select([
+                'fields.id',
+                'fields.dateCreated',
+                'fields.dateUpdated',
+                'fields.groupId',
+                'fields.name',
+                'fields.handle',
+                'fields.context',
+                'fields.instructions',
+                'fields.translationMethod',
+                'fields.translationKeyFormat',
+                'fields.type',
+                'fields.settings'
+            ])
+            ->from(['{{%fields}} fields'])
+            ->orderBy(['fields.name' => SORT_ASC, 'fields.handle' => SORT_ASC]);
+
+        $this->rawFields = ArrayHelper::index(array_map(function ($field) {
+            return Craft::$app->fields->createField($field);
+        }, $fieldQuery->all()), 'id');
+
         $this->mapping = [];
         $rows = (new Query())
-            ->select(['layoutId', 'fieldId'])
+            ->select(['layoutId', 'tabId', 'fieldId', 'sortOrder'])
             ->from(['{{%fieldlayoutfields}}'])
             ->all();
         foreach ($rows as $row) {
-            $this->mapping[$row['layoutId']][] = $row['fieldId'];
+            $this->mapping[$row['layoutId']][$row['tabId'].':'.$row['sortOrder']] = $this->rawFields[$row['fieldId']];
         }
     }
 
@@ -122,15 +144,17 @@ class FieldService {
         if (isset($this->fieldsPerLayoutId[$layoutId])) {
             return $this->fieldsPerLayoutId[$layoutId];
         }
-        $return = [];
-        foreach ($this->rawFields as $field) {
-            if (!empty($this->mapping[$layoutId])) {
-                if (in_array($field->id, $this->mapping[$layoutId])) {
-                    $return[] = $field;
-                }
-            }
-        }
-        return $this->fieldsPerLayoutId[$layoutId] = $return;
+
+        // foreach ($this->rawFields as $field) {
+        //     if (!empty($this->mapping[$layoutId])) {
+        //         if ($field = $this->rawFields) {
+        //             $fieldConfig = $this->mapping[$layoutId][$key];
+        //             $return[$fieldConfig['sortOrder']] = $fieldConfig['fieldId'];
+        //         }
+        //     }
+        // }
+
+        return $this->fieldsPerLayoutId[$layoutId] = array_values(@$this->mapping[$layoutId] ?: []);
     }
 
 }
