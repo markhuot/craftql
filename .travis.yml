@@ -13,6 +13,7 @@ before_install:
   # - composer create-project craftcms/craft /home/travis/build/craftcms/craft
   - git clone https://github.com/craftcms/craft.git /home/travis/build/craftcms/craft
   - if [[ $TRAVIS_BRANCH == [0-9]* ]]; then export COMPOSER_BRANCH="$TRAVIS_BRANCH-dev"; else export COMPOSER_BRANCH="dev-$TRAVIS_BRANCH"; fi
+  - echo "Using markhuot/craftql:$COMPOSER_BRANCH"
   - mv /home/travis/build/vendor_cache /home/travis/build/craftcms/craft/vendor 2>/dev/null
 install:
   - cd /home/travis/build/craftcms/craft
