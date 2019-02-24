@@ -243,6 +243,12 @@ type Field {
   settings: String
 }
 
+type GlobalsSet {
+  testEmptyGlobalSet: TestEmptyGlobalSet
+  testGlobalSet: TestGlobalSet
+  testSecondGlobalSet: TestSecondGlobalSet
+}
+
 type MultiOptionFieldData {
   selected: [OptionFieldDataOptions]
   options: [OptionFieldDataOptions]
@@ -254,6 +260,9 @@ type Mutation {
 
   # Create or update existing BlogPost.
   upsertBlogPost(id: Int, siteId: Int, authorId: Int, title: String, slug: String, enabled: Boolean, postDate: Timestamp, expiryDate: Timestamp, parentId: Int, query: MutationQuery, testPlainText: String, testPlainTextWithCharacterLimit: String, testEmailField: String, testNumberField: Int, testNumberFloatField: Float, testNumberMaxField: Int, testTableField: [TestTableFieldInput], testUrlField: String, testCategoryField: [TestCategoryFieldCategoryInput], testCategoryNestingField: [TestCategoryNestingFieldCategoryInput], testEntriesField: [Int], testEntriesFieldWithLimit: [Int], testTagField: [TestTagFieldTagInput], testUsersField: [Int], testCheckboxes: [TestCheckboxesEnum], testCheckboxesWithOneBadValue: [TestCheckboxesWithOneBadValueEnum], testDropdownField: TestDropdownFieldEnum, testMultiSelectField: [TestMultiSelectFieldEnum], testRadioButtonField: TestRadioButtonFieldEnum, testColorField: String, testColorFieldWithDefaultValue: String, testLightswitchField: Boolean, testLightswitchOnField: Boolean, testDateField: Int, testTimeField: Int, testDateAndTimeField: Int, testMatrixField: [TestMatrixFieldInput], testMatrixFieldWithEmptyBlock: [TestMatrixFieldWithEmptyBlockInput]): BlogPost
+  upsertTestEmptyGlobalSetGlobals: TestEmptyGlobalSet
+  upsertTestGlobalSetGlobals(testPlainText: String, testPlainTextWithCharacterLimit: String): TestGlobalSet
+  upsertTestSecondGlobalSetGlobals(testPlainText: String, testDropdownField: TestDropdownFieldEnum, testCheckboxes: [TestCheckboxesEnum]): TestSecondGlobalSet
   upsertUser(id: Int, firstName: String, lastName: String, username: String, email: String, permissions: [String]): User
 }
 
@@ -357,6 +366,7 @@ type Query {
   entriesConnection(after: String, ancestorDist: Int, ancestorOf: Int, anyStatus: Boolean, archived: Boolean, authorGroup: [String], authorGroupId: [Int], authorId: [Int], before: String, dateCreated: String, dateUpdated: String, descendantDist: Int, descendantOf: Int, enabledForSite: Boolean, expiryDate: String, fixedOrder: Boolean, hasDescendants: Boolean, id: [Int], idNot: [Int], inReverse: Boolean, leaves: Boolean, level: Int, limit: Int, nextSiblingOf: Int, offset: Int, order: String, orderBy: String, positionedAfter: Int, positionedBefore: Int, postDate: String, prevSiblingOf: Int, relatedTo: [RelatedToInputType], orRelatedTo: [RelatedToInputType], search: String, section: [SectionsEnum], siblingOf: Int, site: SitesEnum, siteId: Int, slug: [String], status: [String], title: [String], trashed: Boolean, type: [EntryTypesEnum], uid: String, uri: String, testBlockCheckboxesField: TestBlockCheckboxesFieldEnum, testBlockPlainTextField: String, testBlockTableField: String, testCategoryField: String, testCategoryNestingField: String, testCheckboxes: TestCheckboxesEnum, testCheckboxesWithOneBadValue: TestCheckboxesWithOneBadValueEnum, testDateAndTimeField: String, testDateField: String, testDropdownField: TestDropdownFieldEnum, testEmailField: String, testLightswitchField: Boolean, testLightswitchOnField: Boolean, testMultiSelectField: TestMultiSelectFieldEnum, testNumberField: Int, testNumberFloatField: Float, testNumberMaxField: Int, testPlainText: String, testPlainTextWithCharacterLimit: String, testRadioButtonField: TestRadioButtonFieldEnum, testTableField: String, testTagField: Int, testTimeField: String, testUrlField: String): EntryConnection
   entry(after: String, ancestorDist: Int, ancestorOf: Int, anyStatus: Boolean, archived: Boolean, authorGroup: [String], authorGroupId: [Int], authorId: [Int], before: String, dateCreated: String, dateUpdated: String, descendantDist: Int, descendantOf: Int, enabledForSite: Boolean, expiryDate: String, fixedOrder: Boolean, hasDescendants: Boolean, id: [Int], idNot: [Int], inReverse: Boolean, leaves: Boolean, level: Int, limit: Int, nextSiblingOf: Int, offset: Int, order: String, orderBy: String, positionedAfter: Int, positionedBefore: Int, postDate: String, prevSiblingOf: Int, relatedTo: [RelatedToInputType], orRelatedTo: [RelatedToInputType], search: String, section: [SectionsEnum], siblingOf: Int, site: SitesEnum, siteId: Int, slug: [String], status: [String], title: [String], trashed: Boolean, type: [EntryTypesEnum], uid: String, uri: String, testBlockCheckboxesField: TestBlockCheckboxesFieldEnum, testBlockPlainTextField: String, testBlockTableField: String, testCategoryField: String, testCategoryNestingField: String, testCheckboxes: TestCheckboxesEnum, testCheckboxesWithOneBadValue: TestCheckboxesWithOneBadValueEnum, testDateAndTimeField: String, testDateField: String, testDropdownField: TestDropdownFieldEnum, testEmailField: String, testLightswitchField: Boolean, testLightswitchOnField: Boolean, testMultiSelectField: TestMultiSelectFieldEnum, testNumberField: Int, testNumberFloatField: Float, testNumberMaxField: Int, testPlainText: String, testPlainTextWithCharacterLimit: String, testRadioButtonField: TestRadioButtonFieldEnum, testTableField: String, testTagField: Int, testTimeField: String, testUrlField: String): EntryInterface
   draft(draftId: Int!, after: String, ancestorDist: Int, ancestorOf: Int, anyStatus: Boolean, archived: Boolean, authorGroup: [String], authorGroupId: [Int], authorId: [Int], before: String, dateCreated: String, dateUpdated: String, descendantDist: Int, descendantOf: Int, enabledForSite: Boolean, expiryDate: String, fixedOrder: Boolean, hasDescendants: Boolean, id: [Int], idNot: [Int], inReverse: Boolean, leaves: Boolean, level: Int, limit: Int, nextSiblingOf: Int, offset: Int, order: String, orderBy: String, positionedAfter: Int, positionedBefore: Int, postDate: String, prevSiblingOf: Int, relatedTo: [RelatedToInputType], orRelatedTo: [RelatedToInputType], search: String, section: [SectionsEnum], siblingOf: Int, site: SitesEnum, siteId: Int, slug: [String], status: [String], title: [String], trashed: Boolean, type: [EntryTypesEnum], uid: String, uri: String, testBlockCheckboxesField: TestBlockCheckboxesFieldEnum, testBlockPlainTextField: String, testBlockTableField: String, testCategoryField: String, testCategoryNestingField: String, testCheckboxes: TestCheckboxesEnum, testCheckboxesWithOneBadValue: TestCheckboxesWithOneBadValueEnum, testDateAndTimeField: String, testDateField: String, testDropdownField: TestDropdownFieldEnum, testEmailField: String, testLightswitchField: Boolean, testLightswitchOnField: Boolean, testMultiSelectField: TestMultiSelectFieldEnum, testNumberField: Int, testNumberFloatField: Float, testNumberMaxField: Int, testPlainText: String, testPlainTextWithCharacterLimit: String, testRadioButtonField: TestRadioButtonFieldEnum, testTableField: String, testTagField: Int, testTimeField: String, testUrlField: String): EntryInterface
+  globals(site: SitesEnum, siteId: Int): GlobalsSet
   tags(fixedOrder: Boolean, group: TagGroupsEnum, groupId: Int, id: Int, indexBy: String, limit: Int, site: SitesEnum, siteId: Int, offset: Int, order: String, orderBy: String, search: String, slug: String, title: String): [TagInterface]
   tagsConnection(fixedOrder: Boolean, group: TagGroupsEnum, groupId: Int, id: Int, indexBy: String, limit: Int, site: SitesEnum, siteId: Int, offset: Int, order: String, orderBy: String, search: String, slug: String, title: String): TagConnection
   categories(ancestorOf: Int, ancestorDist: Int, level: Int, descendantOf: Int, descendantDist: Int, fixedOrder: Boolean, group: [CategoryGroupsEnum], groupId: Int, id: [Int], indexBy: String, limit: Int, site: SitesEnum, siteId: Int, nextSiblingOf: Int, offset: Int, order: String, orderBy: String, positionedAfter: Int, positionedBefore: Int, prevSiblingOf: Int, search: String, siblingOf: Int, slug: String, title: String, uri: String, testBlockCheckboxesField: TestBlockCheckboxesFieldEnum, testBlockPlainTextField: String, testBlockTableField: String, testCategoryField: String, testCategoryNestingField: String, testCheckboxes: TestCheckboxesEnum, testCheckboxesWithOneBadValue: TestCheckboxesWithOneBadValueEnum, testDateAndTimeField: String, testDateField: String, testDropdownField: TestDropdownFieldEnum, testEmailField: String, testLightswitchField: Boolean, testLightswitchOnField: Boolean, testMultiSelectField: TestMultiSelectFieldEnum, testNumberField: Int, testNumberFloatField: Float, testNumberMaxField: Int, testPlainText: String, testPlainTextWithCharacterLimit: String, testRadioButtonField: TestRadioButtonFieldEnum, testTableField: String, testTagField: Int, testTimeField: String, testUrlField: String): [CategoryInterface]
@@ -565,6 +575,12 @@ type TestEmptyCategoryGroupCategory implements CategoryInterface {
   prevSibling: CategoryInterface
 }
 
+type TestEmptyGlobalSet {
+  # The global set, `TestEmptyGlobalSet`, has no fields. This would violate the
+  # GraphQL spec so we filled it in with this placeholder.
+  empty: String
+}
+
 type TestEmptyMatrixFieldEmpty {
   # The matrix field, `Test Empty Matrix Field`, has no block types. This would
   # violate the GraphQL spec so we filled it in with this placeholder.
@@ -579,6 +595,11 @@ type TestEmptyTagGroupTags implements TagInterface {
   title: String!
   slug: String!
   group: TagGroup!
+}
+
+type TestGlobalSet {
+  testPlainText: String
+  testPlainTextWithCharacterLimit: String
 }
 
 input TestMatrixFieldInput {
@@ -664,6 +685,14 @@ enum TestRadioButtonFieldEnum {
 
   # Option Three
   optionThree
+}
+
+type TestSecondGlobalSet {
+  testPlainText: String
+  testDropdownField: TestDropdownFieldEnum
+  testDropdownField_FieldData: OptionFieldData
+  testCheckboxes: [TestCheckboxesEnum]
+  testCheckboxes_FieldData: MultiOptionFieldData
 }
 
 input TestTableFieldInput {
