@@ -28,20 +28,9 @@ class GetImagerFieldSchema {
             ->type(ImagerTransformedImages::class)
             ->name("{$craftField->handle}Imager")
             ->resolve(function ($root, $args, $context, $info) use ($craftField) {
-                $images = $root->{$craftField->handle}->all();
-
-                foreach ($images as &$image) {
-                    $image = Imager::$plugin->imager->transformImage($image, @$args['transforms']);
-                }
-
-                return $images;
+                return $root->{$craftField->handle}->all();
             });
 
-        /** @var InputSchema $transforms */
-        $transforms = $schema->createInputObjectType('ImagerTransformOptions');
-        $transforms->addIntArgument('width');
-
-        $field->addArgument('transforms')->type($transforms)->lists();
     }
 
 }

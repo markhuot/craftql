@@ -11,7 +11,7 @@ class InputSchema extends BaseBuilder {
 
     protected static $objects;
 
-    function __construct($request, $name) {
+    function __construct($request, $name=null) {
         $this->request = $request;
         $this->name = $name;
     }
@@ -38,7 +38,12 @@ class InputSchema extends BaseBuilder {
         return new InputSchema($this->request, $name);
     }
 
+    function boot() {
+
+    }
+
     function getArguments() {
+        $this->boot();
         $this->bootBehaviors();
         return $this->getArgumentConfig();
     }
