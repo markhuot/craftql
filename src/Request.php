@@ -180,6 +180,10 @@ class Request {
 
         $type = @$this->types[$name];
 
+        if (is_callable($type)) {
+            $type = $type();
+        }
+
         if (method_exists($type, 'getRawGraphQLObject')) {
             return static::$typeCaches[$name] = $type->getRawGraphQLObject();
         }

@@ -12,7 +12,9 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
+use markhuot\CraftQL\Types\Category;
 use markhuot\CraftQL\Types\ElementInterface;
+use markhuot\CraftQL\Types\Entry;
 use markhuot\CraftQL\Types\EntryConnection;
 use markhuot\CraftQL\Types\EntryDraftConnection;
 use markhuot\CraftQL\Types\EntryDraftEdge;
@@ -21,10 +23,12 @@ use markhuot\CraftQL\Types\EntryEdge;
 use markhuot\CraftQL\Types\EntryInterface;
 use markhuot\CraftQL\Types\EntryType;
 use markhuot\CraftQL\Types\Field;
+use markhuot\CraftQL\Types\Globals;
 use markhuot\CraftQL\Types\PageInfo;
 use markhuot\CraftQL\Types\Section;
 use markhuot\CraftQL\Types\SectionSiteSettings;
 use markhuot\CraftQL\Types\Site;
+use markhuot\CraftQL\Types\Tag;
 use markhuot\CraftQL\Types\Timestamp;
 use markhuot\CraftQL\Types\User;
 use yii\base\Component;
@@ -112,24 +116,32 @@ class GraphQLService extends Component {
         $request->registerType('Query', $query);
 
         array_map(function ($entryType) use ($request) {
-            $request->registerType($entryType->getName(), $entryType);
-        }, $request->entryTypes()->all());
+            $request->registerType(ucfirst($entryType['handle']), function () use ($entryType, $request) {
+                return new Entry($request, $entryType);
+            });
+        }, $this->entryTypes->all());
 
         array_map(function ($volume) use ($request) {
             $request->registerType($volume->getName(), $volume);
         }, $request->volumes()->all());
 
         array_map(function ($globalSet) use ($request) {
-            $request->registerType($globalSet->getName(), $globalSet);
-        }, $request->globals()->all());
+            $request->registerType(ucfirst($globalSet['handle']), function () use ($globalSet, $request) {
+                return new Globals($request, $globalSet);
+            });
+        }, $this->globals->all());
 
         array_map(function ($categoryGroup) use ($request) {
-            $request->registerType($categoryGroup->getName(), $categoryGroup);
-        }, $request->categoryGroups()->all());
+            $request->registerType(ucfirst($categoryGroup['handle']).'Category', function() use ($categoryGroup, $request) {
+                return new Category($request, $categoryGroup);
+            });
+        }, $this->categoryGroups->all());
 
         array_map(function ($tagGroup) use ($request) {
-            $request->registerType($tagGroup->getName(), $tagGroup);
-        }, $request->tagGroups()->all());
+            $request->registerType(ucfirst($tagGroup['handle']).'Tags', function () use ($tagGroup, $request) {
+                return new Tag($request, $tagGroup);
+            });
+        }, $this->tagGroups->all());
 
         $request->registerType('DateFormatTypes', \markhuot\CraftQL\Directives\Date::dateFormatTypesEnum());
 
@@ -183,7 +195,7 @@ class GraphQLService extends Component {
 
         $schema = new Schema($schemaConfig);
 
-        if (Craft::$app->config->general->devMode) {
+        if (Craft::$app->config->general->devMode && CraftQL::getInstance()->getSettings()->disableSchemaValidation === false) {
             $schema->assertValid();
         }
 
