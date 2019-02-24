@@ -31,6 +31,7 @@ use markhuot\CraftQL\Types\Site;
 use markhuot\CraftQL\Types\Tag;
 use markhuot\CraftQL\Types\Timestamp;
 use markhuot\CraftQL\Types\User;
+use markhuot\CraftQL\Types\Volume;
 use yii\base\Component;
 use Yii;
 
@@ -122,8 +123,10 @@ class GraphQLService extends Component {
         }, $this->entryTypes->all());
 
         array_map(function ($volume) use ($request) {
-            $request->registerType($volume->getName(), $volume);
-        }, $request->volumes()->all());
+            $request->registerType(ucfirst($volume['name']).'Volume', function () use ($volume, $request) {
+                return new Volume($request, $volume);
+            });
+        }, $this->volumes->all());
 
         array_map(function ($globalSet) use ($request) {
             $request->registerType(ucfirst($globalSet['handle']), function () use ($globalSet, $request) {
