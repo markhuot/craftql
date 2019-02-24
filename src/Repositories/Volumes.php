@@ -12,10 +12,26 @@ class Volumes {
 
   function load() {
       $volumes = (new Query())
-          ->select(['id'])
+          ->select([
+              'id',
+              'dateCreated',
+              'dateUpdated',
+              'name',
+              'handle',
+              'hasUrls',
+              'url',
+              'sortOrder',
+              'fieldLayoutId',
+              'type',
+              'settings',
+          ])
           ->from(['{{%volumes}}'])
           ->orderBy('sortOrder asc')
           ->all();
+
+      foreach ($volumes as $volume) {
+          $this->volumes[$volume['id']] = $volume;
+      }
 
       // foreach (Craft::$app->volumes->getAllVolumes() as $volume) {
       //     $this->volumes[$volume->id] = $volume;
@@ -26,13 +42,13 @@ class Volumes {
   }
 
   function get($id) {
-      $volume = new VolumeFolder($this->volumes[$id]);
+      $volume = Craft::$app->volumes->createVolume($this->volumes[$id]);
       return $volume;
   }
 
   function all() {
       return array_map(function ($volume) {
-          return $this->volumes[$volume['id']];
+          return $this->get($volume['id']);
       }, $this->volumes);
   }
 

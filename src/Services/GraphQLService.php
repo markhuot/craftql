@@ -123,7 +123,7 @@ class GraphQLService extends Component {
         }, $this->entryTypes->all());
 
         array_map(function ($volume) use ($request) {
-            $request->registerType(ucfirst($volume['name']).'Volume', function () use ($volume, $request) {
+            $request->registerType(ucfirst($volume['handle']).'Volume', function () use ($volume, $request) {
                 return new Volume($request, $volume);
             });
         }, $this->volumes->all());
