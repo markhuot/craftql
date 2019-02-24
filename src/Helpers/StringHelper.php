@@ -3,8 +3,11 @@
 namespace markhuot\CraftQL\Helpers;
 
 use craft\models\EntryType;
+use markhuot\CraftQL\Request;
 
 class StringHelper {
+
+    static $entryTypeMap = [];
 
     /**
      * Convert a Craft Entry Type in to a valid GraphQL Name
@@ -17,6 +20,26 @@ class StringHelper {
         $sectionHandle = ucfirst($entryType->section->handle);
 
         return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
+    }
+
+    /**
+     * Convert a Craft Entry Type in to a valid GraphQL Name
+     *
+     * @return string
+     */
+    static function graphQLNameForEntryTypeSection(Request $request, $entryTypeId, $sectionId): string {
+        $key = "{$entryTypeId}:{$sectionId}";
+        if (isset(static::$entryTypeMap[$key])) {
+            return static::$entryTypeMap[$key];
+        }
+
+        $entryType = $request->entryTypes()->getRaw($entryTypeId);
+        $section = $request->sections()->getRaw($sectionId);
+
+        $typeHandle = ucfirst($entryType->handle);
+        $sectionHandle = ucfirst($section->handle);
+
+        return static::$entryTypeMap[$key] = (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
     }
 
     /**

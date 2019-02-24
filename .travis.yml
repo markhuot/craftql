@@ -7,21 +7,25 @@ env:
   - ENVIRONMENT="dev" SECURITY_KEY="12345" DB_DRIVER="mysql" DB_SERVER="localhost" DB_USER="root" DB_PASSWORD="" DB_DATABASE="craftql"
 cache:
   directories:
-    # - /home/travis/build/vendor_cache
+     - /home/travis/build/vendor_cache
 before_install:
   - mysql -e 'CREATE DATABASE IF NOT EXISTS craftql;'
-  - composer create-project craftcms/craft /home/travis/build/craftcms/craft
-  # - mv /home/travis/build/vendor_cache /home/travis/build/craftcms/craft/vendor 2>/dev/null
+  # - composer create-project craftcms/craft /home/travis/build/craftcms/craft
+  - git clone https://github.com/craftcms/craft.git /home/travis/build/craftcms/craft
+  - export TRAVIS_REAL_BRANCH=${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}
+  - if [[ $TRAVIS_REAL_BRANCH == [0-9]* ]]; then export COMPOSER_BRANCH="$TRAVIS_REAL_BRANCH-dev"; else export COMPOSER_BRANCH="dev-$TRAVIS_REAL_BRANCH"; fi
+  - echo "Using markhuot/craftql:$COMPOSER_BRANCH"
+  - mv /home/travis/build/vendor_cache /home/travis/build/craftcms/craft/vendor 2>/dev/null
 install:
   - cd /home/travis/build/craftcms/craft
   - composer config repositories.craftql path /home/travis/build/markhuot/craftql
   - composer config minimum-stability dev
-  - composer require markhuot/craftql:dev-master phpunit/phpunit
-  - ./craft install --email=foo@example.com --username=admin --password=foobar --siteName="Test Site" --siteUrl="http://localhost" --language=en
-  - ./craft install/plugin craftql
-  - ./craft craftql/tools/seed
+  - composer require markhuot/craftql:$COMPOSER_BRANCH phpunit/phpunit
+  # - ./craft install --email=foo@example.com --username=admin --password=foobar --siteName="Test Site" --siteUrl="http://localhost" --language=en
+  # - ./craft install/plugin craftql
+  - mysql -u root craftql < /home/travis/build/markhuot/craftql/seeds/tests.sql
 script:
   - vendor/bin/phpunit --bootstrap vendor/craftcms/cms/bootstrap/web.php vendor/markhuot/craftql/tests/
-# before_cache:
-#   - mv /home/travis/build/craftcms/craft/vendor /home/travis/build/vendor_cache
-#   - rm -rf /home/travis/build/vendor_cache/markhuot
+before_cache:
+  - mv /home/travis/build/craftcms/craft/vendor /home/travis/build/vendor_cache
+  - rm -rf /home/travis/build/vendor_cache/markhuot

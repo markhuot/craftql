@@ -13,12 +13,18 @@ class Argument extends BaseBuilder {
     use HasNonNullAttribute;
     use HasOnSaveAttribute;
 
+    private $config = null;
+
     function __construct(Request $request, string $name) {
         $this->request = $request;
         $this->name = $name;
     }
 
     function getConfig() {
+        if ($this->config !== null) {
+            return $this->config;
+        }
+
         $type = $this->getTypeConfig();
 
         if ($this->isList) {
@@ -29,7 +35,7 @@ class Argument extends BaseBuilder {
             $type = Type::nonNull($type);
         }
 
-        return [
+        return $this->config = [
             'type' => $type,
             'description' => $this->getDescription(),
         ];

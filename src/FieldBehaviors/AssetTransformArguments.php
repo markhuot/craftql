@@ -7,6 +7,7 @@ use markhuot\CraftQL\Behaviors\FieldBehavior;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Request;
 
 class AssetTransformArguments extends FieldBehavior {
 
@@ -15,7 +16,7 @@ class AssetTransformArguments extends FieldBehavior {
     static $formatInputEnum;
     static $cropInputObject;
 
-    static function getTransformsEnum() {
+    static function getTransformsEnum(Request $request) {
         if (!empty(static::$transformEnum)) {
             return static::$transformEnum;
         }
@@ -33,10 +34,14 @@ class AssetTransformArguments extends FieldBehavior {
             $values[] = 'Empty';
         }
 
-        return static::$transformEnum = new EnumType([
+        static::$transformEnum = new EnumType([
             'name' => 'NamedTransformsEnum',
             'values' => $values,
         ]);
+
+        $request->registerType('NamedTransformsEnum', static::$transformEnum);
+
+        return static::$transformEnum;
     }
 
     static function positionInputEnum() {
@@ -76,28 +81,38 @@ class AssetTransformArguments extends FieldBehavior {
         ]);
     }
 
-    static function cropInputObject() {
+    static function cropInputObject(Request $request) {
         if (!empty(static::$cropInputObject)) {
             return static::$cropInputObject;
         }
 
-        return static::$cropInputObject = new InputObjectType([
+        $positionInputEnum = static::positionInputEnum();
+        $request->registerType('PositionInputEnum', $positionInputEnum);
+        $formatInputEnum = static::formatInputEnum();
+        $request->registerType('CropFormatInputEnum', $formatInputEnum);
+
+        static::$cropInputObject = new InputObjectType([
             'name' => 'CropInputObject',
             'fields' => [
                 'width' => ['type' => Type::int()],
                 'height' => ['type' => Type::int()],
                 'quality' => ['type' => Type::int()],
-                'position' => ['type' => static::positionInputEnum()],
-                'format' => ['type' => static::formatInputEnum()],
+                'position' => ['type' => $positionInputEnum],
+                'format' => ['type' => $formatInputEnum],
             ],
         ]);
+
+        $request->registerType('CropInputObject', static::$cropInputObject);
+        return static::$cropInputObject;
     }
 
     function initAssetTransformArguments() {
-        $this->owner->addStringArgument('transform')->type(static::getTransformsEnum());
-        $this->owner->addStringArgument('crop')->type(static::cropInputObject());
-        $this->owner->addStringArgument('fit')->type(static::cropInputObject());
-        $this->owner->addStringArgument('stretch')->type(static::cropInputObject());
+        $this->owner->addStringArgument('transform')->type(static::getTransformsEnum($this->owner->request));
+
+        $this->owner->addStringArgument('crop')->type(static::cropInputObject($this->owner->request));
+        $this->owner->addStringArgument('fit')->type(static::cropInputObject($this->owner->request));
+        $this->owner->addStringArgument('stretch')->type(static::cropInputObject($this->owner->request));
+
 
         $this->owner->resolve(function ($root, $args, $context, ResolveInfo $info) {
             if (!empty($args['transform'])) {

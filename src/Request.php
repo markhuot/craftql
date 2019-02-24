@@ -11,6 +11,7 @@ class Request {
     private $tagGroups;
     private $sections;
     private $globals;
+    private $sites;
 
     function __construct($token) {
         $this->token = $token;
@@ -42,6 +43,10 @@ class Request {
 
     function addGlobals(\markhuot\CraftQL\Factories\Globals $globals) {
         $this->globals = $globals;
+    }
+
+    function addSites(\markhuot\CraftQL\Factories\Site $sites) {
+        $this->sites = $sites;
     }
 
     function token() {
@@ -78,6 +83,10 @@ class Request {
 
     function globals(): \markhuot\CraftQL\Factories\Globals {
         return $this->globals;
+    }
+
+    function sites(): \markhuot\CraftQL\Factories\Site {
+        return $this->sites;
     }
 
     private function parseRelatedTo($relations, $id) {
@@ -146,6 +155,53 @@ class Request {
         }
 
         return $criteria;
+    }
+
+    private $types = [];
+    static $typeCaches = [];
+    private $namespaces = [];
+
+    function registerNamespace($namespace, $prefix='') {
+        $this->namespaces[] = ['namespace' => $namespace, 'prefix' => $prefix];
+    }
+
+    function registerType($name, $obj) {
+        $this->types[$name] = $obj;
+    }
+
+    function getTypeBuilder($name) {
+        return @$this->types[$name];
+    }
+
+    function getType($name) {
+        if (!empty(static::$typeCaches[$name])) {
+            return static::$typeCaches[$name];
+        }
+
+        $type = @$this->types[$name];
+
+        if (is_callable($type)) {
+            $type = $type();
+        }
+
+        if (method_exists($type, 'getRawGraphQLObject')) {
+            return static::$typeCaches[$name] = $type->getRawGraphQLObject();
+        }
+
+        foreach ($this->namespaces as $namespaceConfig) {
+            $namespace = $namespaceConfig['namespace'];
+            $prefix = $namespaceConfig['prefix'];
+            $class = $namespace.'\\'.$prefix.$name;
+            if (class_exists($class)) {
+                return static::$typeCaches[$name] = (new $class($this))->getRawGraphQLObject();
+            }
+        }
+
+        if ($type) {
+            return static::$typeCaches[$name] = $type;
+        }
+
+        return false;
     }
 
 }
