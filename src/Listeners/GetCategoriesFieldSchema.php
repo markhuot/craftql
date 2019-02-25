@@ -20,6 +20,8 @@ class GetCategoriesFieldSchema
 
         $field = $event->sender;
 
+        return false;
+
         if (!$event->schema->getRequest()->token()->can('query:categories')) {
             return;
         }

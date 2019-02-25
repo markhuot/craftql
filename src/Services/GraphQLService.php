@@ -96,13 +96,14 @@ class GraphQLService extends Component {
 
     function getSchema($token) {
         $request = new \markhuot\CraftQL\Request($token);
-        $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
-        $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
-        $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
-        $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
-        $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
-        $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
-        $request->addSites(new \markhuot\CraftQL\Factories\Site($this->sites, $request));
+        // $token->setRequest($request);
+        // $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
+        // $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
+        // $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
+        // $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
+        // $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
+        // $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
+        // $request->addSites(new \markhuot\CraftQL\Factories\Site($this->sites, $request));
 
         $schemaConfig = [];
 

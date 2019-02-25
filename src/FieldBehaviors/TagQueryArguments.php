@@ -8,12 +8,12 @@ class TagQueryArguments extends FieldBehavior {
 
     function initTagQueryArguments() {
         $this->owner->addBooleanArgument('fixedOrder');
-        $this->owner->addArgument('group')->type($this->owner->getRequest()->tagGroups()->enum());
+        // $this->owner->addArgument('group')->type($this->owner->getRequest()->tagGroups()->enum());
         $this->owner->addIntArgument('groupId');
         $this->owner->addIntArgument('id');
         $this->owner->addStringArgument('indexBy');
         $this->owner->addIntArgument('limit');
-        $this->owner->addArgument('site')->type($this->owner->request->sites()->enum());
+        // $this->owner->addArgument('site')->type($this->owner->request->sites()->enum());
         $this->owner->addIntArgument('siteId');
         $this->owner->addIntArgument('offset');
         $this->owner->addStringArgument('order');

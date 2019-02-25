@@ -24,8 +24,8 @@ class User extends Schema {
 
         $volumeId = Craft::$app->getSystemSettings()->getSetting('users', 'photoVolumeId');
         if ($volumeId) {
-            $this->addField('photo')
-                ->type($this->request->volumes()->get($volumeId));
+            // $this->addField('photo')
+            //     ->type($this->request->volumes()->get($volumeId));
         }
 
         $this->addDateField('dateCreated')->nonNull();

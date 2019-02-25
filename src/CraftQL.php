@@ -6,17 +6,28 @@ use Craft;
 
 use craft\base\Plugin;
 use craft\console\Application as ConsoleApplication;
+use craft\services\Sites;
 use craft\web\UrlManager;
 use craft\events\RegisterUrlRulesEvent;
 
 use markhuot\CraftQL\Models\Settings;
+use markhuot\CraftQL\Repositories\Site;
+use markhuot\CraftQL\Services\SitesService;
 use yii\base\Event;
 
 use markhuot\CraftQL\Models\Token;
 
+/**
+ * Class CraftQL
+ * @package markhuot\CraftQL
+ * @property SitesService sites
+ */
 class CraftQL extends Plugin
 {
     // const EVENT_GET_FIELD_SCHEMA = 'getFieldSchema';
+
+    /** @var CraftQL */
+    static $plugin;
 
     public $schemaVersion = '1.1.0';
     public $controllerNamespace = 'markhuot\\CraftQL\\Controllers';
@@ -29,6 +40,8 @@ class CraftQL extends Plugin
      * @return void
      */
     function init() {
+        static::$plugin = $this;
+
         // Add in our console commands
         if (Craft::$app instanceof ConsoleApplication) {
             $this->controllerNamespace = 'markhuot\CraftQL\Console';

@@ -9,6 +9,10 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Builders\EnumObject;
+use markhuot\CraftQL\CraftQL;
+use markhuot\CraftQL\Repositories\Site;
+use markhuot\CraftQL\Repositories\TagGroup;
 
 class Token extends ActiveRecord
 {
@@ -73,6 +77,20 @@ class Token extends ActiveRecord
     function canNot($do): bool {
         return !$this->can($do);
     }
+
+    function canSee($class) {
+        switch ($class) {
+            case 'markhuot\CraftQL\Types\Site':
+                CraftQL::$plugin->sites->handles()
+                break;
+        }
+    }
+
+    // private $request;
+
+    // function setRequest($request) {
+    //     $this->request = $request;
+    // }
 
     // function mutableEntryTypeIds(): array {
     //     $ids = [];

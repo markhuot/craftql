@@ -20,6 +20,8 @@ class GetTagsFieldSchema
         $field = $event->sender;
         $schema = $event->schema;
 
+        return false;
+
         if (!$schema->getRequest()->token()->can('query:tags')) {
             return;
         }

@@ -54,15 +54,15 @@ class EntryQueryArguments extends FieldBehavior {
         $tmp->addStringArgument('relatedTo')->lists()->type($this->relatedToInputObject());
         $tmp->addStringArgument('orRelatedTo')->lists()->type($this->relatedToInputObject());
         $tmp->addStringArgument('search');
-        $tmp->addStringArgument('section')->lists()->type($this->owner->getRequest()->sections()->enum());
+        // $tmp->addStringArgument('section')->lists()->type($this->owner->getRequest()->sections()->enum());
         $tmp->addIntArgument('siblingOf');
-        $tmp->addArgument('site')->type($this->owner->getRequest()->sites()->enum());
+        // $tmp->addArgument('site')->type($this->owner->getRequest()->sites()->enum());
         $tmp->addIntArgument('siteId');
         $tmp->addStringArgument('slug')->lists();
         $tmp->addStringArgument('status')->lists();
         $tmp->addStringArgument('title')->lists();
         $tmp->addBooleanArgument('trashed');
-        $tmp->addStringArgument('type')->lists()->type($this->owner->getRequest()->entryTypes()->enum());
+        // $tmp->addStringArgument('type')->lists()->type($this->owner->getRequest()->entryTypes()->enum());
         $tmp->addStringArgument('uid');
         $tmp->addStringArgument('uri');
 
