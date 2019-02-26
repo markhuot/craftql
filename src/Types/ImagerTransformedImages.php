@@ -67,6 +67,11 @@ class ImagerTransformedImages extends Schema {
         $transforms->addEnumArgument('mode')->values(['crop', 'fit', 'stretch', 'croponly', 'letterbox']);
         $transforms->addFloatArgument('cropZoom');
         $transforms->addStringArgument('frames');
+        $transforms->addIntArgument('jpegQuality');
+        $transforms->addIntArgument('pngCompressionLevel');
+        $transforms->addIntArgument('webpQuality');
+        $transforms->addBooleanArgument('allowUpscale');
+        $transforms->addEnumArgument('resizeFilter')->values(['point', 'box', 'triangle', 'hermite', 'hanning', 'hamming', 'blackman', 'gaussian', 'quadratic', 'cubic', 'catrom', 'mitchell', 'lanczos', 'bessel', 'sinc']);
 
         $watermark = $transforms->createInputObjectType('ImagerWatermark');
         $transforms->addArgument('watermark')->type($watermark);
