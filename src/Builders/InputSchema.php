@@ -35,7 +35,9 @@ class InputSchema extends BaseBuilder {
      * @return self
      */
     function createInputObjectType($name): InputSchema {
-        return new InputSchema($this->request, $name);
+        $inputSchema = new InputSchema($this->request, $name);
+        $this->request->registerType($name, $inputSchema);
+        return $inputSchema;
     }
 
     function getArguments() {

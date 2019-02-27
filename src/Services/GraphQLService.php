@@ -12,6 +12,7 @@ use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
+use markhuot\CraftQL\Helpers\StringHelper;
 use markhuot\CraftQL\Types\Category;
 use markhuot\CraftQL\Types\ElementInterface;
 use markhuot\CraftQL\Types\Entry;
@@ -118,7 +119,8 @@ class GraphQLService extends Component {
         $request->registerType('Query', $query);
 
         array_map(function ($entryType) use ($request) {
-            $request->registerType(ucfirst($entryType['handle']), function () use ($entryType, $request) {
+            $name = StringHelper::graphQLNameForEntryTypeSection($request, $entryType['id'], $entryType['sectionId']);
+            $request->registerType($name, function () use ($entryType, $request) {
                 return new Entry($request, $entryType);
             });
         }, $this->entryTypes->all());

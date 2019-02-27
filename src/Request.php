@@ -201,7 +201,7 @@ class Request {
             return static::$typeCaches[$name] = $type;
         }
 
-        return false;
+        throw new \Exception('Could not find '.$name.' in the type registry.');
     }
 
 }
