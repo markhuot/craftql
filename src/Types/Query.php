@@ -98,6 +98,8 @@ class Query extends Schema {
      * @return Schema
      */
     function addEntriesSchema() {
+        if ($this->request)
+
         // if ($this->request->token()->canSee(Entry::class) == false) {
         //     return;
         // }
@@ -176,9 +178,9 @@ class Query extends Schema {
      * The fields you can query that return globals
      */
     function addGlobalsSchema() {
-        // if ($this->request->globals()->count() > 0) {
-        //     return;
-        // }
+        if ($this->request->token()->canNot('query:globals')) {
+            return;
+        }
 
         // $this->addObjectField('globals')
         //     ->config(function ($object) use ($this->request) {
@@ -199,8 +201,8 @@ class Query extends Schema {
 
         $this->addField('globals')
             ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
-            ->arguments(function ($field) {
-                $field->addEnumArgument('site')->values($this->request->token()->canSee(Site::class));
+            ->arguments(function (\markhuot\CraftQL\Builders\Field $field) {
+                $field->addEnumArgument('site')->values($this->request->getTypeBuilder('SitesEnum'));
                 $field->addIntArgument('siteId');
             })
             ->resolve(function ($root, $args) {

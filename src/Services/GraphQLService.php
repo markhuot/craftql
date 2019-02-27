@@ -118,6 +118,14 @@ class GraphQLService extends Component {
 
         $request->registerType('Query', $query);
 
+        $request->registerType('SitesEnum', function () use ($token) {
+            return array_map(function ($site) {
+                return $site['handle'];
+            }, array_filter(CraftQL::$plugin->sites->all(), function ($site) use ($token) {
+                return $token->can('query:entryType:'.$site['id']);
+            }));
+        });
+
         array_map(function ($entryType) use ($request) {
             $name = StringHelper::graphQLNameForEntryTypeSection($request, $entryType['id'], $entryType['sectionId']);
             $request->registerType($name, function () use ($entryType, $request) {

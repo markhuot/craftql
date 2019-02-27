@@ -12,6 +12,8 @@ use craft\events\RegisterUrlRulesEvent;
 
 use markhuot\CraftQL\Models\Settings;
 use markhuot\CraftQL\Repositories\Site;
+use markhuot\CraftQL\Services\EntryTypesService;
+use markhuot\CraftQL\Services\SectionsService;
 use markhuot\CraftQL\Services\SitesService;
 use yii\base\Event;
 
@@ -21,6 +23,8 @@ use markhuot\CraftQL\Models\Token;
  * Class CraftQL
  * @package markhuot\CraftQL
  * @property SitesService sites
+ * @property SectionsService sections
+ * @property EntryTypesService entryTypes
  */
 class CraftQL extends Plugin
 {

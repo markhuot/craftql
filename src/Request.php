@@ -2,6 +2,8 @@
 
 namespace markhuot\CraftQL;
 
+use markhuot\CraftQL\Models\Token;
+
 class Request {
 
     private $token;
@@ -49,6 +51,9 @@ class Request {
     //     $this->sites = $sites;
     // }
 
+    /**
+     * @return Token
+     */
     function token() {
         return $this->token;
     }
@@ -103,25 +108,25 @@ class Request {
     }
 
     function entries($criteria, $root, $args, $context, $info) {
-        if (empty($args['section'])) {
-            $args['sectionId'] = array_map(function ($value) {
-                return $value->value;
-            }, $this->sections()->enum()->getValues());
-        }
-        else {
-            $args['sectionId'] = $args['section'];
-            unset($args['section']);
-        }
+        // if (empty($args['section'])) {
+        //     $args['sectionId'] = array_map(function ($value) {
+        //         return $value->value;
+        //     }, $this->sections()->enum()->getValues());
+        // }
+        // else {
+        //     $args['sectionId'] = $args['section'];
+        //     unset($args['section']);
+        // }
 
-        if (empty($args['type'])) {
-            $args['typeId'] = array_map(function ($value) {
-                return $value->value;
-            }, $this->entryTypes()->enum()->getValues());
-        }
-        else {
-            $args['typeId'] = $args['type'];
-            unset($args['type']);
-        }
+        // if (empty($args['type'])) {
+        //     $args['typeId'] = array_map(function ($value) {
+        //         return $value->value;
+        //     }, $this->entryTypes()->enum()->getValues());
+        // }
+        // else {
+        //     $args['typeId'] = $args['type'];
+        //     unset($args['type']);
+        // }
 
         if (!empty($args['relatedTo'])) {
             $criteria->relatedTo(array_merge(['and'], $this->parseRelatedTo($args['relatedTo'], @$root->id)));

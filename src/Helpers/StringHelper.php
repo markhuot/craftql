@@ -3,6 +3,7 @@
 namespace markhuot\CraftQL\Helpers;
 
 use craft\models\EntryType;
+use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Request;
 
 class StringHelper {
@@ -15,12 +16,12 @@ class StringHelper {
      * @param CraftEntryType $entryType
      * @return string
      */
-    static function graphQLNameForEntryType(EntryType $entryType): string {
-        $typeHandle = ucfirst($entryType->handle);
-        $sectionHandle = ucfirst($entryType->section->handle);
-
-        return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
-    }
+    // static function graphQLNameForEntryType(EntryType $entryType): string {
+    //     $typeHandle = ucfirst($entryType->handle);
+    //     $sectionHandle = ucfirst($entryType->section->handle);
+    //
+    //     return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
+    // }
 
     /**
      * Convert a Craft Entry Type in to a valid GraphQL Name
@@ -33,11 +34,11 @@ class StringHelper {
             return static::$entryTypeMap[$key];
         }
 
-        $entryType = $request->entryTypes()->getRaw($entryTypeId);
-        $section = $request->sections()->getRaw($sectionId);
+        $entryType = CraftQL::$plugin->entryTypes->getById($entryTypeId);
+        $section = CraftQL::$plugin->sections->getById($sectionId);
 
-        $typeHandle = ucfirst($entryType->handle);
-        $sectionHandle = ucfirst($section->handle);
+        $typeHandle = ucfirst($entryType['handle']);
+        $sectionHandle = ucfirst($section['handle']);
 
         return static::$entryTypeMap[$key] = (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
     }

@@ -31,7 +31,10 @@
         "developerUrl": "https://www.github.com/markhuot",
         "class": "markhuot\\CraftQL\\CraftQL",
         "components": {
-            "sites": "markhuot\\CraftQL\\Services\\SitesService"
+            "sites": "markhuot\\CraftQL\\Services\\SitesService",
+            "sections": "markhuot\\CraftQL\\Services\\SectionsService",
+            "entryTypes": "markhuot\\CraftQL\\Services\\EntryTypesService",
+            "globals": "markhuot\\CraftQL\\Services\\GlobalsService"
         }
     }
 }
