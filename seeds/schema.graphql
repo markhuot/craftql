@@ -83,6 +83,32 @@ type BlogPost implements EntryInterface, ElementInterface {
   testEmptyMatrixField(type: String, limit: Int): [TestEmptyMatrixFieldUnion]
 }
 
+type BlogPostOffsiteLink implements EntryInterface, ElementInterface {
+  id: Int!
+  author: User!
+  title: String!
+  slug: String!
+  dateCreated: Timestamp!
+  dateUpdated: Timestamp!
+  expiryDate: Timestamp
+  postDate: Timestamp
+  enabled: Boolean!
+  status: String!
+  uri: String
+  url: String
+  section: Section
+  type: EntryType
+  ancestors: [EntryInterface]
+  children(after: String, ancestorDist: Int, ancestorOf: Int, anyStatus: Boolean, archived: Boolean, authorGroup: [String], authorGroupId: [Int], authorId: [Int], before: String, dateCreated: String, dateUpdated: String, descendantDist: Int, descendantOf: Int, enabledForSite: Boolean, expiryDate: String, fixedOrder: Boolean, hasDescendants: Boolean, id: [Int], idNot: [Int], inReverse: Boolean, leaves: Boolean, level: Int, limit: Int, nextSiblingOf: Int, offset: Int, order: String, orderBy: String, positionedAfter: Int, positionedBefore: Int, postDate: String, prevSiblingOf: Int, relatedTo: [RelatedToInputType], orRelatedTo: [RelatedToInputType], search: String, section: [SectionsEnum], siblingOf: Int, site: SitesEnum, siteId: Int, slug: [String], status: [String], title: [String], trashed: Boolean, type: [EntryTypesEnum], uid: String, uri: String, testBlockCheckboxesField: TestBlockCheckboxesFieldEnum, testBlockPlainTextField: String, testBlockTableField: String, testCategoryField: String, testCategoryNestingField: String, testCheckboxes: TestCheckboxesEnum, testCheckboxesWithOneBadValue: TestCheckboxesWithOneBadValueEnum, testDateAndTimeField: String, testDateField: String, testDropdownField: TestDropdownFieldEnum, testEmailField: String, testLightswitchField: Boolean, testLightswitchOnField: Boolean, testMultiSelectField: TestMultiSelectFieldEnum, testNumberField: Int, testNumberFloatField: Float, testNumberMaxField: Int, testPlainText: String, testPlainTextWithCharacterLimit: String, testRadioButtonField: TestRadioButtonFieldEnum, testTableField: String, testTagField: Int, testTimeField: String, testUrlField: String): [EntryInterface]
+  descendants: [EntryInterface]
+  hasDescendants: Boolean!
+  level: Int
+  parent: EntryInterface
+  siblings: [EntryInterface]
+  elementType: String
+  testUrlField: String
+}
+
 type CategoryConnection {
   totalCount: Int!
   pageInfo: PageInfo
@@ -256,6 +282,7 @@ type EntryType {
 
 enum EntryTypesEnum {
   BlogPost
+  BlogPostOffsiteLink
 }
 
 type Field {
