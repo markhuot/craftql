@@ -5,10 +5,13 @@ namespace markhuot\CraftQL\Builders;
 use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\UnionType;
+use markhuot\CraftQL\Request;
 
 class UnionField extends Field {
 
-    function boot() {
+    function __construct(Request $request, string $name) {
+        parent::__construct($request, $name);
+
         $this->type = (new Union($this->request))
             ->name(ucfirst($this->getName()).'Union');
         $this->request->registerType($this->type->getName(), $this->type);

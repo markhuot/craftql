@@ -58,20 +58,21 @@ class ImagerTransformedImages extends Schema {
         /** @var InputSchema $transforms */
         $transforms = $this->createInputObjectType('ImagerTransformOptions');
         $imagesField->addArgument('transforms')->nonNull()->type($transforms)->lists();
-        $transforms->addEnumArgument('format')->values(['jpg', 'png', 'gif', 'webp']);
+        $transforms->addEnumArgument('format', 'Imager')->values(['jpg', 'png', 'gif', 'webp']);
         $transforms->addIntArgument('width');
         $transforms->addIntArgument('height');
         $transforms->addFloatArgument('ratio');
         $transforms->addStringArgument('position');
         $transforms->addBooleanArgument('ignoreFocalPoint');
-        $transforms->addEnumArgument('mode')->values(['crop', 'fit', 'stretch', 'croponly', 'letterbox']);
+        $transforms->addEnumArgument('mode', 'Imager')->values(['crop', 'fit', 'stretch', 'croponly', 'letterbox']);
         $transforms->addFloatArgument('cropZoom');
         $transforms->addStringArgument('frames');
         $transforms->addIntArgument('jpegQuality');
         $transforms->addIntArgument('pngCompressionLevel');
         $transforms->addIntArgument('webpQuality');
         $transforms->addBooleanArgument('allowUpscale');
-        $transforms->addEnumArgument('resizeFilter')->values(['point', 'box', 'triangle', 'hermite', 'hanning', 'hamming', 'blackman', 'gaussian', 'quadratic', 'cubic', 'catrom', 'mitchell', 'lanczos', 'bessel', 'sinc']);
+        $transforms->addEnumArgument('resizeFilter', 'Imager')->values(['point', 'box', 'triangle', 'hermite', 'hanning', 'hamming', 'blackman', 'gaussian', 'quadratic', 'cubic', 'catrom', 'mitchell', 'lanczos', 'bessel', 'sinc']);
+        $transforms->addEnumArgument('interlace', 'Imager')->values(['none', 'line', 'plane', 'partition']);
 
         $watermark = $transforms->createInputObjectType('ImagerWatermark');
         $transforms->addArgument('watermark')->type($watermark);
@@ -79,7 +80,7 @@ class ImagerTransformedImages extends Schema {
         $watermark->addIntArgument('width');
         $watermark->addIntArgument('height');
         $watermark->addIntArgument('opacity');
-        $watermark->addEnumArgument('blendMode')->values(['blend', 'darken', 'lighten', 'modulate', 'multiply', 'overlay', 'screen']);
+        $watermark->addEnumArgument('blendMode', 'Imager')->values(['blend', 'darken', 'lighten', 'modulate', 'multiply', 'overlay', 'screen']);
 
         $watermarkPosition = $watermark->createInputObjectType('ImagerWatermarkPosition');
         $watermark->addArgument('position')->type($watermarkPosition);
@@ -118,13 +119,13 @@ class ImagerTransformedImages extends Schema {
                 return Imager::$plugin->placeholder->placeholder($config);
             });
 
-        $placeholderField->addEnumArgument('type')->values(['svg', 'gif', 'silhouette']);
+        $placeholderField->addEnumArgument('type', 'Imager')->values(['svg', 'gif', 'silhouette']);
         $placeholderField->addIntArgument('width');
         $placeholderField->addIntArgument('height');
         $placeholderField->addStringArgument('color');
         $placeholderField->addStringArgument('fgColor');
         $placeholderField->addStringArgument('size');
-        $placeholderField->addEnumArgument('silhouetteType')->values(['curve']);
+        $placeholderField->addEnumArgument('silhouetteType', 'Imager')->values(['curve']);
     }
 
 }

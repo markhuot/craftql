@@ -10,7 +10,7 @@ class ImagerLevelsEffect extends InputSchema {
         $this->addFloatArgument('blackPoint');
         $this->addFloatArgument('gamma');
         $this->addFloatArgument('whitePoint');
-        $this->addEnumArgument('channel')->values(['red', 'green', 'blue']);
+        $this->addEnumArgument('channel', 'Imager')->values(['red', 'green', 'blue']);
     }
 
 }

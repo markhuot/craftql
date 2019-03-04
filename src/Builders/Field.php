@@ -21,7 +21,6 @@ class Field extends BaseBuilder {
     function __construct(Request $request, string $name) {
         $this->request = $request;
         $this->name = $name;
-        $this->boot();
     }
 
     protected function boot() {
@@ -53,6 +52,7 @@ class Field extends BaseBuilder {
     }
 
     function getConfig() {
+        $this->boot();
         $type = $this->getTypeConfig();
 
         if ($this->isList) {
