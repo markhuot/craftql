@@ -14,6 +14,7 @@ use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
 use markhuot\CraftQL\Helpers\StringHelper;
 use markhuot\CraftQL\Types\Category;
+use markhuot\CraftQL\Types\Date;
 use markhuot\CraftQL\Types\ElementInterface;
 use markhuot\CraftQL\Types\Entry;
 use markhuot\CraftQL\Types\EntryConnection;
@@ -148,7 +149,7 @@ class GraphQLService extends Component {
             });
         }, $this->tagGroups->all());
 
-        $request->registerType('DateFormatTypes', \markhuot\CraftQL\Directives\Date::dateFormatTypesEnum());
+        // $request->registerType('DateFormatTypes', \markhuot\CraftQL\Types\DateFormatTypes::class);
 
         $schemaConfig['types'] = function () use ($request) {
             $types = [];
@@ -191,7 +192,7 @@ class GraphQLService extends Component {
         };
 
         $schemaConfig['directives'] = array_merge(GraphQL::getStandardDirectives(), [
-            \markhuot\CraftQL\Directives\Date::directive(),
+            (new Date)->getRawGraphQLObject(),
         ]);
 
         $mutation = new \markhuot\CraftQL\Types\Mutation($request);
