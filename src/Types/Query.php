@@ -310,7 +310,7 @@ class Query extends Schema {
             ->type(CategoryInterface::class)
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args) use ($categoryResolver) {
-                return $categoryResolver($root, $args)->first();
+                return $categoryResolver($root, $args)->one();
             });
 
         $this->addField('categoriesConnection')
@@ -351,7 +351,7 @@ class Query extends Schema {
             ->type(User::class)
             ->use(new UserQueryArguments)
             ->resolve(function ($root, $args) use ($userResolver) {
-                return $userResolver($root, $args)->first();
+                return $userResolver($root, $args)->one();
             });
     }
 

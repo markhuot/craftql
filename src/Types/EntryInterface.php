@@ -31,21 +31,34 @@ class EntryInterface extends InterfaceBuilder {
             $this->addField('type')->type(EntryType::class);
         }
 
-        $this->addField('ancestors')->lists()->type(EntryInterface::class);
+        $this->addField('ancestors')->lists()->type(EntryInterface::class)
+            ->resolve(function ($root) {
+                return $root->getAncestors()->all();
+            });
 
         $this->addField('children')
             ->lists()
             ->type(EntryInterface::class)
             ->use(new EntryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
-                return $this->request->entries($root->{$info->fieldName}, $root, $args, $context, $info);
+                return $this->request->entries($root->{$info->fieldName}, $root, $args, $context, $info)->all();
             });
 
-        $this->addField('descendants')->lists()->type(EntryInterface::class);
+        $this->addField('descendants')->lists()->type(EntryInterface::class)
+            ->resolve(function ($root) {
+                return $root->getDescendants()->all();
+            });
+
         $this->addBooleanField('hasDescendants')->nonNull();
         $this->addIntField('level');
+
         $this->addField('parent')->type(EntryInterface::class);
-        $this->addField('siblings')->lists()->type(EntryInterface::class);
+
+        $this->addField('siblings')->lists()->type(EntryInterface::class)
+            ->resolve(function ($root) {
+                return $root->getSiblings()->all();
+            });
+
     }
 
     function getResolveType() {

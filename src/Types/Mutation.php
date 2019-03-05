@@ -129,7 +129,7 @@ class Mutation extends Schema {
         //     'resolve' => function ($root, $args) {
         //         $entry = \craft\elements\Entry::find();
         //         $entry->id($args['id']);
-        //         $entry = $entry->first();
+        //         $entry = $entry->one();
 
         //         $json = json_decode($args['json'], true);
         //         $fieldData = [];
