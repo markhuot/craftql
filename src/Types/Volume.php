@@ -13,11 +13,11 @@ class Volume extends Schema {
     ];
 
     function boot() {
-        $this->addFieldsByLayoutId($this->context->fieldLayoutId);
+        $this->addFieldsByLayoutId($this->context['fieldLayoutId']);
     }
 
     function getName(): string {
-        return ucfirst($this->context->handle).'Volume';
+        return ucfirst($this->context['handle']).'Volume';
     }
 
 }

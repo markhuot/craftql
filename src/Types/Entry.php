@@ -14,13 +14,13 @@ class Entry extends Schema {
     ];
 
     function boot() {
-        $this->addFieldsByLayoutId($this->context->fieldLayoutId);
+        $this->addFieldsByLayoutId($this->context['fieldLayoutId']);
     }
 
     function getName(): string {
         /** @var \craft\models\EntryType $entryType */
         $entryType = $this->context;
-        return StringHelper::graphQLNameForEntryTypeSection($this->request, $entryType->id, $entryType->sectionId);
+        return StringHelper::graphQLNameForEntryTypeSection($entryType['id'], $entryType['sectionId']);
     }
 
 }

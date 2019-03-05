@@ -23,12 +23,26 @@ class StringHelper {
     //     return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
     // }
 
+    static function graphQLNameForEntryType(array $entryType) {
+        $key = "{$entryType['id']}:{$entryType['sectionId']}";
+        if (isset(static::$entryTypeMap[$key])) {
+            return static::$entryTypeMap[$key];
+        }
+
+        $section = CraftQL::$plugin->sections->getById($entryType['sectionId']);
+
+        $typeHandle = ucfirst($entryType['handle']);
+        $sectionHandle = ucfirst($section['handle']);
+
+        return static::$entryTypeMap[$key] = (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
+    }
+
     /**
      * Convert a Craft Entry Type in to a valid GraphQL Name
      *
      * @return string
      */
-    static function graphQLNameForEntryTypeSection(Request $request, $entryTypeId, $sectionId): string {
+    static function graphQLNameForEntryTypeSection($entryTypeId, $sectionId): string {
         $key = "{$entryTypeId}:{$sectionId}";
         if (isset(static::$entryTypeMap[$key])) {
             return static::$entryTypeMap[$key];

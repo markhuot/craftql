@@ -88,7 +88,10 @@ class Token extends ActiveRecord
     function can($do): bool {
         if (substr($do, 0, 6) === 'query:') {
             $service = substr($do, 6);
-            if (in_array($service, ['globals'])) {
+            if (in_array($service, ['globals', 'categories'])) {
+                if ($service == 'categories') {
+                    $service = 'categoryGroups';
+                }
                 if (count(CraftQL::$plugin->$service->all()) == 0) {
                     return false;
                 }
@@ -100,6 +103,20 @@ class Token extends ActiveRecord
         }
 
         return @$this->scopeArray[$do] ?: false;
+    }
+
+    function globals($mode='query') {
+        if ($this->canNot($mode.':globals')) {
+            return [];
+        }
+
+        return CraftQL::$plugin->globals->all();
+    }
+
+    function entryTypes($mode='query') {
+        return array_filter(CraftQL::$plugin->entryTypes->all(), function ($entryType) use ($mode) {
+            return $this->can($mode.':entryType:'.$entryType['id']);
+        });
     }
 
     function canNot($do): bool {

@@ -22,6 +22,7 @@ class Schema extends BaseBuilder {
 
     function __construct(Request $request, $context=null, $parent=null) {
         $this->request = $request;
+        $this->token = $request->token();
         $this->context = $context;
         $this->parent = $parent;
         // CALLED LOWER, BEFORE GETTING FIELDS TO ACCOUNT FOR

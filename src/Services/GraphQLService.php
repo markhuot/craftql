@@ -47,38 +47,12 @@ class GraphQLService extends Component {
     private $globals;
     private $sites;
 
-    function __construct(
-        \markhuot\CraftQL\Repositories\Volumes $volumes,
-        \markhuot\CraftQL\Repositories\CategoryGroup $categoryGroups,
-        \markhuot\CraftQL\Repositories\TagGroup $tagGroups,
-        \markhuot\CraftQL\Repositories\EntryType $entryTypes,
-        \markhuot\CraftQL\Repositories\Section $sections,
-        \markhuot\CraftQL\Repositories\Globals $globals,
-        \markhuot\CraftQL\Repositories\Site $sites
-    ) {
-        $this->volumes = $volumes;
-        $this->categoryGroups = $categoryGroups;
-        $this->tagGroups = $tagGroups;
-        $this->entryTypes = $entryTypes;
-        $this->sections = $sections;
-        $this->globals = $globals;
-        $this->sites = $sites;
-    }
-
     /**
      * Bootstrap the schema
      *
      * @return void
      */
     function bootstrap() {
-        $this->volumes->load();
-        $this->categoryGroups->load();
-        $this->tagGroups->load();
-        $this->entryTypes->load();
-        $this->sections->load();
-        $this->globals->load();
-        $this->sites->load();
-
         // @TODO don't load _everything_. Instead only load what's needed on demand
         \Yii::$container->get('craftQLFieldService')->load();
 
@@ -97,14 +71,6 @@ class GraphQLService extends Component {
 
     function getSchema($token) {
         $request = new \markhuot\CraftQL\Request($token);
-        // $token->setRequest($request);
-        // $request->addCategoryGroups(new \markhuot\CraftQL\Factories\CategoryGroup($this->categoryGroups, $request));
-        // $request->addEntryTypes(new \markhuot\CraftQL\Factories\EntryType($this->entryTypes, $request));
-        // $request->addVolumes(new \markhuot\CraftQL\Factories\Volume($this->volumes, $request));
-        // $request->addSections(new \markhuot\CraftQL\Factories\Section($this->sections, $request));
-        // $request->addTagGroups(new \markhuot\CraftQL\Factories\TagGroup($this->tagGroups, $request));
-        // $request->addGlobals(new \markhuot\CraftQL\Factories\Globals($this->globals, $request));
-        // $request->addSites(new \markhuot\CraftQL\Factories\Site($this->sites, $request));
 
         $schemaConfig = [];
 
@@ -127,35 +93,34 @@ class GraphQLService extends Component {
         });
 
         array_map(function ($entryType) use ($request) {
-            $name = StringHelper::graphQLNameForEntryTypeSection($request, $entryType['id'], $entryType['sectionId']);
-            $request->registerType($name, function () use ($entryType, $request) {
+            $request->registerType($entryType['craftQlTypeName'], function () use ($entryType, $request) {
                 return new Entry($request, $entryType);
             });
-        }, $this->entryTypes->all());
+        }, CraftQL::$plugin->entryTypes->all());
 
         array_map(function ($volume) use ($request) {
-            $request->registerType(ucfirst($volume['handle']).'Volume', function () use ($volume, $request) {
+            $request->registerType($volume['craftQlTypeName'], function () use ($volume, $request) {
                 return new Volume($request, $volume);
             });
-        }, $this->volumes->all());
+        }, CraftQL::$plugin->volumes->all());
 
         array_map(function ($globalSet) use ($request) {
             $request->registerType(ucfirst($globalSet['handle']), function () use ($globalSet, $request) {
                 return new Globals($request, $globalSet);
             });
-        }, $this->globals->all());
+        }, CraftQL::$plugin->globals->all());
 
         array_map(function ($categoryGroup) use ($request) {
-            $request->registerType(ucfirst($categoryGroup['handle']).'Category', function() use ($categoryGroup, $request) {
+            $request->registerType($categoryGroup['craftQlTypeName'], function() use ($categoryGroup, $request) {
                 return new Category($request, $categoryGroup);
             });
-        }, $this->categoryGroups->all());
+        }, CraftQL::$plugin->categoryGroups->all());
 
         array_map(function ($tagGroup) use ($request) {
-            $request->registerType(ucfirst($tagGroup['handle']).'Tags', function () use ($tagGroup, $request) {
+            $request->registerType($tagGroup['craftQlTypeName'], function () use ($tagGroup, $request) {
                 return new Tag($request, $tagGroup);
             });
-        }, $this->tagGroups->all());
+        }, CraftQL::$plugin->tagGroups->all());
 
         $request->registerType('DateFormatTypes', \markhuot\CraftQL\Directives\Date::dateFormatTypesEnum());
 
@@ -163,24 +128,24 @@ class GraphQLService extends Component {
             $types = [];
 
             $types = array_merge($types, array_map(function ($entryType) use ($request) {
-                return $request->getType($entryType->getName());
-            }, $request->entryTypes()->all()));
+                return $request->getType($entryType['craftQlTypeName']);
+            }, CraftQl::$plugin->entryTypes->all()));
 
             $types = array_merge($types, array_map(function ($volume) use ($request) {
-                return $request->getType($volume->getName());
-            }, $request->volumes()->all()));
+                return $request->getType($volume['craftQlTypeName']);
+            }, CraftQl::$plugin->volumes->all()));
 
             $types = array_merge($types, array_map(function ($categoryGroup) use ($request) {
-                return $request->getType($categoryGroup->getName());
-            }, $request->categoryGroups()->all()));
+                return $request->getType($categoryGroup['craftQlTypeName']);
+            }, CraftQl::$plugin->categoryGroups->all()));
 
             $types = array_merge($types, array_map(function ($tagGroup) use ($request) {
-                return $request->getType($tagGroup->getName());
-            }, $request->tagGroups()->all()));
+                return $request->getType($tagGroup['craftQlTypeName']);
+            }, CraftQl::$plugin->tagGroups->all()));
 
             $types = array_merge($types, array_map(function ($section) use ($request) {
-                return $request->getType($section->getName());
-            }, $request->sections()->all()));
+                return $request->getType($section['craftQlTypeName']);
+            }, CraftQl::$plugin->sections->all()));
 
             $types[] = $request->getType('DateFormatTypes');
 

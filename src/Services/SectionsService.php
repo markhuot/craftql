@@ -27,12 +27,17 @@ class SectionsService {
             ->all();
 
         foreach ($sections as $section) {
+            $section['craftQlTypeName'] = ucfirst($section['handle']);
             $this->sections[$section['id']] = $section;
         }
     }
 
     function getById($id) {
         return $this->sections[$id];
+    }
+
+    function all() {
+        return $this->sections;
     }
 
 }

@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Types;
 
 use craft\base\Element;
 use GraphQL\Error\UserError;
+use markhuot\CraftQL\Helpers\StringHelper;
 use yii\base\Component;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -20,14 +21,17 @@ class Mutation extends Schema {
             ->description('A sample mutation. Doesn\'t actually save anything.')
             ->resolve('If this were a real mutation it would have saved to the database.');
 
-        foreach ($this->request->entryTypes()->all('mutate') as $entryType) {
-            $this->addField('upsert'.$entryType->getName())
-                ->type($entryType)
-                ->description('Create or update existing '.$entryType->getName().'.')
+        foreach ($this->token->entryTypes('mutate') as $entryType) {
+            $entryTypeName = StringHelper::graphQLNameForEntryTypeSection($entryType['id'], $entryType['sectionId']);
+            $entryTypeObj = $this->request->getTypeBuilder($entryTypeName)();
+
+            $this->addField('upsert'.$entryTypeName)
+                ->type($entryTypeObj)
+                ->description('Create or update existing '.$entryType['name'].'.')
                 ->use(new EntryMutationArguments);
         }
 
-        if ($this->request->globals()->count() && $this->request->token()->can('mutate:globals')) {
+        if (false && $this->request->globals()->count() && $this->request->token()->can('mutate:globals')) {
             /** @var \markhuot\CraftQL\Types\Globals $globalSet */
             foreach ($this->request->globals()->all() as $globalSet) {
                 $upsertField = $this->addField('upsert'.$globalSet->getName().'Globals')

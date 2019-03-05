@@ -22,6 +22,13 @@ class BaseBuilder extends Component {
     protected $request;
 
     /**
+     * The token used to permission the schema
+     *
+     * @var \markhuot\CraftQL\Models\Token
+     */
+    protected $token;
+
+    /**
      * Run the behavior's init methods
      *
      * @return void

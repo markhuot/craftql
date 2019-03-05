@@ -7,49 +7,10 @@ use markhuot\CraftQL\Models\Token;
 class Request {
 
     private $token;
-    // private $entryTypes;
-    // private $volumes;
-    // private $categoryGroups;
-    // private $tagGroups;
-    // private $sections;
-    // private $globals;
-    // private $sites;
 
     function __construct($token) {
         $this->token = $token;
     }
-
-    // function resolve($className, $params=[]) {
-    //     return new $className($this, ...$params);
-    // }
-
-    // function addCategoryGroups(\markhuot\CraftQL\Factories\CategoryGroup $categoryGroups) {
-    //     $this->categoryGroups = $categoryGroups;
-    // }
-
-    // function addTagGroups(\markhuot\CraftQL\Factories\TagGroup $tagGroups) {
-    //     $this->tagGroups = $tagGroups;
-    // }
-
-    // function addEntryTypes(\markhuot\CraftQL\Factories\EntryType $entryTypes) {
-    //     $this->entryTypes = $entryTypes;
-    // }
-
-    // function addVolumes(\markhuot\CraftQL\Factories\Volume $volumes) {
-    //     $this->volumes = $volumes;
-    // }
-
-    // function addSections(\markhuot\CraftQL\Factories\Section $sections) {
-    //     $this->sections = $sections;
-    // }
-
-    // function addGlobals(\markhuot\CraftQL\Factories\Globals $globals) {
-    //     $this->globals = $globals;
-    // }
-
-    // function addSites(\markhuot\CraftQL\Factories\Site $sites) {
-    //     $this->sites = $sites;
-    // }
 
     /**
      * @return Token
@@ -57,42 +18,6 @@ class Request {
     function token() {
         return $this->token;
     }
-
-    // function categoryGroup($id) {
-    //     return $this->categoryGroups->get($id);
-    // }
-
-    // function categoryGroups(): \markhuot\CraftQL\Factories\CategoryGroup {
-    //     return $this->categoryGroups;
-    // }
-
-    // function tagGroup($id) {
-    //     return $this->tagGroups->get($id);
-    // }
-
-    // function tagGroups(): \markhuot\CraftQL\Factories\TagGroup {
-    //     return $this->tagGroups;
-    // }
-
-    // function entryTypes(): \markhuot\CraftQL\Factories\EntryType {
-    //     return $this->entryTypes;
-    // }
-
-    // function volumes(): \markhuot\CraftQL\Factories\Volume {
-    //     return $this->volumes;
-    // }
-
-    // function sections(): \markhuot\CraftQL\Factories\Section {
-    //     return $this->sections;
-    // }
-
-    // function globals(): \markhuot\CraftQL\Factories\Globals {
-    //     return $this->globals;
-    // }
-
-    // function sites(): \markhuot\CraftQL\Factories\Site {
-    //     return $this->sites;
-    // }
 
     private function parseRelatedTo($relations, $id) {
         foreach ($relations as $index => &$relatedTo) {

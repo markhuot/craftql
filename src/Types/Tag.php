@@ -14,11 +14,11 @@ class Tag extends Schema {
     ];
 
     function boot() {
-        $this->addFieldsByLayoutId($this->context->fieldLayoutId);
+        $this->addFieldsByLayoutId($this->context['fieldLayoutId']);
     }
 
     function getName(): string {
-        return ucfirst($this->context->handle).'Tags';
+        return ucfirst($this->context['handle']).'Tags';
     }
 
 }
