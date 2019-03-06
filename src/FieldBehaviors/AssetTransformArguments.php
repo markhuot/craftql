@@ -4,14 +4,8 @@ namespace markhuot\CraftQL\FieldBehaviors;
 
 use GraphQL\Type\Definition\ResolveInfo;
 use markhuot\CraftQL\Behaviors\FieldBehavior;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Request;
-use markhuot\CraftQL\Types\CropFormatInputEnum;
-use markhuot\CraftQL\Types\CropinputObject;
+use markhuot\CraftQL\Types\CropInputObject;
 use markhuot\CraftQL\Types\NamedTransformsEnum;
-use markhuot\CraftQL\Types\PositionInputEnum;
 
 class AssetTransformArguments extends FieldBehavior {
 
