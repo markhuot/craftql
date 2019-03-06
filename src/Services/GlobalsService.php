@@ -17,6 +17,7 @@ class GlobalsService {
             ->all();
 
         foreach ($globalSets as $globalSet) {
+            $globalSet['craftQlTypeName'] = ucfirst($globalSet['handle']);
             $this->sets[$globalSet['id']] = $globalSet;
         }
     }

@@ -10,7 +10,9 @@ use GraphQL\Type\Schema;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
+use markhuot\CraftQL\Builders\EnumObject;
 use markhuot\CraftQL\CraftQL;
+use markhuot\CraftQL\Directives\Date;
 use markhuot\CraftQL\Events\AlterQuerySchema;
 use markhuot\CraftQL\Helpers\StringHelper;
 use markhuot\CraftQL\Types\Category;
@@ -35,6 +37,9 @@ use markhuot\CraftQL\Types\User;
 use markhuot\CraftQL\Types\Volume;
 use yii\base\Component;
 use Yii;
+
+// - children(ancestorOf: Int, ancestorDist: Int, level: Int, descendantOf: Int, descendantDist: Int, fixedOrder: Boolean, group: [CategoryGroupsEnum], groupId: Int, id: [Int], indexBy: String, limit: Int, site: SitesEnum, siteId: Int, nextSiblingOf: Int, offset: Int, order: String, orderBy: String, positionedAfter: Int, positionedBefore: Int, prevSiblingOf: Int,                                  search: String, siblingOf: Int, slug: String, title: String, uri: String, testBlockCheckboxesField: TestBlockCheckboxesFieldEnum, testBlockPlainTextField: String, testBlockTableField: String, testCategoryField: String, testCategoryNestingField: String, testCheckboxes: TestCheckboxesEnum, testCheckboxesWithOneBadValue: TestCheckboxesWithOneBadValueEnum, testDateAndTimeField: String, testDateField: String, testDropdownField: TestDropdownFieldEnum, testEmailField: String, testLightswitchField: Boolean, testLightswitchOnField: Boolean, testMultiSelectField: TestMultiSelectFieldEnum, testNumberField: Int, testNumberFloatField: Float, testNumberMaxField: Int, testPlainText: String, testPlainTextWithCharacterLimit: String, testRadioButtonField: TestRadioButtonFieldEnum, testTableField: String, testTagField: Int, testTimeField: String, testUrlField: String): [CategoryInterface]
+// + children(ancestorOf: Int, ancestorDist: Int, level: Int, descendantOf: Int, descendantDist: Int, fixedOrder: Boolean, group: [CategoryGroupsEnum], groupId: Int, id: [Int], indexBy: String, limit: Int, site: SitesEnum, siteId: Int, nextSiblingOf: Int, offset: Int, order: String, orderBy: String, positionedAfter: Int, positionedBefore: Int, prevSiblingOf: Int, relatedTo: [RelatedToInputType], search: String, siblingOf: Int, slug: String, title: String, uri: String, testBlockCheckboxesField: TestBlockCheckboxesFieldEnum, testBlockPlainTextField: String, testBlockTableField: String, testCategoryField: String, testCategoryNestingField: String, testCheckboxes: TestCheckboxesEnum, testCheckboxesWithOneBadValue: TestCheckboxesWithOneBadValueEnum, testDateAndTimeField: String, testDateField: String, testDropdownField: TestDropdownFieldEnum, testEmailField: String, testLightswitchField: Boolean, testLightswitchOnField: Boolean, testMultiSelectField: TestMultiSelectFieldEnum, testNumberField: Int, testNumberFloatField: Float, testNumberMaxField: Int, testPlainText: String, testPlainTextWithCharacterLimit: String, testRadioButtonField: TestRadioButtonFieldEnum, testTableField: String, testTagField: Int, testTimeField: String, testUrlField: String): [CategoryInterface]
 
 class GraphQLService extends Component {
 
@@ -84,14 +89,6 @@ class GraphQLService extends Component {
 
         $request->registerType('Query', $query);
 
-        $request->registerType('SitesEnum', function () use ($token) {
-            return array_map(function ($site) {
-                return $site['handle'];
-            }, array_filter(CraftQL::$plugin->sites->all(), function ($site) use ($token) {
-                return $token->can('query:entryType:'.$site['id']);
-            }));
-        });
-
         array_map(function ($entryType) use ($request) {
             $request->registerType($entryType['craftQlTypeName'], function () use ($entryType, $request) {
                 return new Entry($request, $entryType);
@@ -122,36 +119,13 @@ class GraphQLService extends Component {
             });
         }, CraftQL::$plugin->tagGroups->all());
 
-        $request->registerType('DateFormatTypes', \markhuot\CraftQL\Directives\Date::dateFormatTypesEnum());
-
+        // This is a callback because we're going to defer the loading of all types until
+        // the underlying graphql-php determines we actually _need_ all of the types
         $schemaConfig['types'] = function () use ($request) {
-            $types = [];
-
-            $types = array_merge($types, array_map(function ($entryType) use ($request) {
-                return $request->getType($entryType['craftQlTypeName']);
-            }, CraftQl::$plugin->entryTypes->all()));
-
-            $types = array_merge($types, array_map(function ($volume) use ($request) {
-                return $request->getType($volume['craftQlTypeName']);
-            }, CraftQl::$plugin->volumes->all()));
-
-            $types = array_merge($types, array_map(function ($categoryGroup) use ($request) {
-                return $request->getType($categoryGroup['craftQlTypeName']);
-            }, CraftQl::$plugin->categoryGroups->all()));
-
-            $types = array_merge($types, array_map(function ($tagGroup) use ($request) {
-                return $request->getType($tagGroup['craftQlTypeName']);
-            }, CraftQl::$plugin->tagGroups->all()));
-
-            $types = array_merge($types, array_map(function ($section) use ($request) {
-                return $request->getType($section['craftQlTypeName']);
-            }, CraftQl::$plugin->sections->all()));
-
-            $types[] = $request->getType('DateFormatTypes');
-
-            $types = array_merge($types, $request->getTypeBuilder('Query')->getConcreteTypes());
-
-            return $types;
+            return array_merge($request->getAllTypes(), [
+                $request->getType('DateFormatTypes'),
+                $request->getType('CategoryGroupsEnum'),
+            ]);
         };
 
         $schemaConfig['query'] = $request->getType('Query');
@@ -165,7 +139,7 @@ class GraphQLService extends Component {
         };
 
         $schemaConfig['directives'] = array_merge(GraphQL::getStandardDirectives(), [
-            \markhuot\CraftQL\Directives\Date::directive(),
+            (new Date($request))->getRawGraphQLObject()
         ]);
 
         $mutation = new \markhuot\CraftQL\Types\Mutation($request);

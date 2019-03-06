@@ -97,11 +97,31 @@ trait HasArgumentsAttribute {
         return null;
     }
 
+    /**
+     * Get the arguments as a GraphQL config array
+     *
+     * @return array
+     */
     function getArgumentConfig(): array {
         $arguments = [];
 
         foreach ($this->arguments as $argument) {
             $arguments[$argument->getName()] = $argument->getConfig();
+        }
+
+        return $arguments;
+    }
+
+    /**
+     * Get the arguments configured for a directive
+     *
+     * @return array
+     */
+    function getDirectiveArgumentConfig(): array {
+        $arguments = [];
+
+        foreach ($this->arguments as $argument) {
+            $arguments[$argument->getName()] = $argument->getDirectiveConfig();
         }
 
         return $arguments;

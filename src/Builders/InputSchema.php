@@ -7,11 +7,12 @@ use markhuot\CraftQL\Behaviors\FieldBehavior;
 
 class InputSchema extends BaseBuilder {
 
+    use HasNameAttribute;
     use HasArgumentsAttribute;
 
     protected static $objects;
 
-    function __construct($request, $name) {
+    function __construct($request, $name=null) {
         $this->request = $request;
         $this->name = $name;
     }
@@ -40,7 +41,12 @@ class InputSchema extends BaseBuilder {
         return $inputSchema;
     }
 
+    function boot() {
+
+    }
+
     function getArguments() {
+        $this->boot();
         $this->bootBehaviors();
         return $this->getArgumentConfig();
     }

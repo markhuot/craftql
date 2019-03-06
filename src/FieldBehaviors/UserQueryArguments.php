@@ -3,6 +3,8 @@
 namespace markhuot\CraftQL\FieldBehaviors;
 
 use markhuot\CraftQL\Behaviors\FieldBehavior;
+use markhuot\CraftQL\Types\RelatedToInputType;
+use markhuot\CraftQL\Types\StatusEnum;
 
 class UserQueryArguments extends FieldBehavior {
 
@@ -19,8 +21,9 @@ class UserQueryArguments extends FieldBehavior {
         $this->owner->addIntArgument('offset');
         $this->owner->addStringArgument('order');
         $this->owner->addStringArgument('orderBy');
+        $this->owner->addArgument('relatedTo')->type(RelatedToInputType::class)->lists();
         $this->owner->addStringArgument('search');
-        // $this->owner->addStringArgument('status' => static::statusEnum(),
+        $this->owner->addArgument('status')->type(StatusEnum::class)->lists();
         $this->owner->addStringArgument('username');
 
         $fieldService = \Yii::$container->get('craftQLFieldService');

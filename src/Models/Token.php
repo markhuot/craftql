@@ -88,9 +88,12 @@ class Token extends ActiveRecord
     function can($do): bool {
         if (substr($do, 0, 6) === 'query:') {
             $service = substr($do, 6);
-            if (in_array($service, ['globals', 'categories'])) {
+            if (in_array($service, ['globals', 'categories', 'tags'])) {
                 if ($service == 'categories') {
                     $service = 'categoryGroups';
+                }
+                if ($service == 'tags') {
+                    $service = 'tagGroups';
                 }
                 if (count(CraftQL::$plugin->$service->all()) == 0) {
                     return false;

@@ -7,6 +7,7 @@ use GraphQL\Type\Definition\UnionType;
 
 class Union extends BaseBuilder {
 
+    use HasNameAttribute;
     use HasResolveAttribute;
     use HasResolveTypeAttribute;
 

@@ -17,13 +17,16 @@ class Mutation extends Schema {
 
     function boot() {
 
+        $request = $this->request;
+        $token = $request->token();
+
         $this->addField('helloWorld')
             ->description('A sample mutation. Doesn\'t actually save anything.')
             ->resolve('If this were a real mutation it would have saved to the database.');
 
-        foreach ($this->token->entryTypes('mutate') as $entryType) {
+        foreach ($token->entryTypes('mutate') as $entryType) {
             $entryTypeName = StringHelper::graphQLNameForEntryTypeSection($entryType['id'], $entryType['sectionId']);
-            $entryTypeObj = $this->request->getTypeBuilder($entryTypeName)();
+            $entryTypeObj = $this->request->getTypeBuilder($entryTypeName);
 
             $this->addField('upsert'.$entryTypeName)
                 ->type($entryTypeObj)
@@ -31,28 +34,26 @@ class Mutation extends Schema {
                 ->use(new EntryMutationArguments);
         }
 
-        if (false && $this->request->globals()->count() && $this->request->token()->can('mutate:globals')) {
-            /** @var \markhuot\CraftQL\Types\Globals $globalSet */
-            foreach ($this->request->globals()->all() as $globalSet) {
-                $upsertField = $this->addField('upsert'.$globalSet->getName().'Globals')
-                    ->type($globalSet)
-                    ->addArgumentsByLayoutId($globalSet->getContext()->fieldLayoutId);
+        /** @var \markhuot\CraftQL\Types\Globals $globalSet */
+        foreach ($token->globals('mutate') as $globalSet) {
+            $upsertField = $this->addField('upsert'.$globalSet['craftQlTypeName'].'Globals')
+                ->type($request->getTypeBuilder($globalSet['craftQlTypeName']))
+                ->addArgumentsByLayoutId($globalSet['fieldLayoutId']);
 
-                $upsertField->resolve(function ($root, $args) use ($globalSet, $upsertField) {
-                        $globalSetElement = $globalSet->getContext();
+            $upsertField->resolve(function ($root, $args) use ($globalSet, $upsertField) {
+                    $globalSetElement = $globalSet->getContext();
 
-                        foreach ($args as $handle => &$value) {
-                            $callback = $upsertField->getArgument($handle)->getOnSave();
-                            if ($callback) {
-                                $value = $callback($value);
-                            }
+                    foreach ($args as $handle => &$value) {
+                        $callback = $upsertField->getArgument($handle)->getOnSave();
+                        if ($callback) {
+                            $value = $callback($value);
                         }
+                    }
 
-                        $globalSetElement->setFieldValues($args);
-                        Craft::$app->getElements()->saveElement($globalSetElement);
-                        return $globalSetElement;
-                    });
-            }
+                    $globalSetElement->setFieldValues($args);
+                    Craft::$app->getElements()->saveElement($globalSetElement);
+                    return $globalSetElement;
+                });
         }
 
         if ($this->request->token()->can('mutate:users')) {

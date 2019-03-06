@@ -5,6 +5,10 @@ namespace markhuot\CraftQL\FieldBehaviors;
 use markhuot\CraftQL\Behaviors\FieldBehavior;
 use markhuot\CraftQL\Builders\Field;
 use markhuot\CraftQL\Builders\InputSchema;
+use markhuot\CraftQL\Types\EntryTypesEnum;
+use markhuot\CraftQL\Types\RelatedToInputType;
+use markhuot\CraftQL\Types\SectionsEnum;
+use markhuot\CraftQL\Types\SitesEnum;
 
 class EntryQueryArguments extends FieldBehavior {
 
@@ -51,18 +55,18 @@ class EntryQueryArguments extends FieldBehavior {
         $tmp->addIntArgument('positionedBefore');
         $tmp->addStringArgument('postDate');
         $tmp->addIntArgument('prevSiblingOf');
-        $tmp->addStringArgument('relatedTo')->lists()->type($this->relatedToInputObject());
-        $tmp->addStringArgument('orRelatedTo')->lists()->type($this->relatedToInputObject());
+        $tmp->addArgument('relatedTo')->lists()->type(RelatedToInputType::class);
+        $tmp->addArgument('orRelatedTo')->lists()->type(RelatedToInputType::class);
         $tmp->addStringArgument('search');
-        // $tmp->addStringArgument('section')->lists()->type($this->owner->getRequest()->sections()->enum());
+        $tmp->addStringArgument('section')->lists()->type(SectionsEnum::class);
         $tmp->addIntArgument('siblingOf');
-        // $tmp->addArgument('site')->type($this->owner->getRequest()->sites()->enum());
+        $tmp->addArgument('site')->type(SitesEnum::class);
         $tmp->addIntArgument('siteId');
         $tmp->addStringArgument('slug')->lists();
         $tmp->addStringArgument('status')->lists();
         $tmp->addStringArgument('title')->lists();
         $tmp->addBooleanArgument('trashed');
-        // $tmp->addStringArgument('type')->lists()->type($this->owner->getRequest()->entryTypes()->enum());
+        $tmp->addStringArgument('type')->lists()->type(EntryTypesEnum::class);
         $tmp->addStringArgument('uid');
         $tmp->addStringArgument('uri');
 
@@ -73,23 +77,6 @@ class EntryQueryArguments extends FieldBehavior {
 
         $this->owner->addArguments(static::$args, false);
         return static::$args;
-    }
-
-    function relatedToInputObject() {
-        if (!empty(static::$inputObjectType)) {
-            return static::$inputObjectType;
-        }
-
-        $type = $this->owner->createInputObjectType('RelatedToInputType');
-        $type->addIntArgument('element')->lists();
-        $type->addBooleanArgument('elementIsEdge');
-        $type->addIntArgument('sourceElement')->lists();
-        $type->addBooleanArgument('sourceElementIsEdge');
-        $type->addIntArgument('targetElement')->lists();
-        $type->addBooleanArgument('targetElementIsEdge');
-        $type->addStringArgument('field');
-        $type->addStringArgument('sourceLocale');
-        return static::$inputObjectType = $type;
     }
 
 }

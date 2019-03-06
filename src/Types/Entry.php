@@ -18,7 +18,6 @@ class Entry extends Schema {
     }
 
     function getName(): string {
-        /** @var \craft\models\EntryType $entryType */
         $entryType = $this->context;
         return StringHelper::graphQLNameForEntryTypeSection($entryType['id'], $entryType['sectionId']);
     }

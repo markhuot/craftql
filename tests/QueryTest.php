@@ -33,4 +33,16 @@ final class QueryTest extends TestCase
 
         $this->assertEquals('Welcome to GraphQL! You now have a fully functional GraphQL endpoint.', @$result['data']['helloWorld']);
     }
+
+    /**
+     *
+     */
+    public function testSiteAttribute(): void
+    {
+        $input = '{ entry(id:15, site:default) { id } }';
+
+        $result = $this->execute($input);
+
+        $this->assertEquals(15, @$result['data']['entry']['id']);
+    }
 }

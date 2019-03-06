@@ -8,6 +8,7 @@ use markhuot\CraftQL\Request;
 
 class Field extends BaseBuilder {
 
+    use HasNameAttribute;
     use HasTypeAttribute;
     use HasDescriptionAttribute;
     use HasIsListAttribute;

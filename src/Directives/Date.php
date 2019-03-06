@@ -2,76 +2,40 @@
 
 namespace markhuot\CraftQL\Directives;
 
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\Directive;
 use GraphQL\Type\Definition\DirectiveLocation;
-use GraphQL\Type\Definition\FieldArgument;
+use markhuot\CraftQL\Builders\Directive;
+use markhuot\CraftQL\Types\DateFormatTypes;
 
-class Date {
+class Date extends Directive {
 
-    static $directive;
-    static $dateFormatTypesEnum;
+    protected $name = 'date';
 
-    static function directive() {
-        if (static::$directive) {
-            return static::$directive;
-        }
+    protected $description = 'Transform Timestamp types into string representations';
 
-        return static::$directive = new Directive([
-            'name' => 'date',
-            'description' => 'Transform Timestamp types into string representations',
-            'locations' => [
-                DirectiveLocation::FIELD,
-            ],
-            'args' => [
-                new FieldArgument([
-                    'name' => 'as',
-                    'type' => Type::string(),
-                    'description' => 'Date formatting',
-                    'defaultValue' => 'r'
-                ]),
-                new FieldArgument([
-                    'name' => 'timezone',
-                    'type' => Type::string(),
-                    'description' => 'The full name of the timezone, defaults to GMT. (E.g., America/New_York)',
-                    'defaultValue' => 'GMT'
-                ]),
-                new FieldArgument([
-                    'name' => 'format',
-                    'type' => static::dateFormatTypesEnum(),
-                    'description' => 'A standard format to use, overrides the `as` argument',
-                ]),
-                new FieldArgument([
-                    'name' => 'locale',
-                    'type' => Type::string(),
-                    'description' => 'The locale to use when formatting the date',
-                ])
-            ]
-        ]);
-    }
+    protected $locations = [
+        DirectiveLocation::FIELD,
+    ];
 
-    static function dateFormatTypesEnum() {
-        if (!empty(static::$dateFormatTypesEnum)) {
-            return static::$dateFormatTypesEnum;
-        }
+    // @TODO maybe make this dynamic instead of setting `$this->name` above
+    // function getName(): string {
+    //     return lcfirst(parent::getName());
+    // }
 
-        return static::$dateFormatTypesEnum = new EnumType([
-            'name' => 'DateFormatTypes',
-            'values' => [
-                'atom' => ['description' => 'Atom feeds'],
-                'cookie' => ['description' => 'HTTP cookies'],
-                'iso8601' => ['description' => 'ISO-8601 spec'],
-                'rfc822' => ['description' => 'RFC-822 spec'],
-                'rfc850' => ['description' => 'RFC-850 spec'],
-                'rfc1036' => ['description' => 'RFC-1036 spec'],
-                'rfc1123' => ['description' => 'RFC-1123 spec'],
-                'rfc2822' => ['description' => 'RFC-2822 spec'],
-                'rfc3339' => ['description' => 'RFC-3339 spec'],
-                'rss' => ['description' => 'RSS feed'],
-                'w3c' => ['description' => 'W3C spec'],
-            ]
-        ]);
+    function boot() {
+        $this->addStringArgument('as')
+            ->defaultValue('r')
+            ->description('Date formatting');
+
+        $this->addStringArgument('timezone')
+            ->defaultValue('GMT')
+            ->description('The full name of the timezone, defaults to GMT. (E.g., America/New_York)');
+
+        $this->addArgument('format')
+            ->type(DateFormatTypes::class)
+            ->description('A standard format to use, overrides the `as` argument');
+
+        $this->addStringArgument('locale')
+            ->description('The locale to use when formatting the date');
     }
 
 }

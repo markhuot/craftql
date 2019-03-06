@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Listeners;
 
 use Craft;
 use craft\helpers\ElementHelper;
+use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\GetFieldSchema;
 
 class GetTagsFieldSchema
@@ -19,10 +20,10 @@ class GetTagsFieldSchema
 
         $field = $event->sender;
         $schema = $event->schema;
+        $request = $schema->getRequest();
+        $token = $request->token();
 
-        return false;
-
-        if (!$schema->getRequest()->token()->can('query:tags')) {
+        if ($token->canNot('query:tags')) {
             return;
         }
 
@@ -32,7 +33,7 @@ class GetTagsFieldSchema
 
             $schema->addField($field)
                 ->lists()
-                ->type($schema->getRequest()->tagGroups()->get($groupId))
+                ->type($request->getTypeBuilder(CraftQL::$plugin->tagGroups->getTypeNameByIdOrUid($groupId)))
                 ->resolve(function ($root, $args) use ($field) {
                     return $root->{$field->handle}->all();
                 });

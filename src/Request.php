@@ -100,7 +100,19 @@ class Request {
     }
 
     function getTypeBuilder($name) {
-        return @$this->types[$name];
+        $type = @$this->types[$name];
+
+        if (is_callable($type)) {
+            $type = $type();
+        }
+
+        return $type;
+    }
+
+    function getAllTypes() {
+        return array_map(function ($typeName) {
+            return $this->getType($typeName);
+        }, array_keys($this->types));
     }
 
     function getType($name) {

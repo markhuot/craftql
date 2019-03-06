@@ -202,7 +202,7 @@ class Query extends Schema {
         $this->addField('globals')
             ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
             ->arguments(function (\markhuot\CraftQL\Builders\Field $field) {
-                $field->addEnumArgument('site')->values($this->request->getTypeBuilder('SitesEnum'));
+                $field->addArgument('site')->type(SitesEnum::class);
                 $field->addIntArgument('siteId');
             })
             ->resolve(function ($root, $args) {

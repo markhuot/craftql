@@ -12,6 +12,8 @@ use markhuot\CraftQL\Builders\Field as BaseField;
 
 class Schema extends BaseBuilder {
 
+    use HasNameAttribute;
+
     protected static $objects;
     protected $fields = [];
     protected $context;
