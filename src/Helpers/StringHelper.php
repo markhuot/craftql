@@ -11,18 +11,11 @@ class StringHelper {
     static $entryTypeMap = [];
 
     /**
-     * Convert a Craft Entry Type in to a valid GraphQL Name
+     * Convert an Entry Type to a valid GraphQL name
      *
-     * @param CraftEntryType $entryType
-     * @return string
+     * @param array $entryType
+     * @return mixed|string
      */
-    // static function graphQLNameForEntryType(EntryType $entryType): string {
-    //     $typeHandle = ucfirst($entryType->handle);
-    //     $sectionHandle = ucfirst($entryType->section->handle);
-    //
-    //     return (($typeHandle == $sectionHandle) ? $typeHandle : $sectionHandle.$typeHandle);
-    // }
-
     static function graphQLNameForEntryType(array $entryType) {
         $key = "{$entryType['id']}:{$entryType['sectionId']}";
         if (isset(static::$entryTypeMap[$key])) {
