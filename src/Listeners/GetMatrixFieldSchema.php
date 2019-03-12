@@ -17,7 +17,7 @@ class GetMatrixFieldSchema
      * @return void
      */
     function handle($event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $field = $event->sender;
         $schema = $event->schema;

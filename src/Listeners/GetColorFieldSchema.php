@@ -15,7 +15,7 @@ class GetColorFieldSchema
      * @return void
      */
     function handle($event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $color = $event->schema->createObjectType('Color');
         $color->addStringField('hex')->resolve(function (ColorData $root) { return $root->getHex(); });

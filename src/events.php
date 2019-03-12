@@ -4,6 +4,7 @@ return [
     \craft\fields\Assets::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetAssetsFieldSchema,
+            new \markhuot\CraftQL\Listeners\GetImagerFieldSchema,
         ],
     ],
     \craft\fields\Categories::class => [

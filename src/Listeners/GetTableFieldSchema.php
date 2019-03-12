@@ -14,7 +14,7 @@ class GetTableFieldSchema
      * @return void
      */
     function handle(GetFieldSchema $event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $field = $event->sender;
         $schema = $event->schema;

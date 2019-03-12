@@ -131,13 +131,13 @@ class Schema extends BaseBuilder {
         return $this->addField($field)->type(Type::float());
     }
 
-    function addEnumField($field): BaseField {
+    function addEnumField($field, $prefix=''): BaseField {
         if (is_a($field, CraftField::class)) {
-            return $this->fields[] = (new EnumField($this->request, $field->handle))
+            return $this->fields[] = (new EnumField($this->request, $field->handle, $prefix))
                 ->description($field->instructions);
         }
 
-        return $this->fields[] = new EnumField($this->request, $field);
+        return $this->fields[] = new EnumField($this->request, $field, $prefix);
     }
 
     function addDateField($field): BaseField {

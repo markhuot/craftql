@@ -15,7 +15,7 @@ class GetEntriesFieldSchema
      * @return void
      */
     function handle($event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $request = $event->schema->request;
         $field = $event->sender;

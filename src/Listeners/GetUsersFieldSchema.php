@@ -13,7 +13,7 @@ class GetUsersFieldSchema
      * @return void
      */
     function handle($event) {
-        $event->handled = true;
+        $event->preventDefault = true;
         $field = $event->sender;
 
         if (!$event->query->getRequest()->token()->can('query:users')) {

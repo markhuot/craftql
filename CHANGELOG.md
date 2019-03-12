@@ -1,6 +1,6 @@
 ## dev-master
 
-- (none)
+- Added Imager support
 
 ## 1.3.1 - 2019-01-29
 

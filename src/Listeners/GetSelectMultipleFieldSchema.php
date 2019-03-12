@@ -17,7 +17,7 @@ class GetSelectMultipleFieldSchema
      * @return void
      */
     function handle($event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $craftField = $event->sender;
 

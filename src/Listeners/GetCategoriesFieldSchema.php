@@ -17,7 +17,7 @@ class GetCategoriesFieldSchema
      * @return void
      */
     function handle(GetFieldSchema $event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $field = $event->sender;
         $request = $event->schema->getRequest();

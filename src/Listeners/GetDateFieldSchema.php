@@ -14,7 +14,7 @@ class GetDateFieldSchema
      * @return void
      */
     function handle($event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $event->schema->addDateField($event->sender);
 

@@ -16,7 +16,7 @@ class GetSelectOneFieldSchema
      * @return void
      */
     function handle($event) {
-        $event->handled = true;
+        $event->preventDefault = true;
 
         $field = $event->sender;
 

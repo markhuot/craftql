@@ -51,6 +51,7 @@ type BlogPost implements EntryInterface, ElementInterface {
   testTableField: [TestTableFieldTable]
   testUrlField: String
   testAssetsField(filename: String, fixedOrder: Boolean, folderId: Int, height: Int, id: Int, kind: String, limit: Int, locale: String, offset: Int, order: String, search: String, size: Int, title: String, sourceId: Int, width: Int, testBlockCheckboxesField: TestBlockCheckboxesFieldEnum, testBlockPlainTextField: String, testBlockTableField: String, testCategoryField: String, testCategoryNestingField: String, testCheckboxes: TestCheckboxesEnum, testCheckboxesWithOneBadValue: TestCheckboxesWithOneBadValueEnum, testDateAndTimeField: String, testDateField: String, testDropdownField: TestDropdownFieldEnum, testEmailField: String, testLightswitchField: Boolean, testLightswitchOnField: Boolean, testMultiSelectField: TestMultiSelectFieldEnum, testNumberField: Int, testNumberFloatField: Float, testNumberMaxField: Int, testPlainText: String, testPlainTextWithCharacterLimit: String, testRadioButtonField: TestRadioButtonFieldEnum, testTableField: String, testTagField: Int, testTimeField: String, testUrlField: String): [VolumeInterface]
+  testAssetsFieldImager: [ImagerTransformedImages]
   testCategoryField: [TestCategoryGroupCategory]
   testCategoryFieldConnection: CategoryConnection
   testCategoryNestingField: [TestNestedCategoryGroupCategory]
@@ -296,6 +297,172 @@ type GlobalsSet {
   testEmptyGlobalSet: TestEmptyGlobalSet
   testGlobalSet: TestGlobalSet
   testSecondGlobalSet: TestSecondGlobalSet
+}
+
+enum ImagerBlendModeEnum {
+  blend
+  darken
+  lighten
+  modulate
+  multiply
+  overlay
+  screen
+}
+
+enum ImagerChannelEnum {
+  red
+  green
+  blue
+}
+
+input ImagerColorBlendEffect {
+  color: String
+  opacity: Float
+}
+
+enum ImagerDitherEnum {
+  no
+  riemersma
+  floydsteinberg
+}
+
+input ImagerEffects {
+  grayscale: Boolean
+  negative: Boolean
+  blur: Float
+  sharpen: Boolean
+  gamma: Float
+  colorize: String
+  colorBlend: ImagerColorBlendEffect
+  tint: [ImagerTintEffect]
+  sepia: Int
+  contrast: Float
+  modulate: [Int]
+  normalize: Boolean
+  contrastStretch: [Float]
+  posterize: ImagerPosterizeEffect
+  unsharpMask: [Float]
+  clut: String
+  quantize: [Int]
+  levels: ImagerLevelsEffect
+}
+
+enum ImagerFormatEnum {
+  jpg
+  png
+  gif
+  webp
+}
+
+enum ImagerInterlaceEnum {
+  none
+  line
+  plane
+  partition
+}
+
+input ImagerLevelsEffect {
+  blackPoint: Float
+  gamma: Float
+  whitePoint: Float
+  channel: ImagerChannelEnum
+}
+
+enum ImagerModeEnum {
+  crop
+  fit
+  stretch
+  croponly
+  letterbox
+}
+
+input ImagerPosterizeEffect {
+  levels: Float
+  dither: ImagerDitherEnum
+}
+
+enum ImagerResizeFilterEnum {
+  point
+  box
+  triangle
+  hermite
+  hanning
+  hamming
+  blackman
+  gaussian
+  quadratic
+  cubic
+  catrom
+  mitchell
+  lanczos
+  bessel
+  sinc
+}
+
+enum ImagerSilhouetteTypeEnum {
+  curve
+}
+
+input ImagerTintEffect {
+  color: String
+}
+
+input ImagerTransformOptions {
+  format: ImagerFormatEnum
+  width: Int
+  height: Int
+  ratio: Float
+  position: String
+  ignoreFocalPoint: Boolean
+  mode: ImagerModeEnum
+  cropZoom: Float
+  frames: String
+  jpegQuality: Int
+  pngCompressionLevel: Int
+  webpQuality: Int
+  allowUpscale: Boolean
+  resizeFilter: ImagerResizeFilterEnum
+  interlace: ImagerInterlaceEnum
+  watermark: ImagerWatermark
+  effects: ImagerEffects
+  preEffects: ImagerEffects
+}
+
+type ImagerTransformedImageModel {
+  url: String
+  path: String
+  extension: String
+  mimetype: String
+  width: String
+  height: String
+  size: String
+}
+
+type ImagerTransformedImages {
+  images(transforms: [ImagerTransformOptions]!): [ImagerTransformedImageModel]
+  placeholder(type: ImagerTypeEnum, width: Int, height: Int, color: String, fgColor: String, size: String, silhouetteType: ImagerSilhouetteTypeEnum): String
+}
+
+enum ImagerTypeEnum {
+  svg
+  gif
+  silhouette
+}
+
+input ImagerWatermark {
+  image: String
+  width: Int
+  height: Int
+  opacity: Int
+  blendMode: ImagerBlendModeEnum
+  position: ImagerWatermarkPosition
+}
+
+input ImagerWatermarkPosition {
+  left: Int
+  right: Int
+  top: Int
+  bottom: Int
 }
 
 type MultiOptionFieldData {
