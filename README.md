@@ -334,7 +334,7 @@ CraftQL supports GraphQl field level permissions. By default a token will have n
 
 Scopes allow you to configure which GraphQL fields and entry types are included in the schema.
 
-## Third-pary Field Support
+## Third-party Field Support
 
 To add CraftQL support to your third-party field plugin you will need to listen to the `craftQlGetFieldSchema` event. This event, triggered on your custom field, will pass a "schema builder" into the event handler, allowing you to specify the field schema your custom field provides. For example, in your plugin's `::init` method you could specify,
 
