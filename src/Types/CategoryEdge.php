@@ -3,6 +3,8 @@
 namespace markhuot\CraftQL\Types;
 
 // use GraphQL\Type\Definition\ObjectType;
+use craft\db\Paginator;
+use craft\web\twig\variables\Paginate;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
@@ -28,13 +30,15 @@ class CategoryEdge extends Schema {
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
-                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria(CategoryInterface::criteriaResolver($root, $args, $context, $info, $root['node']->getChildren()));
-                $pageInfo->limit = @$args['limit'] ?: 100;
+                $paginator = new Paginator(CategoryInterface::criteriaResolver($root, $args, $context, $info, $root['node']->getChildren()), [
+                    'pageSize' => @$args['limit'] ?: 100,
+                    'currentPage' => \Craft::$app->request->pageNum,
+                ]);
 
                 return [
-                    'totalCount' => $pageInfo->total,
-                    'pageInfo' => $pageInfo,
-                    'edges' => $categories,
+                    'totalCount' => $paginator->getTotalResults(),
+                    'pageInfo' => Paginate::create($paginator),
+                    'edges' => $paginator->getPageResults(),
                 ];
             });
     }

@@ -1,6 +1,13 @@
 ## dev-master
 
-- (none)
+### Changed
+
+- CraftQL now requires Craft 3.1.19+.
+
+### Fixed
+
+- Fixed an error that occurred on Craft 3.1.19+. ([#248](https://github.com/markhuot/craftql/issues/248))
+- Fixed a bug where pagination limits weren’t being respected. 
 
 ## 1.3.1 - 2019-01-29
 

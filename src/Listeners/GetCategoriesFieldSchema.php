@@ -3,7 +3,9 @@
 namespace markhuot\CraftQL\Listeners;
 
 use Craft;
+use craft\db\Paginator;
 use craft\helpers\ElementHelper;
+use craft\web\twig\variables\Paginate;
 use markhuot\CraftQL\Events\GetFieldSchema;
 use markhuot\CraftQL\Types\CategoryConnection;
 
@@ -41,13 +43,15 @@ class GetCategoriesFieldSchema
             $event->schema->addField($field->handle.'Connection')
                 ->type(CategoryConnection::class)
                 ->resolve(function ($root, $args) use ($field) {
-                    list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($root->{$field->handle});
-                    $pageInfo->limit = @$args['limit'] ?: 100;
+                    $paginator = new Paginator($root->{$field->handle}, [
+                        'pageSize' => @$args['limit'] ?: 100,
+                        'currentPage' => \Craft::$app->request->pageNum,
+                    ]);
 
                     return [
-                        'totalCount' => $pageInfo->total,
-                        'pageInfo' => $pageInfo,
-                        'edges' => $categories,
+                        'totalCount' => $paginator->getTotalResults(),
+                        'pageInfo' => Paginate::create($paginator),
+                        'edges' => $paginator->getPageResults(),
                     ];
                 });
 

@@ -2,6 +2,8 @@
 
 namespace markhuot\CraftQL\Types;
 
+use craft\db\Paginator;
+use craft\web\twig\variables\Paginate;
 use GraphQL\Type\Definition\InterfaceType;
 use markhuot\CraftQL\Builders\InterfaceBuilder;
 use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
@@ -26,13 +28,15 @@ class CategoryInterface extends InterfaceBuilder {
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
-                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria(static::criteriaResolver($root, $args, $context, $info, $root->getChildren()));
-                $pageInfo->limit = @$args['limit'] ?: 100;
+                $paginator = new Paginator(static::criteriaResolver($root, $args, $context, $info, $root->getChildren()), [
+                    'pageSize' => @$args['limit'] ?: 100,
+                    'currentPage' => \Craft::$app->request->pageNum,
+                ]);
 
                 return [
-                    'totalCount' => $pageInfo->total,
-                    'pageInfo' => $pageInfo,
-                    'edges' => $categories,
+                    'totalCount' => $paginator->getTotalResults(),
+                    'pageInfo' => Paginate::create($paginator),
+                    'edges' => $paginator->getPageResults(),
                 ];
             });
         $this->addField('parent')->type(CategoryInterface::class);

@@ -2,6 +2,8 @@
 
 namespace markhuot\CraftQL\Types;
 
+use craft\db\Paginator;
+use craft\web\twig\variables\Paginate;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
 use yii\base\Component;
@@ -116,13 +118,15 @@ class Query extends Schema {
              ->use(new EntryQueryArguments)
              ->resolve(function ($root, $args, $context, $info) {
                  $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
-                 list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
-                 $pageInfo->limit = @$args['limit'] ?: 100;
+                 $paginator = new Paginator($criteria, [
+                     'pageSize' => @$args['limit'] ?: 100,
+                     'currentPage' => \Craft::$app->request->pageNum,
+                 ]);
 
                  return [
-                     'totalCount' => $pageInfo->total,
-                     'pageInfo' => $pageInfo,
-                     'edges' => $entries,
+                     'totalCount' => $paginator->getTotalResults(),
+                     'pageInfo' => Paginate::create($paginator),
+                     'edges' => $paginator->getPageResults(),
                      'criteria' => $criteria,
                      'args' => $args,
                  ];
@@ -262,13 +266,15 @@ class Query extends Schema {
                     $criteria = $criteria->{$key}($value);
                 }
 
-                list($pageInfo, $tags) = \craft\helpers\Template::paginateCriteria($criteria);
-                $pageInfo->limit = @$args['limit'] ?: 100;
+                $paginator = new Paginator($criteria, [
+                    'pageSize' => @$args['limit'] ?: 100,
+                    'currentPage' => \Craft::$app->request->pageNum,
+                ]);
 
                 return [
-                    'totalCount' => $pageInfo->total,
-                    'pageInfo' => $pageInfo,
-                    'edges' => $tags,
+                    'totalCount' => $paginator->getTotalResults(),
+                    'pageInfo' => Paginate::create($paginator),
+                    'edges' => $paginator->getPageResults(),
                     'criteria' => $criteria,
                     'args' => $args,
                 ];
@@ -317,13 +323,15 @@ class Query extends Schema {
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args) use ($categoryResolver) {
-                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($categoryResolver($root, $args));
-                $pageInfo->limit = @$args['limit'] ?: 100;
+                $paginator = new Paginator($categoryResolver($root, $args), [
+                    'pageSize' => @$args['limit'] ?: 100,
+                    'currentPage' => \Craft::$app->request->pageNum,
+                ]);
 
                 return [
-                    'totalCount' => $pageInfo->total,
-                    'pageInfo' => $pageInfo,
-                    'edges' => $categories,
+                    'totalCount' => $paginator->getTotalResults(),
+                    'pageInfo' => Paginate::create($paginator),
+                    'edges' => $paginator->getPageResults(),
                 ];
             });
     }

@@ -2,6 +2,8 @@
 
 namespace markhuot\CraftQL\FieldBehaviors;
 
+use craft\db\Paginator;
+use craft\web\twig\variables\Paginate;
 use markhuot\CraftQL\Behaviors\SchemaBehavior;
 use markhuot\CraftQL\Types\EntryConnection;
 
@@ -18,13 +20,15 @@ class RelatedEntriesField extends SchemaBehavior {
                     $criteria->relatedTo(@$root['node']->id);
                 }
 
-                list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
-                $pageInfo->limit = @$args['limit'] ?: 100;
+                $paginator = new Paginator($criteria, [
+                    'pageSize' => @$args['limit'] ?: 100,
+                    'currentPage' => \Craft::$app->request->pageNum,
+                ]);
 
                 return [
-                    'totalCount' => $pageInfo->total,
-                    'pageInfo' => $pageInfo,
-                    'edges' => $entries,
+                    'totalCount' => $paginator->getTotalResults(),
+                    'pageInfo' => Paginate::create($paginator),
+                    'edges' => $paginator->getPageResults(),
                 ];
             });
     }
