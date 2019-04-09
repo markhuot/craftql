@@ -28,7 +28,7 @@ class CategoryInterface extends InterfaceBuilder {
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
-                $paginator = new Paginator(static::criteriaResolver($root, $args, $context, $info, $root->getChildren()), [
+                $paginator = new Paginator(static::criteriaResolver($root, $args, $context, $info, $root->getChildren(), false), [
                     'pageSize' => @$args['limit'] ?: 100,
                     'currentPage' => \Craft::$app->request->pageNum,
                 ]);
@@ -52,7 +52,7 @@ class CategoryInterface extends InterfaceBuilder {
         };
     }
 
-    static function criteriaResolver($root, $args, $context, $info, $criteria=null) {
+    static function criteriaResolver($root, $args, $context, $info, $criteria=null, $asArray=true) {
         $criteria = $criteria ?: \craft\elements\Category::find();
 
         if (isset($args['group'])) {
@@ -64,7 +64,7 @@ class CategoryInterface extends InterfaceBuilder {
             $criteria = $criteria->{$key}($value);
         }
 
-        return $criteria->all();
+        return $asArray ? $criteria->all() : $criteria;
     }
 
 }
