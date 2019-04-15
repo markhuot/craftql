@@ -5,6 +5,7 @@ namespace markhuot\CraftQL\Types;
 use GraphQL\Type\Definition\InterfaceType;
 use markhuot\CraftQL\Builders\InterfaceBuilder;
 use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
+use markhuot\CraftQL\TypeModels\PageInfo;
 
 class CategoryInterface extends InterfaceBuilder {
 
@@ -26,13 +27,15 @@ class CategoryInterface extends InterfaceBuilder {
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
-                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria(static::criteriaResolver($root, $args, $context, $info, $root->getChildren()));
-                $pageInfo->limit = @$args['limit'] ?: 100;
+                $criteria = static::criteriaResolver($root, $args, $context, $info, $root->getChildren(), false);
+                $totalCount = $criteria->count();
+                $offset = @$args['offset'] ?: 0;
+                $perPage = @$args['limit'] ?: 100;
 
                 return [
-                    'totalCount' => $pageInfo->total,
-                    'pageInfo' => $pageInfo,
-                    'edges' => $categories,
+                    'totalCount' => $totalCount,
+                    'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                    'edges' => $criteria->all(),
                 ];
             });
         $this->addField('parent')->type(CategoryInterface::class);
@@ -48,7 +51,7 @@ class CategoryInterface extends InterfaceBuilder {
         };
     }
 
-    static function criteriaResolver($root, $args, $context, $info, $criteria=null) {
+    static function criteriaResolver($root, $args, $context, $info, $criteria=null, $asArray=true) {
         $criteria = $criteria ?: \craft\elements\Category::find();
 
         if (isset($args['group'])) {
@@ -60,7 +63,7 @@ class CategoryInterface extends InterfaceBuilder {
             $criteria = $criteria->{$key}($value);
         }
 
-        return $criteria->all();
+        return $asArray ? $criteria->all() : $criteria;
     }
 
 }

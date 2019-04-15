@@ -14,6 +14,7 @@ use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\UserQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\TagQueryArguments;
+use markhuot\CraftQL\TypeModels\PageInfo;
 
 class Query extends Schema {
 
@@ -116,13 +117,14 @@ class Query extends Schema {
              ->use(new EntryQueryArguments)
              ->resolve(function ($root, $args, $context, $info) {
                  $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
-                 list($pageInfo, $entries) = \craft\helpers\Template::paginateCriteria($criteria);
-                 $pageInfo->limit = @$args['limit'] ?: 100;
+                 $totalCount = $criteria->count();
+                 $offset = @$args['offset'] ?: 0;
+                 $perPage = @$args['limit'] ?: 100;
 
                  return [
-                     'totalCount' => $pageInfo->total,
-                     'pageInfo' => $pageInfo,
-                     'edges' => $entries,
+                     'totalCount' => $totalCount,
+                     'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                     'edges' => $criteria->all(),
                      'criteria' => $criteria,
                      'args' => $args,
                  ];
@@ -252,6 +254,9 @@ class Query extends Schema {
             ->use(new TagQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Tag::find();
+                $totalCount = $criteria->count();
+                $offset = @$args['offset'] ?: 0;
+                $perPage = @$args['limit'] ?: 100;
 
                 if (isset($args['group'])) {
                     $args['groupId'] = $args['group'];
@@ -262,13 +267,10 @@ class Query extends Schema {
                     $criteria = $criteria->{$key}($value);
                 }
 
-                list($pageInfo, $tags) = \craft\helpers\Template::paginateCriteria($criteria);
-                $pageInfo->limit = @$args['limit'] ?: 100;
-
                 return [
-                    'totalCount' => $pageInfo->total,
-                    'pageInfo' => $pageInfo,
-                    'edges' => $tags,
+                    'totalCount' => $totalCount,
+                    'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                    'edges' => $criteria->all(),
                     'criteria' => $criteria,
                     'args' => $args,
                 ];
@@ -317,13 +319,15 @@ class Query extends Schema {
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args) use ($categoryResolver) {
-                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($categoryResolver($root, $args));
-                $pageInfo->limit = @$args['limit'] ?: 100;
+                $criteria = $categoryResolver($root, $args);
+                $totalCount = $criteria->count();
+                $offset = @$args['offset'] ?: 0;
+                $perPage = @$args['limit'] ?: 100;
 
                 return [
-                    'totalCount' => $pageInfo->total,
-                    'pageInfo' => $pageInfo,
-                    'edges' => $categories,
+                    'totalCount' => $totalCount,
+                    'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                    'edges' => $criteria->all(),
                 ];
             });
     }

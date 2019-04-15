@@ -10,6 +10,7 @@ use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\FieldBehaviors\RelatedEntriesField;
+use markhuot\CraftQL\TypeModels\PageInfo;
 
 class CategoryEdge extends Schema {
 
@@ -28,13 +29,15 @@ class CategoryEdge extends Schema {
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
-                list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria(CategoryInterface::criteriaResolver($root, $args, $context, $info, $root['node']->getChildren()));
-                $pageInfo->limit = @$args['limit'] ?: 100;
+                $criteria = CategoryInterface::criteriaResolver($root, $args, $context, $info, $root['node']->getChildren(), false);
+                $totalCount = $criteria->count();
+                $offset = @$args['offset'] ?: 0;
+                $perPage = @$args['limit'] ?: 100;
 
                 return [
-                    'totalCount' => $pageInfo->total,
-                    'pageInfo' => $pageInfo,
-                    'edges' => $categories,
+                    'totalCount' => $totalCount,
+                    'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                    'edges' => $criteria->all(),
                 ];
             });
     }
