@@ -3,8 +3,6 @@
 namespace markhuot\CraftQL\Types;
 
 // use GraphQL\Type\Definition\ObjectType;
-use craft\db\Paginator;
-use craft\web\twig\variables\Paginate;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
@@ -12,6 +10,7 @@ use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
 use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\FieldBehaviors\RelatedEntriesField;
+use markhuot\CraftQL\TypeModels\PageInfo;
 
 class CategoryEdge extends Schema {
 
@@ -30,15 +29,15 @@ class CategoryEdge extends Schema {
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
-                $paginator = new Paginator(CategoryInterface::criteriaResolver($root, $args, $context, $info, $root['node']->getChildren(), false), [
-                    'pageSize' => @$args['limit'] ?: 100,
-                    'currentPage' => \Craft::$app->request->pageNum,
-                ]);
+                $criteria = CategoryInterface::criteriaResolver($root, $args, $context, $info, $root['node']->getChildren(), false);
+                $totalCount = $criteria->count();
+                $offset = @$args['offset'] ?: 0;
+                $perPage = @$args['limit'] ?: 100;
 
                 return [
-                    'totalCount' => $paginator->getTotalResults(),
-                    'pageInfo' => Paginate::create($paginator),
-                    'edges' => $paginator->getPageResults(),
+                    'totalCount' => $totalCount,
+                    'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                    'edges' => $criteria->all(),
                 ];
             });
     }

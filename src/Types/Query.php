@@ -2,8 +2,6 @@
 
 namespace markhuot\CraftQL\Types;
 
-use craft\db\Paginator;
-use craft\web\twig\variables\Paginate;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
 use yii\base\Component;
@@ -16,6 +14,7 @@ use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\UserQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\TagQueryArguments;
+use markhuot\CraftQL\TypeModels\PageInfo;
 
 class Query extends Schema {
 
@@ -118,15 +117,14 @@ class Query extends Schema {
              ->use(new EntryQueryArguments)
              ->resolve(function ($root, $args, $context, $info) {
                  $criteria = $this->getRequest()->entries(\craft\elements\Entry::find(), $root, $args, $context, $info);
-                 $paginator = new Paginator($criteria, [
-                     'pageSize' => @$args['limit'] ?: 100,
-                     'currentPage' => \Craft::$app->request->pageNum,
-                 ]);
+                 $totalCount = $criteria->count();
+                 $offset = @$args['offset'] ?: 0;
+                 $perPage = @$args['limit'] ?: 100;
 
                  return [
-                     'totalCount' => $paginator->getTotalResults(),
-                     'pageInfo' => Paginate::create($paginator),
-                     'edges' => $paginator->getPageResults(),
+                     'totalCount' => $totalCount,
+                     'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                     'edges' => $criteria->all(),
                      'criteria' => $criteria,
                      'args' => $args,
                  ];
@@ -256,6 +254,9 @@ class Query extends Schema {
             ->use(new TagQueryArguments)
             ->resolve(function ($root, $args, $context, $info) {
                 $criteria = \craft\elements\Tag::find();
+                $totalCount = $criteria->count();
+                $offset = @$args['offset'] ?: 0;
+                $perPage = @$args['limit'] ?: 100;
 
                 if (isset($args['group'])) {
                     $args['groupId'] = $args['group'];
@@ -266,15 +267,10 @@ class Query extends Schema {
                     $criteria = $criteria->{$key}($value);
                 }
 
-                $paginator = new Paginator($criteria, [
-                    'pageSize' => @$args['limit'] ?: 100,
-                    'currentPage' => \Craft::$app->request->pageNum,
-                ]);
-
                 return [
-                    'totalCount' => $paginator->getTotalResults(),
-                    'pageInfo' => Paginate::create($paginator),
-                    'edges' => $paginator->getPageResults(),
+                    'totalCount' => $totalCount,
+                    'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                    'edges' => $criteria->all(),
                     'criteria' => $criteria,
                     'args' => $args,
                 ];
@@ -323,15 +319,15 @@ class Query extends Schema {
             ->type(CategoryConnection::class)
             ->use(new CategoryQueryArguments)
             ->resolve(function ($root, $args) use ($categoryResolver) {
-                $paginator = new Paginator($categoryResolver($root, $args), [
-                    'pageSize' => @$args['limit'] ?: 100,
-                    'currentPage' => \Craft::$app->request->pageNum,
-                ]);
+                $criteria = $categoryResolver($root, $args);
+                $totalCount = $criteria->count();
+                $offset = @$args['offset'] ?: 0;
+                $perPage = @$args['limit'] ?: 100;
 
                 return [
-                    'totalCount' => $paginator->getTotalResults(),
-                    'pageInfo' => Paginate::create($paginator),
-                    'edges' => $paginator->getPageResults(),
+                    'totalCount' => $totalCount,
+                    'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                    'edges' => $criteria->all(),
                 ];
             });
     }

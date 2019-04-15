@@ -2,9 +2,8 @@
 
 namespace markhuot\CraftQL\Listeners;
 
-use craft\db\Paginator;
-use craft\web\twig\variables\Paginate;
 use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
+use markhuot\CraftQL\TypeModels\PageInfo;
 use markhuot\CraftQL\Types\EntryInterface;
 use markhuot\CraftQL\Types\EntryConnection;
 
@@ -37,15 +36,14 @@ class GetEntriesFieldSchema
             ->name("{$field->handle}Connection")
             ->resolve(function ($root, $args, $context, $info) use ($field, $request) {
                 $criteria = $request->entries($root->{$field->handle}, $root, $args, $context, $info);
-                $paginator = new Paginator($criteria, [
-                    'pageSize' => @$args['limit'] ?: 100,
-                    'currentPage' => \Craft::$app->request->pageNum,
-                ]);
+                $totalCount = $criteria->count();
+                $offset = @$args['offset'] ?: 0;
+                $perPage = @$args['limit'] ?: 100;
 
                 return [
-                    'totalCount' => $paginator->getTotalResults(),
-                    'pageInfo' => Paginate::create($paginator),
-                    'edges' => $paginator->getPageResults(),
+                    'totalCount' => $totalCount,
+                    'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                    'edges' => $criteria->all(),
                     'criteria' => $criteria,
                     'args' => $args,
                 ];
