@@ -8,6 +8,7 @@ use markhuot\CraftQL\Request;
 
 class Field extends BaseBuilder {
 
+    use HasNameAttribute;
     use HasTypeAttribute;
     use HasDescriptionAttribute;
     use HasIsListAttribute;
@@ -47,7 +48,9 @@ class Field extends BaseBuilder {
      * @return self
      */
     function createInputObjectType($name): InputSchema {
-        return new InputSchema($this->request, $name);
+        $inputSchema = new InputSchema($this->request, $name);
+        $this->request->registerType($name, $inputSchema);
+        return $inputSchema;
     }
 
     function getConfig() {

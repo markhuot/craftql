@@ -32,7 +32,7 @@ class EntryMutationArguments extends FieldBehavior {
         $mutationQueryObject->use(new EntryQueryArguments);
         $this->owner->addArgument('query')->type($mutationQueryObject);
 
-        $fieldLayoutId = $this->owner->getType()->getContext()->fieldLayoutId;
+        $fieldLayoutId = $this->owner->getType()->getContext()['fieldLayoutId'];
         $this->owner->addArgumentsByLayoutId($fieldLayoutId);
 
         $this->owner->resolve(function ($root, $args, $context, $info) {

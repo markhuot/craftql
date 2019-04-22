@@ -18,7 +18,7 @@ class EntryType extends Schema {
         $this->addStringField('graphQlTypeName')
             ->nonNull()
             ->resolve(function($root, $args) {
-                return StringHelper::graphQLNameForEntryType($root);
+                return StringHelper::graphQLNameForEntryTypeSection($root->id, $root->sectionId);
             });
         $this->addField('fields')
             ->nonNull()

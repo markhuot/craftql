@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\Type;
 use craft\base\Field as CraftField;
+use markhuot\CraftQL\Scalars\Timestamp;
 
 trait HasArgumentsAttribute {
 
@@ -70,7 +71,7 @@ trait HasArgumentsAttribute {
     }
 
     function addDateArgument($name): Argument {
-        return $this->addArgument($name)->type(\markhuot\CraftQL\Types\Timestamp::type());
+        return $this->addArgument($name)->type($this->request->getType('Timestamp'));
     }
 
     function addEnumArgument($name): EnumField {
@@ -96,11 +97,31 @@ trait HasArgumentsAttribute {
         return null;
     }
 
+    /**
+     * Get the arguments as a GraphQL config array
+     *
+     * @return array
+     */
     function getArgumentConfig(): array {
         $arguments = [];
 
         foreach ($this->arguments as $argument) {
             $arguments[$argument->getName()] = $argument->getConfig();
+        }
+
+        return $arguments;
+    }
+
+    /**
+     * Get the arguments configured for a directive
+     *
+     * @return array
+     */
+    function getDirectiveArgumentConfig(): array {
+        $arguments = [];
+
+        foreach ($this->arguments as $argument) {
+            $arguments[$argument->getName()] = $argument->getDirectiveConfig();
         }
 
         return $arguments;

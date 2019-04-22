@@ -4,6 +4,7 @@ namespace markhuot\CraftQL\Listeners;
 
 use Craft;
 use craft\helpers\ElementHelper;
+use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\GetFieldSchema;
 use markhuot\CraftQL\TypeModels\PageInfo;
 use markhuot\CraftQL\Types\CategoryConnection;
@@ -20,12 +21,10 @@ class GetCategoriesFieldSchema
         $event->handled = true;
 
         $field = $event->sender;
+        $request = $event->schema->getRequest();
+        $token = $event->schema->getRequest()->token();
 
-        if (!$event->schema->getRequest()->token()->can('query:categories')) {
-            return;
-        }
-
-        if ($event->schema->getRequest()->categoryGroups()->count() == 0) {
+        if ($token->canNot('query:categories')) {
             return;
         }
 
@@ -34,7 +33,7 @@ class GetCategoriesFieldSchema
 
             $event->schema->addField($field)
                 ->lists()
-                ->type($event->schema->getRequest()->categoryGroups()->get($groupId))
+                ->type($request->getTypeBuilder(CraftQL::$plugin->categoryGroups->getTypeNameByIdOrUid($groupId)))
                 ->resolve(function ($root, $args) use ($field) {
                     return $root->{$field->handle}->all();
                 });

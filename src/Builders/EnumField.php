@@ -7,6 +7,7 @@ class EnumField extends Field {
     function boot() {
         $this->type = (new EnumObject($this->request))
             ->name(ucfirst($this->getName()).'Enum');
+        $this->request->registerType($this->type->getName(), $this->type);
     }
 
     function __call($method, $args) {

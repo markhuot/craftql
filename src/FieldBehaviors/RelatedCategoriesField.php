@@ -10,7 +10,7 @@ use markhuot\CraftQL\Types\EntryConnection;
 class RelatedCategoriesField extends SchemaBehavior {
 
     function initRelatedCategoriesField() {
-        if ($this->owner->getRequest()->categoryGroups()->count() == 0) {
+        if ($this->owner->getRequest()->token()->canNot('query:categories')) {
             return;
         }
 

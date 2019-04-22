@@ -29,6 +29,15 @@
         "handle": "craftql",
         "developer": "Mark Huot",
         "developerUrl": "https://www.github.com/markhuot",
-        "class": "markhuot\\CraftQL\\CraftQL"
+        "class": "markhuot\\CraftQL\\CraftQL",
+        "components": {
+            "categoryGroups": "markhuot\\CraftQL\\Services\\CategoryGroupsService",
+            "entryTypes": "markhuot\\CraftQL\\Services\\EntryTypesService",
+            "globals": "markhuot\\CraftQL\\Services\\GlobalsService",
+            "sections": "markhuot\\CraftQL\\Services\\SectionsService",
+            "sites": "markhuot\\CraftQL\\Services\\SitesService",
+            "tagGroups": "markhuot\\CraftQL\\Services\\TagGroupsService",
+            "volumes": "markhuot\\CraftQL\\Services\\VolumesService"
+        }
     }
 }

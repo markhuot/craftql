@@ -112,6 +112,7 @@ class ApiController extends Controller
         }
         Craft::trace('CraftQL: Parsing request complete');
 
+        // xdebug_start_trace('/Users/markhuot/Desktop/craftql', XDEBUG_TRACE_COMPUTERIZED);
         Craft::trace('CraftQL: Bootstrapping');
         $this->graphQl->bootstrap();
         Craft::trace('CraftQL: Bootstrapping complete');
@@ -123,6 +124,7 @@ class ApiController extends Controller
         Craft::trace('CraftQL: Executing query');
         $result = $this->graphQl->execute($schema, $input, $variables);
         Craft::trace('CraftQL: Execution complete');
+        // xdebug_stop_trace();
 
         $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];
         foreach ($customHeaders as $key => $value) {

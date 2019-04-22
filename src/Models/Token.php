@@ -9,6 +9,10 @@ use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
 use GraphQL\Type\Definition\Type;
+use markhuot\CraftQL\Builders\EnumObject;
+use markhuot\CraftQL\CraftQL;
+use markhuot\CraftQL\Repositories\Site;
+use markhuot\CraftQL\Repositories\TagGroup;
 
 class Token extends ActiveRecord
 {
@@ -66,66 +70,61 @@ class Token extends ActiveRecord
         return json_decode($this->scopes ?: '[]', true);
     }
 
+    /**
+     * Check if this token has access to the requested scope. This method checks
+     * three things to validate scopes,
+     *
+     *   1. are there any elements of the requested type. E.g., if you're asking if
+     *      the token can query:globals it'll make sure there _are_ globals
+     *   2. is this an admin token, if it is then all permissions are allowd
+     *   3. is the scope enabled. If the scope is _not_ enabled it will not be in the
+     *      the scopes array so our only check needs to be if the key is present.
+     *      However, to build for the future we also allow false-y values in the scope
+     *      array so we also check for truthyness on the scope
+     *
+     * @param string $do
+     * @return bool
+     */
     function can($do): bool {
-        return $this->admin || @$this->scopeArray[$do] ?: false;
+        if (substr($do, 0, 6) === 'query:') {
+            $service = substr($do, 6);
+            if (in_array($service, ['globals', 'categories', 'tags'])) {
+                if ($service == 'categories') {
+                    $service = 'categoryGroups';
+                }
+                if ($service == 'tags') {
+                    $service = 'tagGroups';
+                }
+                if (count(CraftQL::$plugin->$service->all()) == 0) {
+                    return false;
+                }
+            }
+        }
+
+        if ($this->admin) {
+            return true;
+        }
+
+        return @$this->scopeArray[$do] ?: false;
+    }
+
+    function globals($mode='query') {
+        if ($this->canNot($mode.':globals')) {
+            return [];
+        }
+
+        return CraftQL::$plugin->globals->all();
+    }
+
+    function entryTypes($mode='query') {
+        return array_filter(CraftQL::$plugin->entryTypes->all(), function ($entryType) use ($mode) {
+            return $this->can($mode.':entryType:'.$entryType['id']);
+        });
     }
 
     function canNot($do): bool {
         return !$this->can($do);
     }
-
-    // function mutableEntryTypeIds(): array {
-    //     $ids = [];
-
-    //     foreach ($this->scopeArray as $scope => $enabled) {
-    //         if ($enabled && preg_match('/mutation:entryType:(\d+)/', $scope, $matches)) {
-    //             $ids[] = $matches[1];
-    //         }
-    //     }
-
-    //     return $ids;
-    // }
-
-    // function queryableEntryTypeIds(): array {
-    //     $ids = [];
-
-    //     foreach ($this->scopeArray as $scope => $enabled) {
-    //         if ($enabled && preg_match('/query:entryType:(\d+)/', $scope, $matches)) {
-    //             $ids[] = $matches[1];
-    //         }
-    //     }
-
-    //     return $ids;
-    // }
-
-    // private $entryTypeEnum;
-
-    // function entryTypeEnum() {
-    //     if ($this->entryTypeEnum) {
-    //         return $this->entryTypeEnum;
-    //     }
-
-    //     $entryTypeEnumValues = [];
-    //     // $sectionEnumValues = [];
-
-    //     foreach (\markhuot\CraftQL\Repositories\EntryType::all() as $entryType) {
-    //         if (in_array($entryType->id, $this->queryableEntryTypeIds())) {
-    //             $name = \markhuot\CraftQL\Types\EntryType::getName($entryType);
-    //             $entryTypeEnumValues[$name] = $entryType->id;
-    //             // $sectionEnumValues[$entryType->section->handle] = $entryType->section->id;
-    //         }
-    //     }
-
-    //     return $this->entryTypeEnum = new EnumType([
-    //         'name' => 'EntryTypeEnum',
-    //         'values' => $entryTypeEnumValues,
-    //     ]);
-
-    //     // $this->sectionArgEnum = new EnumType([
-    //     //     'name' => 'SectionEnum',
-    //     //     'values' => $sectionEnumValues,
-    //     // ]);
-    // }
 
     function allowsMatch($regex): bool {
         if ($this->admin) {

@@ -14,11 +14,12 @@ class Entry extends Schema {
     ];
 
     function boot() {
-        $this->addFieldsByLayoutId($this->context->fieldLayoutId);
+        $this->addFieldsByLayoutId($this->context['fieldLayoutId']);
     }
 
     function getName(): string {
-        return StringHelper::graphQLNameForEntryType($this->context);
+        $entryType = $this->context;
+        return StringHelper::graphQLNameForEntryTypeSection($entryType['id'], $entryType['sectionId']);
     }
 
 }

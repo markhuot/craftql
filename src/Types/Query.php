@@ -99,9 +99,15 @@ class Query extends Schema {
      * @return Schema
      */
     function addEntriesSchema() {
-        if ($this->request->entryTypes()->count() == 0) {
-            return;
-        }
+        if ($this->request)
+
+        // if ($this->request->token()->canSee(Entry::class) == false) {
+        //     return;
+        // }
+
+        // if ($this->request->entryTypes()->count() == 0) {
+        //     return;
+        // }
 
         $this->addField('entries')
             ->lists()
@@ -151,9 +157,9 @@ class Query extends Schema {
      * The fields you can query that return assets
      */
     function addAssetsSchema() {
-        if ($this->getRequest()->volumes()->count() == 0) {
-            return;
-        }
+        // if ($this->getRequest()->volumes()->count() == 0) {
+        //     return;
+        // }
 
         $this->addField('assets')
             ->type(VolumeInterface::class)
@@ -174,6 +180,9 @@ class Query extends Schema {
      * The fields you can query that return globals
      */
     function addGlobalsSchema() {
+        if ($this->request->token()->canNot('query:globals')) {
+            return;
+        }
 
         // $this->addObjectField('globals')
         //     ->config(function ($object) use ($this->request) {
@@ -191,44 +200,43 @@ class Query extends Schema {
         //         return $sets;
         //     });
 
-        if ($this->request->globals()->count() > 0) {
-            $this->addField('globals')
-                ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
-                ->arguments(function ($field) {
-                    $field->addStringArgument('site');
-                    $field->addIntArgument('siteId');
-                })
-                ->resolve(function ($root, $args) {
-                    if (!empty($args['site'])) {
-                        $siteId = Craft::$app->getSites()->getSiteByHandle($args['site'])->id;
-                    }
-                    else if (!empty($args['siteId'])) {
-                        $siteId = $args['siteId'];
-                    }
-                    else {
-                        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
-                    }
 
-                    $sets = [];
-                    $setIds = \Craft::$app->globals->getAllSetIds();
+        $this->addField('globals')
+            ->type(\markhuot\CraftQL\Types\GlobalsSet::class)
+            ->arguments(function (\markhuot\CraftQL\Builders\Field $field) {
+                $field->addArgument('site')->type(SitesEnum::class);
+                $field->addIntArgument('siteId');
+            })
+            ->resolve(function ($root, $args) {
+                if (!empty($args['site'])) {
+                    $siteId = Craft::$app->getSites()->getSiteByHandle($args['site'])->id;
+                }
+                else if (!empty($args['siteId'])) {
+                    $siteId = $args['siteId'];
+                }
+                else {
+                    $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+                }
 
-                    foreach ($setIds as $id) {
-                        $set = \Craft::$app->globals->getSetById($id, $siteId);
-                        $sets[$set->handle] = $set;
-                    }
+                $sets = [];
+                $setIds = \Craft::$app->globals->getAllSetIds();
 
-                    return $sets;
-                });
-        }
+                foreach ($setIds as $id) {
+                    $set = \Craft::$app->globals->getSetById($id, $siteId);
+                    $sets[$set->handle] = $set;
+                }
+
+                return $sets;
+            });
     }
 
     /**
      * The fields you can query that return tags
      */
     function addTagsSchema() {
-        if ($this->request->tagGroups()->count() == 0) {
-            return;
-        }
+        // if ($this->request->tagGroups()->count() == 0) {
+        //     return;
+        // }
 
         $this->addField('tags')
             ->lists()
@@ -281,9 +289,9 @@ class Query extends Schema {
      * The fields you can query that return categories
      */
     function addCategoriesSchema() {
-        if ($this->request->categoryGroups()->count() == 0) {
-            return;
-        }
+        // if ($this->request->categoryGroups()->count() == 0) {
+        //     return;
+        // }
 
         $categoryResolver = function ($root, $args) {
             $criteria = \craft\elements\Category::find();

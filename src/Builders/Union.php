@@ -2,23 +2,22 @@
 
 namespace markhuot\CraftQL\Builders;
 
-use GraphQL\Type\Definition\Type;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\UnionType;
 
-class Union extends Field {
+class Union extends BaseBuilder {
+
+    use HasNameAttribute;
+    use HasResolveAttribute;
+    use HasResolveTypeAttribute;
 
     protected $types = [];
-    protected $resolveType;
     protected static $rawTypes = [];
 
-    function resolveType(callable $resolveType): self {
-        $this->resolveType = $resolveType;
-        return $this;
-    }
-
-    function getResolveType() {
-        return $this->resolveType;
+    function __construct($request, $context=null, $parent=null) {
+        $this->request = $request;
+        // $this->context = $context;
+        // $this->parent = $parent;
     }
 
     /**
@@ -29,6 +28,7 @@ class Union extends Field {
     function addType($typeName, $context=null) {
         $this->types[$typeName] = new Schema($this->request, $context);
         $this->types[$typeName]->name($typeName);
+        $this->request->registerType($typeName, $this->types[$typeName]);
         return $this->types[$typeName];
     }
 
@@ -40,47 +40,25 @@ class Union extends Field {
         $types = [];
 
         foreach ($this->types as $typeName => $typeSchema) {
-            $types[] = new ObjectType([
-                'name' => $typeName,
-                'fields' => $typeSchema->getFieldConfig(),
-            ]);
+            $types[] = $this->request->getType($typeName);
         }
 
         return $types;
     }
 
-    function getRawType() {
+    function getRawGraphQLObject() {
         if (!empty(static::$rawTypes[$this->getName()])) {
             return static::$rawTypes[$this->getName()];
         }
 
         return static::$rawTypes[$this->getName()] = new UnionType([
-            'name' => ucfirst($this->getName()).'Union',
+            'name' => $this->getName(),
             'description' => 'A union of possible blocks types',
             'types' => function () {
                 return $this->getRawTypes();
             },
             'resolveType' => $this->getResolveType(),
         ]);
-    }
-
-    function getConfig() {
-        $type = $this->getRawType();
-
-        if ($this->isList) {
-            $type = Type::listOf($type);
-        }
-
-        if ($this->isNonNull) {
-            $type = Type::nonNull($type);
-        }
-
-        return [
-            'type' => $type,
-            'description' => $this->getDescription(),
-            'args' => $this->getArgumentConfig(),
-            'resolve' => $this->getResolve(),
-        ];
     }
 
 }

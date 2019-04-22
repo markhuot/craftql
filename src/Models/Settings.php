@@ -16,6 +16,7 @@ class Settings extends Model
     public $maxQueryDepth = false;
     public $maxQueryComplexity = false;
     public $throwSchemaBuildErrors = false;
+    public $disableSchemaValidation = false;
 
     function rules()
     {

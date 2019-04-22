@@ -3,6 +3,7 @@
 namespace markhuot\CraftQL\Builders;
 
 use GraphQL\Type\Definition\EnumType;
+use markhuot\CraftQL\Request;
 
 class EnumObject extends Schema {
 

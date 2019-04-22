@@ -7,11 +7,12 @@ use markhuot\CraftQL\Behaviors\FieldBehavior;
 
 class InputSchema extends BaseBuilder {
 
+    use HasNameAttribute;
     use HasArgumentsAttribute;
 
     protected static $objects;
 
-    function __construct($request, $name) {
+    function __construct($request, $name=null) {
         $this->request = $request;
         $this->name = $name;
     }
@@ -35,10 +36,17 @@ class InputSchema extends BaseBuilder {
      * @return self
      */
     function createInputObjectType($name): InputSchema {
-        return new InputSchema($this->request, $name);
+        $inputSchema = new InputSchema($this->request, $name);
+        $this->request->registerType($name, $inputSchema);
+        return $inputSchema;
+    }
+
+    function boot() {
+
     }
 
     function getArguments() {
+        $this->boot();
         $this->bootBehaviors();
         return $this->getArgumentConfig();
     }
@@ -52,7 +60,7 @@ class InputSchema extends BaseBuilder {
         ];
     }
 
-    function getRawGraphQLType() {
+    function getRawGraphQLObject() {
         $key = $this->getName();
 
         if (!empty(static::$objects[$key])) {

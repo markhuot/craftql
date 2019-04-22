@@ -20,12 +20,12 @@ class User extends Schema {
         $this->addBooleanField('admin')->nonNull();
         $this->addBooleanField('isCurrent')->nonNull();
         $this->addStringField('preferredLocale');
-        // $this->addField('status')->type(UsersField::statusEnum())->nonNull();
+        $this->addField('status')->type(StatusEnum::class)->nonNull();
 
         $volumeId = Craft::$app->getSystemSettings()->getSetting('users', 'photoVolumeId');
         if ($volumeId) {
-            $this->addField('photo')
-                ->type($this->request->volumes()->get($volumeId));
+            // $this->addField('photo')
+            //     ->type($this->request->volumes()->get($volumeId));
         }
 
         $this->addDateField('dateCreated')->nonNull();
