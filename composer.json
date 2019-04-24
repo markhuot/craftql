@@ -9,7 +9,7 @@
         "craft-plugin"
     ],
     "require": {
-        "craftcms/cms": "^3.0.0",
+        "craftcms/cms": "^3.1.19",
         "webonyx/graphql-php": "^0.11.0",
         "react/http": "^0.7"
     },
