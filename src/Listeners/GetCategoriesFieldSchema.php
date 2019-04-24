@@ -5,6 +5,7 @@ namespace markhuot\CraftQL\Listeners;
 use Craft;
 use craft\helpers\ElementHelper;
 use markhuot\CraftQL\Events\GetFieldSchema;
+use markhuot\CraftQL\TypeModels\PageInfo;
 use markhuot\CraftQL\Types\CategoryConnection;
 
 class GetCategoriesFieldSchema
@@ -41,13 +42,15 @@ class GetCategoriesFieldSchema
             $event->schema->addField($field->handle.'Connection')
                 ->type(CategoryConnection::class)
                 ->resolve(function ($root, $args) use ($field) {
-                    list($pageInfo, $categories) = \craft\helpers\Template::paginateCriteria($root->{$field->handle});
-                    $pageInfo->limit = @$args['limit'] ?: 100;
+                    $criteria = $root->{$field->handle};
+                    $totalCount = $criteria->count();
+                    $offset = @$args['offset'] ?: 0;
+                    $perPage = @$args['limit'] ?: 100;
 
                     return [
-                        'totalCount' => $pageInfo->total,
-                        'pageInfo' => $pageInfo,
-                        'edges' => $categories,
+                        'totalCount' => $totalCount,
+                        'pageInfo' => new PageInfo($offset, $perPage, $totalCount),
+                        'edges' => $criteria->all(),
                     ];
                 });
 

@@ -2,7 +2,6 @@
 
 namespace markhuot\CraftQL\Types;
 
-use craft\web\twig\variables\Paginate;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\InterfaceType;
 use GraphQL\Type\Definition\EnumType;
@@ -24,11 +23,7 @@ class PageInfo extends Schema {
             return $root->currentPage < $root->totalPages;
         });
 
-        $this->addIntField('currentPage')
-            ->resolve(function (Paginate $root, $args, $context, $info) {
-                return floor(($root->first - 1) / (@$root->limit ?: 100)) + 1;
-            });
-
+        $this->addIntField('currentPage');
         $this->addIntField('totalPages');
         $this->addIntField('first');
         $this->addIntField('last');
