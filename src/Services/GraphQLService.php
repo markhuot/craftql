@@ -117,8 +117,13 @@ class GraphQLService extends Component {
             \markhuot\CraftQL\Directives\Date::directive(),
         ]);
 
-        $mutation = (new \markhuot\CraftQL\Types\Mutation($request))->getRawGraphQLObject();
-        $schemaConfig['mutation'] = $mutation;
+        $mutation = new \markhuot\CraftQL\Types\Mutation($request);
+
+        $event = new AlterMutationSchema;
+        $event->mutation = $mutation;
+        $mutation->trigger(AlterMutationSchema::EVENT, $event);
+
+        $schemaConfig['mutation'] = $mutation->getRawGraphQLObject();
 
         $schema = new Schema($schemaConfig);
 
