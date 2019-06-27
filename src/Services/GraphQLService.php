@@ -11,6 +11,7 @@ use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
 use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
+use markhuot\CraftQL\Events\AlterMutationSchema;
 use markhuot\CraftQL\Events\AlterQuerySchema;
 use yii\base\Component;
 use Yii;
