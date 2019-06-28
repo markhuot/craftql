@@ -23,6 +23,15 @@ class User extends Schema {
         // $this->addField('status')->type(UsersField::statusEnum())->nonNull();
 
         $volumeId = Craft::$app->getSystemSettings()->getSetting('users', 'photoVolumeId');
+        
+        if (!$volumeId)
+        {
+        	$uid = Craft::$app->getProjectConfig()->get('users')['photoVolumeUid'];
+
+        	if ($uid)
+	        	$volumeId = Craft::$app->getVolumes()->getVolumeByUid($uid)->id;
+        }
+        
         if ($volumeId) {
             $this->addField('photo')
                 ->type($this->request->volumes()->get($volumeId));
