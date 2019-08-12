@@ -1,5 +1,5 @@
 {
-    "name": "ashtonlance/craftql",
+    "name": "markhuot/craftql",
     "description": "A GraphQL implementation for Craft",
     "type": "craft-plugin",
     "keywords": [
