@@ -56,7 +56,7 @@ class CpController extends Controller
     function actionGraphiql()
     {
         $instance = \markhuot\CraftQL\CraftQL::getInstance();
-        $graphiqlFetchUrl = $instance->settings->graphiqlFetchUrl ?? \craft\helpers\UrlHelper::siteUrl();
+        $graphiqlFetchUrl = $instance->settings->graphiqlFetchUrl ?? \craft\helpers\UrlHelper::baseCpUrl();
         $uri = $instance->settings->uri;
 
         $this->view->registerAssetBundle(GraphiQLAssetBundle::class);
@@ -70,7 +70,7 @@ class CpController extends Controller
     function actionGraphiqlas($token)
     {
         $instance = \markhuot\CraftQL\CraftQL::getInstance();
-        $graphiqlFetchUrl = $instance->settings->graphiqlFetchUrl ?? \craft\helpers\UrlHelper::siteUrl();
+        $graphiqlFetchUrl = $instance->settings->graphiqlFetchUrl ?? \craft\helpers\UrlHelper::baseCpUrl();
         $uri = $instance->settings->uri;
 
         $this->view->registerAssetBundle(GraphiQLAssetBundle::class);
