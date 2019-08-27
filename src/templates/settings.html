@@ -77,6 +77,14 @@ You can access your GraphQL endpoint in two ways,
         instructions: 'The URI to the GraphQL service. Typically this is `api` but you can override it with your own preference.',
     }) }}
 
+    <h2>Graphiql Fetch Url</h2>
+
+    {{ forms.textField({
+        name: 'graphiqlFetchUrl',
+        value: settings.graphiqlFetchUrl,
+        instructions: 'The Base url to use for the graphiql requests. Defaults to Craft's baseCpUrl()',
+    }) }}
+
     <h2>Tokens</h2>
     <p>Tokens control access in to your API. Instead of authenticating with a username and password, API access is granted via a token. Treat this token like a password because it provides privileged access in to your Craft website.</p>
 
