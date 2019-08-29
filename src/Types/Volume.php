@@ -2,8 +2,6 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\InputObjectType;
-use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Builders\Schema;
 
 class Volume extends Schema {

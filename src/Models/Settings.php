@@ -3,7 +3,6 @@
 namespace markhuot\CraftQL\Models;
 
 use craft\base\Model;
-use markhuot\CraftQL\Models\Token;
 
 class Settings extends Model
 {

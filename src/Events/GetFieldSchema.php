@@ -3,7 +3,6 @@
 namespace markhuot\CraftQL\Events;
 
 use yii\base\Event;
-use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Builders\Schema as SchemaBuilder;
 use markhuot\CraftQL\Builders\Field as FieldBuilder;
 use craft\base\Field;

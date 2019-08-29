@@ -5,7 +5,6 @@ namespace markhuot\CraftQL\Listeners;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Helpers\StringHelper;
 use markhuot\CraftQL\Types\MultiOptionFieldData;
-use markhuot\CraftQL\Types\OptionFieldData;
 use yii\Log\Logger;
 
 class GetSelectMultipleFieldSchema

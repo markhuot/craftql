@@ -6,7 +6,6 @@ use Craft;
 use craft\elements\Entry;
 use craft\i18n\Locale;
 use DateTime;
-use DateTimeZone;
 
 class Date extends Field {
 

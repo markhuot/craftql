@@ -4,10 +4,7 @@ namespace markhuot\CraftQL\Listeners;
 
 use Craft;
 use craft\elements\Asset;
-use GraphQL\Type\Definition\Type;
-use GraphQL\Type\Definition\InputObjectType;
 use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
-use markhuot\CraftQL\Types\Volume;
 use markhuot\CraftQL\Types\VolumeInterface;
 use markhuot\CraftQL\Events\GetFieldSchema;
 

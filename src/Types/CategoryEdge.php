@@ -3,11 +3,7 @@
 namespace markhuot\CraftQL\Types;
 
 // use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;
-use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
 use markhuot\CraftQL\FieldBehaviors\RelatedEntriesField;
 use markhuot\CraftQL\TypeModels\PageInfo;

@@ -6,7 +6,6 @@ use Craft;
 use markhuot\CraftQL\GraphiQLAssetBundle;
 use Yii;
 use craft\web\Controller;
-use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Models\Token;
 
 class CpController extends Controller

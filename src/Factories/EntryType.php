@@ -2,8 +2,6 @@
 
 namespace markhuot\CraftQL\Factories;
 
-use markhuot\CraftQL\Factories\BaseFactory;
-use GraphQL\Type\Definition\EnumType;
 use markhuot\CraftQL\Types\Entry as EntryObjectType;
 use markhuot\CraftQL\Helpers\StringHelper;
 

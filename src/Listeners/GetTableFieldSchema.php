@@ -3,7 +3,6 @@
 namespace markhuot\CraftQL\Listeners;
 
 use markhuot\CraftQL\Events\GetFieldSchema;
-use markhuot\CraftQL\Builders\Schema;
 
 class GetTableFieldSchema
 {

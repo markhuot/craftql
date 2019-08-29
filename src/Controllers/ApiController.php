@@ -4,10 +4,8 @@ namespace markhuot\CraftQL\Controllers;
 
 use Craft;
 use craft\web\Controller;
-use craft\records\User;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Models\Token;
-use yii\web\ForbiddenHttpException;
 
 class ApiController extends Controller
 {
