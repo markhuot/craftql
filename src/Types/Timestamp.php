@@ -64,10 +64,11 @@ class Timestamp extends ScalarType
      * }
      *
      * @param \GraphQL\Language\AST\Node $valueNode
+     * @param array|null $variables
      * @return string
      * @throws Error
      */
-    public function parseLiteral($valueNode)
+    public function parseLiteral($valueNode, array $variables = null)
     {
         // Note: throwing GraphQL\Error\Error vs \UnexpectedValueException to benefit from GraphQL
         // error location in query:

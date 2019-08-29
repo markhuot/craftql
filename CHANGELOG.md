@@ -1,5 +1,9 @@
 ## Unreleased
 
+### Fixed
+
+- Fixed a couple compatibility issues with graphql-php 0.12. ([#312](https://github.com/markhuot/craftql/issues/312)) 
+
 ## 1.3.3 - 2019-08-28
 
 ### Changed
