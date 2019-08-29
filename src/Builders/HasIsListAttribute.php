@@ -25,9 +25,9 @@ trait HasIsListAttribute {
     /**
      * Get the description
      *
-     * @return string
+     * @return bool
      */
-    function getIsList(): boolean {
+    function getIsList(): bool {
         return $this->isList;
     }
 

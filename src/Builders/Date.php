@@ -55,7 +55,7 @@ class Date extends Field {
             $date = $root->{$info->fieldName};
 
             if ($this->isNonNull() && !$date) {
-                throw new Error("`{$info->fieldName}` is a required field but has no value");
+                throw new \Exception("`{$info->fieldName}` is a required field but has no value");
             }
 
             if (!$date) {
