@@ -39,7 +39,7 @@ class CraftQL extends Plugin
 
         // Register cp routes
         Event::on(
-            UrlManager::className(),
+            UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function (RegisterUrlRulesEvent $event) {
                 $event->rules['GET craftql'] = 'craftql/cp/index';
@@ -56,7 +56,7 @@ class CraftQL extends Plugin
         $verbs = $this->getSettings()->verbs;
         $uri = $this->settings->uri;
         Event::on(
-            UrlManager::className(),
+            UrlManager::class,
             UrlManager::EVENT_REGISTER_SITE_URL_RULES,
             function (RegisterUrlRulesEvent $event) use ($uri, $verbs) {
                 $event->rules["OPTIONS {$uri}"] = 'craftql/api/index';

@@ -2,7 +2,6 @@
 
 namespace markhuot\CraftQL\Factories;
 
-use markhuot\CraftQL\Factories\BaseFactory;
 use markhuot\CraftQL\Types\Tag as TagObjectType;
 
 class TagGroup extends BaseFactory {

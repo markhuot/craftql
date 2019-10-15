@@ -2,8 +2,6 @@
 
 namespace markhuot\CraftQL\Builders;
 
-use GraphQL\Type\Definition\Type;
-
 trait HasIsListAttribute {
 
     /**
@@ -27,9 +25,9 @@ trait HasIsListAttribute {
     /**
      * Get the description
      *
-     * @return string
+     * @return bool
      */
-    function getIsList(): boolean {
+    function getIsList(): bool {
         return $this->isList;
     }
 

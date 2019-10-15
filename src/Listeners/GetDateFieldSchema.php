@@ -2,9 +2,6 @@
 
 namespace markhuot\CraftQL\Listeners;
 
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\GraphQLFields\General\Date as DateField;
-
 class GetDateFieldSchema
 {
     /**

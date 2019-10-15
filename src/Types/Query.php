@@ -2,14 +2,9 @@
 
 namespace markhuot\CraftQL\Types;
 
-use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\FieldBehaviors\AssetQueryArguments;
-use yii\base\Component;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\Type;
 use Craft;
 use markhuot\CraftQL\Builders\Schema;
-use markhuot\CraftQL\Request;
 use markhuot\CraftQL\FieldBehaviors\EntryQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\UserQueryArguments;
 use markhuot\CraftQL\FieldBehaviors\CategoryQueryArguments;

@@ -2,8 +2,6 @@
 
 namespace markhuot\CraftQL\Builders;
 
-use GraphQL\Type\Definition\Type;
-
 trait HasDeprecationReasonAttribute {
 
     /**

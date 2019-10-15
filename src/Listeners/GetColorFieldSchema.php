@@ -4,7 +4,6 @@ namespace markhuot\CraftQL\Listeners;
 
 use craft\fields\data\ColorData;
 use GraphQL\Type\Definition\ResolveInfo;
-use GraphQL\Type\Definition\Type;
 
 class GetColorFieldSchema
 {

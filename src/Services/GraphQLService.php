@@ -3,7 +3,6 @@
 namespace markhuot\CraftQL\Services;
 
 use Craft;
-use Egulias\EmailValidator\Exception\CRLFAtTheEnd;
 use GraphQL\GraphQL;
 use GraphQL\Error\Debug;
 use GraphQL\Type\Schema;
@@ -13,7 +12,6 @@ use GraphQL\Validator\Rules\QueryDepth;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Events\AlterQuerySchema;
 use yii\base\Component;
-use Yii;
 
 class GraphQLService extends Component {
 

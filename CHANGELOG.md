@@ -1,4 +1,21 @@
-## dev-master
+## 1.3.4 - 2019-08-29
+
+### Fixed
+
+- Fixed a couple compatibility issues with graphql-php 0.12. ([#312](https://github.com/markhuot/craftql/issues/312)) 
+
+## 1.3.3 - 2019-08-28
+
+### Changed
+
+- CraftQL now requires Craft 3.2.0+.
+- CraftQL now requires graphql-php ^0.12.0, fixing compatibility with Craft 3.3. ([#309](https://github.com/markhuot/craftql/pull/309))
+
+### Fixed
+
+- Fixed an error that occurred on Craft 3.2.0+ when querying for entry drafts, if the `name` or `notes` fields were specified. ([#296](https://github.com/markhuot/craftql/pull/296))
+
+## 1.3.2 - 2019-04-15
 
 ### Changed
 
