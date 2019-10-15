@@ -2,8 +2,6 @@
 
 namespace markhuot\CraftQL\Listeners;
 
-use Craft;
-use craft\helpers\ElementHelper;
 use markhuot\CraftQL\Events\GetFieldSchema;
 
 class GetVideosFieldSchema

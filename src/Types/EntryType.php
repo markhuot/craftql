@@ -3,10 +3,7 @@
 namespace markhuot\CraftQL\Types;
 
 use Craft;
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Request;
 use markhuot\CraftQL\Builders\Schema;
-use craft\models\EntryType as CraftEntryType;
 use markhuot\CraftQL\Helpers\StringHelper;
 
 class EntryType extends Schema {

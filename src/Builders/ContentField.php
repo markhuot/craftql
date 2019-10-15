@@ -3,7 +3,6 @@
 namespace markhuot\CraftQL\Builders;
 
 use craft\base\Field as CraftField;
-use GraphQL\Type\Definition\Type;
 use markhuot\CraftQL\Request;
 
 class ContentField extends Field {

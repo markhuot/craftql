@@ -22,7 +22,7 @@ class User extends Schema {
         $this->addStringField('preferredLocale');
         // $this->addField('status')->type(UsersField::statusEnum())->nonNull();
 
-        $volumeId = Craft::$app->getSystemSettings()->getSetting('users', 'photoVolumeId');
+        $volumeId = Craft::$app->getProjectConfig()->get('users.photoVolumeId');
         if ($volumeId) {
             $this->addField('photo')
                 ->type($this->request->volumes()->get($volumeId));

@@ -2,10 +2,7 @@
 
 namespace markhuot\CraftQL\Listeners;
 
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\UnionType;
 use markhuot\CraftQL\Builders\Argument;
-use markhuot\CraftQL\Builders\Field;
 use markhuot\CraftQL\Builders\InputSchema;
 
 class GetMatrixFieldSchema

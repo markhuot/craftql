@@ -3,7 +3,6 @@
 namespace markhuot\CraftQL\FieldBehaviors;
 
 use markhuot\CraftQL\Behaviors\FieldBehavior;
-use markhuot\CraftQL\Builders\InputSchema;
 
 class EntryQueryArguments extends FieldBehavior {
 

@@ -3,10 +3,7 @@
 namespace markhuot\CraftQL\Types;
 
 use GraphQL\Error\Error;
-use GraphQL\Error\InvariantViolation;
-use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
-use GraphQL\Utils\Utils;
 
 class Timestamp extends ScalarType
 {
@@ -57,17 +54,18 @@ class Timestamp extends ScalarType
 
     /**
      * Parses an externally provided literal value (hardcoded in GraphQL query) to use as an input.
-     * 
-     * E.g. 
+     *
+     * E.g.
      * {
-     *   user(email: "user@example.com") 
+     *   user(email: "user@example.com")
      * }
      *
      * @param \GraphQL\Language\AST\Node $valueNode
+     * @param array|null $variables
      * @return string
      * @throws Error
      */
-    public function parseLiteral($valueNode)
+    public function parseLiteral($valueNode, array $variables = null)
     {
         // Note: throwing GraphQL\Error\Error vs \UnexpectedValueException to benefit from GraphQL
         // error location in query:

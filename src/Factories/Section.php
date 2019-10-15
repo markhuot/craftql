@@ -2,7 +2,6 @@
 
 namespace markhuot\CraftQL\Factories;
 
-use markhuot\CraftQL\Factories\BaseFactory;
 use markhuot\CraftQL\Types\Section as SectionObjectType;
 
 class Section extends BaseFactory {

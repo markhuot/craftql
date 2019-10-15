@@ -2,10 +2,6 @@
 
 namespace markhuot\CraftQL\Types;
 
-use GraphQL\Type\Definition\Type;
-use markhuot\CraftQL\Request;
-use markhuot\CraftQL\GraphQLFields\Query\Connection\Edges as EdgesField;
-use markhuot\CraftQL\Types\Entry;
 use markhuot\CraftQL\Builders\Schema;
 
 class EntryConnection extends Schema {

@@ -4,8 +4,6 @@ namespace markhuot\CraftQL\Console;
 
 use Craft;
 use GraphQL\Utils\SchemaPrinter;
-use React\EventLoop\Factory;
-use React\Socket\Server;
 use React\Http\Response;
 use React\Http\Server as HttpServer;
 use React\Promise\Promise;

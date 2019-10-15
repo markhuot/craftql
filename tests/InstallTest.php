@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use markhuot\CraftQL\Models\Token;
-use markhuot\CraftQL\Services\GraphQLService;
 
 /**
  * @covers Email

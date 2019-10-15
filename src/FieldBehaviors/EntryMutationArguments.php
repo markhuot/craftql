@@ -3,7 +3,6 @@
 namespace markhuot\CraftQL\FieldBehaviors;
 
 use craft\base\Element;
-use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
 use craft\helpers\DateTimeHelper;
 use markhuot\CraftQL\Behaviors\FieldBehavior;

@@ -5,10 +5,6 @@ namespace markhuot\CraftQL\Models;
 use Craft;
 use craft\db\ActiveRecord;
 use craft\records\User;
-use GraphQL\Type\Definition\ObjectType;
-use GraphQL\Type\Definition\InterfaceType;
-use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\Type;
 
 class Token extends ActiveRecord
 {

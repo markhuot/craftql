@@ -5,7 +5,6 @@ namespace markhuot\CraftQL\FieldBehaviors;
 use markhuot\CraftQL\Behaviors\SchemaBehavior;
 use markhuot\CraftQL\TypeModels\PageInfo;
 use markhuot\CraftQL\Types\CategoryConnection;
-use markhuot\CraftQL\Types\EntryConnection;
 
 class RelatedCategoriesField extends SchemaBehavior {
 

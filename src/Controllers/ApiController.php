@@ -4,10 +4,8 @@ namespace markhuot\CraftQL\Controllers;
 
 use Craft;
 use craft\web\Controller;
-use craft\records\User;
 use markhuot\CraftQL\CraftQL;
 use markhuot\CraftQL\Models\Token;
-use yii\web\ForbiddenHttpException;
 
 class ApiController extends Controller
 {
@@ -87,7 +85,7 @@ class ApiController extends Controller
             ]);
         }
 
-        Craft::trace('CraftQL: Parsing request');
+        Craft::debug('CraftQL: Parsing request');
         if (Craft::$app->request->isPost && $query=Craft::$app->request->post('query')) {
             $input = $query;
         }
@@ -149,7 +147,7 @@ class ApiController extends Controller
         }
 
         Craft::trace('CraftQL: Execution complete');
-
+      
         $customHeaders = CraftQL::getInstance()->getSettings()->headers ?: [];
         foreach ($customHeaders as $key => $value) {
             if (is_callable($value)) {
