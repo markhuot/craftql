@@ -1,3 +1,8 @@
+## Unreleased
+
+### Fixed
+- Fixed Craft 3.5 compatibility. ([#338](https://github.com/markhuot/craftql/issues/338))
+
 ## 1.3.4 - 2019-08-29
 
 ### Fixed
