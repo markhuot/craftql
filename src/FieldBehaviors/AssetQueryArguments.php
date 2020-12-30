@@ -12,7 +12,7 @@ class AssetQueryArguments extends FieldBehavior {
         $this->owner->addBooleanArgument('fixedOrder');
         $this->owner->addIntArgument('folderId');
         $this->owner->addIntArgument('height');
-        $this->owner->addIntArgument('id');
+        $this->owner->addIntArgument('id')->lists();
         $this->owner->addStringArgument('kind');
         $this->owner->addIntArgument('limit');
         $this->owner->addStringArgument('locale');
