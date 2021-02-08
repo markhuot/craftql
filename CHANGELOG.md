@@ -1,6 +1,12 @@
 ## Unreleased
 
-### Fixed
+## Unreleased
+
+- Fixed Craft 3.6 compatibility.
+- Updated graphql-php to v14.
+
+## 1.3.5 - 2020-08-14
+
 - Fixed Craft 3.5 compatibility. ([#338](https://github.com/markhuot/craftql/issues/338))
 
 ## 1.3.4 - 2019-08-29
