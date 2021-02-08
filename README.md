@@ -412,7 +412,7 @@ No software is ever done. There's a lot still to do in order to make _CraftQL_ f
 
 ## Requirements
 
-- Craft 3.2.0+
+- Craft 3.6.0+
 - PHP 7.0+
 
 ## Installation

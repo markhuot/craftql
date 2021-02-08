@@ -4,7 +4,7 @@ namespace markhuot\CraftQL\Services;
 
 use Craft;
 use GraphQL\GraphQL;
-use GraphQL\Error\Debug;
+use GraphQL\Error\DebugFlag;
 use GraphQL\Type\Schema;
 use GraphQL\Validator\DocumentValidator;
 use GraphQL\Validator\Rules\QueryComplexity;
@@ -128,7 +128,7 @@ class GraphQLService extends Component {
     }
 
     function execute($schema, $input, $variables = []) {
-        $debug = Craft::$app->config->getGeneral()->devMode ? Debug::INCLUDE_DEBUG_MESSAGE | Debug::RETHROW_INTERNAL_EXCEPTIONS : null;
+        $debug = Craft::$app->config->getGeneral()->devMode ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS : null;
         return GraphQL::executeQuery($schema, $input, null, null, $variables)->toArray($debug);
     }
 
