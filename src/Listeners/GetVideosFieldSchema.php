@@ -19,6 +19,7 @@ class GetVideosFieldSchema
         $schema = $event->schema;
 
         $object = $schema->createObjectType('Videos');
+        $object->addIntField('id');
         $object->addStringField('title');
         $object->addStringField('url');
         $embed = $object->addStringField('embed')
