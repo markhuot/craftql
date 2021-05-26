@@ -65,7 +65,7 @@ class GetCategoriesFieldSchema
                 ->type($inputObject)
                 ->lists()
                 ->onSave(function ($values) use ($groupId) {
-                    $group = Craft::$app->getCategories()->getGroupById($groupId);
+                    $group = Craft::$app->getCategories()->getGroupByUid($groupId);
 
                     foreach ($values as &$value) {
                         if (!empty($value['id']) && is_numeric($value['id'])) {
