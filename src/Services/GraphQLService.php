@@ -128,7 +128,7 @@ class GraphQLService extends Component {
     }
 
     function execute($schema, $input, $variables = []) {
-        $debug = Craft::$app->config->getGeneral()->devMode ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS : null;
+        $debug = Craft::$app->config->getGeneral()->devMode ? DebugFlag::INCLUDE_DEBUG_MESSAGE | DebugFlag::RETHROW_INTERNAL_EXCEPTIONS : 0;
         return GraphQL::executeQuery($schema, $input, null, null, $variables)->toArray($debug);
     }
 
