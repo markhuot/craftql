@@ -203,7 +203,10 @@ class Schema extends BaseBuilder {
         return $this->fields;
     }
 
-    function getField($name): BaseField {
+    /**
+     * @return BaseField|false
+     */
+    function getField($name) {
         foreach ($this->fields as $field) {
             if ($field->getName() == $name) {
                 return $field;
