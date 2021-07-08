@@ -111,21 +111,4 @@ class CraftQL extends Plugin
             'settings' => $this->getSettings()
         ]);
     }
-
-    /**
-     * Save the settings, some custom work here to make sure token names
-     * are saved correctly
-     */
-    public function setSettings(array $settings)
-    {
-        parent::setSettings($settings);
-
-        if (isset($_POST['settings']['token'])) {
-            foreach ($_POST['settings']['token'] as $tokenId => $values) {
-                $token = Token::find()->where(['id' => $tokenId])->one();
-                $token->name = @$values['name'];
-                $token->save();
-            }
-        }
-    }
 }

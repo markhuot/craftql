@@ -29,4 +29,23 @@ class Settings extends Model
         $tokens = Token::find()->where(['userId' => \Craft::$app->user->id])->all();
         return $tokens;
     }
+
+    /**
+     * Make sure token names are saved correctly along with this model.
+     * 
+     * @inheritdoc
+     */
+    public function beforeValidate()
+    {
+        if (isset($_POST['settings']['token'])) {
+            foreach ($_POST['settings']['token'] as $tokenId => $values) {
+                $token = Token::find()->where(['id' => $tokenId])->one();
+                $token->name = @$values['name'];
+                $token->save();
+            }
+        }
+
+        return parent::beforeValidate();
+    }
+
 }
