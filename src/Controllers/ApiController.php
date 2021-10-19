@@ -97,7 +97,7 @@ class ApiController extends Controller
         }
 
         if (Craft::$app->request->isPost && $query=Craft::$app->request->post('variables')) {
-            $variables = $query;
+            $variables = json_decode($query, true);
         }
         else if (Craft::$app->request->isGet && $query=Craft::$app->request->get('variables')) {
             $variables = json_decode($query, true);
