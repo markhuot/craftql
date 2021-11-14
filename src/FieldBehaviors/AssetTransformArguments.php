@@ -47,15 +47,15 @@ class AssetTransformArguments extends FieldBehavior {
         return static::$positionInputEnum = new EnumType([
             'name' => 'PositionInputEnum',
             'values' => [
-                'topLeft' => 'Top Left',
-                'topCenter' => 'Top Center',
-                'topRight' => 'Top Right',
-                'centerLeft' => 'Center Left',
-                'centerCenter' => 'Center Center',
-                'centerRight' => 'Center Right',
-                'bottomLeft' => 'Bottom Left',
-                'bottomCenter' => 'Bottom Center',
-                'bottomRight' => 'Bottom Right',
+                'topLeft' => 'top-left',
+                'topCenter' => 'top-center',
+                'topRight' => 'top-right',
+                'centerLeft' => 'center-left',
+                'centerCenter' => 'center-center',
+                'centerRight' => 'center-right',
+                'bottomLeft' => 'bottom-left',
+                'bottomCenter' => 'bottom-center',
+                'bottomRight' => 'bottom-right',
             ],
         ]);
     }
