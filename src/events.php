@@ -71,6 +71,11 @@ return [
             new \markhuot\CraftQL\Listeners\GetSuperTableFieldSchema,
         ],
     ],
+    \plugins\dolphiq\iconpicker\fields\Iconpicker::class => [
+        'craftQlGetFieldSchema' => [
+            new \markhuot\CraftQL\Listeners\GetIconPickerFieldSchema,
+        ],
+    ],
     \craft\fields\Table::class => [
         'craftQlGetFieldSchema' => [
             new \markhuot\CraftQL\Listeners\GetTableFieldSchema,
