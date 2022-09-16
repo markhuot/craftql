@@ -11,7 +11,7 @@
     "require": {
         "craftcms/cms": "^3.6.0",
         "webonyx/graphql-php": "^14.4.1",
-        "react/http": "^0.7"
+        "react/http": "^1.7"
     },
     "authors": [
         {
